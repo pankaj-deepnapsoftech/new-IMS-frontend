@@ -23,6 +23,7 @@ import {
 import BuyerDetails from "../components/Drawers/Buyer/BuyerDetails";
 import { AiFillFileExcel } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
+import { FiSearch } from "react-icons/fi";
 
 const Buyers: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -173,7 +174,7 @@ const Buyers: React.FC = () => {
   }
 
   return (
-    <div className=" bg-white shadow-2xl rounded-md mb-3 px-3">
+    <div className="rounded-md mb-3 px-3">
       {/* Add Buyer Drawer */}
       {isAddBuyerDrawerOpened && (
         <AddBuyer
@@ -197,16 +198,16 @@ const Buyers: React.FC = () => {
         />
       )}
       <div>
-        <h1 className="text-center font-[700] pb-4 text-2xl pt-2">
+        <h1 className="text-center font-[700] text-white pb-4 text-3xl pt-2">
           Buyers
         </h1>
 
         <div className="mt-2 flex flex-col md:flex-row justify-center gap-y-2 md:gap-y-0 gap-x-2 w-full">
           {/* Search */}
-          <textarea
-            className="rounded-[10px] w-full md:w-auto px-2 py-2 md:px-3 md:py-2 text-sm border resize-none"
-            rows={1}
-            placeholder="Search..."
+          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+          <input
+            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+            placeholder="Search roles..."
             value={searchKey}
             onChange={(e) => setSearchKey(e.target.value)}
           />
@@ -219,8 +220,8 @@ const Buyers: React.FC = () => {
             width={{ base: "100%", md: 100 }} 
             onClick={fetchBuyersHandler}
             leftIcon={<MdOutlineRefresh />}
-            color="#2D3748"
-            borderColor="#2D3748"
+            color="#fff"
+            borderColor="#fff"
             variant="outline"
             _hover={{ bg: "#2D3748", color: "white" }}
           >
@@ -235,8 +236,8 @@ const Buyers: React.FC = () => {
             width={{ base: "100%", md: 200 }} 
             onClick={openAddBuyerDrawerHandler}
             color="white"
-            backgroundColor="#2D3748"
-            _hover={{ bg: "#2D3748ba" }}
+            backgroundColor="#4b87a0d9"
+            _hover={{ bg: "#fff",textColor:"#000" }}
           >
             Add New Buyer
           </Button>
@@ -250,9 +251,9 @@ const Buyers: React.FC = () => {
               width="100%" 
               onClick={() => setShowBulkUploadMenu(true)}
               color="white"
-              backgroundColor="#2D3748"
+              backgroundColor="#4b87a0d9"
               rightIcon={<AiFillFileExcel size={22} />}
-              _hover={{ bg: "#2D3748ba" }}
+              _hover={{ bg: "#fff",textColor:"#000" }}
             >
               Bulk Upload
             </Button>

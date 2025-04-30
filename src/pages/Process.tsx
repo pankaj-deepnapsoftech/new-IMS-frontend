@@ -17,6 +17,7 @@ import AddProcess from "../components/Drawers/Process/AddProcess";
 import ProcessDetails from "../components/Drawers/Process/ProcessDetails";
 import UpdateProcess from "../components/Drawers/Process/UpdateProcess";
 import { useDeleteProcessMutation } from "../redux/api/api";
+import { FiSearch } from "react-icons/fi";
 
 const Process: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -159,17 +160,18 @@ const Process: React.FC = () => {
       )}
 
       <div>
-        <h1 className="text-center font-[700] text-[25px] pb-4">
+        <h1 className="text-center font-[700] text-white text-[30px] pb-4">
           Production Process
         </h1>
 
         <div className="mt-2  flex flex-wrap pb-4  justify-center  w-full gap-4">
-          <textarea
-            className="rounded-[10px] w-full md:w-fit px-2 py-2 md:px-3 md:py-2 text-sm focus:outline-[#2D3748] hover:outline:[#2D3748] border resize-none border-[#bbbbbb] bg-[#f9f9f9]" rows={1}
-            placeholder="Search"
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
+          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+                    <input
+                      className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+                      placeholder="Search roles..."
+                      value={searchKey}
+                      onChange={(e) => setSearchKey(e.target.value)}
+                    />
           <Button
             fontSize={{ base: "14px", md: "14px" }}
             paddingX={{ base: "10px", md: "12px" }}
@@ -177,7 +179,7 @@ const Process: React.FC = () => {
             width={{ base: "-webkit-fill-available", md: 230 }}
             onClick={openAddProcessDrawerHandler}
             color="white"
-            backgroundColor="#2D3748"
+            backgroundColor="#4b87a0d9"
             _hover={{ bg: "#2e2e4f" }}
           >
             Add New Production Process
@@ -189,8 +191,8 @@ const Process: React.FC = () => {
             width={{ base: "-webkit-fill-available", md: 100 }}
             onClick={fetchProcessHandler}
             leftIcon={<MdOutlineRefresh />}
-            color="#2D3748"
-            borderColor="#2D3748"
+            color="white"
+            borderColor="white"
             variant="outline"
             _hover={{ bg: "#2D3748", color: "white" }}  
           >

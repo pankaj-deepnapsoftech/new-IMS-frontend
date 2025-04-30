@@ -24,6 +24,7 @@ import {
 import AddProduct from "../components/Drawers/Product/AddProduct";
 import UpdateProduct from "../components/Drawers/Product/UpdateProduct";
 import ProductDetails from "../components/Drawers/Product/ProductDetails";
+import { FiSearch } from "react-icons/fi";
 
 const IndirectProducts: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -173,6 +174,33 @@ const IndirectProducts: React.FC = () => {
     }
   };
 
+  const customStyles = {
+    control: (base: any) => ({
+      ...base,
+      backgroundColor: "#ffffff3b",
+      border: "none",
+      color: "#444e5b",
+    }),
+    menu: (base: any) => ({
+      ...base,
+      backgroundColor: "#444e5b",
+      color: "white",
+    }),
+    singleValue: (base: any) => ({
+      ...base,
+      color: "white",
+    }),
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isFocused ? "#236fd9" : "#444e5b",
+      color: "white",
+    }),
+    placeholder: (base: any) => ({
+      ...base,
+      color: "white", // 👈 set placeholder text color to gray
+    }),
+  };
+
   useEffect(() => {
     fetchProductsHandler();
     fetchAllStores();
@@ -251,16 +279,16 @@ const IndirectProducts: React.FC = () => {
 
       {/* Products Page */}
       <div>
-        <h1 className="text-center font-[700] text-[25px] pb-4">
+        <h1 className="text-center font-[700] text-white text-[30px] pb-4">
           Inventory
         </h1>
         {/* Main Button Row */}
         <div className="mt-2 w-full flex flex-col md:flex-wrap md:flex-row gap-2 md:gap-4 justify-center px-4 pb-4">
           {/* Search */}
-          <textarea
-            className="rounded-[10px] w-full md:w-auto px-3 py-2 text-sm focus:outline-[#2D3748] border resize-none border-[#bbbbbb] bg-[#f9f9f9]"
-            rows={1}
-            placeholder="Search..."
+          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+          <input
+            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+            placeholder="Search roles..."
             value={searchKey}
             onChange={(e) => setSearchKey(e.target.value)}
           />
@@ -268,7 +296,7 @@ const IndirectProducts: React.FC = () => {
           {/* Add Product */}
           <button
             onClick={openAddProductDrawerHandler}
-            className="text-white bg-[#2D3748] hover:bg-[#2e2e4f] text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] transition-all"
+            className="text-white bg-[#4b87a0d9] hover:bg-[#fff] hover:text-black text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] transition-all"
           >
             Add New Product
           </button>
@@ -276,7 +304,7 @@ const IndirectProducts: React.FC = () => {
           {/* Refresh */}
           <button
             onClick={fetchProductsHandler}
-            className="text-[#2D3748] border border-[#2D3748] hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
+            className="text-[#fff] border border-[#fff] hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
           >
             <MdOutlineRefresh className="text-base" />
             Refresh
@@ -285,7 +313,7 @@ const IndirectProducts: React.FC = () => {
           {/* Bulk Upload Button */}
           <button
             onClick={() => setShowBulkUploadMenu(true)}
-            className="text-white bg-[#2D3748] hover:bg-[#2e2e4f] text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] flex justify-between items-center gap-2 transition-all"
+            className="text-white bg-[#4b87a0d9] hover:bg-[#fff] hover:text-black text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] flex justify-between items-center gap-2 transition-all"
           >
             Bulk Upload
             <AiFillFileExcel size={22} />
@@ -341,7 +369,52 @@ const IndirectProducts: React.FC = () => {
 
 
       </div>
-      <div className="flex justify-start items-center gap-2 mb-2">
+
+         <div className="flex justify-start items-center gap-2 mb-2">
+                <FormControl width={"-webkit-max-content"}>
+                  <FormLabel fontWeight="bold" marginBottom={0} textColor="#fbfbfb">
+                    Products/Services
+                  </FormLabel>
+                  <select
+                    value={productServiceFilter}
+                    onChange={(e) => setProductServiceFilter(e.target.value)}
+                    className="w-[200px] mt-2 rounded border text-white bg-[#ffffff3b] border-none py-2 px-2"
+                  >
+                    <option
+                      style={{ backgroundColor: "#444e5b", color: "white" }}
+                      value=""
+                    >
+                      All
+                    </option>
+                    <option
+                      style={{ backgroundColor: "#444e5b", color: "white" }}
+                      value="product"
+                    >
+                      Products
+                    </option>
+                    <option
+                      style={{ backgroundColor: "#444e5b", color: "white" }}
+                      value="service"
+                    >
+                      Services
+                    </option>
+                  </select>
+                </FormControl>
+                <FormControl width={"-webkit-max-content"}>
+                  <FormLabel textColor="#fbfbfb" fontWeight="bold">
+                    Store
+                  </FormLabel>
+                  <Select
+                    className="w-[200px] mt-2 "
+                    styles={customStyles}
+                    options={storeOptions}
+                    value={storeFilter}
+                    onChange={(d: any) => setStoreFilter(d)}
+                  />
+                </FormControl>
+              </div>
+
+      {/* <div className="flex justify-start items-center gap-2 mb-2">
         <FormControl width={"-webkit-max-content"}>
           <FormLabel fontWeight="bold" marginBottom={0}>
             Products/Services
@@ -365,7 +438,7 @@ const IndirectProducts: React.FC = () => {
             onChange={(d: any) => setStoreFilter(d)}
           />
         </FormControl>
-      </div>
+      </div> */}
 
       <div>
         <ProductTable

@@ -54,7 +54,7 @@ const Layout: React.FC = () => {
           style={{ boxShadow: "0 0 20px 3px #96beee26" }}
         >
         </div>
-        <div className="flex-1  w-[100%] overflow-auto ">
+        <div className="flex-1  w-[100%] overflow-auto scrollbar-hidden ">
           <Navigation />
           <Container>
             <Outlet />

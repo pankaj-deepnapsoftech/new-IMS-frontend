@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import ScrapTable from "../components/Table/ScrapTable";
 import { toast } from "react-toastify";
+import { FiSearch } from "react-icons/fi";
 
 const Scrap: React.FC = () => {
   const [cookies] = useCookies();
@@ -67,18 +68,18 @@ const Scrap: React.FC = () => {
   return (
     <div className=" mx-2 rounded-md h-full ">
       <div>
-        <h1 className="text-center font-[700] pb-4 text-2xl pt-2">
+        <h1 className="text-center font-[700] text-white pb-6 text-3xl pt-2">
           Scrap Management
         </h1>
 
         <div className="mt-2  flex justify-center gap-y-1 it gap-x-2 w-full">
-          <textarea
-            className="rounded-[10px]  px-2 py-2 md:px-3 md:py-2 text-sm  border resize-none"
-            rows={1}
-            placeholder="Search"
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
+        <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+      <input
+        className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+        placeholder="Search roles..."
+        value={searchKey}
+        onChange={(e) => setSearchKey(e.target.value)}
+      />
           <Button
             fontSize={{ base: "14px", md: "14px" }}
             paddingX={{ base: "10px", md: "12px" }}
@@ -86,8 +87,8 @@ const Scrap: React.FC = () => {
             width={{ base: "-webkit-fill-available", md: 100 }}
             onClick={fetchScrapHandler}
             leftIcon={<MdOutlineRefresh />}
-            color="#2D3748"
-            borderColor="#2D3748"
+            color="white"
+            borderColor="white"
             variant="outline"
             _hover={{ bg: "#2D3748", color: "white" }}
           >

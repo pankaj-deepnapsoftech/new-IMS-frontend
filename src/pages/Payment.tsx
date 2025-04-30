@@ -13,6 +13,7 @@ import {
 } from "../redux/reducers/drawersSlice";
 import PaymentDetails from "../components/Drawers/Payment/PaymentDetails";
 import UpdatePayment from "../components/Drawers/Payment/UpdatePayment";
+import { FiSearch } from "react-icons/fi";
 
 const Payment: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -109,7 +110,7 @@ const Payment: React.FC = () => {
   }
 
   return (
-    <div className=" rounded-md  px-4 bg-white shadow-sm pb-4 pt-2 ">
+    <div className=" rounded-md  px-4  pb-4 pt-2 ">
       {isPaymentDetailsDrawerOpened && (
         <PaymentDetails
           closeDrawerHandler={closePaymentDetailsDrawerHandler}
@@ -125,20 +126,20 @@ const Payment: React.FC = () => {
       )}
 
       <div>
-        <h1 className=" text-[25px] text-center pb-4 font-[700]">Payments</h1>
+        <h1 className=" text-[35px] text-center text-white pb-4 font-[700]">Payments</h1>
 
         <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3 w-full px-4 md:px-10 mt-2">
-          <textarea
-            className="rounded-[10px] w-full md:w-auto px-3 py-2 text-sm border resize-none focus:outline-none border-[#c7c6c6ad]"
-            rows={1}
-            placeholder="Search"
+        <FiSearch className="relative left-10 top-2 transform -translate-y-1/2 text-gray-200" />
+          <input
+            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+            placeholder="Search roles..."
             value={searchKey}
             onChange={(e) => setSearchKey(e.target.value)}
           />
 
           <button
             onClick={fetchPaymentsHandler}
-            className="text-[#2D3748] border border-[#2D3748] hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
+            className="text-white border border-white hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
           >
             <MdOutlineRefresh className="text-base" />
             Refresh

@@ -19,6 +19,7 @@ import AgentTable from "../components/Table/AgentTable";
 import BOMTable from "../components/Table/BOMTable";
 import BOMRawMaterialTable from "../components/Table/BOMRawMaterialTable";
 import { useSelector } from "react-redux";
+import { FiSearch } from "react-icons/fi";
 
 const Approvals: React.FC = () => {
   const [cookies] = useCookies();
@@ -501,20 +502,26 @@ const Approvals: React.FC = () => {
   }, [bomSearchKey]);
 
   if (!isAllowed) {
-    return <div className="text-center text-red-500">You are not allowed to access this route.</div>
+    return (
+      <div className="text-center text-red-500">
+        You are not allowed to access this route.
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
       {/* PRODUCTS */}
-      <div className="bg-white shadow-sm rounded-md mb-3">
+      <div className="rounded-md mb-3">
         <div>
-          <h1 className="text-center font-[700] pb-4 text-2xl pt-2">Products for Approval</h1>
+          <h1 className="text-center text-white font-[700] pb-6 text-2xl pt-2">
+            Products for Approval
+          </h1>
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
-            <textarea
-              className="rounded-[10px] px-2 py-2 md:px-3 md:py-2 text-sm border resize-none  md:w-[220px]"
-              rows={1}
-              placeholder="Search"
+          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+          <input
+            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+            placeholder="Search roles..."
               value={productSearchKey}
               onChange={(e) => setProductSearchKey(e.target.value)}
             />
@@ -522,11 +529,10 @@ const Approvals: React.FC = () => {
               fontSize={{ base: "14px", md: "14px" }}
               paddingX={{ base: "10px", md: "12px" }}
               paddingY={{ base: "0", md: "3px" }}
-              
               onClick={fetchUnapprovedProductsHandler}
               leftIcon={<MdOutlineRefresh />}
-              color="#2D3748"
-              borderColor="#2D3748"
+               color="#ffff"
+            borderColor="#fff"
               variant="outline"
               _hover={{ bg: "#2D3748", color: "white" }}
             >
@@ -545,14 +551,16 @@ const Approvals: React.FC = () => {
       </div>
 
       {/* STORES */}
-      <div className="bg-white shadow-sm rounded-md mb-3">
+      <div className=" rounded-md mb-3">
         <div>
-          <h1 className="text-center font-[700] pb-4 text-2xl pt-2">Stores for Approval</h1>
+          <h1 className="text-center text-white pb-6 font-[700]  text-2xl pt-10">
+            Stores for Approval
+          </h1>
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
-            <textarea
-              className="rounded-[10px] px-2 py-2 md:px-3 md:py-2 text-sm border resize-none  md:w-[220px]"
-              rows={1}
-              placeholder="Search"
+          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+                    <input
+                      className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+                      placeholder="Search roles..."
               value={storeSearchKey}
               onChange={(e) => setStoreSearchKey(e.target.value)}
             />
@@ -562,8 +570,8 @@ const Approvals: React.FC = () => {
               paddingY={{ base: "0", md: "3px" }}
               onClick={fetchUnapprovedStoresHandler}
               leftIcon={<MdOutlineRefresh />}
-              color="#2D3748"
-              borderColor="#2D3748"
+               color="#ffff"
+            borderColor="#fff"
               variant="outline"
               _hover={{ bg: "#2D3748", color: "white" }}
             >
@@ -582,14 +590,16 @@ const Approvals: React.FC = () => {
       </div>
 
       {/* BUYERS */}
-      <div className="bg-white shadow-sm rounded-md mb-3">
+      <div className=" rounded-md mb-3">
         <div>
-          <h1 className="text-center font-[700] pb-4 text-2xl pt-2">Buyers for Approval</h1>
+          <h1 className="text-center text-white font-[700] pb-6 text-2xl pt-10">
+            Buyers for Approval
+          </h1>
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
-            <textarea
-              className="rounded-[10px] px-2 py-2 md:px-3 md:py-2 text-sm border resize-none  md:w-[220px]"
-              rows={1}
-              placeholder="Search"
+          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+                    <input
+                      className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+                      placeholder="Search roles..."
               value={buyerSearchKey}
               onChange={(e) => setBuyerSearchKey(e.target.value)}
             />
@@ -597,11 +607,10 @@ const Approvals: React.FC = () => {
               fontSize={{ base: "14px", md: "14px" }}
               paddingX={{ base: "10px", md: "12px" }}
               paddingY={{ base: "0", md: "3px" }}
-            
               onClick={fetchUnapprovedBuyersHandler}
               leftIcon={<MdOutlineRefresh />}
-              color="#2D3748"
-              borderColor="#2D3748"
+               color="#ffff"
+            borderColor="#fff"
               variant="outline"
               _hover={{ bg: "#2D3748", color: "white" }}
             >
@@ -620,14 +629,16 @@ const Approvals: React.FC = () => {
       </div>
 
       {/* SELLERS */}
-      <div className="bg-white shadow-sm rounded-md mb-3">
+      <div className=" rounded-md mb-3">
         <div>
-          <h1 className="text-center font-[700] pb-4 text-2xl pt-2">Suppliers for Approval</h1>
+          <h1 className="text-center font-[700] text-white pb-6 text-2xl pt-10">
+            Suppliers for Approval
+          </h1>
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
-            <textarea
-              className="rounded-[10px] px-2 py-2 md:px-3 md:py-2 text-sm border resize-none  md:w-[220px]"
-              rows={1}
-              placeholder="Search"
+           <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+                     <input
+                       className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+                       placeholder="Search roles..."
               value={sellerSearchKey}
               onChange={(e) => setSellerSearchKey(e.target.value)}
             />
@@ -635,11 +646,10 @@ const Approvals: React.FC = () => {
               fontSize={{ base: "14px", md: "14px" }}
               paddingX={{ base: "10px", md: "12px" }}
               paddingY={{ base: "0", md: "3px" }}
-              
               onClick={fetchUnapprovedSellersHandler}
               leftIcon={<MdOutlineRefresh />}
-              color="#2D3748"
-              borderColor="#2D3748"
+              color="#ffff"
+            borderColor="#fff"
               variant="outline"
               _hover={{ bg: "#2D3748", color: "white" }}
             >
@@ -658,14 +668,16 @@ const Approvals: React.FC = () => {
       </div>
 
       {/* BOMs */}
-      <div className="bg-white shadow-sm rounded-md mb-3">
+      <div className=" rounded-md mb-3">
         <div>
-          <h1 className="text-center font-[700] pb-4 text-2xl pt-2">BOMs for Approval</h1>
+          <h1 className="text-center font-[700] pb-6 text-white text-2xl pt-10">
+            BOMs for Approval
+          </h1>
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
-            <textarea
-              className="rounded-[10px] px-2 py-2 md:px-3 md:py-2 text-sm border resize-none  md:w-[220px]"
-              rows={1}
-              placeholder="Search"
+           <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+                     <input
+                       className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+                       placeholder="Search roles..."
               value={bomSearchKey}
               onChange={(e) => setBomSearchKey(e.target.value)}
             />
@@ -673,11 +685,10 @@ const Approvals: React.FC = () => {
               fontSize={{ base: "14px", md: "14px" }}
               paddingX={{ base: "10px", md: "12px" }}
               paddingY={{ base: "0", md: "3px" }}
-              
               onClick={fetchUnapprovedBomsHandler}
               leftIcon={<MdOutlineRefresh />}
-              color="#2D3748"
-              borderColor="#2D3748"
+              color="#ffff"
+            borderColor="#fff"
               variant="outline"
               _hover={{ bg: "#2D3748", color: "white" }}
             >
@@ -696,14 +707,16 @@ const Approvals: React.FC = () => {
       </div>
 
       {/* BOM Raw Materials */}
-      <div className="bg-white shadow-sm rounded-md">
+      <div className="rounded-md">
         <div>
-          <h1 className="text-center font-[700] pb-4 text-2xl pt-2">Inventory for Approval</h1>
+          <h1 className="text-center font-[700] text-white pb-6 text-2xl pt-10">
+            Inventory for Approval
+          </h1>
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
-            <textarea
-              className="rounded-[10px] px-2 py-2 md:px-3 md:py-2 text-sm border resize-none  md:w-[220px]"
-              rows={1}
-              placeholder="Search"
+            <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+            <input
+              className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              placeholder="Search roles..."
               value={bomRMSearchKey}
               onChange={(e) => setBomRMSearchKey(e.target.value)}
             />
@@ -711,11 +724,10 @@ const Approvals: React.FC = () => {
               fontSize={{ base: "14px", md: "14px" }}
               paddingX={{ base: "10px", md: "12px" }}
               paddingY={{ base: "0", md: "3px" }}
-              
               onClick={fetchUnapprovedBomRMsHandler}
               leftIcon={<MdOutlineRefresh />}
-              color="#2D3748"
-              borderColor="#2D3748"
+             color="#ffff"
+            borderColor="#fff"
               variant="outline"
               _hover={{ bg: "#2D3748", color: "white" }}
             >
@@ -732,8 +744,6 @@ const Approvals: React.FC = () => {
         </div>
       </div>
     </div>
-
-
   );
 };
 

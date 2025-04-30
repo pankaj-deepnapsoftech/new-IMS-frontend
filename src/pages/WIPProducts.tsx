@@ -20,6 +20,7 @@ import AddProduct from "../components/Drawers/Product/AddProduct";
 import UpdateProduct from "../components/Drawers/Product/UpdateProduct";
 import ProductDetails from "../components/Drawers/Product/ProductDetails";
 import WIPProductTable from "../components/Table/WIPProductTable";
+import { FiSearch } from "react-icons/fi";
 
 const WIPProducts: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -213,7 +214,7 @@ const WIPProducts: React.FC = () => {
   }
 
   return (
-    <div className=" bg-white shadow-2xl  mx-2 rounded-md h-full">
+    <div className="  mx-2 rounded-md h-full">
       {/* Add Product Drawer */}
       {isAddProductDrawerOpened && (
         <AddProduct
@@ -239,19 +240,19 @@ const WIPProducts: React.FC = () => {
 
       {/* Products Page */}
       <div>
-        <h1 className=" text-center font-[700] pb-4 text-2xl pt-2">
+        <h1 className="  text-center text-white font-[800] pb-6 text-3xl pt-2">
           WIP (Work In Progress) Inventory
         </h1>
 
         <div className="mt-2 flex flex-col md:flex-row justify-center items-center gap-2 px-4">
           {/* Search Box */}
-          <textarea
-            className=" md:w-auto rounded-[10px] px-3 py-2 text-sm border resize-none focus:outline-[#2D3748] border-[#bbbbbb] bg-[#f9f9f9]"
-            rows={1}
-            placeholder="Search"
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
+          <FiSearch className="relative left-10 top-2 transform -translate-y-1/2 text-gray-200" />
+      <input
+        className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+        placeholder="Search roles..."
+        value={searchKey}
+        onChange={(e) => setSearchKey(e.target.value)}
+      />
 
           {/* Refresh Button */}
           <Button
@@ -261,10 +262,10 @@ const WIPProducts: React.FC = () => {
             width={{ base: "100%", md: "100px" }}
             onClick={fetchProductsHandler}
             leftIcon={<MdOutlineRefresh />}
-            color="#2D3748"
-            borderColor="#2D3748"
+            color="white"
+            borderColor="white"
             variant="outline"
-            _hover={{ bg: "#2D3748", color: "white" }}
+            _hover={{ bg: "#2D3748" }}
           >
             Refresh
           </Button>

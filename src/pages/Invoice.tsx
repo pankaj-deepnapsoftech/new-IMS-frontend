@@ -20,6 +20,7 @@ import AddInvoice from "../components/Drawers/Invoice/AddInvoice";
 import InvoiceDetails from "../components/Drawers/Invoice/InvoiceDetails";
 import UpdateInvoice from "../components/Drawers/Invoice/UpdateInvoice";
 import AddPayment from "../components/Drawers/Payment/AddPayment";
+import { FiSearch } from "react-icons/fi";
 
 const Invoice: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -146,7 +147,7 @@ const Invoice: React.FC = () => {
   }
 
   return (
-    <div className=" rounded-md  px-4 bg-white shadow-sm pb-4 ">
+    <div className=" rounded-md  px-4  pb-4 ">
       {isAddInvoiceDrawerOpened && (
         <AddInvoice
           closeDrawerHandler={closeAddInvoiceDrawerHandler}
@@ -171,25 +172,26 @@ const Invoice: React.FC = () => {
       )}
 
       <div className="">
-        <h1 className=" text-[25px] text-center pb-4 font-[700]">Invoices</h1>
+        <h1 className=" text-[35px] text-center text-white pb-6 font-[700]">Invoices</h1>
 
         <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3 w-full px-4 md:px-10 mt-2">
+        <FiSearch className="relative left-10 top-2 transform -translate-y-1/2 text-gray-200" />
           <input
-            className="rounded-[10px] border border-gray-300 focus:outline-none px-3 py-2 text-sm w-full md:w-auto"
-            placeholder="Search"
+            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+            placeholder="Search roles..."
             value={searchKey}
             onChange={(e) => setSearchKey(e.target.value)}
           />
           <button
             onClick={openAddInvoiceDrawerHandler}
-            className="text-white bg-[#2D3748] hover:bg-[#2e2e4f] text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] transition-all"
+            className="text-white bg-[#4b87a0d9] hover:bg-[#ffff] hover:text-black text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] transition-all"
           >
             Add New Invoice
           </button>
 
           <button
             onClick={fetchInvoiceHandler}
-            className="text-[#2D3748] border border-[#2D3748] hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
+            className="text-[#fff] border border-[#fff] hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
           >
             <MdOutlineRefresh className="text-base" />
             Refresh

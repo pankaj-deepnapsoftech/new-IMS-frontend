@@ -10,6 +10,7 @@ import { MdOutlineRefresh } from "react-icons/md";
 import { useDeleteProformaInvoiceMutation } from "../redux/api/api";
 import ProformaInvoiceDetails from "../components/Drawers/Proforma Invoice/ProformaInvoiceDetails";
 import UpdateProformaInvoice from "../components/Drawers/Proforma Invoice/UpdateProformaInvoice";
+import { FiSearch } from "react-icons/fi";
 
 const ProformaInvoice: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -120,7 +121,7 @@ const ProformaInvoice: React.FC = () => {
   }
 
   return (
-    <div className=" bg-white shadow-sm pb-4  rounded-md h-full">
+    <div className="  pb-4  rounded-md h-full">
 
       {isAddProformaInvoiceDrawerOpened && <AddProformaInvoice closeDrawerHandler={closeAddProformaInvoiceDrawerHandler} fetchProformaInvoicesHandler={fetchProformaInvoiceHandler} />}
       {isProformaInvoiceDetailsDrawerOpened && <ProformaInvoiceDetails closeDrawerHandler={closeProformaInvoiceDetailsDrawerHandler} id={id} />}
@@ -128,26 +129,26 @@ const ProformaInvoice: React.FC = () => {
 
       <div>
 
-        <h1 className=" text-center font-[700] pb-4 text-2xl pt-2"> Proforma Invoices</h1>
+        <h1 className=" text-center font-[700] pb-6 text-white text-3xl pt-2"> Proforma Invoices</h1>
 
         <div className="mt-2 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-2 px-4 md:px-10">
-          <textarea
-            className="rounded-[10px] w-full md:w-auto px-3 py-2 text-sm border resize-none bg-white"
-            rows={1}
-            placeholder="Search"
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
+        <FiSearch className="relative left-10 top-2 transform -translate-y-1/2 text-gray-200" />
+      <input
+        className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+        placeholder="Search roles..."
+        value={searchKey}
+        onChange={(e) => setSearchKey(e.target.value)}
+      />
 
           <button
-            className="text-white bg-[#2D3748] hover:bg-[#2d3748c9] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[210px] transition-all"
+            className="text-white bg-[#4b87a0d9] hover:bg-[#2d3748c9] hover:text-black hover:bg-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[210px] transition-all"
             onClick={openAddProformaInvoiceDrawerHandler}
           >
             Add New Proforma Invoice
           </button>
 
           <button
-            className="text-[#2D3748] border border-[#2D3748] hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
+            className="text-[white] border border-[white] hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
             onClick={fetchProformaInvoiceHandler}
           >
             <MdOutlineRefresh className="text-base" />

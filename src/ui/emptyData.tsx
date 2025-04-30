@@ -12,7 +12,7 @@ const EmptyData = () => {
 
         {/* Empty state message */}
         <div className="space-y-2">
-          <h3 className="text-lg font-medium text-gray-900">
+          <h3 className="text-lg font-medium text-[#fbfbfb]">
             No data available
           </h3>
           <p className="max-w-sm text-sm text-gray-100">

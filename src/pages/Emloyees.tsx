@@ -136,20 +136,20 @@ const Employees: React.FC = () => {
 
       {/* Employees Page */}
       <div className="  justify-start gap-y-1 ">
-        <div className=" text-center  md:text-2xl font-bold items-center gap-y-1">
-          <h1 className="text-[30px]">Employees</h1>
+        <div className=" text-center  md:text-2xl text-white font-bold items-center gap-y-1">
+          <h1 className="text-[30px] pb-6">Employees</h1>
         </div>
         <br />
-        <div className="flex justify-center gap-4   ">
+        <div className="flex justify-center gap-4 ">
           {/* Search Wrapper */}
           <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
-            <input
-              className="pl-10 pr-4 py-2 w-full text-sm rounded-[5px] border border-gray-300 bg-white shadow-sm focus:outline-none"
-              placeholder="Search roles..."
-              value={searchKey}
-              onChange={(e) => setSearchKey(e.target.value)}
-            />
+          <FiSearch className="absolute left-2 top-5 transform -translate-y-1/2 text-gray-200 "  />
+          <input
+            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+            placeholder="Search roles..."
+            value={searchKey}
+            onChange={(e) => setSearchKey(e.target.value)}
+          />
           </div>
 
           {/* Refresh Button */}
@@ -159,10 +159,10 @@ const Employees: React.FC = () => {
             paddingY={{ base: "5px", md: "3px" }}
             onClick={fetchEmployeesHandler}
             leftIcon={<MdOutlineRefresh />}
-            color="#2e2e4f"
-            borderColor="#2e2e4f"
+            color="#fff"
+            borderColor="#fff"
             variant="outline"
-            className="whitespace-nowrap"
+            className="whitespace-nowrap "
             _hover={{ bg: "#2D3748", color: "white" }}
           >
             Refresh

@@ -3,7 +3,7 @@ import Select from "react-select";
 import { MdOutlineRefresh } from "react-icons/md";
 import { AiFillFileExcel } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
-import SampleCSV from '../assets/csv/product-sample.csv';
+import SampleCSV from "../assets/csv/product-sample.csv";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   useDeleteProductMutation,
@@ -25,6 +25,8 @@ import {
 import AddProduct from "../components/Drawers/Product/AddProduct";
 import UpdateProduct from "../components/Drawers/Product/UpdateProduct";
 import ProductDetails from "../components/Drawers/Product/ProductDetails";
+import { FiSearch } from "react-icons/fi";
+import Placeholder from "react-select/dist/declarations/src/components/Placeholder";
 
 const Products: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -174,6 +176,33 @@ const Products: React.FC = () => {
     }
   };
 
+  const customStyles = {
+    control: (base: any) => ({
+      ...base,
+      backgroundColor: "#ffffff3b",
+      border: "none",
+      color: "#444e5b",
+    }),
+    menu: (base: any) => ({
+      ...base,
+      backgroundColor: "#444e5b",
+      color: "white",
+    }),
+    singleValue: (base: any) => ({
+      ...base,
+      color: "white",
+    }),
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isFocused ? "#236fd9" : "#444e5b",
+      color: "white",
+    }),
+    placeholder: (base: any) => ({
+      ...base,
+      color: "white", // 👈 set placeholder text color to gray
+    }),
+  };
+
   useEffect(() => {
     fetchProductsHandler();
     fetchAllStores();
@@ -184,10 +213,10 @@ const Products: React.FC = () => {
     // // @ts-ignore
     const results = data.filter(
       (prod: any) =>
-        (prod.product_or_service?.toLowerCase().includes(productServiceFilter) &&
-          (storeFilter &&
-            (storeFilter?.value === "" ||
-              prod?.store?._id === storeFilter?.value))) &&
+        prod.product_or_service?.toLowerCase().includes(productServiceFilter) &&
+        storeFilter &&
+        (storeFilter?.value === "" ||
+          prod?.store?._id === storeFilter?.value) &&
         (prod.name?.toLowerCase()?.includes(searchTxt) ||
           prod.product_id?.toLowerCase()?.includes(searchTxt) ||
           prod.category?.toLowerCase()?.includes(searchTxt) ||
@@ -222,7 +251,11 @@ const Products: React.FC = () => {
   }, [searchKey, productServiceFilter, storeFilter]);
 
   if (!isAllowed) {
-    return <div className="text-center text-red-500">You are not allowed to access this route.</div>
+    return (
+      <div className="text-center text-red-500">
+        You are not allowed to access this route.
+      </div>
+    );
   }
 
   return (
@@ -252,17 +285,17 @@ const Products: React.FC = () => {
 
       {/* Products Page */}
       <div>
-        <h1 className="text-center pb-4 text-[25px] font-[600] ">
-          Inventory
+        <h1 className="text-center text-white pb-6 text-[30px] font-[600] ">
+          Direct Inventory
         </h1>
 
         {/* Main Row */}
         <div className="mt-2 w-full flex flex-col md:flex-row md:flex-wrap justify-center gap-3 px-4 pb-4">
           {/* Search */}
-          <textarea
-            className="rounded-[10px] w-full md:w-auto px-3 py-2 text-sm focus:outline-[#2D3748] border resize-none border-[#bbbbbb] bg-[#f9f9f9]"
-            rows={1}
-            placeholder="Search"
+          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+          <input
+            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+            placeholder="Search roles..."
             value={searchKey}
             onChange={(e) => setSearchKey(e.target.value)}
           />
@@ -275,8 +308,8 @@ const Products: React.FC = () => {
             width={{ base: "100%", md: "200px" }}
             onClick={openAddProductDrawerHandler}
             color="white"
-            backgroundColor="#2D3748"
-            _hover={{ bg: "#2e2e4f" }}
+            backgroundColor="#4b87a0d9"
+            _hover={{ bg: "white", textColor: "black" }}
           >
             Add New Product
           </Button>
@@ -289,8 +322,8 @@ const Products: React.FC = () => {
             width={{ base: "100%", md: "100px" }}
             onClick={fetchProductsHandler}
             leftIcon={<MdOutlineRefresh />}
-            color="#2D3748"
-            borderColor="#2D3748"
+            color="white"
+            borderColor="white"
             variant="outline"
             _hover={{ bg: "#2D3748", color: "white" }}
           >
@@ -305,8 +338,8 @@ const Products: React.FC = () => {
             width={{ base: "100%", md: "200px" }}
             onClick={() => setShowBulkUploadMenu(true)}
             color="white"
-            backgroundColor="#2D3748"
-            _hover={{ bg: "#2e2e4f" }}
+            backgroundColor="#4b87a0d9"
+            _hover={{ bg: "white", textColor: "black" }}
             rightIcon={<AiFillFileExcel size={22} />}
           >
             Bulk Upload
@@ -372,27 +405,44 @@ const Products: React.FC = () => {
             </form>
           </div>
         )}
-
       </div>
       <div className="flex justify-start items-center gap-2 mb-2">
         <FormControl width={"-webkit-max-content"}>
-          <FormLabel fontWeight="bold" marginBottom={0}>
+          <FormLabel fontWeight="bold" marginBottom={0} textColor="#fbfbfb">
             Products/Services
           </FormLabel>
           <select
             value={productServiceFilter}
-            onChange={(e: any) => setProductServiceFilter(e.target.value)}
-            className="w-[200px] mt-2 rounded border border-[#a9a9a9] py-2 px-2"
+            onChange={(e) => setProductServiceFilter(e.target.value)}
+            className="w-[200px] mt-2 rounded border text-white bg-[#ffffff3b] border-none py-2 px-2"
           >
-            <option value="">All</option>
-            <option value="product">Products</option>
-            <option value="service">Services</option>
+            <option
+              style={{ backgroundColor: "#444e5b", color: "white" }}
+              value=""
+            >
+              All
+            </option>
+            <option
+              style={{ backgroundColor: "#444e5b", color: "white" }}
+              value="product"
+            >
+              Products
+            </option>
+            <option
+              style={{ backgroundColor: "#444e5b", color: "white" }}
+              value="service"
+            >
+              Services
+            </option>
           </select>
         </FormControl>
         <FormControl width={"-webkit-max-content"}>
-          <FormLabel fontWeight="bold">Store</FormLabel>
+          <FormLabel textColor="#fbfbfb" fontWeight="bold">
+            Store
+          </FormLabel>
           <Select
-            className="w-[200px] rounded mt-2 border border-[#a9a9a9]"
+            className="w-[200px] mt-2 "
+            styles={customStyles}
             options={storeOptions}
             value={storeFilter}
             onChange={(d: any) => setStoreFilter(d)}

@@ -23,6 +23,7 @@ import {
 import SellerDetails from "../components/Drawers/Seller/SellerDetails";
 import { AiFillFileExcel } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
+import { FiSearch } from "react-icons/fi";
 
 const Sellers: React.FC = () => {
   const [sellerId, setSellerId] = useState<string | undefined>();
@@ -165,7 +166,7 @@ const Sellers: React.FC = () => {
   }, [searchKey]);
 
   return (
-    <div className=" bg-white shadow-2xl rounded-md mb-3 px-3">
+    <div className="  rounded-md mb-3 px-3">
       {/* Add Seller */}
       {isAddSellerDrawerOpened && (
         <AddSeller
@@ -190,20 +191,19 @@ const Sellers: React.FC = () => {
       )}
 
       <div>
-        <h1 className="text-center font-[700] pb-4 text-2xl pt-2">
+        <h1 className="text-center text-white font-[800] pb-6 text-3xl pt-2">
           Suppliers
         </h1>
 
         <div className="mt-2 flex flex-col md:flex-row justify-center gap-y-2 md:gap-y-0 gap-x-2 w-full">
           {/* Search */}
-          <textarea
-            className="rounded-[10px] w-full md:w-auto px-2 py-2 md:px-3 md:py-2 text-sm border resize-none"
-            rows={1}
-            placeholder="Search"
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
-
+          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
+      <input
+        className="pl-10 pr-4 py-2 w-[200px]  text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+        placeholder="Search roles..."
+        value={searchKey}
+        onChange={(e) => setSearchKey(e.target.value)}
+      />
           {/* Refresh Button */}
           <Button
             fontSize={{ base: "14px", md: "14px" }}
@@ -212,8 +212,8 @@ const Sellers: React.FC = () => {
             width={{ base: "100%", md: 100 }}  
             onClick={fetchSellersHandler}
             leftIcon={<MdOutlineRefresh />}
-            color="#2D3748"
-            borderColor="#2D3748"
+            color="white"
+            borderColor="white"
             variant="outline"
             _hover={{ bg: "#2D3748", color: "white" }}
           >
@@ -228,8 +228,8 @@ const Sellers: React.FC = () => {
             width={{ base: "100%", md: 200 }}  
             onClick={openAddSellerDrawerHandler}
             color="white"
-            backgroundColor="#2D3748"
-            _hover={{ bg: "#2D3748ba" }}
+            backgroundColor="#4b87a0d9"
+            _hover={{ bg: "white", textColor:"black" }}
           >
             Add New Supplier
           </Button>
@@ -243,9 +243,9 @@ const Sellers: React.FC = () => {
               width="100%"  
               onClick={() => setShowBulkUploadMenu(true)}
               color="white"
-              backgroundColor="#2D3748"
+              backgroundColor="#4b87a0d9"
               rightIcon={<AiFillFileExcel size={22} />}
-              _hover={{ bg: "#2D3748ba" }}
+              _hover={{ bg: "white", textColor:"black" }}
             >
               Bulk Upload
             </Button>
