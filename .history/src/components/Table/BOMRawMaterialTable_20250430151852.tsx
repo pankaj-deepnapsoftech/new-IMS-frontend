@@ -221,7 +221,7 @@ import EmptyData from "../../ui/emptyData";
               </Select>
             </div>
             <TableContainer maxHeight="600px" overflowY="auto" className="bg-[#ffffff26]  rounded-md">
-              <Table variant="simple" {...getTableProps()} bg="#ffffff26">
+              <Table variant="simple" {...getTableProps()} >
                 <Thead className="text-sm font-semibold" bg="#ffffff26">
                   {headerGroups.map(
                     (
@@ -240,7 +240,7 @@ import EmptyData from "../../ui/emptyData";
                       }>
                     ) => {
                       return (
-                        <Tr {...hg.getHeaderGroupProps()} borderBottom="1px solid #e2e8f0">
+                        <Tr {...hg.getHeaderGroupProps()}>
                           {hg.headers.map((column: any) => {
                             return (
                               <Th
@@ -248,8 +248,9 @@ import EmptyData from "../../ui/emptyData";
                                 fontSize="14px"
                                 fontWeight="600"
                                 color="white"
-                                backgroundColor="#ffffff26"
-                               
+                                backgroundColor="#2D3748"
+                                borderLeft="1px solid #2D3748"
+                                borderRight="1px solid #2D3748"
                                 {...column.getHeaderProps(
                                   column.getSortByToggleProps()
                                 )}

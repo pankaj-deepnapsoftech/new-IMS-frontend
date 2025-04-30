@@ -104,8 +104,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
           </div>
 
           <TableContainer overflowY="auto" borderRadius="md" className="mx-3 bg-[#ffffff26]">
-            <Table variant="unstyled" {...getTableProps()} >
-              <Thead className="text-sm font-semibold bg-[#ffffff26]">
+            <Table variant="unstyled" {...getTableProps()}>
+              <Thead className="text-sm font-semibold">
                 {headerGroups.map((hg) => (
                   <Tr {...hg.getHeaderGroupProps()}>
                     {hg.headers.map((column: any) => (
@@ -142,7 +142,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     <Tr
                       {...row.getRowProps()}
                       bgColor={dynamicBg(index)}
-                      className="font-[600] hover:cursor-pointer text-gray-200 text-[14px]"
+                      className="font-[700] hover:cursor-pointer text-[15px]"
                       _hover={{
                         bg: "#ffffff78",
                         cursor: "pointer",

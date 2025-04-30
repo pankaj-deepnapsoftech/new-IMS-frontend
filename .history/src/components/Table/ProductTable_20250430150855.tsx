@@ -142,7 +142,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     <Tr
                       {...row.getRowProps()}
                       bgColor={dynamicBg(index)}
-                      className="font-[600] hover:cursor-pointer text-gray-200 text-[14px]"
+                      className="font-[600] hover:cursor-pointer text-[15px]"
                       _hover={{
                         bg: "#ffffff78",
                         cursor: "pointer",

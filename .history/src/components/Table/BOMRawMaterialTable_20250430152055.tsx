@@ -248,7 +248,7 @@ import EmptyData from "../../ui/emptyData";
                                 fontSize="14px"
                                 fontWeight="600"
                                 color="white"
-                                backgroundColor="#ffffff26"
+                                backgroundColor="#2D3748"
                                
                                 {...column.getHeaderProps(
                                   column.getSortByToggleProps()

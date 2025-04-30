@@ -21,12 +21,35 @@ import {
   useSortBy,
   useTable,
   Column,
+  TableInstance,
+  HeaderGroup,
+  Row,
+  Cell,
 } from "react-table";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
 
-interface ProductTableProps {
-  products: Array<any>;
+interface BOMRawMaterialTableProps {
+  products: Array<{
+    name: string;
+    product_id: string;
+    uom: string;
+    category: string;
+    sub_category?: string;
+    item_type: string;
+    product_or_service: string;
+    current_stock: number;
+    price: number;
+    min_stock?: number;
+    max_stock?: number;
+    hsn_code?: number;
+    inventory_category?: string;
+    createdAt: string;
+    updatedAt: string;
+    change_type?: string;
+    quantity_changed?: number;
+    _id: string;
+  }>;
   isLoadingProducts: boolean;
   openUpdateProductDrawerHandler?: (id: string) => void;
   openProductDetailsDrawerHandler?: (id: string) => void;
@@ -34,7 +57,7 @@ interface ProductTableProps {
   approveProductHandler?: (id: string) => void;
 }
 
-const ProductTable: React.FC<ProductTableProps> = ({
+const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
   products,
   isLoadingProducts,
   openUpdateProductDrawerHandler,
@@ -44,6 +67,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
 }) => {
   const columns: Column<any>[] = useMemo(
     () => [
+      { Header: "BOM", accessor: "bom_name" },
       { Header: "ID", accessor: "product_id" },
       { Header: "Name", accessor: "name" },
       { Header: "Inventory Category", accessor: "inventory_category" },
@@ -64,8 +88,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
   );
 
   const inventoryCategoryStyles = {
-    indirect: { bg: "#F03E3E", text: "#ffffff" },
-    direct: { bg: "#409503", text: "#ffffff" },
+    indirect: {
+      bg: "#F03E3E",
+      text: "#ffffff",
+    },
+    direct: {
+      bg: "#409503",
+      text: "#ffffff",
+    },
   };
 
   const {
@@ -81,8 +111,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
     state: { pageIndex },
     pageCount,
     setPageSize,
-  } = useTable(
-    { columns, data: products, initialState: { pageIndex: 0 } },
+  }: TableInstance<any> = useTable(
+    {
+      columns,
+      data: products,
+      initialState: { pageIndex: 0 },
+    },
     useSortBy,
     usePagination
   );
@@ -93,28 +127,31 @@ const ProductTable: React.FC<ProductTableProps> = ({
     <div>
       {isLoadingProducts && <Loading />}
       {!isLoadingProducts && products.length === 0 && <EmptyData />}
+
       {!isLoadingProducts && products.length > 0 && (
         <div>
           <div className="flex justify-end mb-2">
             <Select onChange={(e) => setPageSize(Number(e.target.value))} width="80px">
-              {[10, 20, 50, 100, 100000].map((n) => (
-                <option key={n} value={n}>{n === 100000 ? "All" : n}</option>
-              ))}
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={100000}>All</option>
             </Select>
           </div>
 
-          <TableContainer overflowY="auto" borderRadius="md" className="mx-3 bg-[#ffffff26]">
-            <Table variant="unstyled" {...getTableProps()} >
-              <Thead className="text-sm font-semibold bg-[#ffffff26]">
+          <TableContainer maxHeight="600px" overflowY="auto" className="bg-[#ffffff26] rounded-md">
+            <Table variant="simple" {...getTableProps()} bg="#ffffff26">
+              <Thead className="text-sm font-semibold" bg="#ffffff26">
                 {headerGroups.map((hg) => (
-                  <Tr {...hg.getHeaderGroupProps()}>
+                  <Tr {...hg.getHeaderGroupProps()} borderBottom="1px solid #e2e8f0">
                     {hg.headers.map((column: any) => (
                       <Th
+                        {...column.getHeaderProps(column.getSortByToggleProps())}
                         textTransform="capitalize"
                         fontSize="14px"
                         fontWeight="600"
-                        color="white"
-                        {...column.getHeaderProps(column.getSortByToggleProps())}
+                        color="gray.200"
                       >
                         <p className="flex items-center gap-1">
                           {column.render("Header")}
@@ -125,103 +162,104 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     ))}
                     <Th
                       textTransform="capitalize"
-                      fontSize="12px"
-                      fontWeight="700"
+                      fontSize="14px"
+                      fontWeight="600"
                       color="white"
-                      // bg="#ffffff26"
+                      textAlign="center"
                     >
                       Actions
                     </Th>
                   </Tr>
                 ))}
               </Thead>
+
               <Tbody {...getTableBodyProps()}>
                 {page.map((row, index) => {
                   prepareRow(row);
                   return (
                     <Tr
                       {...row.getRowProps()}
-                      bgColor={dynamicBg(index)}
-                      className="font-[600] hover:cursor-pointer text-gray-200 text-[14px]"
+                      bg={dynamicBg(index)}
                       _hover={{
-                        bg: "#ffffff78",
+                        bg: "gray.50",
                         cursor: "pointer",
                         transition: "all 0.2s",
                       }}
+                      className="text-[15px] font-[700]"
                     >
-                      {row.cells.map((cell) => {
-                        const colId = cell.column.id;
-                        const original = row.original;
-                        return (
-                          <Td fontWeight="500" {...cell.getCellProps()} border="none">
-                            {colId === "createdAt" && original?.createdAt
-                              ? moment(original?.createdAt).format("DD/MM/YYYY")
-                              : colId === "updatedAt" && original?.updatedAt
-                              ? moment(original?.updatedAt).format("DD/MM/YYYY")
-                              : colId === "inventory_category" && original.inventory_category
-                              ? (
+                      {row.cells.map((cell: Cell) => (
+                        <Td
+                          fontWeight="500"
+                          color="gray.200"
+                          {...cell.getCellProps()}
+                        >
+                          {cell.column.id === "createdAt"
+                            ? moment(row.original?.createdAt).format("DD/MM/YYYY")
+                            : cell.column.id === "updatedAt"
+                            ? moment(row.original?.updatedAt).format("DD/MM/YYYY")
+                            : cell.column.id === "inventory_category"
+                            ? row.original.inventory_category && (
+                                <span
+                                  className="px-2 py-1 rounded-md"
+                                  style={{
+                                    backgroundColor:
+                                      inventoryCategoryStyles[row.original.inventory_category]?.bg,
+                                    color:
+                                      inventoryCategoryStyles[row.original.inventory_category]?.text,
+                                  }}
+                                >
+                                  {row.original.inventory_category[0].toUpperCase() +
+                                    row.original.inventory_category.slice(1)}
+                                </span>
+                              )
+                            : cell.column.id === "change"
+                            ? row.original.change_type && (
+                                <span className="flex items-center gap-1">
+                                  {row.original.change_type === "increase" ? (
+                                    <FaArrowUpLong size={20} color="#0dac51" />
+                                  ) : (
+                                    <FaArrowDownLong size={20} color="#c70505" />
+                                  )}
                                   <span
-                                    className="px-2 py-1 rounded-md"
                                     style={{
-                                      backgroundColor:
-                                        inventoryCategoryStyles[original.inventory_category]?.bg,
                                       color:
-                                        inventoryCategoryStyles[original.inventory_category]?.text,
+                                        row.original.change_type === "increase"
+                                          ? "#0dac51"
+                                          : "#c70505",
                                     }}
                                   >
-                                    {original.inventory_category[0].toUpperCase() +
-                                      original.inventory_category.slice(1)}
+                                    {row.original.quantity_changed}
                                   </span>
-                                )
-                              : colId === "change" && original.change_type
-                              ? (
-                                  <p className="flex gap-1 items-center">
-                                    {original.change_type === "increase" ? (
-                                      <FaArrowUpLong color="#0dac51" size={20} />
-                                    ) : (
-                                      <FaArrowDownLong color="#c70505" size={20} />
-                                    )}
-                                    <span
-                                      style={{
-                                        color:
-                                          original.change_type === "increase"
-                                            ? "#0dac51"
-                                            : "#c70505",
-                                      }}
-                                    >
-                                      {original.quantity_changed}
-                                    </span>
-                                  </p>
-                                )
-                              : cell.render("Cell")}
-                          </Td>
-                        );
-                      })}
-                      <Td border="none" className="flex gap-x-2 items-center">
+                                </span>
+                              )
+                            : cell.render("Cell")}
+                        </Td>
+                      ))}
+                      <Td className="flex items-center justify-center gap-2 text-white">
                         {openProductDetailsDrawerHandler && (
                           <MdOutlineVisibility
-                            className="hover:scale-110"
+                            className="hover:scale-110 cursor-pointer"
                             size={16}
                             onClick={() => openProductDetailsDrawerHandler(row.original?._id)}
                           />
                         )}
                         {openUpdateProductDrawerHandler && (
                           <MdEdit
-                            className="hover:scale-110"
+                            className="hover:scale-110 cursor-pointer"
                             size={16}
                             onClick={() => openUpdateProductDrawerHandler(row.original?._id)}
                           />
                         )}
                         {deleteProductHandler && (
                           <MdDeleteOutline
-                            className="hover:scale-110"
+                            className="hover:scale-110 cursor-pointer"
                             size={16}
                             onClick={() => deleteProductHandler(row.original?._id)}
                           />
                         )}
                         {approveProductHandler && (
                           <FcApproval
-                            className="hover:scale-110"
+                            className="hover:scale-110 cursor-pointer"
                             size={16}
                             onClick={() => approveProductHandler(row.original?._id)}
                           />
@@ -236,15 +274,17 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
           <div className="w-[max-content] m-auto my-7">
             <button
-              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
+              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
               disabled={!canPreviousPage}
               onClick={previousPage}
             >
               Prev
             </button>
-            <span className="mx-3 text-sm">{pageIndex + 1} of {pageCount}</span>
+            <span className="mx-3 text-sm text-gray-300">
+              {pageIndex + 1} of {pageCount}
+            </span>
             <button
-              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
+              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
               disabled={!canNextPage}
               onClick={nextPage}
             >
@@ -257,4 +297,4 @@ const ProductTable: React.FC<ProductTableProps> = ({
   );
 };
 
-export default ProductTable;
+export default BOMRawMaterialTable;

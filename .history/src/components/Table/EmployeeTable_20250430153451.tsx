@@ -70,11 +70,11 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   const verificationStyles = {
     "not verified": {
      
-      text: "#fc0303",
+      text: "##27a357",
     },
     verified: {
       
-      text: "#25d98b",
+      text: "##27a357",
     },
   };
 
