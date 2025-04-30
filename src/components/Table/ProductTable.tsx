@@ -16,12 +16,7 @@ import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
 import { FcApproval } from "react-icons/fc";
 import { FaArrowUpLong, FaArrowDownLong } from "react-icons/fa6";
-import {
-  usePagination,
-  useSortBy,
-  useTable,
-  Column,
-} from "react-table";
+import { usePagination, useSortBy, useTable, Column } from "react-table";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
 
@@ -96,15 +91,36 @@ const ProductTable: React.FC<ProductTableProps> = ({
       {!isLoadingProducts && products.length > 0 && (
         <div>
           <div className="flex justify-end mb-2">
-            <Select onChange={(e) => setPageSize(Number(e.target.value))} width="80px">
+            <Select
+              onChange={(e) => setPageSize(Number(e.target.value))}
+              color="white"
+              width="80px"
+              size="sm"
+              borderRadius="md"
+              border="1px solid white"
+              sx={{
+                option: {
+                  backgroundColor: "#444e5b", // Default background
+                  color: "white",
+                },
+              }}
+            >
               {[10, 20, 50, 100, 100000].map((n) => (
-                <option key={n} value={n}>{n === 100000 ? "All" : n}</option>
+                <option key={n} value={n}>
+                  {n === 100000 ? "All" : n}
+                </option>
               ))}
             </Select>
+
+
           </div>
 
-          <TableContainer overflowY="auto" borderRadius="md" className="mx-3 bg-[#ffffff26]">
-            <Table variant="unstyled" {...getTableProps()} >
+          <TableContainer
+            overflowY="auto"
+            borderRadius="md"
+            className="mx-3 bg-[#ffffff26]"
+          >
+            <Table variant="unstyled" {...getTableProps()}>
               <Thead className="text-sm font-semibold bg-[#ffffff26]">
                 {headerGroups.map((hg) => (
                   <Tr {...hg.getHeaderGroupProps()}>
@@ -114,12 +130,18 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         fontSize="14px"
                         fontWeight="600"
                         color="white"
-                        {...column.getHeaderProps(column.getSortByToggleProps())}
+                        {...column.getHeaderProps(
+                          column.getSortByToggleProps()
+                        )}
                       >
                         <p className="flex items-center gap-1">
                           {column.render("Header")}
                           {column.isSorted &&
-                            (column.isSortedDesc ? <FaCaretDown /> : <FaCaretUp />)}
+                            (column.isSortedDesc ? (
+                              <FaCaretDown />
+                            ) : (
+                              <FaCaretUp />
+                            ))}
                         </p>
                       </Th>
                     ))}
@@ -153,47 +175,54 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         const colId = cell.column.id;
                         const original = row.original;
                         return (
-                          <Td fontWeight="500" {...cell.getCellProps()} border="none">
-                            {colId === "createdAt" && original?.createdAt
-                              ? moment(original?.createdAt).format("DD/MM/YYYY")
-                              : colId === "updatedAt" && original?.updatedAt
-                              ? moment(original?.updatedAt).format("DD/MM/YYYY")
-                              : colId === "inventory_category" && original.inventory_category
-                              ? (
-                                  <span
-                                    className="px-2 py-1 rounded-md"
-                                    style={{
-                                      backgroundColor:
-                                        inventoryCategoryStyles[original.inventory_category]?.bg,
-                                      color:
-                                        inventoryCategoryStyles[original.inventory_category]?.text,
-                                    }}
-                                  >
-                                    {original.inventory_category[0].toUpperCase() +
-                                      original.inventory_category.slice(1)}
-                                  </span>
-                                )
-                              : colId === "change" && original.change_type
-                              ? (
-                                  <p className="flex gap-1 items-center">
-                                    {original.change_type === "increase" ? (
-                                      <FaArrowUpLong color="#0dac51" size={20} />
-                                    ) : (
-                                      <FaArrowDownLong color="#c70505" size={20} />
-                                    )}
-                                    <span
-                                      style={{
-                                        color:
-                                          original.change_type === "increase"
-                                            ? "#0dac51"
-                                            : "#c70505",
-                                      }}
-                                    >
-                                      {original.quantity_changed}
-                                    </span>
-                                  </p>
-                                )
-                              : cell.render("Cell")}
+                          <Td
+                            fontWeight="500"
+                            {...cell.getCellProps()}
+                            border="none"
+                          >
+                            {colId === "createdAt" && original?.createdAt ? (
+                              moment(original?.createdAt).format("DD/MM/YYYY")
+                            ) : colId === "updatedAt" && original?.updatedAt ? (
+                              moment(original?.updatedAt).format("DD/MM/YYYY")
+                            ) : colId === "inventory_category" &&
+                              original.inventory_category ? (
+                              <span
+                                className="px-2 py-1 rounded-md"
+                                style={{
+                                  backgroundColor:
+                                    inventoryCategoryStyles[
+                                      original.inventory_category
+                                    ]?.bg,
+                                  color:
+                                    inventoryCategoryStyles[
+                                      original.inventory_category
+                                    ]?.text,
+                                }}
+                              >
+                                {original.inventory_category[0].toUpperCase() +
+                                  original.inventory_category.slice(1)}
+                              </span>
+                            ) : colId === "change" && original.change_type ? (
+                              <p className="flex gap-1 items-center">
+                                {original.change_type === "increase" ? (
+                                  <FaArrowUpLong color="#0dac51" size={20} />
+                                ) : (
+                                  <FaArrowDownLong color="#c70505" size={20} />
+                                )}
+                                <span
+                                  style={{
+                                    color:
+                                      original.change_type === "increase"
+                                        ? "#0dac51"
+                                        : "#c70505",
+                                  }}
+                                >
+                                  {original.quantity_changed}
+                                </span>
+                              </p>
+                            ) : (
+                              cell.render("Cell")
+                            )}
                           </Td>
                         );
                       })}
@@ -202,28 +231,36 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           <MdOutlineVisibility
                             className="hover:scale-110"
                             size={16}
-                            onClick={() => openProductDetailsDrawerHandler(row.original?._id)}
+                            onClick={() =>
+                              openProductDetailsDrawerHandler(row.original?._id)
+                            }
                           />
                         )}
                         {openUpdateProductDrawerHandler && (
                           <MdEdit
                             className="hover:scale-110"
                             size={16}
-                            onClick={() => openUpdateProductDrawerHandler(row.original?._id)}
+                            onClick={() =>
+                              openUpdateProductDrawerHandler(row.original?._id)
+                            }
                           />
                         )}
                         {deleteProductHandler && (
                           <MdDeleteOutline
                             className="hover:scale-110"
                             size={16}
-                            onClick={() => deleteProductHandler(row.original?._id)}
+                            onClick={() =>
+                              deleteProductHandler(row.original?._id)
+                            }
                           />
                         )}
                         {approveProductHandler && (
                           <FcApproval
                             className="hover:scale-110"
                             size={16}
-                            onClick={() => approveProductHandler(row.original?._id)}
+                            onClick={() =>
+                              approveProductHandler(row.original?._id)
+                            }
                           />
                         )}
                       </Td>
@@ -242,7 +279,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
             >
               Prev
             </button>
-            <span className="mx-3 text-sm">{pageIndex + 1} of {pageCount}</span>
+            <span className="mx-3 text-sm">
+              {pageIndex + 1} of {pageCount}
+            </span>
             <button
               className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
               disabled={!canNextPage}

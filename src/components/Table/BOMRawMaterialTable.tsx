@@ -209,17 +209,28 @@ import EmptyData from "../../ui/emptyData";
         {!isLoadingProducts && products.length > 0 && (
           <div>
             <div className="flex justify-end mb-2">
-              <Select
-                onChange={(e) => setPageSize(e.target.value)}
-                width="80px"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-                <option value={100000}>All</option>
-              </Select>
-            </div>
+            <Select
+              onChange={(e) => setPageSize(e.target.value)}
+              color="white"
+              width="80px"
+              size="sm"
+              borderRadius="md"
+              border="1px solid white"
+              sx={{
+                option: {
+                  backgroundColor: "#444e5b", // Default background
+                  color: "white",
+                },
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={100000}>All</option>
+            </Select>
+          </div>
+
             <TableContainer maxHeight="600px" overflowY="auto" className="bg-[#ffffff26]  rounded-md">
               <Table variant="simple" {...getTableProps()} bg="#ffffff26">
                 <Thead className="text-sm font-semibold" bg="#ffffff26">

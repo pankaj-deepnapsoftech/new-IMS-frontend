@@ -15,7 +15,6 @@ import moment from "moment";
 import { useMemo } from "react";
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
-import { FcDatabase } from "react-icons/fc";
 import {
   usePagination,
   useSortBy,
@@ -86,22 +85,29 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
       {!isLoadingRoles && roles.length > 0 && (
         <>
           {/* Page Size Selector */}
-          <div className="flex justify-end mb-3">
-            <Select
-              onChange={(e) => setPageSize(Number(e.target.value))}
-              width="80px"
-              size="sm"
-              color="white"
-              borderRadius="md"
-              border="1px solid gray"
-            >
-              {[10, 20, 50, 100, 100000].map((size) => (
+
+           <div className="flex justify-end mb-2">
+                      <Select
+                        onChange={(e) => setPageSize(Number(e.target.value))}
+                        color="white"
+                        width="80px"
+                        size="sm"
+                        borderRadius="md"
+                        border="1px solid white"
+                        sx={{
+                          option: {
+                            backgroundColor: "#444e5b", // Default background
+                            color: "white",
+                          },
+                        }}
+                      >
+                       {[10, 20, 50, 100, 100000].map((size) => (
                 <option key={size} value={size} >
                   {size === 100000 ? "All" : size}
                 </option>
               ))}
-            </Select>
-          </div>
+                      </Select>
+                    </div>
 
           {/* Table */}
           <TableContainer
@@ -112,7 +118,7 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
             overflowX="auto"
           >
             <Table {...getTableProps()} variant="unstyled" borderRadius="md" size="md" >
-              <Thead bg="#ffffff26"   borderRadius="md">
+              <Thead bg="#ffffff26"  borderRadius="md">
                 {headerGroups.map((hg) => (
                   <Tr {...hg.getHeaderGroupProps()} borderBottom="1px solid #e2e8f0">
                     {hg.headers.map((column) => (
@@ -124,7 +130,7 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                         
                         whiteSpace="nowrap"
                       >
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center  gap-1">
                           {column.render("Header")}
                           {column.isSorted &&
                             (column.isSortedDesc ? <FaCaretDown /> : <FaCaretUp />)}

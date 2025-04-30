@@ -137,7 +137,7 @@ const Employees: React.FC = () => {
       {/* Employees Page */}
       <div className="  justify-start gap-y-1 ">
         <div className=" text-center  md:text-2xl text-white font-bold items-center gap-y-1">
-          <h1 className="text-[30px] pb-6">Employees</h1>
+          <h1 className="text-[30px] pb-4">Employees</h1>
         </div>
         <br />
         <div className="flex justify-center gap-4 ">

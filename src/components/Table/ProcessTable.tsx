@@ -66,7 +66,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   );
 
   const statusStyles = {
-    'raw material approval pending': {
+    "raw material approval pending": {
       bg: "#F03E3E",
       text: "#ffffff",
     },
@@ -81,7 +81,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
     completed: {
       bg: "#409503",
       text: "#ffffff",
-    }
+    },
   };
 
   const {
@@ -116,15 +116,23 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   return (
     <div>
       {isLoadingProcess && <Loading />}
-      {process.length === 0 && !isLoadingProcess && (
-       <EmptyData/>
-      )}
+      {process.length === 0 && !isLoadingProcess && <EmptyData />}
       {!isLoadingProcess && process.length > 0 && (
         <div>
           <div className="flex justify-end mb-2">
             <Select
               onChange={(e) => setPageSize(e.target.value)}
+              color="white"
               width="80px"
+              size="sm"
+              borderRadius="md"
+              border="1px solid white"
+              sx={{
+                option: {
+                  backgroundColor: "#444e5b", // Default background
+                  color: "white",
+                },
+              }}
             >
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -133,7 +141,12 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
               <option value={100000}>All</option>
             </Select>
           </div>
-          <TableContainer maxHeight="600px" overflowY="auto" className=" mx-3  bg-white rounded-md">
+
+          <TableContainer
+            maxHeight="600px"
+            overflowY="auto"
+            className=" mx-3  bg-white rounded-md"
+          >
             <Table variant="simple" {...getTableProps()}>
               <Thead className="text-sm font-semibold">
                 {headerGroups.map(
@@ -251,9 +264,16 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                               <span>{row.original.scrap_store.name}</span>
                             )}
                             {cell.column.id === "status" && (
-                              <span className="px-2 py-1 rounded-md" style={{
-                                backgroundColor: statusStyles[row.original.status].bg,
-                                color: statusStyles[row.original.status].text}}>{row.original.status.toUpperCase()}</span>
+                              <span
+                                className="px-2 py-1 rounded-md"
+                                style={{
+                                  backgroundColor:
+                                    statusStyles[row.original.status].bg,
+                                  color: statusStyles[row.original.status].text,
+                                }}
+                              >
+                                {row.original.status.toUpperCase()}
+                              </span>
                             )}
                           </Td>
                         );

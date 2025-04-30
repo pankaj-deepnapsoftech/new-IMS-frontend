@@ -53,7 +53,7 @@ const UserRoleDetails: React.FC<UserRoleDetailsProps> = ({
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[350px] bg-[#4b86a0] right-0 top-0 z-10 py-3"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
@@ -65,7 +65,7 @@ const UserRoleDetails: React.FC<UserRoleDetailsProps> = ({
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-md text-white w-[200px] rounded-md font-semibold py-2 cursor-pointer  text-center mb-6  bg-[#2D3748]">
+          <h2 className="text-[25px] text-white w-[350px] rounded-md font-semibold  cursor-pointer  text-center mb-6  ">
             User Role Details
           </h2>
 
@@ -73,15 +73,15 @@ const UserRoleDetails: React.FC<UserRoleDetailsProps> = ({
           {!isLoadinRole && (
             <div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold">Role</p>
+                <p className="font-bold">Role</p>
                 <p>{role}</p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold">Description</p>
+                <p className="font-bold">Description</p>
                 <p>{description}</p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold">Permissions</p>
+                <p className="font-bold">Permissions</p>
                 <ul className="pl-5 list-decimal">
                     {permissions.map(permission => <li>{permission}</li>)}
                 </ul>
