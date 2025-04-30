@@ -69,11 +69,9 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
 
   const verificationStyles = {
     "not verified": {
-     
       text: "#fc0303",
     },
     verified: {
-      
       text: "#25d98b",
     },
   };
@@ -115,19 +113,23 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   return (
     <div>
       {isLoadingEmployees && <Loading />}
-      {employees.length === 0 && !isLoadingEmployees && (
-        <EmptyData />
-      )}
+      {employees.length === 0 && !isLoadingEmployees && <EmptyData />}
       {!isLoadingEmployees && employees.length > 0 && (
         <div>
           <div className="flex justify-end mb-2">
             <Select
               onChange={(e) => setPageSize(e.target.value)}
-              width="80px"
               color="white"
+              width="80px"
               size="sm"
               borderRadius="md"
-              border="1px solid gray"
+              border="1px solid white"
+              sx={{
+                option: {
+                  backgroundColor: "#444e5b", // Default background
+                  color: "white",
+                },
+              }}
             >
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -137,7 +139,11 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
             </Select>
           </div>
 
-          <TableContainer overflowY="auto" borderRadius="md" className="   bg-[#ffffff26]">
+          <TableContainer
+            overflowY="auto"
+            borderRadius="md"
+            className="   bg-[#ffffff26]"
+          >
             <Table variant="simple" {...getTableProps()}>
               <Thead className="text-sm font-semibold bg-[#ffffff26]">
                 {headerGroups.map(
@@ -154,7 +160,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     }>
                   ) => {
                     return (
-                      <Tr {...hg.getHeaderGroupProps()} borderBottom="1px solid #e2e8f0">
+                      <Tr
+                        {...hg.getHeaderGroupProps()}
+                        borderBottom="1px solid #e2e8f0"
+                      >
                         {hg.headers.map((column: any) => {
                           return (
                             <Th
@@ -163,9 +172,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                               fontSize="14px"
                               fontWeight="600"
                               color="white"
-                              {...column.getHeaderProps(column.getSortByToggleProps())}
+                              {...column.getHeaderProps(
+                                column.getSortByToggleProps()
+                              )}
                             >
-
                               <p className="flex font-[600] text-[15px]">
                                 {column.render("Header")}
                                 {column.isSorted && (
@@ -187,7 +197,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                           fontWeight="700"
                           color="white"
                           // backgroundColor="#ffffff26"
-
                         >
                           Actions
                         </Th>
@@ -196,9 +205,9 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   }
                 )}
               </Thead>
-              <Tbody {...getTableBodyProps()} >
+              <Tbody {...getTableBodyProps()}>
                 {page.map((row: any, index) => {
-                  prepareRow(row)
+                  prepareRow(row);
 
                   return (
                     <Tr
@@ -212,7 +221,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                         transition: "all 0.2s",
                       }}
                     >
-
                       {row.cells.map((cell: Cell, index: number) => {
                         const isFirst = index === 0;
                         const isLast = index === row.cells.length - 1;
@@ -225,7 +233,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                             fontSize="sm"
                             color="gray.200"
                           >
-
                             {/* Custom cell rendering (dates, role, verification) */}
                             {cell.column.id !== "createdAt" &&
                               cell.column.id !== "updatedAt" &&
@@ -233,34 +240,49 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                               cell.column.id !== "role" &&
                               cell.render("Cell")}
 
-                            {cell.column.id === "createdAt" && row.original?.createdAt && (
-                              <span>
-                                {moment(row.original?.createdAt).format("DD/MM/YYYY")}
-                              </span>
-                            )}
-                            {cell.column.id === "updatedAt" && row.original?.updatedAt && (
-                              <span>
-                                {moment(row.original?.updatedAt).format("DD/MM/YYYY")}
-                              </span>
-                            )}
+                            {cell.column.id === "createdAt" &&
+                              row.original?.createdAt && (
+                                <span>
+                                  {moment(row.original?.createdAt).format(
+                                    "DD/MM/YYYY"
+                                  )}
+                                </span>
+                              )}
+                            {cell.column.id === "updatedAt" &&
+                              row.original?.updatedAt && (
+                                <span>
+                                  {moment(row.original?.updatedAt).format(
+                                    "DD/MM/YYYY"
+                                  )}
+                                </span>
+                              )}
                             {cell.column.id === "isVerified" && (
                               <span
                                 className="rounded-md flex  w-[90px] items-center h-[25px]"
                                 style={{
-                                  backgroundColor: verificationStyles[
-                                    row.original.isVerified ? "verified" : "not verified"
-                                  ].bg,
-                                  color: verificationStyles[
-                                    row.original.isVerified ? "verified" : "not verified"
-                                  ].text,
+                                  backgroundColor:
+                                    verificationStyles[
+                                      row.original.isVerified
+                                        ? "verified"
+                                        : "not verified"
+                                    ].bg,
+                                  color:
+                                    verificationStyles[
+                                      row.original.isVerified
+                                        ? "verified"
+                                        : "not verified"
+                                    ].text,
                                 }}
                               >
-                                {row.original.isVerified ? "Verified" : "Not Verified"}
+                                {row.original.isVerified
+                                  ? "Verified"
+                                  : "Not Verified"}
                               </span>
                             )}
                             {cell.column.id === "role" && (
                               <span>
-                                {(row.original?.role && row.original.role.role) ||
+                                {(row.original?.role &&
+                                  row.original.role.role) ||
                                   (row.original.isSuper && "Super Admin") ||
                                   ""}
                               </span>
@@ -274,7 +296,9 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                             className="hover:scale-110 text-gray-200 hover:text-blue-400"
                             size={16}
                             onClick={() =>
-                              openEmployeeDetailsDrawerHandler(row.original?._id)
+                              openEmployeeDetailsDrawerHandler(
+                                row.original?._id
+                              )
                             }
                           />
                         )}
@@ -306,12 +330,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                           />
                         )}
                       </Td>
-
                     </Tr>
                   );
                 })}
               </Tbody>
-
             </Table>
           </TableContainer>
 

@@ -21,7 +21,7 @@ const UserDetailsMenu: React.FC<UserDetailsMenuProps> = ({
       }}
     >
       <div className="cursor-pointer flex border-b py-2 px-3 rounded-md hover:bg-[#e3e3e3]">
-        <Avatar size="md" name={firstname + ' ' + lastname} />
+        <Avatar backgroundColor="#4b87a0d9" size="md" name={firstname + ' ' + lastname} />
         <div className="pl-2">
           <p className="text-lg font-semibold mb-1">
             {firstname + ' ' + lastname}

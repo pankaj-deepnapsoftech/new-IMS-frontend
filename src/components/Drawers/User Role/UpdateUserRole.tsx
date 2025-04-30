@@ -110,7 +110,7 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[350px] bg-[#4b86a0] right-0 top-0 z-10 py-3"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
@@ -122,7 +122,7 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-md text-white w-[200px] rounded-md font-semibold py-2 cursor-pointer  text-center mb-6  bg-[#2D3748]">
+          <h2 className="text-[25px] text-white w-[300px] rounded-md font-semibold  cursor-pointer  text-center mb-6  ">
             Update Role
           </h2>
 
@@ -151,7 +151,7 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
                 <FormLabel fontWeight="bold">Permissions</FormLabel>
                 <Select
                   required
-                  className="rounded mt-2 border border-[#a9a9a9]"
+                  className="rounded mt-2 bg-transparent"
                   options={permissionOptions}
                   placeholder="Select"
                   value={permissions}
@@ -162,16 +162,19 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
                   isMulti
                 />
               </FormControl>
+              <div className="flex justify-center">
               <Button
                 isLoading={isUpdatingRole}
                 type="submit"
-                className="mt-2"
+              
+                className="mt-5"
                 color="white"
                 backgroundColor="#2D3748"
                 _hover={{ bg: "#2d3748c2" }}
               >
                 Submit
               </Button>
+              </div>
             </form>
           )}
         </div>

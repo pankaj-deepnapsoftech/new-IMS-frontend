@@ -100,7 +100,7 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
           </label>
           <div className="relative w-[100%]">
             <div className="absolute top-[18px] left-[7px] text-base">
-              <TbPasswordMobilePhone />
+              <TbPasswordMobilePhone/>
             </div>
             <input
               value={otp}

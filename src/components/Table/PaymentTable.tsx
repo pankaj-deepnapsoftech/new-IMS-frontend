@@ -46,16 +46,16 @@ const PaymentTable: React.FC<AgentTableProps> = ({
   payments,
   isLoadingPayments,
   openPaymentDetailsDrawerHandler,
-  openUpdatePaymentDrawer
+  openUpdatePaymentDrawer,
 }) => {
   const columns = useMemo(
     () => [
-        { Header: "Created By", accessor: "creator" },
-        { Header: "Customer", accessor: "customer" },
-        { Header: "Amount", accessor: "amount" },
-        { Header: "Payment Mode", accessor: "mode" },
-        { Header: "Created At", accessor: "createdAt" },
-        { Header: "Updated At", accessor: "updatedAt" },
+      { Header: "Created By", accessor: "creator" },
+      { Header: "Customer", accessor: "customer" },
+      { Header: "Amount", accessor: "amount" },
+      { Header: "Payment Mode", accessor: "mode" },
+      { Header: "Created At", accessor: "createdAt" },
+      { Header: "Updated At", accessor: "updatedAt" },
     ],
     []
   );
@@ -93,15 +93,23 @@ const PaymentTable: React.FC<AgentTableProps> = ({
   return (
     <div>
       {isLoadingPayments && <Loading />}
-      {payments.length === 0 && !isLoadingPayments && (
-       <EmptyData/>
-      )}
+      {payments.length === 0 && !isLoadingPayments && <EmptyData />}
       {!isLoadingPayments && payments.length > 0 && (
         <div>
           <div className="flex justify-end mb-2">
             <Select
               onChange={(e) => setPageSize(e.target.value)}
+              color="white"
               width="80px"
+              size="sm"
+              borderRadius="md"
+              border="1px solid white"
+              sx={{
+                option: {
+                  backgroundColor: "#444e5b", // Default background
+                  color: "white",
+                },
+              }}
             >
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -110,18 +118,19 @@ const PaymentTable: React.FC<AgentTableProps> = ({
               <option value={100000}>All</option>
             </Select>
           </div>
+
           <TableContainer maxHeight="600px" overflowY="auto">
             <Table variant="simple" {...getTableProps()}>
               <Thead className="text-sm font-semibold">
                 {headerGroups.map(
                   (
                     hg: HeaderGroup<{
-                        creator: string;
-                        created_on: string;
-                        customer?: string;
-                        amount: string;
-                        date: string;
-                        mode: string;
+                      creator: string;
+                      created_on: string;
+                      customer?: string;
+                      amount: string;
+                      date: string;
+                      mode: string;
                     }>
                   ) => {
                     return (
@@ -206,15 +215,19 @@ const PaymentTable: React.FC<AgentTableProps> = ({
                                 </span>
                               )}
                             {cell.column.id === "creator" && (
-                                <span>
-                                  {row.original?.creator?.first_name + ' ' + row.original?.creator?.last_name}
-                                </span>
-                              )}
+                              <span>
+                                {row.original?.creator?.first_name +
+                                  " " +
+                                  row.original?.creator?.last_name}
+                              </span>
+                            )}
                             {cell.column.id === "customer" && (
-                                <span>
-                                  {row.original?.invoice?.buyer ? row.original?.invoice?.buyer?.name : row.original.invoice?.supplier?.name}
-                                </span>
-                              )}
+                              <span>
+                                {row.original?.invoice?.buyer
+                                  ? row.original?.invoice?.buyer?.name
+                                  : row.original.invoice?.supplier?.name}
+                              </span>
+                            )}
                           </Td>
                         );
                       })}
