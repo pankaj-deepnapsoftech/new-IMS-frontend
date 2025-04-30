@@ -104,7 +104,7 @@ const InventoryApprovals: React.FC = () => {
   }
 
   return (
-    <div className="  mx-2 rounded-md h-full ">
+    <div className="  rounded-md h-full ">
       <div>
         <h1 className="text-center font-[700] text-white pb-6 text-3xl pt-2">
           Inventory Approvals

@@ -143,13 +143,13 @@ const Employees: React.FC = () => {
         <div className="flex justify-center gap-4 ">
           {/* Search Wrapper */}
           <div className="relative">
-          <FiSearch className="absolute left-2 top-5 transform -translate-y-1/2 text-gray-200 "  />
-          <input
-            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-            placeholder="Search roles..."
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300" />
+            <input
+              className="pl-10 pr-4 py-2 w-full text-sm rounded-[5px] placeholder:text-gray-300 bg-[#ffffff3b] shadow-sm focus:outline-none"
+              placeholder="Search roles..."
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
+            />
           </div>
 
           {/* Refresh Button */}

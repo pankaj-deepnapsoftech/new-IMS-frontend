@@ -139,7 +139,7 @@ const UserRole: React.FC = () => {
   }
 
   return (
-    <div  className="md:pl-3 max-[800px]:pl-0">
+    <div  className=" max-[800px]:pl-0">
       {/* Add User Role */}
       {isAddRoleDrawerOpened && (
         <AddUserRole
