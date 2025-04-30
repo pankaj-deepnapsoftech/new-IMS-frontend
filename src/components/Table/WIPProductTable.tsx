@@ -27,6 +27,7 @@ import {
   Cell,
 } from "react-table";
 import Loading from "../../ui/Loading";
+import EmptyData from "../../ui/emptyData";
 
 interface WIPProductTableProps {
   products: Array<{
@@ -169,10 +170,7 @@ const WIPProductTable: React.FC<WIPProductTableProps> = ({
     <div>
       {isLoadingProducts && <Loading />}
       {products.length === 0 && !isLoadingProducts && (
-        <div className="mx-auto w-max">
-          <FcDatabase size={100} />
-          <p className="text-lg">No Data Found</p>
-        </div>
+        <EmptyData/>
       )}
       {!isLoadingProducts && products.length > 0 && (
         <div>

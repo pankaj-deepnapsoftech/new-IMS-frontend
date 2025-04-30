@@ -22,6 +22,7 @@ import {
   useTable,
 } from "react-table";
 import Loading from "../../ui/Loading";
+import EmptyData from "../../ui/emptyData";
 
 interface UserRoleTableProps {
   roles: Array<{
@@ -79,10 +80,7 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
       {isLoadingRoles && <Loading />}
 
       {!isLoadingRoles && roles.length === 0 && (
-        <div className="mx-auto w-max text-center">
-          <FcDatabase size={100} />
-          <p className="text-lg font-semibold mt-2">No Data Found</p>
-        </div>
+       <EmptyData/>
       )}
 
       {!isLoadingRoles && roles.length > 0 && (

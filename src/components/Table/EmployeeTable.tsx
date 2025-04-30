@@ -25,6 +25,7 @@ import {
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
+import EmptyData from "../../ui/emptyData";
 
 interface EmployeeTableProps {
   employees: Array<{
@@ -115,10 +116,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     <div>
       {isLoadingEmployees && <Loading />}
       {employees.length === 0 && !isLoadingEmployees && (
-        <div className="mx-auto w-max">
-          <FcDatabase size={100} />
-          <p className="text-lg">No Data Found</p>
-        </div>
+        <EmptyData/>
       )}
       {!isLoadingEmployees && employees.length > 0 && (
         <div>

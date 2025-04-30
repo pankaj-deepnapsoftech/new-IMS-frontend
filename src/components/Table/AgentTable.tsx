@@ -25,6 +25,7 @@ import {
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
+import EmptyData from "../../ui/emptyData";
 
 interface AgentTableProps {
   agents: Array<{
@@ -120,10 +121,7 @@ const AgentTable: React.FC<AgentTableProps> = ({
     <div>
       {isLoadingAgents && <Loading />}
       {agents.length === 0 && !isLoadingAgents && (
-        <div className="mx-auto w-max">
-          <FcDatabase size={100} />
-          <p className="text-lg">No Data Found</p>
-        </div>
+       <EmptyData />
       )}
       {!isLoadingAgents && agents.length > 0 && (
         <div>

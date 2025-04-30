@@ -25,6 +25,7 @@ import {
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
+import EmptyData from "../../ui/emptyData";
 
 interface BOMTableProps {
   boms: Array<{
@@ -96,10 +97,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
     <div>
       {isLoadingBoms && <Loading />}
       {boms.length === 0 && !isLoadingBoms && (
-        <div className="mx-auto w-max">
-          <FcDatabase size={100} />
-          <p className="text-lg">No Data Found</p>
-        </div>
+       <EmptyData/>
       )}
       {!isLoadingBoms && boms.length > 0 && (
         <div>

@@ -26,6 +26,7 @@ import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
 import { log } from "console";
+import EmptyData from "../../ui/emptyData";
 
 interface ProformaInvoiceTableProps {
   proformaInvoices: Array<{
@@ -97,10 +98,7 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
     <div>
       {isLoadingProformaInvoices && <Loading />}
       {proformaInvoices.length === 0 && !isLoadingProformaInvoices && (
-        <div className="mx-auto w-max">
-          <FcDatabase size={100} />
-          <p className="text-lg">No Data Found</p>
-        </div>
+        <EmptyData/>
       )}
       {!isLoadingProformaInvoices && proformaInvoices.length > 0 && (
         <div>

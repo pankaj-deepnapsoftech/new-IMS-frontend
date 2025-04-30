@@ -27,6 +27,7 @@ import {
   Cell,
 } from "react-table";
 import Loading from "../../ui/Loading";
+import EmptyData from "../../ui/emptyData";
 
 interface StoreTableProps {
   stores: Array<{
@@ -146,10 +147,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
     <div>
       {isLoadingStores && <Loading />}
       {stores.length === 0 && !isLoadingStores && (
-        <div className="mx-auto w-max">
-          <FcDatabase size={100} />
-          <p className="text-lg">No Data Found</p>
-        </div>
+        <EmptyData/>
       )}
       {!isLoadingStores && stores.length > 0 && (
         <div>

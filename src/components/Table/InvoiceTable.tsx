@@ -26,6 +26,7 @@ import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
 import { MdDeleteOutline, MdEdit, MdOutlinePayment, MdOutlineVisibility } from "react-icons/md";
 import { log } from "console";
+import EmptyData from "../../ui/emptyData";
 
 interface InvoiceTableProps {
   invoices: Array<{
@@ -99,10 +100,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
     <div>
       {isLoadingInvoices && <Loading />}
       {invoices.length === 0 && !isLoadingInvoices && (
-        <div className="mx-auto w-max">
-          <FcDatabase size={100} />
-          <p className="text-lg">No Data Found</p>
-        </div>
+        <EmptyData/>
       )}
       {!isLoadingInvoices && invoices.length > 0 && (
         <div>

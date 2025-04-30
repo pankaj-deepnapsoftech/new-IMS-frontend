@@ -25,6 +25,7 @@ import {
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
+import EmptyData from "../../ui/emptyData";
 
 interface ProcessTableProps {
   process: Array<{
@@ -116,10 +117,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
     <div>
       {isLoadingProcess && <Loading />}
       {process.length === 0 && !isLoadingProcess && (
-        <div className="mx-auto w-max">
-          <FcDatabase size={100} />
-          <p className="text-lg">No Data Found</p>
-        </div>
+       <EmptyData/>
       )}
       {!isLoadingProcess && process.length > 0 && (
         <div>

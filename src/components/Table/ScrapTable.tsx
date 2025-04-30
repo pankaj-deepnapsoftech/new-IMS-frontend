@@ -27,6 +27,7 @@ import {
     Cell,
 } from "react-table";
 import Loading from "../../ui/Loading";
+import EmptyData from "../../ui/emptyData";
 
 interface ScrapTableProps {
     scraps: Array<{
@@ -141,10 +142,7 @@ const ScrapTable: React.FC<ScrapTableProps> = ({
         <div>
             {isLoadingScraps && <Loading />}
             {scraps.length === 0 && !isLoadingScraps && (
-                <div className="mx-auto w-max">
-                    <FcDatabase size={100} />
-                    <p className="text-lg">No Data Found</p>
-                </div>
+               <EmptyData/>
             )}
             {!isLoadingScraps && scraps.length > 0 && (
                 <div>

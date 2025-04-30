@@ -25,6 +25,7 @@ import {
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
+import EmptyData from "../../ui/emptyData";
 
 interface PaymentTableProps {
   payments: Array<{
@@ -93,10 +94,7 @@ const PaymentTable: React.FC<AgentTableProps> = ({
     <div>
       {isLoadingPayments && <Loading />}
       {payments.length === 0 && !isLoadingPayments && (
-        <div className="mx-auto w-max">
-          <FcDatabase size={100} />
-          <p className="text-lg">No Data Found</p>
-        </div>
+       <EmptyData/>
       )}
       {!isLoadingPayments && payments.length > 0 && (
         <div>
