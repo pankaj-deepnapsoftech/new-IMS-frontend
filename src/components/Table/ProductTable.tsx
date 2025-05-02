@@ -59,8 +59,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
   );
 
   const inventoryCategoryStyles = {
-    indirect: {  text: "#e70000" },
-    direct: {  text: "#25d98b" },
+    indirect: { text: "#e70000" },
+    direct: { text: "#25d98b" },
   };
 
   const {
@@ -91,10 +91,16 @@ const ProductTable: React.FC<ProductTableProps> = ({
       {!isLoadingProducts && products.length > 0 && (
         <div>
           <div className="flex justify-end mb-2">
-            <Select onChange={(e) => setPageSize(Number(e.target.value))} width="80px"  color="white "
+            <Select onChange={(e) => setPageSize(Number(e.target.value))} width="80px" color="white "
               size="sm"
               borderRadius="md"
-              border="1px solid gray">
+              border="1px solid gray" sx={{
+                option: {
+                  backgroundColor: "#444e5b", // Default background
+                  color: "white",
+                },
+              }}>
+
               {[10, 20, 50, 100, 100000].map((n) => (
                 <option key={n} value={n}>
                   {n === 100000 ? "All" : n}
@@ -140,7 +146,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       fontSize="14px"
                       fontWeight="600"
                       color="white"
-                      // bg="#14243452"
+                    // bg="#14243452"
                     >
                       Actions
                     </Th>
@@ -169,43 +175,43 @@ const ProductTable: React.FC<ProductTableProps> = ({
                             {colId === "createdAt" && original?.createdAt
                               ? moment(original?.createdAt).format("DD/MM/YYYY")
                               : colId === "updatedAt" && original?.updatedAt
-                              ? moment(original?.updatedAt).format("DD/MM/YYYY")
-                              : colId === "inventory_category" && original.inventory_category
-                              ? (
-                                  <span
-                                    className="px-2 py-1 rounded-md font-[600]"
-                                    style={{
-                                      backgroundColor:
-                                        inventoryCategoryStyles[original.inventory_category]?.bg,
-                                      color:
-                                        inventoryCategoryStyles[original.inventory_category]?.text,
-                                    }}
-                                  >
-                                    {original.inventory_category[0].toUpperCase() +
-                                      original.inventory_category.slice(1)}
-                                  </span>
-                                )
-                              : colId === "change" && original.change_type
-                              ? (
-                                  <p className="flex gap-1 items-center">
-                                    {original.change_type === "increase" ? (
-                                      <FaArrowUpLong color="#0dac51" size={20} />
-                                    ) : (
-                                      <FaArrowDownLong color="#c70505" size={20} />
-                                    )}
+                                ? moment(original?.updatedAt).format("DD/MM/YYYY")
+                                : colId === "inventory_category" && original.inventory_category
+                                  ? (
                                     <span
+                                      className="px-2 py-1 rounded-md font-[600]"
                                       style={{
+                                        backgroundColor:
+                                          inventoryCategoryStyles[original.inventory_category]?.bg,
                                         color:
-                                          original.change_type === "increase"
-                                            ? "#0dac51"
-                                            : "#c70505",
+                                          inventoryCategoryStyles[original.inventory_category]?.text,
                                       }}
                                     >
-                                      {original.quantity_changed}
+                                      {original.inventory_category[0].toUpperCase() +
+                                        original.inventory_category.slice(1)}
                                     </span>
-                                  </p>
-                                )
-                              : cell.render("Cell")}
+                                  )
+                                  : colId === "change" && original.change_type
+                                    ? (
+                                      <p className="flex gap-1 items-center">
+                                        {original.change_type === "increase" ? (
+                                          <FaArrowUpLong color="#0dac51" size={20} />
+                                        ) : (
+                                          <FaArrowDownLong color="#c70505" size={20} />
+                                        )}
+                                        <span
+                                          style={{
+                                            color:
+                                              original.change_type === "increase"
+                                                ? "#0dac51"
+                                                : "#c70505",
+                                          }}
+                                        >
+                                          {original.quantity_changed}
+                                        </span>
+                                      </p>
+                                    )
+                                    : cell.render("Cell")}
                           </Td>
                         );
                       })}

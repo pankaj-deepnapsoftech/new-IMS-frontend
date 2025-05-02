@@ -90,7 +90,7 @@ const ScrapTable: React.FC<ScrapTableProps> = ({
       {!isLoadingScraps && scraps.length > 0 && (
         <div>
           {/* Page Size Selector */}
-          <div className="flex justify-end mb-2">
+          <div className="flex justify-end mb-2 mt-2">
             <Select
               onChange={(e) => setPageSize(Number(e.target.value))}
               width="80px"
@@ -98,6 +98,12 @@ const ScrapTable: React.FC<ScrapTableProps> = ({
               color="white"
               border="1px solid gray"
               borderRadius="md"
+              sx={{
+                option: {
+                  backgroundColor: "#444e5b", // Default background
+                  color: "white",
+                },
+              }}
             >
               {[10, 20, 50, 100, 100000].map((size) => (
                 <option value={size} key={size}>

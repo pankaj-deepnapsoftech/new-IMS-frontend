@@ -267,7 +267,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
                 type="number"
                 name="total_part_cost"
                 value={input.total_part_cost}
-                className="rounded text-gray-200 px-2 py-[6px] w-[300px] border-[1px] border-[#a9a9a9] disabled:cursor-not-allowed disabled:bg-white"
+                className="rounded text-gray-200 px-2 py-[6px] w-[300px] border-[1px] border-[#a9a9a9] disabled:cursor-not-allowed disabled:bg-transparent"
               ></input>
             </FormControl>
           </div>

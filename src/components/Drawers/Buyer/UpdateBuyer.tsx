@@ -129,31 +129,61 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
   useEffect(() => {
     fetchBuyerDetails();
   }, []);
-
+  const customStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      backgroundColor: "transparent",
+      borderColor: "#a9a9a9",
+      color: "#fff",
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
+      color: "black",
+      cursor: "pointer",
+    }),
+    multiValue: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#808080",
+      color: "#fff",
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      zIndex: 9999, // ensures dropdown doesn't get hidden
+    }),
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: "#fff", // light gray placeholder
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,  
+      color: "#fff", // ensures selected value is white
+    }),
+  };
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f]  right-0 top-0 z-10 py-3"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-          <BiX onClick={closeDrawerHandler} size="26px" />
-          Buyer
+        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
+          <BiX onClick={closeDrawerHandler} size="26px"  color="white"/>
+         
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-2xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
-            Update Buyer
+        <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
+          Update Buyer
           </h2>
 
           {isLoadingBuyer && <Loading />}
           {!isLoadingBuyer && <form onSubmit={updateBuyerHandler}>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">Name</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" className="white">Name</FormLabel>
+              <Input className="text-gray-200"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 type="text"
@@ -161,8 +191,8 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">Email</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" className="white">Email</FormLabel>
+              <Input  className="text-gray-200"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
@@ -170,29 +200,29 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">Phone</FormLabel>
+              <FormLabel fontWeight="bold" className="white">Phone</FormLabel>
               <Input
                 value={phone}
-                className="no-scrollbar"
+                className="no-scrollbar text-gray-200"
                 onChange={(e) => setPhone(e.target.value)}
                 type="number"
                 placeholder="Phone"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold">GST Number</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" className="white">GST Number</FormLabel>
+              <Input 
                 value={gst}
-                className="no-scrollbar"
+                className="no-scrollbar text-gray-200"
                 onChange={(e) => setGst(e.target.value)}
                 type="text"
                 placeholder="GST Number"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">Company Name</FormLabel>
-              <Input
-                className="no-scrollbar"
+              <FormLabel fontWeight="bold" className="white">Company Name</FormLabel>
+              <Input  
+                className="no-scrollbar text-gray-200"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 type="text"
@@ -200,8 +230,8 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">Current Email</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" className="white">Current Email</FormLabel>
+              <Input  className="text-gray-200"
                 value={companyEmail}
                 onChange={(e) => setCompanyEmail(e.target.value)}
                 type="email"
@@ -209,8 +239,8 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">Company Phone</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" className="white">Company Phone</FormLabel>
+              <Input  className="text-gray-200"
                 value={companyPhone}
                 onChange={(e) => setCompanyPhone(e.target.value)}
                 type="number"
@@ -218,8 +248,8 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">Address Line 1</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" className="white">Address Line 1</FormLabel>
+              <Input  className="text-gray-200"
                 value={addressLine1}
                 onChange={(e) => setAddressLine1(e.target.value)}
                 type="text"
@@ -227,8 +257,8 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold">Address Line 2</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" className="white">Address Line 2</FormLabel>
+              <Input  className="text-gray-200"
                 value={addressLine2}
                 onChange={(e) => setAddressLine2(e.target.value)}
                 type="text"
@@ -236,8 +266,8 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold">Pincode</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" className="white">Pincode</FormLabel>
+              <Input  className="text-gray-200"
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
                 type="text"
@@ -245,8 +275,8 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">City</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" className="white">City</FormLabel>
+              <Input  className="text-gray-200"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 type="text"
@@ -254,8 +284,8 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">State</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" className="white">State</FormLabel>
+              <Input className="text-gray-200"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
                 type="text"
@@ -266,8 +296,9 @@ const UpdateBuyer: React.FC<UpdateBuyerProps> = ({
               isLoading={isUpdatingBuyer}
               type="submit"
               className="mt-1"
-              color="white"
-              backgroundColor="#1640d6"
+              color="black"
+              backgroundColor="#ffffff8a"
+              _hover={{ bg: "#d1d2d5" }}
             >
               Submit
             </Button>

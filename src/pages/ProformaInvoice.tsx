@@ -128,35 +128,42 @@ const ProformaInvoice: React.FC = () => {
       {isUpdateProformaInvoiceDrawerOpened && <UpdateProformaInvoice closeDrawerHandler={closeProformaInvoiceUpdateDrawerHandler} id={id} fetchProformaInvoicesHandler={fetchProformaInvoiceHandler} />}
 
       <div>
+        <h1 className="text-center font-bold text-white text-2xl md:text-3xl pt-4 pb-6">
+          Proforma Invoices
+        </h1>
 
-        <h1 className=" text-center font-[700] pb-6 text-white text-3xl pt-2"> Proforma Invoices</h1>
+        <div className="w-full flex flex-col md:flex-row md:items-center md:justify-center gap-3 px-4 md:px-10">
 
-        <div className="mt-2 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-2 px-4 md:px-10">
-        <FiSearch className="relative left-10 top-2 transform -translate-y-1/2 text-gray-200" />
-      <input
-        className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-        placeholder="Search roles..."
-        value={searchKey}
-        onChange={(e) => setSearchKey(e.target.value)}
-      />
+          {/* Search Input */}
+          <div className="relative w-full md:w-[220px]">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-200" />
+            <input
+              className="pl-10 pr-4 py-2 w-full text-sm text-gray-200 border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              placeholder="Search roles..."
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
+            />
+          </div>
 
+          {/* Add New Proforma Invoice Button */}
           <button
-            className="text-white bg-[#4b87a0d9] hover:bg-[#2d3748c9] hover:text-black hover:bg-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[210px] transition-all"
+            className="text-white bg-[#4b87a0d9] hover:bg-white hover:text-black text-sm rounded-[6px] px-4 py-2 w-full md:w-[240px] transition-all"
             onClick={openAddProformaInvoiceDrawerHandler}
           >
             Add New Proforma Invoice
           </button>
 
+          {/* Refresh Button */}
           <button
-            className="text-[white] border border-[white] hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
+            className="text-white border border-white hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[110px] transition-all flex items-center justify-center gap-1"
             onClick={fetchProformaInvoiceHandler}
           >
             <MdOutlineRefresh className="text-base" />
             Refresh
           </button>
         </div>
-
       </div>
+
 
       <div>
         <ProformaInvoiceTable isLoadingProformaInvoices={isLoadingProformaInvoices} proformaInvoices={filteredData} deleteProformaInvoiceHandler={deleteProformaInvoiceHandler} openProformaInvoiceDetailsHandler={openProformaInvoiceDetailsDrawerHandler} openUpdateProformaInvoiceDrawer={openProformaInvoiceUpdateDrawerHandler} />

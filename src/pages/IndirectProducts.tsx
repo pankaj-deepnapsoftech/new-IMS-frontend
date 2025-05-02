@@ -278,33 +278,37 @@ const IndirectProducts: React.FC = () => {
       )}
 
       {/* Products Page */}
-      <div>
-        <h1 className="text-center font-[700] text-white text-[30px] pb-4">
+      <div className="w-full">
+        <h1 className="text-center font-bold text-white text-[26px] md:text-[30px] pb-4">
           Inventory
         </h1>
-        {/* Main Button Row */}
-        <div className="mt-2 w-full flex flex-col md:flex-wrap md:flex-row gap-2 md:gap-4 justify-center px-4 pb-4">
-          {/* Search */}
-          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
-          <input
-            className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-            placeholder="Search roles..."
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
 
-          {/* Add Product */}
+        {/* Button Row */}
+        <div className="mt-2 w-full flex flex-col md:flex-row md:flex-wrap items-center gap-3 justify-center px-4 pb-4">
+
+          {/* Search Input */}
+          <div className="relative w-full max-w-[220px]">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-200" />
+            <input
+              className="pl-10 pr-4 py-2 w-full text-gray-200 text-sm border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              placeholder="Search roles..."
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
+            />
+          </div>
+
+          {/* Add Product Button */}
           <button
             onClick={openAddProductDrawerHandler}
-            className="text-white bg-[#4b87a0d9] hover:bg-[#fff] hover:text-black text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] transition-all"
+            className="text-white bg-[#4b87a0d9] hover:bg-white hover:text-black text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] transition-all"
           >
             Add New Product
           </button>
 
-          {/* Refresh */}
+          {/* Refresh Button */}
           <button
             onClick={fetchProductsHandler}
-            className="text-[#fff] border border-[#fff] hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
+            className="text-white border border-white hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
           >
             <MdOutlineRefresh className="text-base" />
             Refresh
@@ -313,108 +317,110 @@ const IndirectProducts: React.FC = () => {
           {/* Bulk Upload Button */}
           <button
             onClick={() => setShowBulkUploadMenu(true)}
-            className="text-white bg-[#4b87a0d9] hover:bg-[#fff] hover:text-black text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] flex justify-between items-center gap-2 transition-all"
+            className="text-white bg-[#4b87a0d9] hover:bg-white hover:text-black text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] flex justify-center items-center gap-2 transition-all"
           >
             Bulk Upload
             <AiFillFileExcel size={22} />
           </button>
         </div>
 
-        {/* Bulk Upload Form (placed below the row) */}
+        {/* Bulk Upload Form */}
         {showBulkUploadMenu && (
-          <div className="mt-2 border border-[#a9a9a9] rounded p-3 bg-white shadow-md w-full max-w-[300px] mx-auto">
+          <div className="mt-2 border border-[#a9a9a9] rounded p-4 bg-white shadow-md w-full max-w-[350px] mx-auto">
             <form>
-              <div className="mb-2">
-                <label className="font-bold block mb-1">Choose File (.csv)</label>
+              <div className="mb-3">
+                <label className="font-bold block mb-1 text-[#2D3748]">Choose File (.csv or .xlsx)</label>
                 <input
                   ref={fileRef}
                   type="file"
                   accept=".csv, .xlsx"
-                  className="w-full border border-[#a9a9a9] text-sm p-1 rounded"
+                  className="w-full border border-[#a9a9a9] text-sm p-1 rounded text-black bg-white"
                 />
               </div>
 
+              {/* Upload & Close Buttons */}
               <div className="flex flex-col sm:flex-row gap-2">
                 <button
                   type="submit"
                   onClick={bulkUploadHandler}
                   disabled={bulkUploading}
-                  className="text-white bg-[#2D3748] hover:bg-[#2e2e4f] text-sm rounded-[6px] px-4 py-2 flex items-center justify-between gap-2 w-full"
+                  className="text-white bg-[#2D3748] hover:bg-[#2e2e4f] text-sm rounded-[6px] px-4 py-2 flex items-center justify-center gap-2 w-full"
                 >
                   Upload
-                  <AiFillFileExcel size={22} />
+                  <AiFillFileExcel size={20} />
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowBulkUploadMenu(false)}
-                  className="text-white bg-[#2D3748] hover:bg-[#2e2e4f] text-sm rounded-[6px] px-4 py-2 flex items-center justify-between gap-2 w-full"
+                  className="text-white bg-[#2D3748] hover:bg-[#2e2e4f] text-sm rounded-[6px] px-4 py-2 flex items-center justify-center gap-2 w-full"
                 >
                   Close
-                  <RxCross2 size={22} />
+                  <RxCross2 size={20} />
                 </button>
               </div>
 
+              {/* Sample CSV Button */}
               <a href={SampleCSV}>
                 <button
                   type="button"
-                  className="mt-2 text-white bg-[#2D3748] hover:bg-[#2e2e4f] text-sm rounded-[6px] px-4 py-2 flex items-center justify-between gap-2 w-full"
+                  className="mt-2 text-white bg-[#2D3748] hover:bg-[#2e2e4f] text-sm rounded-[6px] px-4 py-2 flex items-center justify-center gap-2 w-full"
                 >
                   Sample CSV
-                  <AiFillFileExcel size={22} />
+                  <AiFillFileExcel size={20} />
                 </button>
               </a>
             </form>
           </div>
         )}
-
-
       </div>
 
-         <div className="flex justify-start items-center gap-2 mb-2">
-                <FormControl width={"-webkit-max-content"}>
-                  <FormLabel fontWeight="bold" marginBottom={0} textColor="#fbfbfb">
-                    Products/Services
-                  </FormLabel>
-                  <select
-                    value={productServiceFilter}
-                    onChange={(e) => setProductServiceFilter(e.target.value)}
-                    className="w-[200px] mt-2 rounded border text-white bg-[#ffffff3b] border-none py-2 px-2"
-                  >
-                    <option
-                      style={{ backgroundColor: "#444e5b", color: "white" }}
-                      value=""
-                    >
-                      All
-                    </option>
-                    <option
-                      style={{ backgroundColor: "#444e5b", color: "white" }}
-                      value="product"
-                    >
-                      Products
-                    </option>
-                    <option
-                      style={{ backgroundColor: "#444e5b", color: "white" }}
-                      value="service"
-                    >
-                      Services
-                    </option>
-                  </select>
-                </FormControl>
-                <FormControl width={"-webkit-max-content"}>
-                  <FormLabel textColor="#fbfbfb" fontWeight="bold">
-                    Store
-                  </FormLabel>
-                  <Select
-                    className="w-[200px] mt-2 "
-                    styles={customStyles}
-                    options={storeOptions}
-                    value={storeFilter}
-                    onChange={(d: any) => setStoreFilter(d)}
-                  />
-                </FormControl>
-              </div>
 
-     
+   <div className="flex flex-col md:flex-row md:items-end gap-3 mb-3 w-full">
+  {/* Products/Services Dropdown */}
+  <div className="flex flex-col">
+    <FormControl width="auto">
+      <FormLabel fontWeight="bold" marginBottom={1} textColor="#fbfbfb">
+        Products/Services
+      </FormLabel>
+      <select
+        value={productServiceFilter}
+        onChange={(e) => setProductServiceFilter(e.target.value)}
+        className="w-[200px]  rounded border text-white bg-[#ffffff3b] border-none py-2 px-2"
+      >
+        <option style={{ backgroundColor: "#444e5b", color: "white" }} value="">
+          All
+        </option>
+        <option style={{ backgroundColor: "#444e5b", color: "white" }} value="product">
+          Products
+        </option>
+        <option style={{ backgroundColor: "#444e5b", color: "white" }} value="service">
+          Services
+        </option>
+      </select>
+    </FormControl>
+  </div>
+
+  {/* Store Filter */}
+  <div className="flex flex-col">
+    <FormControl width="auto">
+      <FormLabel textColor="#fbfbfb" fontWeight="bold" marginBottom={1}>
+        Store
+      </FormLabel>
+      <div className="w-[200px]">
+        <Select
+          className="mt-1"
+          styles={customStyles}
+          options={storeOptions}
+          value={storeFilter}
+          onChange={(d :any) => setStoreFilter(d)}
+        />
+      </div>
+    </FormControl>
+  </div>
+</div>
+
+
+
 
       <div>
         <ProductTable

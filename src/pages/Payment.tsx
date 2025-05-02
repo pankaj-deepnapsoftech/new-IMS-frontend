@@ -125,18 +125,25 @@ const Payment: React.FC = () => {
         />
       )}
 
-      <div>
-        <h1 className=" text-[35px] text-center text-white pb-4 font-[700]">Payments</h1>
+      <div className="w-full">
+        <h1 className="text-[28px] md:text-[35px] text-center text-white pb-4 font-bold">
+          Payments
+        </h1>
 
-        <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3 w-full px-4 md:px-10 mt-2">
-        <FiSearch className="relative left-10 top-2 transform -translate-y-1/2 text-gray-200" />
-          <input
-            className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-            placeholder="Search roles..."
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
+        <div className="flex flex-col md:flex-row items-center justify-center gap-3 px-4 md:px-10 w-full mt-2">
 
+          {/* Search Field with Icon */}
+          <div className="relative w-full md:w-[220px]">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-200" />
+            <input
+              className="pl-10 pr-4 py-2 w-full text-sm text-gray-200 border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              placeholder="Search roles..."
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
+            />
+          </div>
+
+          {/* Refresh Button */}
           <button
             onClick={fetchPaymentsHandler}
             className="text-white border border-white hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
@@ -145,8 +152,8 @@ const Payment: React.FC = () => {
             Refresh
           </button>
         </div>
-
       </div>
+
 
       <div>
         <PaymentTable

@@ -86,7 +86,7 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
         <>
           {/* Page Size Selector */}
 
-           <div className="flex justify-end mb-2">
+           <div className="flex justify-end mb-2 mt-2">
                       <Select
                         onChange={(e) => setPageSize(Number(e.target.value))}
                         color="white"

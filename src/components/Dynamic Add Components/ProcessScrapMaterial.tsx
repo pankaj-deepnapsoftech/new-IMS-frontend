@@ -48,19 +48,49 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
     }));
     setSelectedProducts(prods);
   }, [inputs]);
-
+  const customStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      backgroundColor: "transparent",
+      borderColor: "#a9a9a9",
+      color: "#fff",
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
+      color: "black",
+      cursor: "pointer",
+    }),
+    multiValue: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#808080",
+      color: "#fff",
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      zIndex: 9999, // ensures dropdown doesn't get hidden
+    }),
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: "#fff", // light gray placeholder
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      color: "#fff", // ensures selected value is white
+    }),
+  };
   return (
     <div>
       <FormControl>
-        <FormLabel fontWeight="bold">Scrap Materials</FormLabel>
+        <FormLabel fontWeight="bold" color="white">Scrap Materials</FormLabel>
         {inputs && inputs.map((input, ind) => (
           <div
-            className="grid grid-cols-4 gap-2 pb-2 mb-2"
+            
             key={ind}
           >
             <FormControl className="mb-5">
-              <FormLabel fontWeight="bold">Product Name</FormLabel>
-              <Select
+              <FormLabel fontWeight="bold" color="white">Product Name</FormLabel>
+              <Select styles={customStyles}
                 isDisabled
                 required
                 className="rounded mt-2 border border-[#a9a9a9]"
@@ -74,8 +104,8 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold">Description</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" color="white">Description</FormLabel>
+              <Input className="text-gray-200"
                 isDisabled
                 border="1px"
                 borderColor="#a9a9a9"
@@ -88,8 +118,8 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold">Estimated Quantity</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" color="white">Estimated Quantity</FormLabel>
+              <Input className="text-gray-200"
                 isDisabled
                 border="1px"
                 borderColor="#a9a9a9"
@@ -102,8 +132,8 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold">Produced Quantity</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" color="white">Produced Quantity</FormLabel>
+              <Input className="text-gray-200"
                 border="1px"
                 borderColor="#a9a9a9"
                 onChange={(e) => {
@@ -115,8 +145,8 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold">UOM</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" color="white">UOM</FormLabel>
+              <Input className="text-gray-200"
                 isDisabled={true}
                 border="1px"
                 borderColor="#a9a9a9"
@@ -126,8 +156,8 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold">Unit Cost</FormLabel>
-              <Input
+              <FormLabel fontWeight="bold" color="white">Unit Cost</FormLabel>
+              <Input className="text-gray-200"
                 isDisabled={true}
                 border="1px"
                 borderColor="#a9a9a9"
@@ -140,8 +170,8 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold">Total Part Cost</FormLabel>
-              <input
+              <FormLabel fontWeight="bold" color="white">Total Part Cost</FormLabel>
+              <input 
                 disabled={true}
                 onChange={(e) => {
                   onChangeHandler(e.target.name, e.target.value, ind);
@@ -149,7 +179,7 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
                 type="number"
                 name="total_part_cost"
                 value={input.total_part_cost}
-                className="rounded px-2 py-[6px] w-[300px] border-[1px] border-[#a9a9a9] disabled:cursor-not-allowed disabled:bg-white"
+                className="rounded px-2 text-gray-200 py-[6px] w-[300px] border-[1px] border-[#a9a9a9] disabled:cursor-not-allowed disabled:bg-transparent"
               ></input>
             </FormControl>
           </div>

@@ -380,7 +380,37 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setTotalCost(cost);
     }
   }, [selectedProducts]);
-
+  const customStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      backgroundColor: "transparent",
+      borderColor: "#a9a9a9",
+      color: "#fff",
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
+      color: "black",
+      cursor: "pointer",
+    }),
+    multiValue: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#808080",
+      color: "#fff",
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      zIndex: 9999, // ensures dropdown doesn't get hidden
+    }),
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: "#fff", // light gray placeholder
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      color: "#fff", // ensures selected value is white
+    }),
+  };
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
@@ -453,6 +483,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   <FormLabel fontWeight="bold" color="white">Finished Good</FormLabel>
                   <Select
                     isDisabled
+                    styles={customStyles}
                     className="rounded mt-2 border border-[#a9a9a9]"
                     options={productOptions}
                     placeholder="Select"
@@ -529,6 +560,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     type="file"
                     placeholder="Choose a file"
                     accept=".pdf"
+                    color="#000"
                     className="p-1 border text-gray-200 border-[#a9a9a9] w-[267px] rounded"
                   />
                 </FormControl>
@@ -575,15 +607,16 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                 setInputs={setScrapMaterials}
               />
             </div>
-            <div>
+            <div className="mt-2">
               <Button
                 disabled={isCompleted || rawMaterialApprovalPending}
                 marginRight={2}
                 isLoading={isUpdating}
                 type="submit"
                 className="mt-1"
-                color="white"
-                backgroundColor="#1640d6"
+                color="black"
+              backgroundColor="#ffffff8a"
+              _hover={{ bg: "#d1d2d5" }}
               >
                 {submitBtnText}
               </Button>
@@ -593,8 +626,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   isLoading={isUpdating}
                   type="button"
                   className="mt-1"
-                  color="white"
-                  backgroundColor="#1640d6"
+                  color="black"
+                  backgroundColor="#ffffff8a"
+                  _hover={{ bg: "#d1d2d5" }}
                   onClick={markProcessDoneHandler}
                 >
                   Mark as Done

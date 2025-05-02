@@ -99,7 +99,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
       {boms.length === 0 && !isLoadingBoms && <EmptyData />}
       {!isLoadingBoms && boms.length > 0 && (
         <div>
-          <div className="flex justify-end mb-2">
+          <div className="flex justify-end mb-2 mt-2">
             <Select
               onChange={(e) => setPageSize(e.target.value)}
               color="white"

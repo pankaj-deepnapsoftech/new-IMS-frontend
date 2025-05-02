@@ -308,23 +308,43 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
   useEffect(() => {
     fetchInvoiceDetailsHandler(id || "");
   }, [id]);
-
+  const customStyles = {
+    control: (base: any) => ({
+      ...base,
+      backgroundColor: 'transparent', // Light gray background for the placeholder
+      color : "#fff"
+    }),
+    placeholder: (base: any) => ({
+      ...base,
+      color: '#fff', // Gray text for placeholder
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
+      color: "black",
+      cursor: "pointer",
+    }),
+    singleValue: (base: any) => ({
+      ...base,
+      color: '#fff',
+    }),
+  };
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#4b86a0]  right-0 top-0 z-10 py-3"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-          <BiX onClick={closeDrawerHandler} size="26px" />
-          Invoice
+        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
+          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
+      
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-2xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
+        <h2 className="text-xl text-center  font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
             Update Invoice
           </h2>
 
@@ -332,8 +352,9 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
           {!isLoading && (
             <form onSubmit={updateInvoiceHandler}>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Category</FormLabel>
-                <Select
+                <FormLabel fontWeight="bold" color="white">Category</FormLabel>
+                <Select  
+                styles={customStyles}
                   isDisabled
                   value={category}
                   options={categoryOptions}
@@ -343,8 +364,8 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
               </FormControl>
               {category && category.value === "sale" && (
                 <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold">Buyer</FormLabel>
-                  <Select
+                  <FormLabel fontWeight="bold" color="white">Buyer</FormLabel>
+                  <Select styles={customStyles}
                     isDisabled
                     value={buyer}
                     options={buyerOptions}
@@ -355,19 +376,19 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
               )}
               {category && category.value === "purchase" && (
                 <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold">Supplier</FormLabel>
-                  <Select
+                  <FormLabel fontWeight="bold" color="white">Supplier</FormLabel>
+                  <Select styles={customStyles}
                     isDisabled
                     value={supplier}
                     options={supplierOptions}
                     required={true}
-                    onChange={(e: any) => setSupplier(e)}
+                    onChange={(e: any) => setSupplier(e)} 
                   />
                 </FormControl>
               )}
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Invoice No.</FormLabel>
-                <Input
+                <FormLabel fontWeight="bold" color="white">Invoice No.</FormLabel>
+                <Input  className="text-gray-200"
                   value={invoiceNo}
                   onChange={(e) => setInvoiceNo(e.target.value)}
                   type="text"
@@ -375,28 +396,29 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Document Date</FormLabel>
-                <Input
+                <FormLabel fontWeight="bold" color="white">Document Date</FormLabel>
+                <Input 
                   value={documentDate}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-200"
                   onChange={(e) => setDocumentDate(e.target.value)}
                   type="date"
                   placeholder="Document Date"
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Sales Order Date</FormLabel>
-                <Input
+                <FormLabel fontWeight="bold" color="white">Sales Order Date</FormLabel>
+                <Input  
                   value={salesOrderDate}
-                  className="no-scrollbar"
+
+                  className="no-scrollbar text-gray-200"
                   onChange={(e) => setSalesOrderDate(e.target.value)}
                   type="date"
                   placeholder="Sales Order Date"
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Store</FormLabel>
-                <Select
+                <FormLabel fontWeight="bold" color="white">Store</FormLabel>
+                <Select styles={customStyles}
                   value={store}
                   options={storeOptions}
                   required={true}
@@ -404,30 +426,30 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Note</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Note</FormLabel>
                 <textarea
-                  className="border w-full border-[#a9a9a9] rounded"
+                  className="border w-full border-[#a9a9a9] bg-transparent text-gray-200 rounded"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Items</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Items</FormLabel>
                 <AddItems inputs={inputs} setInputs={setInputs} />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Subtotal</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Subtotal</FormLabel>
                 <Input
                   value={subtotal}
                   isDisabled={true}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-200"
                   type="number"
                   placeholder="Subtotal"
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Tax</FormLabel>
-                <Select
+                <FormLabel fontWeight="bold" color="white">Tax</FormLabel>
+                <Select styles={customStyles}
                   required={true}
                   value={tax}
                   options={taxOptions}
@@ -435,7 +457,7 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Total</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Total</FormLabel>
                 <Input value={total} isDisabled={true} />
               </FormControl>
               <Button

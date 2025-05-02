@@ -204,44 +204,48 @@ const Stores: React.FC = () => {
         )}
         {/* Stores Page */}
         <div>
-          <h1 className="text-center font-[700] text-white pb-6 text-3xl pt-2">Stores</h1>
-          <div className="mt-2 w-full flex flex-col md:flex-row flex-wrap justify-center items-start gap-2 px-4 relative">
-            {/* Search */}
-             <FiSearch className="relative left-10 top-4 transform -translate-y-1/2 text-gray-200" />
-                  <input
-                    className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-                    placeholder="Search roles..."
-                    value={searchKey}
-                    onChange={(e) => setSearchKey(e.target.value)}
-                  />
+          <h1 className="text-center font-bold text-white pb-6 text-3xl pt-2">
+            Stores
+          </h1>
 
-            {/* Refresh */}
+          <div className="mt-2 w-full flex flex-col md:flex-row flex-wrap justify-center items-start gap-3 px-4 relative">
+            {/* Search Box */}
+            <div className="relative w-full md:w-[250px]">
+              <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-200" />
+              <input
+                className="pl-10 pr-4 py-2 w-full text-gray-200 text-sm border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+                placeholder="Search roles..."
+                value={searchKey}
+                onChange={(e) => setSearchKey(e.target.value)}
+              />
+            </div>
+
+            {/* Refresh Button */}
             <Button
               fontSize="14px"
               paddingX="12px"
               paddingY="6px"
-              width={{ base: "100%", md: "100px" }}  
+              width={{ base: "100%", md: "100px" }}
               onClick={fetchStoresHandler}
               leftIcon={<MdOutlineRefresh />}
               color="white"
               borderColor="white"
               variant="outline"
-                      _hover={{ bg: "white", color: "#2D3748" }}  
-
+              _hover={{ bg: "white", color: "#2D3748" }}
             >
               Refresh
             </Button>
 
-            {/* Add Store */}
+            {/* Add Store Button */}
             <Button
               fontSize="14px"
               paddingX="12px"
               paddingY="6px"
-              width={{ base: "100%", md: "200px" }}  
+              width={{ base: "100%", md: "200px" }}
               onClick={openAddStoreDrawerHandler}
               color="white"
               backgroundColor="#4b87a0d9"
-              _hover={{ bg: "white", color:"black"}}
+              _hover={{ bg: "white", color: "black" }}
             >
               Add New Store
             </Button>
@@ -256,8 +260,8 @@ const Stores: React.FC = () => {
                 onClick={() => setShowBulkUploadMenu((prev) => !prev)}
                 color="white"
                 backgroundColor="#4b87a0d9"
-                rightIcon={<AiFillFileExcel size={22}  />}
-                _hover={{ bg: "white", textColor:"black" }}
+                rightIcon={<AiFillFileExcel size={22} />}
+                _hover={{ bg: "white", textColor: "black" }}
               >
                 Bulk Upload
               </Button>
@@ -321,6 +325,7 @@ const Stores: React.FC = () => {
             </div>
           </div>
         </div>
+
 
         <div>
           <StoreTable

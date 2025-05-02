@@ -208,14 +208,20 @@ import EmptyData from "../../ui/emptyData";
         )}
         {!isLoadingProducts && products.length > 0 && (
           <div>
-            <div className="flex justify-end mb-2">
+            <div className="flex justify-end mb-2 mt-2">
               <Select
                 onChange={(e) => setPageSize(e.target.value)}
                 width="80px"
                 color="white"
                 size="sm"
                 borderRadius="md"
-                border="1px solid gray"
+                border="1px solid gray" 
+                sx={{
+                  option: {
+                    backgroundColor: "#444e5b", // Default background
+                    color: "white",
+                  },
+                }}
               >
                 <option value={10}>10</option>
                 <option value={20}>20</option>

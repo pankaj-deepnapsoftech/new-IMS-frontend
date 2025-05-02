@@ -75,9 +75,9 @@ const InventoryApprovals: React.FC = () => {
       setFilteredData(data);
       return;
     }
-  
+
     const searchTxt = searchKey.toLowerCase().trim();
-  
+
     const results = data.filter((emp: any) => {
       const firstName = emp.first_name?.toString().toLowerCase() || "";
       const lastName = emp.last_name?.toString().toLowerCase() || "";
@@ -90,7 +90,7 @@ const InventoryApprovals: React.FC = () => {
       const updatedAt = emp?.updatedAt
         ? new Date(emp.updatedAt).toISOString().substring(0, 10).split("-").reverse().join("")
         : "";
-  
+
       return (
         firstName.includes(searchTxt) ||
         lastName.includes(searchTxt) ||
@@ -101,10 +101,10 @@ const InventoryApprovals: React.FC = () => {
         updatedAt.includes(searchTxt.replaceAll("/", ""))
       );
     });
-  
+
     setFilteredData(results);
   }, [searchKey, data]);
-  
+
 
   if (!isAllowed) {
     return <div className="text-center text-red-500">You are not allowed to access this route.</div>
@@ -113,35 +113,40 @@ const InventoryApprovals: React.FC = () => {
   return (
     <div className="  rounded-md h-full ">
       <div>
-        <h1 className="text-center font-[700] text-white pb-6 text-3xl pt-2">
+        <h1 className="text-center font-bold text-white pb-6 text-3xl pt-2">
           Inventory Approvals
         </h1>
 
-        <div className="mt-2  flex justify-center gap-y-1 it gap-x-2 w-full">
-        <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
-          <input
-            className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-            placeholder="Search roles..."
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
+        <div className="mt-2 flex flex-col md:flex-row justify-center gap-3 px-4 w-full">
+          {/* Search Box */}
+          <div className="relative w-full md:w-[250px]">
+            <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-200" />
+            <input
+              className="pl-10 pr-4 py-2 w-full text-gray-200 text-sm border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              placeholder="Search roles..."
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
+            />
+          </div>
+
+          {/* Refresh Button */}
           <Button
-            fontSize={{ base: "14px", md: "14px" }}
-            paddingX={{ base: "10px", md: "12px" }}
-            paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "-webkit-fill-available", md: 100 }}
+            fontSize="14px"
+            paddingX="12px"
+            paddingY="6px"
+            width={{ base: "100%", md: "120px" }}
             onClick={fetchInventoryHandler}
             leftIcon={<MdOutlineRefresh />}
-            color="#fff"
-            borderColor="#fff"
+            color="white"
+            borderColor="white"
             variant="outline"
-                    _hover={{ bg: "white", color: "#2D3748" }}  
-
+            _hover={{ bg: "white", color: "#2D3748" }}
           >
             Refresh
           </Button>
         </div>
       </div>
+
 
       <div>
         <BOMRawMaterialTable products={filteredData} isLoadingProducts={isLoadingInventory} approveProductHandler={approveRmHandler} />

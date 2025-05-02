@@ -139,7 +139,7 @@ const UserRole: React.FC = () => {
   }
 
   return (
-    <div className=" max-[800px]:pl-0">
+    <div>
       {/* Add User Role */}
       {isAddRoleDrawerOpened && (
         <AddUserRole
@@ -167,40 +167,43 @@ const UserRole: React.FC = () => {
         {/* Title */}
         <span className="text-2xl md:text-3xl pb-6 text-white font-bold max-[800px]:text-center">User Roles</span>
 
-        {/* Buttons + Search in one row on mobile */}
-        <div className="flex flex-row  gap-2 w-full md:w-auto mt-2 md:mt-0">
-          {/* Buttons */}
-          <Button
-            onClick={openAddRoleDrawerHandler}
-            bg="#4b87a0d9"
-            color="white"
-            _hover={{ bg: "white", textColor: "black" }}
-          >
-            Add New Role
-          </Button>
-          <Button
-            onClick={fetchRolesHandler}
-            leftIcon={<MdOutlineRefresh />}
-            variant="outline"
-            color="white"
-            borderColor="white"
-            _hover={{ bg: "white", color: "#2D3748" }}
-
-          >
-            Refresh
-          </Button>
+        <div className="flex flex-col md:flex-row gap-2 mt-2 md:mt-0">
+         
+          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+            <Button
+              onClick={openAddRoleDrawerHandler}
+              bg="#4b87a0d9"
+              color="white"
+              className="w-full md:w-auto"
+              _hover={{ bg: "white", textColor: "black" }}
+            >
+              Add New Role
+            </Button>
+            <Button
+              onClick={fetchRolesHandler}
+              leftIcon={<MdOutlineRefresh />}
+              variant="outline"
+              color="white"
+              borderColor="white"
+              className="w-full md:w-auto"
+              _hover={{ bg: "white", color: "#2D3748" }}
+            >
+              Refresh
+            </Button>
+          </div>
 
           {/* Search */}
-          <div className="relative flex-1 min-w-[150px]">
+          <div className="relative w-full md:w-auto flex-1">
             <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-200" />
             <input
-              className="pl-10 pr-4 py-2 w-full text-sm  border-b bg-[#475569] shadow-sm focus:outline-none text-gray-200 placeholder:text-gray-200"
+              className="pl-10 pr-4 py-2 w-full text-sm border-b bg-[#475569] shadow-sm focus:outline-none text-gray-200 placeholder:text-gray-200"
               placeholder="Search roles..."
               value={searchKey}
               onChange={(e) => setSearchKey(e.target.value)}
             />
           </div>
         </div>
+
       </div>
 
       <div>

@@ -259,8 +259,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
-      
+          <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">    
             Update Product
           </h2>
 

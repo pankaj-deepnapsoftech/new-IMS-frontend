@@ -342,7 +342,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
+        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
           <BiX onClick={closeDrawerHandler} size="26px" color="white" />
           
         </h1>
@@ -356,7 +356,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
           {!isLoading && (
             <form onSubmit={updateProformaInvoiceHandler}>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Category</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Category</FormLabel>
                 <Select
                 styles={customStyles}
                   value={category}
@@ -367,7 +367,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               </FormControl>
               {category && category.value === "sales" && (
                 <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold">Buyer</FormLabel>
+                  <FormLabel fontWeight="bold" color="white">Buyer</FormLabel>
                   <Select
                   styles={customStyles}
                     value={buyer}
@@ -379,7 +379,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               )}
               {category && category.value === "purchase" && (
                 <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold">Supplier</FormLabel>
+                  <FormLabel fontWeight="bold" color="white">Supplier</FormLabel>
                   <Select 
                   styles={customStyles}
                     value={supplier}
@@ -390,7 +390,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
                 </FormControl>
               )}
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Proforma Invoice No.</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Proforma Invoice No.</FormLabel>
                 <Input className="text-gray-300"
                   value={proformaInvoiceNo}
                   onChange={(e) => setProformaInvoiceNo(e.target.value)}
@@ -399,7 +399,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Document Date</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Document Date</FormLabel>
                 <Input 
                   value={documentDate}
                   className="no-scrollbar text-gray-300"
@@ -409,7 +409,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Sales Order Date</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Sales Order Date</FormLabel>
                 <Input 
                   value={salesOrderDate}
                   className="no-scrollbar text-gray-300"
@@ -419,7 +419,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Store</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Store</FormLabel>
                 <Select
                 styles={customStyles}
                   value={store}
@@ -429,19 +429,19 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Note</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Note</FormLabel>
                 <textarea
-                  className="border w-full border-[#a9a9a9] rounded"
+                  className="border w-full border-[#a9a9a9] bg-transparent text-gray-200 rounded"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Items</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Items</FormLabel>
                 <AddItems inputs={inputs} setInputs={setInputs} />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Subtotal</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Subtotal</FormLabel>
                 <Input 
                   value={subtotal}
                   isDisabled={true}
@@ -451,7 +451,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Tax</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Tax</FormLabel>
                 <Select
                 styles={customStyles}
                   required={true}
@@ -461,7 +461,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Total</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Total</FormLabel>
                 <Input value={total} isDisabled={true} className="text-gray-300" />
               </FormControl>
               <Button

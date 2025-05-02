@@ -149,7 +149,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
       {stores.length === 0 && !isLoadingStores && <EmptyData />}
       {!isLoadingStores && stores.length > 0 && (
         <div>
-          <div className="flex justify-end mb-2">
+          <div className="flex justify-end mb-2 mt-2">
             <Select
               onChange={(e) => setPageSize(e.target.value)}
               color="white"

@@ -126,12 +126,12 @@ const BOM: React.FC = () => {
     setFilteredBoms(results);
   }, [searchKey]);
 
-  if(!isAllowed){
+  if (!isAllowed) {
     return <div className="text-center text-red-500">You are not allowed to access this route.</div>
   }
 
   return (
-    <div  className="rounded-md ">
+    <div className="rounded-md ">
       {/* Add BOM */}
       {isAddBomDrawerOpened && (
         <AddBom
@@ -160,44 +160,50 @@ const BOM: React.FC = () => {
           Bill Of Materials (BOM)
         </h1>
 
-        <div className="mt-2  flex flex-wrap pb-4  justify-center  w-full gap-4">
-        <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
-          <input
-            className="pl-10 pr-4 py-2 w-[200px] text-sm text-gray-200  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-            placeholder="Search roles..."
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
-       
+        <div className="mt-2 flex flex-wrap justify-center md:justify-center w-full gap-4">
+          {/* Search Input */}
+          <div className="relative w-full md:w-[200px]">
+            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-200" />
+            <input
+              className="pl-10 pr-4 py-2 w-full text-sm text-gray-200 border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              placeholder="Search roles..."
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
+            />
+          </div>
+
+          {/* Add New BOM Button */}
           <Button
             fontSize={{ base: "14px", md: "14px" }}
             paddingX={{ base: "10px", md: "12px" }}
             paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "-webkit-fill-available", md: 200 }}
+            width={{ base: "100%", md: 200 }}
             onClick={openAddBomDrawerHandler}
             color="white"
             backgroundColor="#4b87a0d9"
-            _hover={{ bg: "#fff",textColor:"#000" }}
+            _hover={{ bg: "#fff", textColor: "#000" }}
           >
             Add New BOM
           </Button>
+
+          {/* Refresh Button */}
           <Button
             fontSize={{ base: "14px", md: "14px" }}
             paddingX={{ base: "10px", md: "12px" }}
             paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "-webkit-fill-available", md: 100 }}
+            width={{ base: "100%", md: 100 }}
             onClick={fetchBomsHandler}
             leftIcon={<MdOutlineRefresh />}
-            color="#ffff"
-            borderColor="#fff"
+            color="white"
+            borderColor="white"
             variant="outline"
-                    _hover={{ bg: "white", color: "#2D3748" }}  
-
+            _hover={{ bg: "white", color: "#2D3748" }}
           >
             Refresh
           </Button>
         </div>
       </div>
+
 
       <div>
         <BOMTable

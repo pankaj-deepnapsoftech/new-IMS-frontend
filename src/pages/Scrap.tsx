@@ -15,15 +15,15 @@ const Scrap: React.FC = () => {
   const [isLoadingScraps, setIsLoadingScraps] = useState<boolean>(false);
   const [searchKey, setSearchKey] = useState<string | undefined>();
 
-  const fetchScrapHandler = async ()=>{
+  const fetchScrapHandler = async () => {
     try {
-      const response = await fetch(process.env.REACT_APP_BACKEND_URL+'scrap/all', {
+      const response = await fetch(process.env.REACT_APP_BACKEND_URL + 'scrap/all', {
         headers: {
           'Authorization': `Bearer ${cookies?.access_token}`
         }
       });
       const data = await response.json();
-      if(!data.success){
+      if (!data.success) {
         throw new Error(data.message);
       }
       setData(data.scraps);
@@ -33,7 +33,7 @@ const Scrap: React.FC = () => {
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchScrapHandler();
   }, [])
 
@@ -68,38 +68,43 @@ const Scrap: React.FC = () => {
   return (
     <div className="  rounded-md h-full ">
       <div>
-        <h1 className="text-center font-[700] text-white pb-6 text-3xl pt-2">
+        <h1 className="text-center font-bold text-white pb-6 text-3xl pt-2">
           Scrap Management
         </h1>
 
-        <div className="mt-2  flex justify-center gap-y-1 it gap-x-2 w-full">
-        <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
-      <input
-        className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-        placeholder="Search roles..."
-        value={searchKey}
-        onChange={(e) => setSearchKey(e.target.value)}
-      />
+        <div className="mt-2 flex flex-col md:flex-row justify-center gap-3 px-4 w-full">
+          {/* Search Box */}
+          <div className="relative w-full md:w-[250px]">
+            <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-200" />
+            <input
+              className="pl-10 pr-4 py-2 w-full text-gray-200 text-sm border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              placeholder="Search roles..."
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
+            />
+          </div>
+
+          {/* Refresh Button */}
           <Button
-            fontSize={{ base: "14px", md: "14px" }}
-            paddingX={{ base: "10px", md: "12px" }}
-            paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "-webkit-fill-available", md: 100 }}
+            fontSize="14px"
+            paddingX="12px"
+            paddingY="6px"
+            width={{ base: "100%", md: "120px" }}
             onClick={fetchScrapHandler}
             leftIcon={<MdOutlineRefresh />}
             color="white"
             borderColor="white"
             variant="outline"
-                    _hover={{ bg: "white", color: "#2D3748" }}  
-
+            _hover={{ bg: "white", color: "#2D3748" }}
           >
             Refresh
           </Button>
         </div>
       </div>
 
+
       <div>
-        <ScrapTable scraps={filteredData} isLoadingScraps={isLoadingScraps} openScrapDetailsDrawerHandler={()=>{}} />
+        <ScrapTable scraps={filteredData} isLoadingScraps={isLoadingScraps} openScrapDetailsDrawerHandler={() => { }} />
       </div>
     </div>
   );

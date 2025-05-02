@@ -66,72 +66,72 @@ const SellerDetails: React.FC<SellerDetailsProps> = ({sellerId, closeDrawerHandl
   }, []);
     return <Drawer closeDrawerHandler={closeDrawerHandler}>
     <div
-      className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
+      className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f] right-0 top-0 z-10 py-3"
       style={{
         boxShadow:
           "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
       }}
     >
-      <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-        <BiX onClick={closeDrawerHandler} size="26px" />
-        Supplier
+      <h1 className="px-4 flex gap-x-2 items-center text-xl py-3">
+        <BiX onClick={closeDrawerHandler} size="26px" color="white" />
+       
       </h1>
 
       <div className="mt-8 px-5">
-        <h2 className="text-2xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
-          Supplier Details
+      <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
+      Supplier Details
         </h2>
 
         {isLoadingSeller && <Loading />}
         {!isLoadingSeller && (
-          <div>
+          <div className="text-white">
             <div className="mt-3 mb-5">
               <p className="font-semibold">Name</p>
-              <p>{name}</p>
+              <p className="text-gray-200">{name}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Email</p>
-              <p>{email}</p>
+              <p className="text-gray-200">{email}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Phone</p>
-              <p>{phone}</p>
+              <p className="text-gray-200">{phone}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">GST Number</p>
-              <p>{gst}</p>
+              <p className="text-gray-200">{gst}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Company Name</p>
-              <p>{companyName}</p>
+              <p className="text-gray-200">{companyName}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Company Email</p>
-              <p>{companyEmail}</p>
+              <p className="text-gray-200">{companyEmail}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Company Phone</p>
-              <p>{companyPhone}</p>
+              <p className="text-gray-200">{companyPhone}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Address Line 1</p>
-              <p>{addressLine1}</p>
+              <p className="text-gray-200">{addressLine1}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Address Line 2</p>
-              <p>{addressLine2}</p>
+              <p className="text-gray-200">{addressLine2}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Pincode</p>
-              <p>{pincode}</p>
+              <p className="text-gray-200">{pincode}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">City</p>
-              <p>{city}</p>
+              <p className="text-gray-200">{city}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">State</p>
-              <p>{state}</p>
+              <p className="text-gray-200">{state}</p>
             </div>
           </div>
         )}

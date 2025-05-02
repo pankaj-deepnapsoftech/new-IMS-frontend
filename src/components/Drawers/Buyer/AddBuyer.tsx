@@ -221,7 +221,8 @@ const AddBuyer: React.FC<AddBuyerProps> = ({
               type="submit"
               className="mt-1"
               color="white"
-              backgroundColor="#1640d6"
+              backgroundColor="#ffffff8a"
+              _hover={{ bg: "#d1d2d5" }}
             >
               Submit
             </Button>

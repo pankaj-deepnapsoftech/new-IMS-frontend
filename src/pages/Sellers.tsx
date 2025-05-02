@@ -195,28 +195,30 @@ const Sellers: React.FC = () => {
           Suppliers
         </h1>
 
-        <div className="mt-2 flex flex-col md:flex-row justify-center gap-y-2 md:gap-y-0 gap-x-2 w-full">
+        <div className="mt-2 flex flex-col md:flex-row justify-center md:justify-center gap-y-2 md:gap-y-0 gap-x-2 w-full">
           {/* Search */}
-          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
-      <input
-        className="pl-10 pr-4 py-2 w-[200px]  text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-        placeholder="Search roles..."
-        value={searchKey}
-        onChange={(e) => setSearchKey(e.target.value)}
-      />
+          <div className="relative w-full md:w-64">
+            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-200" />
+            <input
+              className="pl-10 pr-4 py-2 w-full text-sm border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              placeholder="Search roles..."
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
+            />
+          </div>
+
           {/* Refresh Button */}
           <Button
             fontSize={{ base: "14px", md: "14px" }}
             paddingX={{ base: "10px", md: "12px" }}
             paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "100%", md: 100 }}  
+            width={{ base: "100%", md: 100 }}
             onClick={fetchSellersHandler}
             leftIcon={<MdOutlineRefresh />}
             color="white"
             borderColor="white"
             variant="outline"
-                    _hover={{ bg: "white", color: "#2D3748" }}  
-
+            _hover={{ bg: "white", color: "#2D3748" }}
           >
             Refresh
           </Button>
@@ -226,34 +228,34 @@ const Sellers: React.FC = () => {
             fontSize={{ base: "14px", md: "14px" }}
             paddingX={{ base: "10px", md: "12px" }}
             paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "100%", md: 200 }}  
+            width={{ base: "100%", md: 200 }}
             onClick={openAddSellerDrawerHandler}
             color="white"
             backgroundColor="#4b87a0d9"
-            _hover={{ bg: "white", textColor:"black" }}
+            _hover={{ bg: "white", textColor: "black" }}
           >
             Add New Supplier
           </Button>
 
           {/* Bulk Upload Button */}
-          <div className="w-full md:w-[200px]">
+          <div className="w-full md:w-[200px] relative">
             <Button
               fontSize={{ base: "14px", md: "14px" }}
               paddingX={{ base: "10px", md: "12px" }}
               paddingY={{ base: "0", md: "3px" }}
-              width="100%"  
+              width="100%"
               onClick={() => setShowBulkUploadMenu(true)}
               color="white"
               backgroundColor="#4b87a0d9"
               rightIcon={<AiFillFileExcel size={22} />}
-              _hover={{ bg: "white", textColor:"black" }}
+              _hover={{ bg: "white", textColor: "black" }}
             >
               Bulk Upload
             </Button>
 
             {/* Bulk Upload Dropdown */}
             {showBulkUploadMenu && (
-              <div className="mt-1 border border-[#a9a9a9] rounded p-2">
+              <div className="absolute z-50 mt-1 border border-[#a9a9a9] rounded p-2 bg-white w-[250px] shadow-md">
                 <form>
                   <FormControl>
                     <FormLabel fontWeight="bold">Choose File (.csv)</FormLabel>
@@ -297,7 +299,7 @@ const Sellers: React.FC = () => {
                     <Button
                       type="button"
                       fontSize={{ base: "14px", md: "14px" }}
-                      width={{ base: "100%", md: 190 }}  
+                      width={{ base: "100%", md: 190 }}
                       color="white"
                       backgroundColor="#2D3748"
                       className="mt-1"
@@ -311,9 +313,11 @@ const Sellers: React.FC = () => {
               </div>
             )}
           </div>
+
         </div>
 
       </div>
+
 
       <div>
         <AgentTable

@@ -284,21 +284,23 @@ const Products: React.FC = () => {
       )}
 
       {/* Products Page */}
-      <div>
-        <h1 className="text-center text-white pb-6 text-[30px] font-[600] ">
+      <div className="w-full">
+        <h1 className="text-center text-white pb-6 text-[30px] font-semibold">
           Direct Inventory
         </h1>
 
         {/* Main Row */}
-        <div className="mt-2 w-full flex flex-col md:flex-row md:flex-wrap justify-center gap-3 px-4 pb-4">
-          {/* Search */}
-          <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
-          <input
-            className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none text-gray-200 placeholder:text-gray-200"
-            placeholder="Search roles..."
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
+        <div className="mt-2 w-full flex flex-col md:flex-row md:flex-wrap justify-center gap-3 px-4 pb-4 relative">
+          {/* Search Container */}
+          <div className="relative">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300" />
+            <input
+              className="pl-10 pr-4 py-2 w-full text-gray-200 text-sm border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              placeholder="Search roles..."
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
+            />
+          </div>
 
           {/* Add Product */}
           <Button
@@ -325,13 +327,12 @@ const Products: React.FC = () => {
             color="white"
             borderColor="white"
             variant="outline"
-                    _hover={{ bg: "white", color: "#2D3748" }}  
-
+            _hover={{ bg: "white", color: "#2D3748" }}
           >
             Refresh
           </Button>
 
-          {/* Bulk Upload Button */}
+          {/* Bulk Upload */}
           <Button
             fontSize="14px"
             paddingX="12px"
@@ -347,7 +348,7 @@ const Products: React.FC = () => {
           </Button>
         </div>
 
-        {/* Bulk Upload Section (outside of main row) */}
+        {/* Bulk Upload Section */}
         {showBulkUploadMenu && (
           <div className="mt-2 w-full max-w-[350px] mx-auto border border-[#a9a9a9] rounded p-3 bg-white shadow-md">
             <form>
@@ -407,15 +408,17 @@ const Products: React.FC = () => {
           </div>
         )}
       </div>
-      <div className="flex justify-start items-center gap-2 mb-2">
-        <FormControl width={"-webkit-max-content"}>
+
+      <div className="w-full flex flex-col md:flex-row justify-start items-start md:items-center gap-4 mb-4 px-4">
+        {/* Products/Services Filter */}
+        <FormControl className="w-full md:w-[250px]">
           <FormLabel fontWeight="bold" marginBottom={0} textColor="#fbfbfb">
             Products/Services
           </FormLabel>
           <select
             value={productServiceFilter}
             onChange={(e) => setProductServiceFilter(e.target.value)}
-            className="w-[200px] mt-2 rounded border text-white bg-[#ffffff3b] border-none py-2 px-2"
+            className="w-full mt-2 rounded border text-white bg-[#ffffff3b] border-none py-2 px-2"
           >
             <option
               style={{ backgroundColor: "#444e5b", color: "white" }}
@@ -437,17 +440,21 @@ const Products: React.FC = () => {
             </option>
           </select>
         </FormControl>
-        <FormControl width={"-webkit-max-content"}>
+
+        {/* Store Filter */}
+        <FormControl className="w-full md:w-[250px]">
           <FormLabel textColor="#fbfbfb" fontWeight="bold">
             Store
           </FormLabel>
-          <Select
-            className="w-[200px] mt-2 "
-            styles={customStyles}
-            options={storeOptions}
-            value={storeFilter}
-            onChange={(d: any) => setStoreFilter(d)}
-          />
+          <div className="mt-2">
+            <Select
+              className="w-full"
+              styles={customStyles}
+              options={storeOptions}
+              value={storeFilter}
+              onChange={(d:any) => setStoreFilter(d)}
+            />
+          </div>
         </FormControl>
       </div>
 
