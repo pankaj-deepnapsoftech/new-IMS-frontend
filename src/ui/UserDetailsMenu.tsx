@@ -1,6 +1,6 @@
 import { Avatar } from "@chakra-ui/react";
 import { BiLogOutCircle, BiX } from "react-icons/bi";
-
+import { Link } from "react-router-dom";
 interface UserDetailsMenuProps {
     email: string,
     firstname: string,
@@ -20,6 +20,7 @@ const UserDetailsMenu: React.FC<UserDetailsMenuProps> = ({
           "0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05)",
       }}
     >
+      <Link to="/userprofile">
       <div className="cursor-pointer flex border-b py-2 px-3 rounded-md hover:bg-[#e3e3e3]">
         <Avatar backgroundColor="#4b87a0d9" size="md" name={firstname + ' ' + lastname} />
         <div className="pl-2">
@@ -32,6 +33,7 @@ const UserDetailsMenu: React.FC<UserDetailsMenuProps> = ({
           <p className="mt-[-4px] font-semibold">{email}</p>
         </div>
       </div>
+      </Link>
       <div
         className="cursor-pointer px-3 py-1 rounded-md hover:bg-[#e3e3e3] mt-2 font-semibold text-lg flex items-center gap-x-2 border-b"
         onClick={logoutHandler}
