@@ -53,19 +53,19 @@ const UserRoleDetails: React.FC<UserRoleDetailsProps> = ({
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[350px] bg-[#4b86a0] right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[350px] bg-[#57657F] right-0 top-0 z-10 py-3"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-          <BiX onClick={closeDrawerHandler} size="26px" />
-          User Role
+        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
+          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
+          
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-[25px] text-white w-[350px] rounded-md font-semibold  cursor-pointer  text-center mb-6  ">
+        <h2 className="text-xl text-center  font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
             User Role Details
           </h2>
 
@@ -73,16 +73,16 @@ const UserRoleDetails: React.FC<UserRoleDetailsProps> = ({
           {!isLoadinRole && (
             <div>
               <div className="mt-3 mb-5">
-                <p className="font-bold">Role</p>
-                <p>{role}</p>
+                <p className="font-bold text-white">Role</p>
+                <p className="text-white">{role}</p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-bold">Description</p>
-                <p>{description}</p>
+                <p className="font-bold text-white">Description</p>
+                <p className="text-white">{description}</p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-bold">Permissions</p>
-                <ul className="pl-5 list-decimal">
+                <p className="font-bold text-white">Permissions</p>
+                <ul className="pl-5 list-decimal text-white">
                     {permissions.map(permission => <li>{permission}</li>)}
                 </ul>
               </div>

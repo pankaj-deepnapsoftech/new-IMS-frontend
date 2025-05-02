@@ -213,23 +213,54 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
     fetchProductDetails();
     fetchAllStores();
   }, []);
-
+  const customStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      backgroundColor: "transparent",
+      borderColor: "#a9a9a9",
+      color: "#fff",
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
+      color: "black",
+      cursor: "pointer",
+    }),
+    multiValue: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#808080",
+      color: "#fff",
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      zIndex: 9999, // ensures dropdown doesn't get hidden
+    }),
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: "#fff", // light gray placeholder
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      color: "#fff", // ensures selected value is white
+    }),
+  };
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f]  right-0 top-0 z-10 py-3"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-          <BiX onClick={closeDrawerHandler} size="26px" />
-          Product
+        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
+          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
+          
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-2xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
+          <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
+      
             Update Product
           </h2>
 
@@ -237,8 +268,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
           {!isLoadingProduct && (
             <form onSubmit={updateProductHandler}>
               <FormControl isRequired>
-                <FormLabel fontWeight="bold">Inventory Category</FormLabel>
-                <Select
+                <FormLabel fontWeight="bold" color="white">Inventory Category</FormLabel>
+                <Select 
+                 styles={customStyles}
                   value={inventoryCategory}
                   options={inventoryCategoryOptions}
                   onChange={(e: any) => setInventoryCategory(e)}
@@ -246,8 +278,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Product ID</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Product ID</FormLabel>
                 <Input
+                className="text-gray-200"
                   value={id}
                   onChange={(e) => setId(e.target.value)}
                   type="text"
@@ -255,8 +288,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Product Name</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Product Name</FormLabel>
                 <Input
+                className="text-gray-200"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   type="text"
@@ -264,76 +298,79 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Product Price</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Product Price</FormLabel>
                 <Input
+                
                   value={price}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-200 "
                   onChange={(e) => setPrice(e.target.value)}
                   type="number"
                   placeholder="Product Price"
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Regular Buying Price</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Regular Buying Price</FormLabel>
                 <Input
                   value={regularBuyingPrice}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-200"
                   onChange={(e) => setRegularBuyingPrice(+e.target.value)}
                   type="number"
                   placeholder="Regular Buying Price"
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Wholesale Buying Price</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Wholesale Buying Price</FormLabel>
                 <Input
                   value={wholesaleBuyingPrice}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-200"
                   onChange={(e) => setWholeSaleBuyingPrice(+e.target.value)}
                   type="number"
                   placeholder="Regular Buying Price"
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">MRP</FormLabel>
+                <FormLabel fontWeight="bold" color="white">MRP</FormLabel>
                 <Input
                   value={mrp}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-200"
                   onChange={(e) => setMrp(+e.target.value)}
                   type="number"
                   placeholder="MRP"
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Dealer Price</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Dealer Price</FormLabel>
                 <Input
                   value={dealerPrice}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-200"
                   onChange={(e) => setDealerPrice(+e.target.value)}
                   type="number"
                   placeholder="Dealer Price"
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Distributor Price</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Distributor Price</FormLabel>
                 <Input
                   value={distributorPrice}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-200"
                   onChange={(e) => setDistributorPrice(+e.target.value)}
                   type="number"
                   placeholder="Distributor Price"
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Product Category</FormLabel>
-                <Select
+                <FormLabel fontWeight="bold" color="white">Product Category</FormLabel>
+                <Select 
+                 styles={customStyles}
                   value={category}
                   options={categoryOptions}
                   onChange={(e: any) => setCategory(e)}
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Product Subcategory</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Product Subcategory</FormLabel>
                 <Input
+                className="text-gray-200"
                   value={subCategory}
                   onChange={(e) => setSubCategory(e.target.value)}
                   type="text"
@@ -341,18 +378,20 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">
+                <FormLabel fontWeight="bold" color="white">
                   UOM (Unit of Measurement)
                 </FormLabel>
-                <Select
+                <Select 
+                 styles={customStyles}
                   value={uom}
                   options={uomOptions}
                   onChange={(e: any) => setUom(e)}
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Current Stock</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Current Stock</FormLabel>
                 <Input
+                className="text-gray-200"
                   value={currentStock}
                   onChange={(e) => setCurrentStock(e.target.value)}
                   type="number"
@@ -360,8 +399,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Min Stock</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Min Stock</FormLabel>
                 <Input
+                className="text-gray-200"
                   value={minStock}
                   onChange={(e) => setMinStock(e.target.value)}
                   type="number"
@@ -369,8 +409,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Max Stock</FormLabel>
+                <FormLabel fontWeight="bold" color="white">Max Stock</FormLabel>
                 <Input
+                className="text-gray-200"
                   value={maxStock}
                   onChange={(e) => setMaxStock(e.target.value)}
                   type="number"
@@ -378,8 +419,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">HSN</FormLabel>
+                <FormLabel fontWeight="bold" color="white">HSN</FormLabel>
                 <Input
+                className="text-gray-200"
                   value={hsn}
                   onChange={(e) => setHsn(e.target.value)}
                   type="text"
@@ -387,8 +429,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Store</FormLabel>
-                <Select
+                <FormLabel fontWeight="bold" color="white">Store</FormLabel>
+                <Select 
+                 styles={customStyles}
                   className="w-full rounded mt-2 border border-[#a9a9a9]"
                   options={storeOptions}
                   value={store}
@@ -399,8 +442,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 isLoading={isUpdatingProduct}
                 type="submit"
                 className="mt-1"
-                color="white"
-                backgroundColor="#1640d6"
+                color="black"
+              backgroundColor="#ffffff8a"
+              _hover={{ bg: "#d1d2d5" }}
               >
                 Submit
               </Button>

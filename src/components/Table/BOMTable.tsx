@@ -91,7 +91,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
     usePagination
   );
   const dynamicBg = (index) => {
-    return index % 2 !== 0 ? "gray.100" : "white";
+    return index % 2 !== 0 ? "#ffffff40" : "#ffffff1f";
   };
   return (
     <div>
@@ -125,10 +125,10 @@ const BOMTable: React.FC<BOMTableProps> = ({
           <TableContainer
             maxHeight="600px"
             overflowY="auto"
-            className=" mx-3  bg-white rounded-md"
+            className="  rounded-md bg-[#14243452]"
           >
             <Table variant="simple" {...getTableProps()}>
-              <Thead className="text-sm font-semibold">
+              <Thead className="text-[14px] font-[600]" bg="#14243452">
                 {headerGroups.map(
                   (
                     hg: HeaderGroup<{
@@ -149,9 +149,6 @@ const BOMTable: React.FC<BOMTableProps> = ({
                               fontSize="14px"
                               fontWeight="600"
                               color="white"
-                              backgroundColor="#2D3748"
-                              borderLeft="1px solid #d7d7d7"
-                              borderRight="1px solid #d7d7d7"
                               {...column.getHeaderProps(
                                 column.getSortByToggleProps()
                               )}
@@ -176,9 +173,6 @@ const BOMTable: React.FC<BOMTableProps> = ({
                           fontSize="14px"
                           fontWeight="600"
                           color="white"
-                          backgroundColor="#2D3748"
-                          borderLeft="1px solid #d7d7d7"
-                          borderRight="1px solid #d7d7d7"
                         >
                           Actions
                         </Th>
@@ -193,17 +187,18 @@ const BOMTable: React.FC<BOMTableProps> = ({
 
                   return (
                     <Tr
-                      className="relative  text-[15px] font-[700]"
+                      className="relative text-gray-200  text-[15px] font-[700]"
                       {...row.getRowProps()}
                       bg={dynamicBg(index)}
                       _hover={{
-                        bg: "gray.50",
+                        bg: "#ffffff78",
                         cursor: "pointer",
                       }}
+                     
                     >
                       {row.cells.map((cell: Cell) => {
                         return (
-                          <Td fontWeight="500" {...cell.getCellProps()}>
+                          <Td fontWeight="500" {...cell.getCellProps()}  border="none">
                             {cell.column.id !== "createdAt" &&
                               cell.column.id !== "updatedAt" &&
                               cell.render("Cell")}
@@ -227,7 +222,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                           </Td>
                         );
                       })}
-                      <Td className="flex gap-x-2">
+                      <Td className="flex gap-x-2 text-gray-200"  border="none">
                         {openBomDetailsDrawerHandler && (
                           <MdOutlineVisibility
                             className="hover:scale-110"
@@ -276,7 +271,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
             >
               Prev
             </button>
-            <span className="mx-3 text-sm md:text-lg lg:text-xl xl:text-base">
+            <span className="mx-3 text-sm text-gray-200 md:text-lg lg:text-xl xl:text-base">
               {pageIndex + 1} of {pageCount}
             </span>
             <button

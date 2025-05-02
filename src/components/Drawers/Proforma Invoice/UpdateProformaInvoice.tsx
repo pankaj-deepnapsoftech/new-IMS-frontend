@@ -312,24 +312,44 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
   useEffect(() => {
     fetchProformaInvoiceDetailsHandler(id || "");
   }, [id]);
-
+  const customStyles = {
+    control: (base: any) => ({
+      ...base,
+      backgroundColor: 'transparent', // Light gray background for the placeholder
+      color : "#fff"
+    }),
+    placeholder: (base: any) => ({
+      ...base,
+      color: '#fff', // Gray text for placeholder
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
+      color: "black",
+      cursor: "pointer",
+    }),
+    singleValue: (base: any) => ({
+      ...base,
+      color: '#fff',
+    }),
+  };
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#4b86a0] right-0 top-0 z-10 py-3"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
         <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-          <BiX onClick={closeDrawerHandler} size="26px" />
-          Proforma Invoice
+          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
+          
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-2xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
-            Update Proforma Invoice
+        <h2 className="text-xl text-center  font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
+              Update Proforma Invoice
           </h2>
 
           {isLoading && <Loading />}
@@ -338,6 +358,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               <FormControl className="mt-3 mb-5" isRequired>
                 <FormLabel fontWeight="bold">Category</FormLabel>
                 <Select
+                styles={customStyles}
                   value={category}
                   options={categoryOptions}
                   required={true}
@@ -348,6 +369,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
                 <FormControl className="mt-3 mb-5" isRequired>
                   <FormLabel fontWeight="bold">Buyer</FormLabel>
                   <Select
+                  styles={customStyles}
                     value={buyer}
                     options={buyerOptions}
                     required={true}
@@ -358,7 +380,8 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               {category && category.value === "purchase" && (
                 <FormControl className="mt-3 mb-5" isRequired>
                   <FormLabel fontWeight="bold">Supplier</FormLabel>
-                  <Select
+                  <Select 
+                  styles={customStyles}
                     value={supplier}
                     options={supplierOptions}
                     required={true}
@@ -368,7 +391,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               )}
               <FormControl className="mt-3 mb-5" isRequired>
                 <FormLabel fontWeight="bold">Proforma Invoice No.</FormLabel>
-                <Input
+                <Input className="text-gray-300"
                   value={proformaInvoiceNo}
                   onChange={(e) => setProformaInvoiceNo(e.target.value)}
                   type="text"
@@ -377,9 +400,9 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
                 <FormLabel fontWeight="bold">Document Date</FormLabel>
-                <Input
+                <Input 
                   value={documentDate}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-300"
                   onChange={(e) => setDocumentDate(e.target.value)}
                   type="date"
                   placeholder="Document Date"
@@ -387,9 +410,9 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
                 <FormLabel fontWeight="bold">Sales Order Date</FormLabel>
-                <Input
+                <Input 
                   value={salesOrderDate}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-300"
                   onChange={(e) => setSalesOrderDate(e.target.value)}
                   type="date"
                   placeholder="Sales Order Date"
@@ -398,6 +421,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               <FormControl className="mt-3 mb-5" isRequired>
                 <FormLabel fontWeight="bold">Store</FormLabel>
                 <Select
+                styles={customStyles}
                   value={store}
                   options={storeOptions}
                   required={true}
@@ -418,10 +442,10 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
                 <FormLabel fontWeight="bold">Subtotal</FormLabel>
-                <Input
+                <Input 
                   value={subtotal}
                   isDisabled={true}
-                  className="no-scrollbar"
+                  className="no-scrollbar text-gray-300"
                   type="number"
                   placeholder="Subtotal"
                 />
@@ -429,6 +453,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               <FormControl className="mt-3 mb-5" isRequired>
                 <FormLabel fontWeight="bold">Tax</FormLabel>
                 <Select
+                styles={customStyles}
                   required={true}
                   value={tax}
                   options={taxOptions}
@@ -437,14 +462,15 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
                 <FormLabel fontWeight="bold">Total</FormLabel>
-                <Input value={total} isDisabled={true} />
+                <Input value={total} isDisabled={true} className="text-gray-300" />
               </FormControl>
               <Button
                 isLoading={isUpdating}
                 type="submit"
                 className="mt-1"
                 color="white"
-                backgroundColor="#1640d6"
+                backgroundColor="#ffffff8a"
+                _hover={{ bg: "#d1d2d5" }}
               >
                 Submit
               </Button>

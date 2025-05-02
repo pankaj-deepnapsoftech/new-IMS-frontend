@@ -102,13 +102,13 @@ const UpdateEmployee: React.FC<UpdateEmployeeProps> = ({
       );
       const data = await response.json();
       if (!data.success) {
-          throw new Error(data.message);
-        }
-        const roles = data.roles;
-        const modifiedRoles = roles.map((role: any) => ({
-            value: role._id,
-            label: role.role,
-        }));
+        throw new Error(data.message);
+      }
+      const roles = data.roles;
+      const modifiedRoles = roles.map((role: any) => ({
+        value: role._id,
+        label: role.role,
+      }));
       setRoleOptions(modifiedRoles);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
@@ -122,55 +122,80 @@ const UpdateEmployee: React.FC<UpdateEmployeeProps> = ({
     fetchRolesHandler();
   }, []);
 
+  
+  const customStyles = {
+    control: (base: any) => ({
+      ...base,
+      backgroundColor: 'transparent', // Light gray background for the placeholder
+      color : "#fff"
+    }),
+    placeholder: (base: any) => ({
+      ...base,
+      color: '#fff', // Gray text for placeholder
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
+      color: "black",
+      cursor: "pointer",
+    }),
+    singleValue: (base: any) => ({
+      ...base,
+      color: '#fff',
+    }),
+  };
+  
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#4b86a0] right-0 top-0 z-10 py-3"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-          <BiX onClick={closeDrawerHandler} size="26px" />
-          Store
+        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
+          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
+
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-md text-white w-[200px] rounded-md font-semibold py-2 cursor-pointer  text-center mb-6  bg-[#2D3748]">
-            Update Store
+          <h2 className="text-xl text-center  font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
+            Update Employee
           </h2>
 
           {isLoadingEmployee && <Loading />}
           {!isLoadingEmployee && (
             <form onSubmit={updateEmployeeHandler}>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">First Name</FormLabel>
-                <p>{firstname}</p>
+                <FormLabel fontWeight="500" color="white">First Name</FormLabel>
+                <p className="text-gray-300">{firstname}</p>
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Last Name</FormLabel>
-                <p>{lastname}</p>
+                <FormLabel fontWeight="500" color="white">Last Name</FormLabel>
+                <p className="text-gray-300">{lastname}</p>
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Email</FormLabel>
-                <p>{email}</p>
+                <FormLabel fontWeight="500" color="white">Email</FormLabel>
+                <p className="text-gray-300">{email}</p>
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Phone</FormLabel>
-                <p>{phone}</p>
+                <FormLabel fontWeight="500" color="white">Phone</FormLabel>
+                <p className="text-gray-300">{phone}</p>
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold">Is Verified</FormLabel>
-                <p>{isVerified ? 'Verified' : 'Not Verified'}</p>
+                <FormLabel fontWeight="500" color="white">Is Verified</FormLabel>
+                <p className="text-gray-300">{isVerified ? 'Verified' : 'Not Verified'}</p>
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold">Role</FormLabel>
+                <FormLabel fontWeight="500" color="white">Role</FormLabel>
+
                 <Select
                   required
                   value={role}
                   options={roleOptions}
                   onChange={(e: any) => setRole(e)}
+                  styles={customStyles}
                 />
               </FormControl>
               <Button
@@ -178,8 +203,8 @@ const UpdateEmployee: React.FC<UpdateEmployeeProps> = ({
                 type="submit"
                 className="mt-1"
                 color="white"
-                backgroundColor="#2D3748"
-                _hover={{ bg: "#2d3748c2" }}
+                backgroundColor="#ffffff8a"
+                _hover={{ bg: "#d1d2d5" }}
               >
                 Submit
               </Button>

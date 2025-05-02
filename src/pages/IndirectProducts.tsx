@@ -287,7 +287,7 @@ const IndirectProducts: React.FC = () => {
           {/* Search */}
           <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
           <input
-            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+            className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
             placeholder="Search roles..."
             value={searchKey}
             onChange={(e) => setSearchKey(e.target.value)}

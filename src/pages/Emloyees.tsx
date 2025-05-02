@@ -145,7 +145,7 @@ const Employees: React.FC = () => {
           <div className="relative">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300" />
             <input
-              className="pl-10 pr-4 py-2 w-full text-sm rounded-[5px] placeholder:text-gray-300 bg-[#ffffff3b] shadow-sm focus:outline-none"
+              className="pl-10 pr-4 py-2 w-full text-gray-200 text-sm rounded-[5px] placeholder:text-gray-300 bg-[#ffffff3b] shadow-sm focus:outline-none"
               placeholder="Search roles..."
               value={searchKey}
               onChange={(e) => setSearchKey(e.target.value)}
@@ -163,7 +163,8 @@ const Employees: React.FC = () => {
             borderColor="#fff"
             variant="outline"
             className="whitespace-nowrap "
-            _hover={{ bg: "#2D3748", color: "white" }}
+                    _hover={{ bg: "white", color: "#2D3748" }}  
+
           >
             Refresh
           </Button>

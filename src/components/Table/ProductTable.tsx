@@ -91,27 +91,10 @@ const ProductTable: React.FC<ProductTableProps> = ({
       {!isLoadingProducts && products.length > 0 && (
         <div>
           <div className="flex justify-end mb-2">
-<<<<<<< HEAD
             <Select onChange={(e) => setPageSize(Number(e.target.value))} width="80px"  color="white "
               size="sm"
               borderRadius="md"
               border="1px solid gray">
-=======
-            <Select
-              onChange={(e) => setPageSize(Number(e.target.value))}
-              color="white"
-              width="80px"
-              size="sm"
-              borderRadius="md"
-              border="1px solid white"
-              sx={{
-                option: {
-                  backgroundColor: "#444e5b", // Default background
-                  color: "white",
-                },
-              }}
-            >
->>>>>>> fb1a1721b4dbf1d0a9670f57dac71b35bf0352fc
               {[10, 20, 50, 100, 100000].map((n) => (
                 <option key={n} value={n}>
                   {n === 100000 ? "All" : n}
@@ -125,10 +108,10 @@ const ProductTable: React.FC<ProductTableProps> = ({
           <TableContainer
             overflowY="auto"
             borderRadius="md"
-            className="mx-3 bg-[#ffffff26]"
+            className="mx-3 bg-[#14243452]"
           >
             <Table variant="unstyled" {...getTableProps()}>
-              <Thead className="text-sm font-semibold bg-[#ffffff26]">
+              <Thead className="text-sm font-semibold bg-[#14243452]">
                 {headerGroups.map((hg) => (
                   <Tr {...hg.getHeaderGroupProps()}>
                     {hg.headers.map((column: any) => (
@@ -157,7 +140,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       fontSize="14px"
                       fontWeight="600"
                       color="white"
-                      // bg="#ffffff26"
+                      // bg="#14243452"
                     >
                       Actions
                     </Th>
@@ -182,7 +165,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         const colId = cell.column.id;
                         const original = row.original;
                         return (
-<<<<<<< HEAD
                           <Td fontWeight="500" {...cell.getCellProps()} border="none">
                             {colId === "createdAt" && original?.createdAt
                               ? moment(original?.createdAt).format("DD/MM/YYYY")
@@ -224,56 +206,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                   </p>
                                 )
                               : cell.render("Cell")}
-=======
-                          <Td
-                            fontWeight="500"
-                            {...cell.getCellProps()}
-                            border="none"
-                          >
-                            {colId === "createdAt" && original?.createdAt ? (
-                              moment(original?.createdAt).format("DD/MM/YYYY")
-                            ) : colId === "updatedAt" && original?.updatedAt ? (
-                              moment(original?.updatedAt).format("DD/MM/YYYY")
-                            ) : colId === "inventory_category" &&
-                              original.inventory_category ? (
-                              <span
-                                className="px-2 py-1 rounded-md"
-                                style={{
-                                  backgroundColor:
-                                    inventoryCategoryStyles[
-                                      original.inventory_category
-                                    ]?.bg,
-                                  color:
-                                    inventoryCategoryStyles[
-                                      original.inventory_category
-                                    ]?.text,
-                                }}
-                              >
-                                {original.inventory_category[0].toUpperCase() +
-                                  original.inventory_category.slice(1)}
-                              </span>
-                            ) : colId === "change" && original.change_type ? (
-                              <p className="flex gap-1 items-center">
-                                {original.change_type === "increase" ? (
-                                  <FaArrowUpLong color="#0dac51" size={20} />
-                                ) : (
-                                  <FaArrowDownLong color="#c70505" size={20} />
-                                )}
-                                <span
-                                  style={{
-                                    color:
-                                      original.change_type === "increase"
-                                        ? "#0dac51"
-                                        : "#c70505",
-                                  }}
-                                >
-                                  {original.quantity_changed}
-                                </span>
-                              </p>
-                            ) : (
-                              cell.render("Cell")
-                            )}
->>>>>>> fb1a1721b4dbf1d0a9670f57dac71b35bf0352fc
                           </Td>
                         );
                       })}
@@ -324,17 +256,17 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
           <div className="w-[max-content] m-auto my-7">
             <button
-              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
+              className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
               disabled={!canPreviousPage}
               onClick={previousPage}
             >
               Prev
             </button>
-            <span className="mx-3 text-sm">
+            <span className="mx-3 text-gray-200 text-sm">
               {pageIndex + 1} of {pageCount}
             </span>
             <button
-              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
+              className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
               disabled={!canNextPage}
               onClick={nextPage}
             >

@@ -209,7 +209,6 @@ import EmptyData from "../../ui/emptyData";
         {!isLoadingProducts && products.length > 0 && (
           <div>
             <div className="flex justify-end mb-2">
-<<<<<<< HEAD
               <Select
                 onChange={(e) => setPageSize(e.target.value)}
                 width="80px"
@@ -225,32 +224,8 @@ import EmptyData from "../../ui/emptyData";
                 <option value={100000}>All</option>
               </Select>
             </div>
-=======
-            <Select
-              onChange={(e) => setPageSize(e.target.value)}
-              color="white"
-              width="80px"
-              size="sm"
-              borderRadius="md"
-              border="1px solid white"
-              sx={{
-                option: {
-                  backgroundColor: "#444e5b", // Default background
-                  color: "white",
-                },
-              }}
-            >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-              <option value={100000}>All</option>
-            </Select>
-          </div>
-
->>>>>>> fb1a1721b4dbf1d0a9670f57dac71b35bf0352fc
-            <TableContainer maxHeight="600px" overflowY="auto" className="bg-[#ffffff26]  rounded-md">
-              <Table variant="simple" {...getTableProps()} bg="#ffffff26" border="none">
+            <TableContainer maxHeight="600px" overflowY="auto" className="bg-[#14243452]  rounded-md">
+              <Table variant="simple" {...getTableProps()} bg="#14243452" border="none">
                 <Thead className="text-sm font-semibold" >
                   {headerGroups.map(
                     (
@@ -426,8 +401,8 @@ import EmptyData from "../../ui/emptyData";
                 onClick={previousPage}
               >
                 Prev
-              </button>
-              <span className="mx-3 text-sm md:text-lg lg:text-xl xl:text-base">
+              </button> 
+              <span className="mx-3 text-gray-200 text-sm md:text-lg lg:text-xl xl:text-base">
                 {pageIndex + 1} of {pageCount}
               </span>
               <button

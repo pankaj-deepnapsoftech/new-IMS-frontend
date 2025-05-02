@@ -57,7 +57,7 @@ const Navigation: React.FC = () => {
 
       {/* Sidebar */}
       <div
-        className={`bg-gradient-to-b from-[#252531d5] to-[#214555] backdrop-blur-xl text-white h-full overflow-auto scrollbar-hidden  
+        className={`bg-gradient-to-b from-[#252531] to-[#214555] backdrop-blur-xl text-white h-full overflow-auto scrollbar-hidden  
          md:block  ${checkMenu ? "block" : "hidden"
           } 
              fixed z-40 w-64 md:w-auto top-0 left-0 px-3 py-3`}

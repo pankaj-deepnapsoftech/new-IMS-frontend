@@ -113,14 +113,15 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
           <TableContainer
             borderRadius="md"
             boxShadow="lg"
-            bg="#ffffff26"
+            bg="#14243452"
             // p={2.5}
             overflowX="auto"
+        
           >
             <Table {...getTableProps()} variant="unstyled" borderRadius="md" size="md" >
-              <Thead bg="#ffffff26"  borderRadius="md">
+              <Thead bg="#14243452"  borderRadius="md">
                 {headerGroups.map((hg) => (
-                  <Tr {...hg.getHeaderGroupProps()} borderBottom="1px solid #e2e8f0">
+                  <Tr {...hg.getHeaderGroupProps()} borderBottom="1px solid #e2e8f0" >
                     {hg.headers.map((column) => (
                       <Th
                         {...column.getHeaderProps(column.getSortByToggleProps())}
@@ -163,7 +164,7 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                         transition: "all 0.2s",
                       }}
                       bgColor={dynamicBg(index)}
-                      borderBottom="1px solid #ffffff26"
+                   
                       
                     >
                       {row.cells.map((cell) => (

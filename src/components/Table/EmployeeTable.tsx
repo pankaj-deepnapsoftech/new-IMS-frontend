@@ -142,10 +142,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
           <TableContainer
             overflowY="auto"
             borderRadius="md"
-            className="   bg-[#ffffff26]"
+            className="   bg-[#14243452]"
           >
             <Table variant="simple" {...getTableProps()}>
-              <Thead className="text-sm font-semibold bg-[#ffffff26]">
+              <Thead className="text-sm font-semibold bg-[#14243452]">
                 {headerGroups.map(
                   (
                     hg: HeaderGroup<{
@@ -176,7 +176,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                                 column.getSortByToggleProps()
                               )}
                             >
-                              <p className="flex font-[600] text-[15px]">
+                              <p className="flex font-[600] text-[14px]">
                                 {column.render("Header")}
                                 {column.isSorted && (
                                   <span>
@@ -193,10 +193,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                         })}
                         <Th
                           textTransform="capitalize"
-                          fontSize="12px"
-                          fontWeight="700"
+                          fontSize="14px"
+                          fontWeight="600"
                           color="white"
-                          // backgroundColor="#ffffff26"
+                          // backgroundColor="#14243452"
                         >
                           Actions
                         </Th>
@@ -290,7 +290,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                           </Td>
                         );
                       })}
-                      <Td border="none" className="flex gap-x-2 items-center">
+                      <Td border="none" className="flex gap-3 items-center">
                         {openEmployeeDetailsDrawerHandler && (
                           <MdOutlineVisibility
                             className="hover:scale-110 text-gray-200 hover:text-blue-400"
@@ -345,7 +345,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
             >
               Prev
             </button>
-            <span className="mx-3 text-sm md:text-lg lg:text-xl xl:text-base">
+            <span className="mx-3 text-sm text-gray-200 md:text-lg lg:text-xl xl:text-base">
               {pageIndex + 1} of {pageCount}
             </span>
             <button

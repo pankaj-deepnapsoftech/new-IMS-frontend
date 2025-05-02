@@ -75,7 +75,7 @@ const Scrap: React.FC = () => {
         <div className="mt-2  flex justify-center gap-y-1 it gap-x-2 w-full">
         <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
       <input
-        className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+        className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
         placeholder="Search roles..."
         value={searchKey}
         onChange={(e) => setSearchKey(e.target.value)}
@@ -90,7 +90,8 @@ const Scrap: React.FC = () => {
             color="white"
             borderColor="white"
             variant="outline"
-            _hover={{ bg: "#2D3748", color: "white" }}
+                    _hover={{ bg: "white", color: "#2D3748" }}  
+
           >
             Refresh
           </Button>

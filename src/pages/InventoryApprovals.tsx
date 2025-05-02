@@ -71,33 +71,40 @@ const InventoryApprovals: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const searchTxt = searchKey?.toLowerCase();
-    const results = data.filter(
-      (emp: any) =>
-        emp.first_name?.toLowerCase()?.includes(searchTxt) ||
-        emp.last_name?.toLowerCase().includes(searchTxt) ||
-        emp.email.toLowerCase()?.includes(searchTxt) ||
-        emp.phone.toLowerCase().toString().includes(searchTxt) ||
-        emp?.role?.role?.toLowerCase()?.includes(searchTxt) ||
-        (emp?.createdAt &&
-          new Date(emp?.createdAt)
-            ?.toISOString()
-            ?.substring(0, 10)
-            ?.split("-")
-            .reverse()
-            .join("")
-            ?.includes(searchTxt?.replaceAll("/", "") || "")) ||
-        (emp?.updatedAt &&
-          new Date(emp?.updatedAt)
-            ?.toISOString()
-            ?.substring(0, 10)
-            ?.split("-")
-            ?.reverse()
-            ?.join("")
-            ?.includes(searchTxt?.replaceAll("/", "") || ""))
-    );
+    if (!searchKey) {
+      setFilteredData(data);
+      return;
+    }
+  
+    const searchTxt = searchKey.toLowerCase().trim();
+  
+    const results = data.filter((emp: any) => {
+      const firstName = emp.first_name?.toString().toLowerCase() || "";
+      const lastName = emp.last_name?.toString().toLowerCase() || "";
+      const email = emp.email?.toString().toLowerCase() || "";
+      const phone = emp.phone?.toString() || "";
+      const role = emp?.role?.role?.toString().toLowerCase() || "";
+      const createdAt = emp?.createdAt
+        ? new Date(emp.createdAt).toISOString().substring(0, 10).split("-").reverse().join("")
+        : "";
+      const updatedAt = emp?.updatedAt
+        ? new Date(emp.updatedAt).toISOString().substring(0, 10).split("-").reverse().join("")
+        : "";
+  
+      return (
+        firstName.includes(searchTxt) ||
+        lastName.includes(searchTxt) ||
+        email.includes(searchTxt) ||
+        phone.includes(searchTxt) ||
+        role.includes(searchTxt) ||
+        createdAt.includes(searchTxt.replaceAll("/", "")) ||
+        updatedAt.includes(searchTxt.replaceAll("/", ""))
+      );
+    });
+  
     setFilteredData(results);
-  }, [searchKey]);
+  }, [searchKey, data]);
+  
 
   if (!isAllowed) {
     return <div className="text-center text-red-500">You are not allowed to access this route.</div>
@@ -113,7 +120,7 @@ const InventoryApprovals: React.FC = () => {
         <div className="mt-2  flex justify-center gap-y-1 it gap-x-2 w-full">
         <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
           <input
-            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+            className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
             placeholder="Search roles..."
             value={searchKey}
             onChange={(e) => setSearchKey(e.target.value)}
@@ -128,7 +135,8 @@ const InventoryApprovals: React.FC = () => {
             color="#fff"
             borderColor="#fff"
             variant="outline"
-            _hover={{ bg: "#2D3748", color: "white" }}
+                    _hover={{ bg: "white", color: "#2D3748" }}  
+
           >
             Refresh
           </Button>

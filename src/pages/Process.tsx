@@ -180,7 +180,7 @@ const Process: React.FC = () => {
             onClick={openAddProcessDrawerHandler}
             color="white"
             backgroundColor="#4b87a0d9"
-            _hover={{ bg: "#2e2e4f" }}
+            _hover={{ bg: "white" , color:"black" }}
           >
             Add New Production Process
           </Button>
@@ -194,7 +194,7 @@ const Process: React.FC = () => {
             color="white"
             borderColor="white"
             variant="outline"
-            _hover={{ bg: "#2D3748", color: "white" }}  
+            _hover={{ bg: "white", color: "#2D3748" }}  
           >
             Refresh
           </Button>

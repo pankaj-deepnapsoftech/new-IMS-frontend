@@ -215,7 +215,8 @@ const Sellers: React.FC = () => {
             color="white"
             borderColor="white"
             variant="outline"
-            _hover={{ bg: "#2D3748", color: "white" }}
+                    _hover={{ bg: "white", color: "#2D3748" }}  
+
           >
             Refresh
           </Button>

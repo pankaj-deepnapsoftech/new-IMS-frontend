@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import {
   Select,
   Table,
@@ -12,27 +11,23 @@ import {
 } from "@chakra-ui/react";
 import moment from "moment";
 import { useMemo } from "react";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
-import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
-import { FcApproval, FcDatabase } from "react-icons/fc";
 import {
   usePagination,
   useSortBy,
   useTable,
   Column,
-  TableState,
   TableInstance,
   HeaderGroup,
-  Row,
   Cell,
 } from "react-table";
+import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
 
 interface ScrapTableProps {
   scraps: Array<{
-    item: string;
-    bom: string;
+    item: { name: string };
+    bom: { bom_name: string; finished_good: { item: { name: string } } };
     estimated_quantity: string;
     produced_quantity: string;
     total_part_cost: string;
@@ -48,169 +43,20 @@ const ScrapTable: React.FC<ScrapTableProps> = ({
   isLoadingScraps,
   openScrapDetailsDrawerHandler,
 }) => {
-  const columns: Column<{
-    item: string;
-    bom: string;
-    estimated_quantity: string;
-    produced_quantity: string;
-    total_part_cost: string;
-    createdAt: string;
-    updatedAt: string;
-  }>[] = useMemo(
+  const columns: Column<any>[] = useMemo(
     () => [
-      {
-        Header: "Item",
-        accessor: "item",
-      },
-      {
-        Header: "BOM",
-        accessor: "bom",
-      },
-      {
-        Header: "Finished Good",
-        accessor: "finished_good",
-      },
-      {
-        Header: "Estimated Quantity",
-        accessor: "estimated_quantity",
-      },
-      {
-        Header: "Produced Quantity",
-        accessor: "produced_quantity",
-      },
-      {
-        Header: "Total Part Cost",
-        accessor: "total_part_cost",
-      },
-      {
-        Header: "Created On",
-        accessor: "createdAt",
-      },
-      {
-        Header: "Last Updated",
-        accessor: "updatedAt",
-      },
+      { Header: "Item", accessor: "item" },
+      { Header: "BOM", accessor: "bom" },
+      { Header: "Finished Good", accessor: "finished_good" },
+      { Header: "Estimated Quantity", accessor: "estimated_quantity" },
+      { Header: "Produced Quantity", accessor: "produced_quantity" },
+      { Header: "Total Part Cost", accessor: "total_part_cost" },
+      { Header: "Created On", accessor: "createdAt" },
+      { Header: "Last Updated", accessor: "updatedAt" },
     ],
     []
   );
 
-  const inventoryCategoryStyles = {
-    indirect: {
-      bg: "#F03E3E",
-      text: "#ffffff",
-    },
-    direct: {
-      bg: "#409503",
-      text: "#ffffff",
-    },
-  };
-
-<<<<<<< HEAD
-    const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        prepareRow,
-        page,
-        nextPage,
-        previousPage,
-        canNextPage,
-        canPreviousPage,
-        state: { pageIndex, pageSize },
-        pageCount,
-        setPageSize,
-    }: TableInstance<{
-        item: string;
-        bom: string;
-        estimated_quantity: string;
-        produced_quantity: string;
-        total_part_cost: string;
-        createdAt: string;
-        updatedAt: string;
-    }> = useTable(
-        {
-            columns,
-            data: scraps,
-            initialState: { pageIndex: 0 },
-        },
-        useSortBy,
-        usePagination
-    );
-    const dynamicBg = (index) => {
-        return index % 2 !== 0 ? "#ffffff40" : "#ffffff1f";
-      };
-    return (
-        <div>
-            {isLoadingScraps && <Loading />}
-            {scraps.length === 0 && !isLoadingScraps && (
-               <EmptyData/>
-            )}
-            {!isLoadingScraps && scraps.length > 0 && (
-                <div>
-                    <div className="flex justify-end mb-2">
-                        <Select
-                            onChange={(e) => setPageSize(e.target.value)}
-                            width="80px"
-                            color="white"
-                            size="sm"
-                            borderRadius="md"
-                            border="1px solid gray"
-                        >
-                            <option value={10}>10</option>
-                            <option value={20}>20</option>
-                            <option value={50}>50</option>
-                            <option value={100}>100</option>
-                            <option value={100000}>All</option>
-                        </Select>
-                    </div>
-                    <TableContainer maxHeight="600px" overflowY="auto" className=" bg-[#ffffff26] rounded-md" >
-                        <Table variant="simple" {...getTableProps()} >
-                            <Thead className="text-sm font-semibold"  bg="#ffffff26">
-                                {headerGroups.map(
-                                    (
-                                        hg: HeaderGroup<{
-                                            item: string;
-                                            bom: string;
-                                            estimated_quantity: string;
-                                            produced_quantity: string;
-                                            total_part_cost: string;
-                                            createdAt: string;
-                                            updatedAt: string;
-                                        }>
-                                    ) => {
-                                        return (
-                                            <Tr {...hg.getHeaderGroupProps()} >
-                                                {hg.headers.map((column: any) => {
-                                                    return (
-                                                        <Th
-                                                            textTransform="capitalize"
-                                                            fontSize="14px"
-                                                            fontWeight="600"
-                                                            color="white"
-
-                                                            {...column.getHeaderProps(
-                                                                column.getSortByToggleProps()
-                                                            )}
-                                                        >
-                                                            <p className="flex text-[14px] text-gray-200 font-[600]">
-                                                                {column.render("Header")}
-                                                                {column.isSorted && (
-                                                                    <span>
-                                                                        {column.isSortedDesc ? (
-                                                                            <FaCaretDown />
-                                                                        ) : (
-                                                                            <FaCaretUp />
-                                                                        )}
-                                                                    </span>
-                                                                )}
-                                                            </p>
-                                                        </Th>
-                                                    );
-                                                })}
-                                            </Tr>
-                                        );
-                                    }
-=======
   const {
     getTableProps,
     getTableBodyProps,
@@ -221,263 +67,126 @@ const ScrapTable: React.FC<ScrapTableProps> = ({
     previousPage,
     canNextPage,
     canPreviousPage,
-    state: { pageIndex, pageSize },
-    pageCount,
+    state: { pageIndex },
     setPageSize,
-  }: TableInstance<{
-    item: string;
-    bom: string;
-    estimated_quantity: string;
-    produced_quantity: string;
-    total_part_cost: string;
-    createdAt: string;
-    updatedAt: string;
-  }> = useTable(
+    pageCount,
+  }: TableInstance<any> = useTable(
     {
       columns,
       data: scraps,
-      initialState: { pageIndex: 0 },
+      initialState: { pageIndex: 0, pageSize: 10 },
     },
     useSortBy,
     usePagination
   );
-  const dynamicBg = (index) => {
-    return index % 2 !== 0 ? "gray.100" : "white";
-  };
+
+  const dynamicBg = (index: number) =>
+    index % 2 !== 0 ? "#ffffff40" : "#ffffff1f";
+
   return (
     <div>
       {isLoadingScraps && <Loading />}
-      {scraps.length === 0 && !isLoadingScraps && <EmptyData />}
+      {!isLoadingScraps && scraps.length === 0 && <EmptyData />}
       {!isLoadingScraps && scraps.length > 0 && (
         <div>
+          {/* Page Size Selector */}
           <div className="flex justify-end mb-2">
             <Select
-              onChange={(e) => setPageSize(e.target.value)}
-              color="white"
+              onChange={(e) => setPageSize(Number(e.target.value))}
               width="80px"
               size="sm"
+              color="white"
+              border="1px solid gray"
               borderRadius="md"
-              border="1px solid white"
-              sx={{
-                option: {
-                  backgroundColor: "#444e5b", // Default background
-                  color: "white",
-                },
-              }}
             >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-              <option value={100000}>All</option>
+              {[10, 20, 50, 100, 100000].map((size) => (
+                <option value={size} key={size}>
+                  {size === 100000 ? "All" : size}
+                </option>
+              ))}
             </Select>
           </div>
 
+          {/* Table */}
           <TableContainer
             maxHeight="600px"
             overflowY="auto"
-            className="bg-white shadow-2xl rounded-md"
+            className="bg-[#14243452] rounded-md"
           >
             <Table variant="simple" {...getTableProps()}>
-              <Thead className="text-sm font-semibold">
-                {headerGroups.map(
-                  (
-                    hg: HeaderGroup<{
-                      item: string;
-                      bom: string;
-                      estimated_quantity: string;
-                      produced_quantity: string;
-                      total_part_cost: string;
-                      createdAt: string;
-                      updatedAt: string;
-                    }>
-                  ) => {
-                    return (
-                      <Tr {...hg.getHeaderGroupProps()}>
-                        {hg.headers.map((column: any) => {
-                          return (
-                            <Th
-                              textTransform="capitalize"
-                              fontSize="14px"
-                              fontWeight="600"
-                              color="white"
-                              backgroundColor="#2D3748"
-                              borderLeft="1px solid #2D3748"
-                              borderRight="1px solid #2D3748"
-                              {...column.getHeaderProps(
-                                column.getSortByToggleProps()
-                              )}
-                            >
-                              <p className="flex">
-                                {column.render("Header")}
-                                {column.isSorted && (
-                                  <span>
-                                    {column.isSortedDesc ? (
-                                      <FaCaretDown />
-                                    ) : (
-                                      <FaCaretUp />
-                                    )}
-                                  </span>
->>>>>>> fb1a1721b4dbf1d0a9670f57dac71b35bf0352fc
-                                )}
-                              </p>
-                            </Th>
-                          );
-                        })}
-                      </Tr>
-                    );
-                  }
-                )}
+              <Thead className="text-sm font-semibold" bg="#14243452">
+                {headerGroups.map((hg: HeaderGroup<any>) => (
+                  <Tr {...hg.getHeaderGroupProps()}>
+                    {hg.headers.map((column: any) => (
+                      <Th
+                        textTransform="capitalize"
+                        fontSize="14px"
+                        fontWeight="600"
+                        color="white"
+                        {...column.getHeaderProps(
+                          column.getSortByToggleProps()
+                        )}
+                      >
+                        <p className="flex items-center gap-1 text-[14px] text-gray-200 font-[600]">
+                          {column.render("Header")}
+                          {column.isSorted &&
+                            (column.isSortedDesc ? (
+                              <FaCaretDown />
+                            ) : (
+                              <FaCaretUp />
+                            ))}
+                        </p>
+                      </Th>
+                    ))}
+                  </Tr>
+                ))}
               </Thead>
+
               <Tbody {...getTableBodyProps()}>
-                {page.map((row: any, index) => {
+                {page.map((row: any, index: number) => {
                   prepareRow(row);
-
-<<<<<<< HEAD
-                                    return (
-                                        <Tr
-                                            className="relative  hover:cursor-pointer"
-                                            {...row.getRowProps()}
-                                          bg={dynamicBg(index)}
-                                          _hover={{
-                                            bg: "#ffffff78",
-                                            cursor: "pointer",
-                                            
-                                            transition: "all 0.2s",
-                                          }}
-                                        >
-                                            {row.cells.map((cell: Cell) => {
-                                                return (
-                                                    <Td fontWeight="600" fontSize="14px" color="gray.200" border="none" {...cell.getCellProps()}>
-                                                        {cell.column.id !== "createdAt" &&
-                                                            cell.column.id !== "updatedAt" &&
-                                                            cell.column.id !== "item" &&
-                                                            cell.column.id !== "bom" &&
-                                                            cell.column.id !== "finished_good" &&
-                                                            cell.render("Cell")}
-
-                                                        {cell.column.id === "createdAt" &&
-                                                            row.original?.createdAt && (
-                                                                <span>
-                                                                    {moment(row.original?.createdAt).format(
-                                                                        "DD/MM/YYYY"
-                                                                    )}
-                                                                </span>
-                                                            )}
-                                                        {cell.column.id === "updatedAt" &&
-                                                            row.original?.updatedAt && (
-                                                                <span>
-                                                                    {moment(row.original?.updatedAt).format(
-                                                                        "DD/MM/YYYY"
-                                                                    )}
-                                                                </span>
-                                                            )}
-                                                        {cell.column.id === "item" && (
-                                                            <span
-                                                                className=" rounded-md"
-                                                            >
-                                                                {row.original.item.name}
-                                                            </span>
-                                                        )}
-                                                        {cell.column.id === "bom" && (
-                                                            <span
-                                                                className=" rounded-md"
-                                                            >
-                                                                {row.original.bom.bom_name}
-                                                            </span>
-                                                        )}
-                                                        {cell.column.id === "finished_good" && (
-                                                            <span
-                                                                className=" rounded-md"
-                                                            >
-                                                                {row.original.bom.finished_good.item.name}
-                                                            </span>
-                                                        )}
-                                                    </Td>
-                                                );
-                                            })}
-                                        </Tr>
-                                    );
-                                })}
-                            </Tbody>
-                        </Table>
-                    </TableContainer>
-
-                    <div className="w-[max-content] m-auto my-7">
-                        <button
-                            className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-                            disabled={!canPreviousPage}
-                            onClick={previousPage}
-                        >
-                            Prev
-                        </button>
-                        <span className="mx-3 text-sm md:text-lg text-gray-300 lg:text-xl xl:text-base">
-                            {pageIndex + 1} of {pageCount}
-                        </span>
-                        <button
-                            className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-                            disabled={!canNextPage}
-                            onClick={nextPage}
-                        >
-                            Next
-                        </button>
-                    </div>
-                </div>
-            )}
-=======
                   return (
                     <Tr
-                      className="relative  hover:cursor-pointer text-[16px]"
                       {...row.getRowProps()}
                       bg={dynamicBg(index)}
                       _hover={{
-                        bg: "gray.50",
+                        bg: "#ffffff78",
                         cursor: "pointer",
-
                         transition: "all 0.2s",
                       }}
                     >
                       {row.cells.map((cell: Cell) => {
-                        return (
-                          <Td fontWeight="500" {...cell.getCellProps()}>
-                            {cell.column.id !== "createdAt" &&
-                              cell.column.id !== "updatedAt" &&
-                              cell.column.id !== "item" &&
-                              cell.column.id !== "bom" &&
-                              cell.column.id !== "finished_good" &&
-                              cell.render("Cell")}
+                        const colId = cell.column.id;
+                        const original = row.original;
 
-                            {cell.column.id === "createdAt" &&
-                              row.original?.createdAt && (
-                                <span>
-                                  {moment(row.original?.createdAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "updatedAt" &&
-                              row.original?.updatedAt && (
-                                <span>
-                                  {moment(row.original?.updatedAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "item" && (
-                              <span className="px-2 py-1 rounded-md">
-                                {row.original.item.name}
-                              </span>
-                            )}
-                            {cell.column.id === "bom" && (
-                              <span className="px-2 py-1 rounded-md">
-                                {row.original.bom.bom_name}
-                              </span>
-                            )}
-                            {cell.column.id === "finished_good" && (
-                              <span className="px-2 py-1 rounded-md">
-                                {row.original.bom.finished_good.item.name}
-                              </span>
-                            )}
+                        let displayValue;
+                        if (colId === "item") {
+                          displayValue = original.item.name;
+                        } else if (colId === "bom") {
+                          displayValue = original.bom.bom_name;
+                        } else if (colId === "finished_good") {
+                          displayValue = original.bom.finished_good.item.name;
+                        } else if (colId === "createdAt") {
+                          displayValue = moment(original.createdAt).format(
+                            "DD/MM/YYYY"
+                          );
+                        } else if (colId === "updatedAt") {
+                          displayValue = moment(original.updatedAt).format(
+                            "DD/MM/YYYY"
+                          );
+                        } else {
+                          displayValue = cell.render("Cell");
+                        }
+
+                        return (
+                          <Td
+                            fontWeight="600"
+                            fontSize="14px"
+                            color="gray.200"
+                            border="none"
+                            {...cell.getCellProps()}
+                          >
+                            {displayValue}
                           </Td>
                         );
                       })}
@@ -488,26 +197,26 @@ const ScrapTable: React.FC<ScrapTableProps> = ({
             </Table>
           </TableContainer>
 
-          <div className="w-[max-content] m-auto my-7">
+          {/* Pagination */}
+          <div className="w-max mx-auto my-7 flex items-center gap-4">
             <button
-              className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canPreviousPage}
               onClick={previousPage}
+              disabled={!canPreviousPage}
+              className="bg-[#2D3748] text-white text-sm md:text-lg px-4 py-1 rounded-3xl border border-[#2D3748] disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed"
             >
               Prev
             </button>
-            <span className="mx-3 text-sm md:text-lg lg:text-xl xl:text-base">
+            <span className="text-sm md:text-lg text-gray-300">
               {pageIndex + 1} of {pageCount}
             </span>
             <button
-              className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canNextPage}
               onClick={nextPage}
+              disabled={!canNextPage}
+              className="bg-[#2D3748] text-white text-sm md:text-lg px-4 py-1 rounded-3xl border border-[#2D3748] disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed"
             >
               Next
             </button>
           </div>
->>>>>>> fb1a1721b4dbf1d0a9670f57dac71b35bf0352fc
         </div>
       )}
     </div>

@@ -77,84 +77,84 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f] right-0 top-0 z-10 py-3"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
         <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-          <BiX onClick={closeDrawerHandler} size="26px" />
-          Invoice
+          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
+        
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-2xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
-            Invoice Details
+        <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
+          Invoice Details
           </h2>
 
           {isLoading && <Loading />}
           {!isLoading && (
-            <div>
+            <div className="white">
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Created By</p>
-                <p>{creator?.first_name + ' ' + creator?.last_name}</p>
+                <p className="text-gray-200">{creator?.first_name + ' ' + creator?.last_name}</p>
               </div>
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Category</p>
-                <p>{category?.toUpperCase()}</p>
+                <p className="text-gray-200">{category?.toUpperCase()}</p>
               </div>
               {buyer && <div className="mt-3 mb-5">
                 <p className="font-semibold">Buyer</p>
-                <p>{buyer}</p>
+                <p className="text-gray-200">{buyer}</p>
               </div>}
               {supplier && <div className="mt-3 mb-5">
                 <p className="font-semibold">Supplier</p>
-                <p>{supplier}</p>
+                <p className="text-gray-200">{supplier}</p>
               </div>}
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Invoice No.</p>
-                <p>{invoiceNo}</p>
+                <p className="text-gray-200">{invoiceNo}</p>
               </div>
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Document Date</p>
-                <p>{moment(documentDate).format('DD/MM/YYYY')}</p>
+                <p className="text-gray-200">{moment(documentDate).format('DD/MM/YYYY')}</p>
               </div>
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Sales Order Date</p>
-                <p>{moment(salesOrderDate).format('DD/MM/YYYY')}</p>
+                <p className="text-gray-200">{moment(salesOrderDate).format('DD/MM/YYYY')}</p>
               </div>
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Items</p>
                 <ul className="border">
                   {items?.map((item: any)=>{
                     return <li className="flex gap-3">
-                      <span className="border-l flex-1 p-1">{item.item.name}</span>
-                      <span className="border-l flex-1 p-1">{item.quantity}</span>
-                      <span className="border-l flex-1 p-1">₹ {item.amount}/-</span>
+                      <span className="border-l flex-1 p-1 text-gray-200">{item.item.name}</span>
+                      <span className="border-l flex-1 p-1 text-gray-200">{item.quantity}</span>
+                      <span className="border-l flex-1 p-1 text-gray-200">₹ {item.amount}/-</span>
                     </li>
                   })}
                 </ul>
                 <div className="mt-3 mb-5">
                   <p className="font-semibold">Store</p>
-                  <p>{store}</p>
+                  <p className="text-gray-200">{store}</p>
                 </div>
               </div>
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Note</p>
-                <p>{note}</p>
+                <p className="text-gray-200">{note}</p>
               </div>
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Subtotal</p>
-                <p>₹ {subtotal}/-</p>
+                <p className="text-gray-200">₹ {subtotal}/-</p>
               </div>
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Tax</p>
-                <p>{tax?.tax_name}</p>
+                <p className="text-gray-200">{tax?.tax_name}</p>
               </div>
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Total</p>
-                <p>₹ {total}/-</p>
+                <p className="text-gray-200">₹ {total}/-</p>
               </div>
             </div>
           )}

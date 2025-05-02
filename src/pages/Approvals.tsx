@@ -520,7 +520,7 @@ const Approvals: React.FC = () => {
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
           <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
           <input
-            className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+            className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
             placeholder="Search roles..."
               value={productSearchKey}
               onChange={(e) => setProductSearchKey(e.target.value)}
@@ -534,7 +534,8 @@ const Approvals: React.FC = () => {
                color="#ffff"
             borderColor="#fff"
               variant="outline"
-              _hover={{ bg: "#2D3748", color: "white" }}
+                      _hover={{ bg: "white", color: "#2D3748" }}  
+
             >
               Refresh
             </Button>
@@ -559,7 +560,7 @@ const Approvals: React.FC = () => {
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
           <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
                     <input
-                      className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+                      className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
                       placeholder="Search roles..."
               value={storeSearchKey}
               onChange={(e) => setStoreSearchKey(e.target.value)}
@@ -573,7 +574,8 @@ const Approvals: React.FC = () => {
                color="#ffff"
             borderColor="#fff"
               variant="outline"
-              _hover={{ bg: "#2D3748", color: "white" }}
+                      _hover={{ bg: "white", color: "#2D3748" }}  
+
             >
               Refresh
             </Button>
@@ -598,7 +600,7 @@ const Approvals: React.FC = () => {
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
           <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
                     <input
-                      className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+                      className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
                       placeholder="Search roles..."
               value={buyerSearchKey}
               onChange={(e) => setBuyerSearchKey(e.target.value)}
@@ -612,7 +614,8 @@ const Approvals: React.FC = () => {
                color="#ffff"
             borderColor="#fff"
               variant="outline"
-              _hover={{ bg: "#2D3748", color: "white" }}
+                      _hover={{ bg: "white", color: "#2D3748" }}  
+
             >
               Refresh
             </Button>
@@ -637,7 +640,7 @@ const Approvals: React.FC = () => {
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
            <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
                      <input
-                       className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+                       className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
                        placeholder="Search roles..."
               value={sellerSearchKey}
               onChange={(e) => setSellerSearchKey(e.target.value)}
@@ -651,7 +654,8 @@ const Approvals: React.FC = () => {
               color="#ffff"
             borderColor="#fff"
               variant="outline"
-              _hover={{ bg: "#2D3748", color: "white" }}
+                      _hover={{ bg: "white", color: "#2D3748" }}  
+
             >
               Refresh
             </Button>
@@ -676,7 +680,7 @@ const Approvals: React.FC = () => {
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
            <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
                      <input
-                       className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+                       className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
                        placeholder="Search roles..."
               value={bomSearchKey}
               onChange={(e) => setBomSearchKey(e.target.value)}
@@ -690,7 +694,8 @@ const Approvals: React.FC = () => {
               color="#ffff"
             borderColor="#fff"
               variant="outline"
-              _hover={{ bg: "#2D3748", color: "white" }}
+                      _hover={{ bg: "white", color: "#2D3748" }}  
+
             >
               Refresh
             </Button>
@@ -715,7 +720,7 @@ const Approvals: React.FC = () => {
           <div className="mt-2 flex flex-wrap gap-y-1 justify-center gap-x-2 ">
             <FiSearch className="relative left-10 top-5 transform -translate-y-1/2 text-gray-200" />
             <input
-              className="pl-10 pr-4 py-2 w-[200px] text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              className="pl-10 pr-4 py-2 w-[200px] text-gray-200 text-sm  border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
               placeholder="Search roles..."
               value={bomRMSearchKey}
               onChange={(e) => setBomRMSearchKey(e.target.value)}
@@ -729,7 +734,8 @@ const Approvals: React.FC = () => {
              color="#ffff"
             borderColor="#fff"
               variant="outline"
-              _hover={{ bg: "#2D3748", color: "white" }}
+                      _hover={{ bg: "white", color: "#2D3748" }}  
+
             >
               Refresh
             </Button>

@@ -67,13 +67,14 @@ const EmployeeDetails: React.FC<EmployeeDetailsProps> = ({
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-          <BiX onClick={closeDrawerHandler} size="26px" />
-          Employee
+        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
+          <BiX onClick={closeDrawerHandler} size="26px"  color="white"/>
+        
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-md text-white w-[200px] rounded-md font-semibold py-2 cursor-pointer  text-center mb-6  bg-[#2D3748]">
+        <h2 className="text-xl text-center  font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
+       
             Employee Details
           </h2>
 
@@ -81,32 +82,32 @@ const EmployeeDetails: React.FC<EmployeeDetailsProps> = ({
           {!isLoadingEmployee && (
             <div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold">First Name</p>
-                <p>{firstname}</p>
+                <p className="font-semibold text-white">First Name</p>
+                <p className="text-gray-300">{firstname}</p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold">Last Name</p>
-                <p>{lastname}</p>
+                <p className="font-semibold text-white">Last Name</p>
+                <p className="text-gray-300">{lastname}</p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold">Email</p>
-                <p>{email}</p>
+                <p className="font-semibold text-white">Email</p>
+                <p className="text-gray-300">{email}</p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold">Phone</p>
-                <p>{phone}</p>
+                <p className="font-semibold text-white">Phone</p>
+                <p className="text-gray-300">{phone}</p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold">Is Verified</p>
-                <p>{isVerified ? 'Verified' : 'Not Verified'}</p>
+                <p className="font-semibold text-white">Is Verified</p>
+                <p className="text-gray-300">{isVerified ? 'Verified' : 'Not Verified'}</p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold">Role</p>
-                <p>{(isSuper && 'Super Admin') || role?.role || 'N/A'}</p>
+                <p className="font-semibold text-white">Role</p>
+                <p className="text-gray-300 ">{(isSuper && 'Super Admin') || role?.role || 'N/A'}</p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold">Permissions</p>
-                {!role?.permissions && <p>N/A</p>}
+                <p className="font-semibold text-white">Permissions</p>
+                {!role?.permissions && <p className="text-gray-300">N/A</p>}
                 {role?.permissions && <ul className="pl-5">
                     {role.permissions.map((permission: any) => <li>{permission}</li>)}
                 </ul>}

@@ -67,20 +67,20 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
 
   const statusStyles = {
     "raw material approval pending": {
-      bg: "#F03E3E",
-      text: "#ffffff",
+      
+      text: "#F03E3E",
     },
     "raw materials approved": {
-      bg: "#3392F8",
-      text: "#ffffff",
+      
+      text: "#3392F8",
     },
     "work in progress": {
-      bg: "#E48C27",
-      text: "#ffffff",
+      
+      text: "#E48C27",
     },
     completed: {
-      bg: "#409503",
-      text: "#ffffff",
+      
+      text: "#409503",
     },
   };
 
@@ -112,7 +112,9 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
     useSortBy,
     usePagination
   );
-
+  const dynamicBg = (index) => {
+    return index % 2 !== 0 ? "#ffffff40" : "#ffffff1f";
+  };
   return (
     <div>
       {isLoadingProcess && <Loading />}
@@ -145,10 +147,10 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
           <TableContainer
             maxHeight="600px"
             overflowY="auto"
-            className=" mx-3  bg-white rounded-md"
+            className=" bg-[#14243452] rounded-md"
           >
             <Table variant="simple" {...getTableProps()}>
-              <Thead className="text-sm font-semibold">
+              <Thead className="text-sm font-semibold  bg-[#14243452]">
                 {headerGroups.map(
                   (
                     hg: HeaderGroup<{
@@ -168,9 +170,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                               fontSize="14px"
                               fontWeight="600"
                               color="white"
-                              backgroundColor="#2D3748"
-                              borderLeft="1px solid #d7d7d7"
-                              borderRight="1px solid #d7d7d7"
+                            
                               {...column.getHeaderProps(
                                 column.getSortByToggleProps()
                               )}
@@ -195,9 +195,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                           fontSize="14px"
                           fontWeight="600"
                           color="white"
-                          backgroundColor="#2D3748"
-                          borderLeft="1px solid #d7d7d7"
-                          borderRight="1px solid #d7d7d7"
+                        
                         >
                           Actions
                         </Th>
@@ -207,17 +205,22 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                 )}
               </Thead>
               <Tbody {...getTableBodyProps()}>
-                {page.map((row: any) => {
+                {page.map((row: any,index) => {
                   prepareRow(row);
 
                   return (
                     <Tr
-                      className="relative hover:bg-[#e4e4e4] hover:cursor-pointer text-base lg:text-sm"
+                      className="relative  text-gray-200 hover:cursor-pointer text-base lg:text-sm"
                       {...row.getRowProps()}
+                      bg={dynamicBg(index)}
+                      _hover={{
+                        bg: "#ffffff78",
+                        cursor: "pointer",
+                      }}
                     >
                       {row.cells.map((cell: Cell) => {
                         return (
-                          <Td fontWeight="500" {...cell.getCellProps()}>
+                          <Td fontWeight="500" {...cell.getCellProps()} border="none">
                             {cell.column.id !== "createdAt" &&
                               cell.column.id !== "updatedAt" &&
                               cell.column.id !== "creator" &&
@@ -278,7 +281,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                           </Td>
                         );
                       })}
-                      <Td className="flex gap-x-2">
+                      <Td className="flex gap-x-2" border="none">
                         {openProcessDetailsDrawerHandler && (
                           <MdOutlineVisibility
                             className="hover:scale-110"
@@ -322,7 +325,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
             >
               Prev
             </button>
-            <span className="mx-3 text-sm md:text-lg lg:text-xl xl:text-base">
+            <span className="mx-3 text-gray-200 text-sm md:text-lg lg:text-xl xl:text-base">
               {pageIndex + 1} of {pageCount}
             </span>
             <button
