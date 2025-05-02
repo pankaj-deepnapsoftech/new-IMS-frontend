@@ -1,6 +1,8 @@
 import { FaRegCheckCircle } from "react-icons/fa";
 import { IoDocumentTextOutline, IoStorefrontOutline } from "react-icons/io5";
 import { MdOutlineShoppingCart, MdOutlineSpeed, MdOutlineSell, MdOutlineAttachMoney, MdOutlinePayment, MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { CgProfile } from "react-icons/cg";
+
 import { RiBillLine } from "react-icons/ri";
 import { TbLockAccess, TbUsersGroup } from "react-icons/tb";
 import { SlDirection } from "react-icons/sl";
@@ -27,6 +29,7 @@ import IndirectProducts from "../pages/IndirectProducts";
 import Scrap from "../pages/Scrap";
 import WIPProducts from "../pages/WIPProducts";
 import InventoryApprovals from "../pages/InventoryApprovals";
+import Userprofile from "../pages/Userprofile";
 
 const routes = [
   {
@@ -36,6 +39,8 @@ const routes = [
     element: <Dashboard />,
     isSublink: false
   },
+  
+  
   {
     name: "User Roles",
     icon: <TbLockAccess />,
@@ -168,6 +173,13 @@ const routes = [
       },
     ],
     isSublink: true
+  },
+  {
+    name: "User Profile",
+    icon: <CgProfile />,
+    path: "userprofile",
+    element: <Userprofile />,
+    isSublink: false
   },
 ];
 
