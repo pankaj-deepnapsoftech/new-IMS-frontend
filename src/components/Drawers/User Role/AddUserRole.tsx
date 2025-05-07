@@ -84,7 +84,7 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
     multiValue: (provided: any) => ({
       ...provided,
       backgroundColor: "#fff",
-      color: "#000",
+      color: "#fff",
     }),
     menu: (provided: any) => ({
       ...provided,
@@ -94,6 +94,7 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
       ...provided,
       color: "#fff", // light gray placeholder
     }),
+   
   };
 
 
@@ -126,6 +127,7 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
                 onChange={(e) => setRole(e.target.value)}
                 type="text"
                 placeholder="Role"
+                color="white"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
@@ -136,6 +138,7 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
                 onChange={(e) => setDescription(e.target.value)}
                 type="text"
                 placeholder="Description"
+                color="white"
               />
             </FormControl>
             <FormControl>

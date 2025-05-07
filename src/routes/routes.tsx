@@ -30,6 +30,8 @@ import Scrap from "../pages/Scrap";
 import WIPProducts from "../pages/WIPProducts";
 import InventoryApprovals from "../pages/InventoryApprovals";
 import Userprofile from "../pages/Userprofile";
+import Sales from "../pages/Sales";
+import { FaSalesforce } from "react-icons/fa6";
 
 const routes = [
   {
@@ -114,6 +116,13 @@ const routes = [
     isSublink: true
   },
   {
+   name:"Sales",
+   icon:<FaSalesforce />,
+   path:"sales",
+   element:<Sales/>,
+   isSublink:false
+  },
+  {
     name: "Scrap Management",
     icon: <SiScrapy />,
     path: "scrap",
@@ -181,6 +190,7 @@ const routes = [
     element: <Userprofile />,
     isSublink: false
   },
+
 ];
 
 export default routes;

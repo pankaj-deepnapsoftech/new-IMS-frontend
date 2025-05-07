@@ -92,7 +92,7 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
 
       <form onSubmit={verifyHandler} className="mt-4 w-[100%]">
         <div className="flex flex-col items-start">
-          <label className="flex gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
+          <label className="flex gap-x-1 items-center font-bold text-sm text-white">
             <span>
               <FaStarOfLife size="6px" color="red" />
             </span>
@@ -118,14 +118,14 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
             onClick={resendOTPHandler}
             disabled={!canResend}
             style={{ boxShadow: "0 2px 0 rgba(5, 95, 255, 0.1)" }}
-            className="mt-4 w-[100%] rounded-lg bg-[#1640d6] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
+            className="mt-4 w-[100%] rounded-lg bg-[#1c77ac] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
           >
             {canResend ? "Resend OTP" : `Resend (${secondsLeft}s)`}
           </button>
           <button
             disabled={isVerifyingOTP}
             style={{ boxShadow: "0 2px 0 rgba(5, 95, 255, 0.1)" }}
-            className="mt-4 w-[100%] rounded-lg bg-[#1640d6] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
+            className="mt-4 w-[100%] rounded-lg bg-[#1c77ac] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
           >
             {isVerifyingOTP ? "Verifying OTP..." : "Verify OTP"}
           </button>

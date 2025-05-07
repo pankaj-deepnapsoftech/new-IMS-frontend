@@ -41,22 +41,22 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({email, setEmail, s
       }
     }
 
-    return <div className="w-[80%] md:w-[60%]">
-            <h1 className="text-4xl text-black font-bold border-b pb-5">
+    return <div className="w-[80%] md:w-[60%] shadow-2xl rounded-xl p-10 h-[80vh] bg-[#ffffff2c] backdrop-blur-md ">
+            <h1 className="text-4xl text-white font-bold text-center  pb-5">
               Sign Up
             </h1>
 
             <form onSubmit={registerHandler} className="mt-4 w-[100%]">
               <div className="mt-4 flex flex-col items-start">
-                <label className="flex gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
+                <label className="flex text-white gap-x-1 items-center font-bold text-sm ">
                   <span>
                     <FaStarOfLife size="6px" color="red" />
                   </span>
                   First Name
                 </label>
                 <div className="relative w-[100%]">
-                  <div className="absolute top-[18px] left-[7px] text-base">
-                    <BiUser />
+                  <div className="absolute top-[20px] left-[7px] text-base">
+                    <BiUser color="gray" />
                   </div>
                   <input
                     value={firstname}
@@ -68,12 +68,12 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({email, setEmail, s
                 </div>
               </div>
               <div className="mt-4 flex flex-col items-start">
-                <label className="flex gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
+                <label className="flex gap-x-1 text-white items-center font-bold text-sm ">
                   Last Name
                 </label>
                 <div className="relative w-[100%]">
-                  <div className="absolute top-[18px] left-[7px] text-base">
-                    <BiUser />
+                  <div className="absolute top-[20px] left-[7px] text-base">
+                    <BiUser color="gray" />
                   </div>
                   <input
                     // required={true}
@@ -86,15 +86,15 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({email, setEmail, s
                 </div>
               </div>
               <div className="flex mt-4 flex-col items-start">
-                <label className="flex gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
+                <label className="flex gap-x-1 text-white items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
                   <span>
                     <FaStarOfLife size="6px" color="red" />
                   </span>
                   Phone
                 </label>
                 <div className="relative w-[100%]">
-                  <div className="absolute top-[18px] left-[7px] text-base">
-                    <BiUser />
+                  <div className="absolute top-[20px] left-[7px] text-base">
+                    <BiUser color="gray" />
                   </div>
                   <input
                     value={phone}
@@ -107,28 +107,29 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({email, setEmail, s
                 </div>
               </div>
               <div className="flex mt-4 flex-col items-start">
-                <label className="flex gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
+                <label className="flex gap-x-1 text-white items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
                   <span>
                     <FaStarOfLife size="6px" color="red" />
                   </span>
                   Email
                 </label>
                 <div className="relative w-[100%]">
-                  <div className="absolute top-[18px] left-[7px] text-base">
-                    <BiUser />
+                  <div className="absolute top-[20px] left-[7px] text-base">
+                    <BiUser  color="gray" />
                   </div>
-                  <input
+                  <input 
+                  color="gray"
                     required={true}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-[100%] outline-none text-base pl-7 pr-2 py-2 border mt-2 border-[#d9d9d9] rounded-[10px] hover:border-[#1640d6] cursor-pointer"
+                    className="w-[100%]  outline-none text-base pl-7 pr-2 py-2 border mt-2 border-[#d9d9d9] rounded-[10px] hover:border-[#1640d6] cursor-pointer"
                     type="email"
                     placeholder="Email"
                   />
                 </div>
               </div>
               <div className="mt-4 flex flex-col items-start font-bold text-sm">
-                <label className="flex gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
+                <label className="flex text-white gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
                   <span>
                     <FaStarOfLife size="6px" color="red" />
                   </span>
@@ -136,7 +137,7 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({email, setEmail, s
                 </label>
                 <div className="relative w-[100%]">
                   <div className="absolute top-[20px] left-[7px] text-base">
-                    <BiLockAlt />
+                    <BiLockAlt  color="gray" />
                   </div>
                   <input
                     value={password}
@@ -162,7 +163,7 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({email, setEmail, s
                 </div>
               </div>
               <div className="my-6 flex items-center justify-between font-bold text-sm">
-                <div className="text-[#1640d6]">
+                <div className="text-[#2db2ff]">
                   <Link to="/login">Already have an account?</Link>
                 </div>
               </div>
@@ -170,7 +171,7 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({email, setEmail, s
               <button
                 disabled={isRegistering}
                 style={{ boxShadow: "0 2px 0 rgba(5, 95, 255, 0.1)" }}
-                className="w-[100%] rounded-lg bg-[#1640d6] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
+                className="w-[100%] rounded-lg bg-[#1c77ac] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
               >
                 {isRegistering ? "Signing up..." : "Sign Up"}
               </button>

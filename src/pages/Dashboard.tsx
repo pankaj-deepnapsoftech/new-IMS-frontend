@@ -1,3 +1,4 @@
+// ts-@nocheck
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useSelector } from "react-redux";
@@ -209,10 +210,11 @@ const dynamicColor = (index: number) => {
               FROM:
             </label>
             <input 
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
               id="dob"
               type="text"
+              
               placeholder="DD/MM/YYYY"
               className="w-full  rounded-md px-4 py-2 text-sm  text-gray-200 placeholder-gray-300   bg-[#918f8f57]  focus:outline-none transition"
             />

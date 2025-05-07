@@ -12,7 +12,7 @@ const Register: React.FC = () => {
     useState<boolean>(false);
 
   return (
-    <div className="w-full min-h-[100vh] flex">
+    <div className="w-full min-h-[100%] flex bg-gray-600 ">
       <Intro />
 
       {/* REGISTER AREA */}

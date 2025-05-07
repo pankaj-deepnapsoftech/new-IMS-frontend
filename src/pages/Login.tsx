@@ -22,12 +22,11 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full min-h-[100vh] flex">
+    <div className="w-full h-[100vh] flex ">
       <Intro />
 
-      {/* LOGIN AREA */}
-      <div className="h-[100vh] w-full xl:w-[50%] flex flex-col items-center justify-center">
-        {/* Login Section */}
+      <div className="h-[100%] w-full xl:w-[50%] bg-gray-600 flex flex-col items-center justify-center">
+     
         {showLoginComponent && (
           <LoginComponent
             email={email}

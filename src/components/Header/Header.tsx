@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import UserDetailsMenu from "../../ui/UserDetailsMenu";
+import { log } from "console";
 // import { MdOutlineDashboardCustomize } from "react-icons/md";
 
 const Header: React.FC = () => {
@@ -27,10 +28,10 @@ const Header: React.FC = () => {
       toast.error(error.message || "Something went wrong");
     }
   };
-
+  // console.log("User Data:", { firstname, lastname, email });
   return (
-    <div className="relative   flex justify-end max-[800px]:justify-end items-center py-2 px-3 "
-    // style={{ boxShadow: "0 0 100px 0px #96beee26" }}
+    <div className="relative  flex justify-end max-[800px]:justify-end items-center py-2 px-3 "
+  
     > 
     
       <div className="flex gap-x-5 items-center   ">
@@ -41,6 +42,7 @@ const Header: React.FC = () => {
           size="md"
           name={firstname ? firstname + " " + lastname : ""}
           onClick={() => setShowUserDetails((prev) => !prev)}
+          
         />
         {showUserDetails && (
           <ClickMenu

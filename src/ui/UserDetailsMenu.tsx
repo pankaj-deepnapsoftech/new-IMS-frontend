@@ -2,15 +2,15 @@ import { Avatar } from "@chakra-ui/react";
 import { BiLogOutCircle, BiX } from "react-icons/bi";
 import { Link } from "react-router-dom";
 interface UserDetailsMenuProps {
-    email: string,
-    firstname: string,
-    lastname: string,
-    logoutHandler: ()=>void,
-    closeUserDetailsMenu: ()=>void,
+  email: string,
+  firstname: string,
+  lastname: string,
+  logoutHandler: () => void,
+  closeUserDetailsMenu: () => void,
 }
 
 const UserDetailsMenu: React.FC<UserDetailsMenuProps> = ({
-    email, firstname, lastname, logoutHandler, closeUserDetailsMenu
+  email, firstname, lastname, logoutHandler, closeUserDetailsMenu
 }) => {
   return (
     <div
@@ -21,19 +21,20 @@ const UserDetailsMenu: React.FC<UserDetailsMenuProps> = ({
       }}
     >
       <Link to="/userprofile">
-      <div className="cursor-pointer flex border-b py-2 px-3 rounded-md hover:bg-[#e3e3e3]">
-        <Avatar backgroundColor="#4b87a0d9" size="md" name={firstname + ' ' + lastname} />
-        <div className="pl-2">
-          <p className="text-lg font-semibold mb-1">
-            {firstname + ' ' + lastname}
-            {/* <Badge ml="1" colorScheme="red" rounded={"6px"}>
-              {role === "Admin" ? "Employee" : "Super Admin"}
-            </Badge> */}
-          </p>
-          <p className="mt-[-4px] font-semibold">{email}</p>
+        <div
+          onClick={closeUserDetailsMenu}
+          className="cursor-pointer flex border-b py-2 px-3 rounded-md hover:bg-[#e3e3e3]"
+        >
+          <Avatar backgroundColor="#4b87a0d9" size="md" name={firstname + ' ' + lastname} />
+          <div className="pl-2">
+            <p className="text-lg font-semibold mb-1">
+              {firstname + ' ' + lastname}
+            </p>
+            <p className="mt-[-4px] font-semibold">{email}</p>
+          </div>
         </div>
-      </div>
       </Link>
+
       <div
         className="cursor-pointer px-3 py-1 rounded-md hover:bg-[#e3e3e3] mt-2 font-semibold text-lg flex items-center gap-x-2 border-b"
         onClick={logoutHandler}

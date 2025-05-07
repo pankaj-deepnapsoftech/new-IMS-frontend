@@ -7,63 +7,92 @@ import {
   Stack,
   Button,
   Input,
-  Textarea,
+  Divider,
+  useColorModeValue,
 } from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
 
+const UserProfile: React.FC = () => {
+  const data = useSelector((state: any) => state.auth);
 
-const Userprofile: React.FC = () => {
+ 
+  const cardBg = useColorModeValue('#ffffff2e', '#1a202c');
+  const inputBg = useColorModeValue('#ffffff2e', '#2d3748');
+  const textColor = useColorModeValue('#fff', '#edf2f7');
+  const labelColor = useColorModeValue('#fff', 'gray.300');
+
   return (
-    <div  className="rounded-md ">
-      <Flex
-        direction="column"
-        align="center"
-        p={5}
-        minH="100vh"
-      >
+    <Box
+      minH="100vh"
+      py={10}
+      px={4}
+    >
+      <Flex justify="center" align="center">
         <Box
-          w={{ base: '100%', md: '70%', lg: '50%' }}
-          background="#ffffff63"
+          w={{ base: '100%', md: '100%', lg: '40%' }}
+          bg={cardBg}
           p={8}
-          boxShadow="lg"
-          borderRadius="lg"
+          boxShadow="2xl"
+          borderRadius="2xl"
         >
           <Flex direction="column" align="center" mb={6}>
-            <Avatar size="2xl" name="John Doe" src="https://bit.ly/dan-abramov" />
-            <Heading mt={4} color="#fff" size="lg">
-              John Doe
+            <Avatar
+              size="xl"
+              name={`${data.firstname} ${data.lastname}`}
+              mb={4}
+              src={data.avatarUrl}
+            />
+            <Heading size="lg" color={textColor}>
+              {data.firstname} {data.lastname}
             </Heading>
-            <Text color="#fff" mt={2}>
-              Full Stack Developer at XYZ Inc.
-            </Text>
+           
           </Flex>
+
+          <Divider mb={6} />    
 
           <Stack spacing={4}>
             <Box>
-              <Text color="#fff" fontWeight="semibold">Email</Text>
-              <Input color="#ede7e7" placeholder="john.doe@example.com" />
+              <Text fontWeight="semibold" color={labelColor} mb={1}>
+                First Name
+              </Text>
+              <Input value={data.firstname} border="gray" color="white" isReadOnly bg={inputBg} />
             </Box>
 
             <Box>
-              <Text color="#fff" fontWeight="semibold">Phone</Text>
-              <Input color="#ede7e7" placeholder="+1 234 567 8901" />
+              <Text fontWeight="semibold" color={labelColor} mb={1}>
+                Last Name
+              </Text>
+              <Input value={data.lastname} border="gray" color="white"  isReadOnly bg={inputBg} />
             </Box>
 
             <Box>
-              <Text color="#fff" fontWeight="semibold">Bio</Text>
-              <Textarea color="#ede7e7" placeholder="Short bio about yourself..." />
+              <Text fontWeight="semibold"  color={labelColor} mb={1}>
+                Email
+              </Text>
+              <Input value={data.email} border="gray" color="white"  isReadOnly bg={inputBg} />
             </Box>
 
-            <Button color="#fff"
-              backgroundColor="#206b8f"
-              _hover={{ bg: "#206b8f7a" }} width="full" mt={4}>
-              Update Profile
+            <Box>
+              <Text fontWeight="semibold" color={labelColor} mb={1}>
+                Phone
+              </Text>
+              <Input value={data.phone} border="gray" color="white"  bg={inputBg}  />
+            </Box>
+
+            <Button
+              colorScheme="blue"
+              width="full"
+              mt={4}
+              fontWeight="bold"
+              cursor="default"
+            >
+               Update Profile
             </Button>
-            
           </Stack>
         </Box>
       </Flex>
-    </div>
+    </Box>
   );
 };
 
-export default Userprofile;
+export default UserProfile;

@@ -4,18 +4,22 @@ import { Link } from "react-router-dom";
 
 const Intro: React.FC = () => {
   return (
-    <div className="hidden xl:flex bg-[#e3e3e3] h-[100vh] w-[50%] flex-col justify-center items-center">
+    <div className="hidden xl:flex bg-gray-600 h-[100vh] w-[50%] flex-col justify-center items-center">
       <div className="mb-5">
         <Link to="/">
-          <img className="w-[200px]" src={logo}></img>
+          <img
+            className="w-[200px] relative right-20 filter brightness-0 invert"
+            src={logo}
+            alt="Logo"
+          />
         </Link>
       </div>
       <div>
-        <h1 className="mb-5 text-2xl font-bold text-[#4f5d75]">
+        <h1 className="mb-5 text-2xl font-bold text-[#fff]">
           Manage Your Company With:
         </h1>
 
-        <div className="text-sm text-[#4f5d75] font-bold">
+        <div className="text-sm text-[#fff] font-bold">
           <div className="mb-4 leading-7">
             <p className="flex items-center gap-x-2">
               <FaCheck />

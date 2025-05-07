@@ -1,14 +1,18 @@
 import { FaAngleDown, FaAngleUp, FaSignOutAlt } from "react-icons/fa";
 import routes from "../../routes/routes";
-import { NavLink } from "react-router-dom";
+import { NavLink, Navigate, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 import { RiMenu2Line } from "react-icons/ri";
 import logo from "../../assets/images/logo/logo.png";
+import { useCookies } from "react-cookie";
+import { toast } from "react-toastify";
 
 
 const Navigation: React.FC = () => {
+  const navigate = useNavigate();
+  const [cookie, _, removeCookie] = useCookies();
   const { allowedroutes, isSuper } = useSelector((state: any) => state.auth);
   const [checkMenu, setCheckMenu] = useState(false);
   const [showIcon, setShowIcon] = useState(false);
@@ -37,7 +41,15 @@ const Navigation: React.FC = () => {
       [path]: !prev[path],
     }));
   };
-
+  const logoutHandler = () => {
+    try {
+      removeCookie("access_token");
+      toast.success("Logged out successfully");
+      navigate("/login");
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong");
+    }
+  };
   return (
     <>
       {/* Mobile Menu Button */}
@@ -154,9 +166,11 @@ const Navigation: React.FC = () => {
         </ul>
         <hr className="my-4 border-1.5 w-[180px] ml-4 relative top-0 border-gray-300" />
         <div className="mt-[40px]">
-          <button className="flex items-center text-black shadow-2xl justify-center ml-4 h-[40px] w-[150px] gap-2 bg-gradient-to-r from-white to-white hover:scale-105 font-[700] py-2 rounded-md transition-all">
+          <button onClick={logoutHandler} className="flex items-center text-black shadow-2xl justify-center ml-4 h-[40px] w-[150px] gap-2 bg-gradient-to-r from-white to-white hover:scale-105 font-[700] py-2 rounded-md transition-all">
             Log Out
-            <FaSignOutAlt />
+            <FaSignOutAlt
+            
+            />
           </button>
         </div>
       </div>

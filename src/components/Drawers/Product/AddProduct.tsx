@@ -235,7 +235,8 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="white">Product ID</FormLabel>
-              <Input
+              <Input 
+              color="white"
                 value={id}
                 onChange={(e) => setId(e.target.value)}
                 type="text"
@@ -244,7 +245,7 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="white">Product Name</FormLabel>
-              <Input
+              <Input color="white"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 type="text"
@@ -253,7 +254,7 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="white">Product Price (Default)</FormLabel>
-              <Input
+              <Input color="white"
                 value={price}
                 className="no-scrollbar"
                 onChange={(e) => setPrice(e.target.value)}
@@ -263,9 +264,9 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="white">Regular Buying Price</FormLabel>
-              <Input
+              <Input 
                 value={regularBuyingPrice}
-                className="no-scrollbar"
+                className="no-scrollbar text-white"
                 onChange={(e) => setRegularBuyingPrice(+e.target.value)}
                 type="number"
                 placeholder="Regular Buying Price"
@@ -275,7 +276,7 @@ const AddProduct: React.FC<AddProductProps> = ({
               <FormLabel fontWeight="bold" color="white">Wholesale Buying Price</FormLabel>
               <Input
                 value={wholesaleBuyingPrice}
-                className="no-scrollbar"
+                className="no-scrollbar text-white"
                 onChange={(e) => setWholeSaleBuyingPrice(+e.target.value)}
                 type="number"
                 placeholder="Regular Buying Price"
@@ -285,7 +286,7 @@ const AddProduct: React.FC<AddProductProps> = ({
               <FormLabel fontWeight="bold" color="white">MRP</FormLabel>
               <Input
                 value={mrp}
-                className="no-scrollbar"
+                className="no-scrollbar text-white"
                 onChange={(e) => setMrp(+e.target.value)}
                 type="number"
                 placeholder="MRP"
@@ -295,7 +296,7 @@ const AddProduct: React.FC<AddProductProps> = ({
               <FormLabel fontWeight="bold" color="white">Dealer Price</FormLabel>
               <Input
                 value={dealerPrice}
-                className="no-scrollbar"
+                className="no-scrollbar text-white"
                 onChange={(e) => setDealerPrice(+e.target.value)}
                 type="number"
                 placeholder="Dealer Price"
@@ -305,7 +306,7 @@ const AddProduct: React.FC<AddProductProps> = ({
               <FormLabel fontWeight="bold" color="white">Distributor Price</FormLabel>
               <Input
                 value={distributorPrice}
-                className="no-scrollbar"
+                className="no-scrollbar text-white"
                 onChange={(e) => setDistributorPrice(+e.target.value)}
                 type="number"
                 placeholder="Distributor Price"
@@ -331,7 +332,7 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="white">Product Subcategory</FormLabel>
-              <Input
+              <Input color="white"
                 value={subCategory}
                 onChange={(e) => setSubCategory(e.target.value)}
                 type="text"
@@ -358,7 +359,7 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="white">Current Stock</FormLabel>
-              <Input
+              <Input color="white"
                 value={currentStock}
                 onChange={(e) => setCurrentStock(e.target.value)}
                 type="number"
@@ -367,7 +368,7 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="white">Min Stock</FormLabel>
-              <Input
+              <Input color="white"
                 value={minStock}
                 onChange={(e) => setMinStock(e.target.value)}
                 type="number"
@@ -376,7 +377,7 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="white">Max Stock</FormLabel>
-              <Input
+              <Input color="white"
                 value={maxStock}
                 onChange={(e) => setMaxStock(e.target.value)}
                 type="number"
@@ -385,7 +386,7 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="white">HSN</FormLabel>
-              <Input
+              <Input color="white"
                 value={hsn}
                 onChange={(e) => setHsn(e.target.value)}
                 type="text"

@@ -164,7 +164,7 @@ const Process: React.FC = () => {
           Production Process
         </h1>
 
-        <div className="mt-2 flex flex-wrap justify-center md:justify-start w-full gap-4">
+        <div className="mt-2 flex flex-wrap justify-center md:justify-center w-full gap-4">
           {/* Search Input */}
           <div className="relative w-full md:w-[200px]">
             <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-200" />
@@ -190,7 +190,7 @@ const Process: React.FC = () => {
             Add New Production Process
           </Button>
 
-          {/* Refresh Button */}
+
           <Button
             fontSize={{ base: "14px", md: "14px" }}
             paddingX={{ base: "10px", md: "12px" }}

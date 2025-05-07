@@ -68,8 +68,8 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
   };
 
   return (
-    <div className="w-[80%] md:w-[60%]">
-      <h1 className="flex gap-x-1 text-4xl text-black font-bold border-b pb-5">
+    <div className="w-[80%] md:w-fit shadow-2xl rounded-xl p-10  bg-[#ffffff2c] backdrop-blur-md">
+      <h1 className="flex gap-x-1 text-4xl text-white items-center font-bold  max-[700px]:text-[24px] pb-5">
         <IoMdArrowBack onClick={() => navigate(0)} />
         Reset Password
       </h1>
@@ -79,20 +79,20 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
         className="mt-4 w-[100%]"
       >
         <div className="flex flex-col items-start">
-          <label className="flex gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
+          <label className="flex gap-x-1 items-center font-bold  text-sm text-[#fff]">
             <span>
               <FaStarOfLife size="6px" color="red" />
             </span>
             Email
           </label>
           <div className="relative w-[100%]">
-            <div className="absolute top-[18px] left-[7px] text-base">
-              <BiUser />
+            <div className="absolute top-[22px] left-[7px] text-base">
+              <BiUser color="gray" />
             </div>
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-[100%] outline-none text-base pl-7 pr-2 py-2 border rounded mt-2 border-[#d9d9d9] rounded-[10px] hover:border-[#1640d6] cursor-pointer"
+              className="w-[100%] outline-none text-base pl-7 pr-2 py-2 border  mt-2 border-[#d9d9d9] rounded-[10px] hover:border-[#1640d6] cursor-pointer"
               type="email"
               placeholder="Email"
               required
@@ -103,7 +103,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
         <button
           disabled={isForgetPasswordLoading}
           style={{ boxShadow: "0 2px 0 rgba(5, 95, 255, 0.1)" }}
-          className="mt-4 w-[100%] rounded-lg bg-[#1640d6] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
+          className="mt-4 w-[100%] rounded-lg bg-[#1c77ac] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
         >
           {isForgetPasswordLoading ? "Sending OTP..." : "Get OTP"}
         </button>
@@ -114,7 +114,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
         className="mt-4 w-[100%]"
       >
         <div className="flex flex-col items-start">
-          <label className="flex gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
+          <label className="flex gap-x-1 items-center font-bold text-sm text-white">
             <span>
               <FaStarOfLife size="6px" color="red" />
             </span>
@@ -122,12 +122,12 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
           </label>
           <div className="relative w-[100%]">
             <div className="absolute top-[20px] left-[7px] text-base">
-              <TbPasswordMobilePhone size={18} />
+              <TbPasswordMobilePhone size={18} color="gray" />
             </div>
             <input
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              className="w-[100%] outline-none text-base pl-7 pr-2 py-2 border rounded mt-2 border-[#d9d9d9] rounded-[10px] hover:border-[#1640d6] cursor-pointer"
+              className="w-[100%] outline-none text-base pl-7 pr-2 py-2 border  mt-2 border-[#d9d9d9] rounded-[10px] hover:border-[#1640d6] cursor-pointer"
               type="otp"
               placeholder="OTP"
               required
@@ -135,7 +135,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
           </div>
         </div>
         <div className="mt-2 flex flex-col items-start">
-          <label className="flex gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
+          <label className="flex gap-x-1 items-center font-bold text-sm text-white">
             <span>
               <FaStarOfLife size="6px" color="red" />
             </span>
@@ -143,12 +143,12 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
           </label>
           <div className="relative w-[100%]">
             <div className="absolute top-[18px] left-[7px] text-base">
-              <BiLockAlt />
+              <BiLockAlt  color="gray"/>
             </div>
             <input
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-[100%] outline-none text-base pl-7 pr-2 py-2 border rounded mt-2 border-[#d9d9d9] rounded-[10px] hover:border-[#1640d6] cursor-pointer"
+              className="w-[100%] outline-none text-base pl-7 pr-2 py-2 border  mt-2 border-[#d9d9d9] rounded-[10px] hover:border-[#1640d6] cursor-pointer"
               type={showNewPassword ? "text" : "password"}
               placeholder="New Password"
               required
@@ -172,7 +172,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
         <button
           disabled={isResetPasswordLoading}
           style={{ boxShadow: "0 2px 0 rgba(5, 95, 255, 0.1)" }}
-          className="mt-4 w-[100%] rounded-lg bg-[#1640d6] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
+          className="mt-4 w-[100%] rounded-lg bg-[#1c77ac] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
         >
           {isResetPasswordLoading ? "Updating password..." : "Update Password"}
         </button>
