@@ -32,6 +32,8 @@ import InventoryApprovals from "../pages/InventoryApprovals";
 import Userprofile from "../pages/Userprofile";
 import Sales from "../pages/Sales";
 import { FaSalesforce } from "react-icons/fa6";
+import Parties from "../pages/Parties";
+import { IoIosPeople } from "react-icons/io";
 
 const routes = [
   {
@@ -114,6 +116,13 @@ const routes = [
       }
     ],
     isSublink: true
+  },
+  {
+  name:"Parties",
+  icon:<IoIosPeople/>  ,
+  path:"parties",
+  element:<Parties/>
+
   },
   {
    name:"Sales",
