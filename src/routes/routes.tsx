@@ -1,6 +1,6 @@
 import { FaRegCheckCircle } from "react-icons/fa";
 import { IoDocumentTextOutline, IoStorefrontOutline } from "react-icons/io5";
-import { MdOutlineShoppingCart, MdOutlineSpeed, MdOutlineSell, MdOutlineAttachMoney, MdOutlinePayment, MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { MdOutlineShoppingCart, MdOutlineSpeed, MdOutlineSell, MdOutlineAttachMoney, MdOutlinePayment, MdOutlineProductionQuantityLimits, MdTask } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
 
 import { RiBillLine } from "react-icons/ri";
@@ -35,6 +35,7 @@ import { FaSalesforce } from "react-icons/fa6";
 import Dispatch from "../pages/Dispatch";
 import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
+import Task from "../pages/Task";
 
 const routes = [
   {
@@ -130,6 +131,13 @@ const routes = [
    icon:<FaSalesforce />,
    path:"sales",
    element:<Sales/>,
+   isSublink:false
+  },
+  {
+   name:"Task",
+   icon:<MdTask />,
+   path:"task",
+   element:<Task/>,
    isSublink:false
   },
   {

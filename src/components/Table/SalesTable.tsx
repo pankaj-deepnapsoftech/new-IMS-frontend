@@ -2,14 +2,18 @@
 
 import { useState } from "react"
 import AssignEmployee from "../Drawers/Sales/AssignEmployee"
+import UploadInvoice from "../Drawers/Sales/UploadInvoice"
 
 
 
 const SalesTable = () => {
     const [show, setShow] = useState(false)
+    const [showinvoice, setShowInvoice] = useState(false)
+
     return (
         <section className="relative " >
-          <AssignEmployee show={show}  setShow={setShow}/>
+          <AssignEmployee  show={show}  setShow={setShow}/>
+          <UploadInvoice showinvoice={showinvoice}  setShowInvoice={setShowInvoice}/>
           <div className="rounded-xl shadow-lg text-white p-6 bg-[#1e1e2f4f] mb-4">
             <div className="flex justify-between flex-wrap gap-4">
                 <div>
@@ -55,7 +59,7 @@ const SalesTable = () => {
                 <button className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white">Approve Sample</button>
                 <button className="px-4 py-2 border border-orange-500 text-orange-400 rounded-md text-sm hover:bg-orange-600 hover:text-white">View Design</button>
                 <button className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white">View Delivery Proof</button>
-                <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black">Upload Invoice</button>
+                <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={()=> setShowInvoice(!showinvoice)}>Upload Invoice</button>
                 <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black">View Payment</button>
                 <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onClick={()=> setShow(!show)}>Assign</button>
             </div>
