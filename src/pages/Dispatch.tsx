@@ -1,4 +1,4 @@
-import React from "react";
+import { TbTruckDelivery } from "react-icons/tb";
 
 const Dispatch = () => {
   const products = [
@@ -14,61 +14,14 @@ const Dispatch = () => {
       paymentStatus: "PAID",
       productStatus: "DELIVERED",
     },
-    {
-      id: 2,
-      date: "4/23/2025",
-      customer: "Neeraj",
-      productName: "tag",
-      quantity: 200,
-      price: 20000,
-      gst: "0%",
-      deliveryStatus: "yes",
-      paymentStatus: "PAID",
-      productStatus: "DELIVERED",
-    },
-    {
-      id: 3,
-      date: "4/23/2025",
-      customer: "Neeraj",
-      productName: "tag",
-      quantity: 200,
-      price: 20000,
-      gst: "0%",
-      deliveryStatus: "yes",
-      paymentStatus: "PAID",
-      productStatus: "DELIVERED",
-    },
-    {
-      id: 4,
-      date: "4/23/2025",
-      customer: "Neeraj",
-      productName: "tag",
-      quantity: 200,
-      price: 20000,
-      gst: "0%",
-      deliveryStatus: "yes",
-      paymentStatus: "PAID",
-      productStatus: "DELIVERED",
-    },
-    {
-      id: 5,
-      date: "4/23/2025",
-      customer: "Neeraj",
-      productName: "tag",
-      quantity: 200,
-      price: 20000,
-      gst: "0%",
-      deliveryStatus: "yes",
-      paymentStatus: "PAID",
-      productStatus: "DELIVERED",
-    },
+    
   ];
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold mb-4">Completed Products</h2>
+      <h2 className="text-xl font-semibold mb-4 text-white text-center">Completed Products</h2>
 
-      {/* Filters */}
+
       <div className="flex gap-4 mb-6">
         <select className="border rounded p-2">
           <option>All</option>
@@ -85,7 +38,7 @@ const Dispatch = () => {
         </button>
       </div>
 
-      {/* Product Cards */}
+    
       {products.map((product) => (
         <div
           key={product.id}
@@ -137,13 +90,12 @@ const Dispatch = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-4 mt-4">
-            <button className="flex items-center gap-2 px-4 py-2 border border-green-500 text-green-600 rounded hover:bg-green-50">
-              🚚 Dispatch
+            <button className="flex items-center gap-2 px-4 py-2 border border-green-500 text-green-600 rounded hover:bg-green-500 hover:text-white transition-all duration-300">
+            <TbTruckDelivery color="green"  /> Dispatch
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 border border-yellow-600 text-yellow-700 rounded hover:bg-yellow-50">
-              📄 View Delivery Proof
+            <button className="flex items-center gap-2 px-4 py-2 border border-yellow-600 text-yellow-700 rounded hover:bg-yellow-600 hover:text-white transition-all duration-300">
+               View Delivery Proof
             </button>
           </div>
         </div>

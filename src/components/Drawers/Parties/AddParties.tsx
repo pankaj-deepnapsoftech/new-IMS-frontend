@@ -1,12 +1,13 @@
 // @ts-nocheck 
 
+import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { BiX } from "react-icons/bi";
 import { toast } from "react-toastify";
 
 
-const AddParties = ({ showData, setshowData,setCounter }) => {
+const AddParties = ({ showData, setshowData, setCounter }) => {
     const [cookies] = useCookies();
     const [formData, setFormData] = useState({
         full_name: '',
@@ -15,51 +16,60 @@ const AddParties = ({ showData, setshowData,setCounter }) => {
         company_name: '',
         GST_NO: '',
         type: '',
+        parties_type: ""
     });
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
- 
+    const { values, errors, touched, handleBlur, handleChange, handleSubmit, handleReset } = useFormik({
+        initialValues: {
+            full_name: '',
+            email: '',
+            phone: '',
+            company_name: '',
+            GST_NO: '',
+            type: '',
+            parties_type: ""
+        },
+        onSubmit: (value) => {
+            console.log(value)
+            // try {
+            //     const res = await fetch(process.env.REACT_APP_BACKEND_URL + "parties/create", {
+            //         method: "POST",
+            //         headers: {
+            //             "Content-Type": "application/json",
+            //             Authorization: `Bearer ${cookies?.access_token}`,
+            //         },
+            //         body: JSON.stringify(value)
+            //     });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await fetch(process.env.REACT_APP_BACKEND_URL + "parties/create", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${cookies?.access_token}`,
-                },
-                body: JSON.stringify(formData)
-            });
-    
-            const data = await res.json();
-    
-            if (res.ok) {
-                toast.success("Party saved successfully!");
-                setshowData(false);
-                setFormData({
-                    full_name: '',
-                    email: '',
-                    phone: '',
-                    company_name: '',
-                    GST_NO: '',
-                    type: '',
-                });
-                setCounter((prev) => prev + 1);
-            } else {
-                toast.error(data?.message || "Failed to save party.");
-            }
-        } catch (error) {
-            console.error("Error saving party:", error);
-            toast.error("Something went wrong. Please try again.");
+            //     const data = await res.json();
+
+            //     if (res.ok) {
+            //         toast.success("Party saved successfully!");
+            //         setshowData(false);
+            //         setFormData({
+            //             full_name: '',
+            //             email: '',
+            //             phone: '',
+            //             company_name: '',
+            //             GST_NO: '',
+            //             type: '',
+            //         });
+            //         setCounter((prev) => prev + 1);
+            //     } else {
+            //         toast.error(data?.message || "Failed to save party.");
+            //     }
+            // } catch (error) {
+            //     console.error("Error saving party:", error);
+            //     toast.error("Something went wrong. Please try again.");
+            // }
         }
-    };
-    
+    })
+
+
+
+
+
+
 
 
     return (
@@ -76,73 +86,92 @@ const AddParties = ({ showData, setshowData,setCounter }) => {
                     onSubmit={handleSubmit}
                 >
                     <div>
-                        <label className="block text-sm font-medium  text-white">Full Name</label>
-                        <input
-                            type="text"
-                            name="full_name"
-                            value={formData.full_name}
-                            onChange={handleChange}
-                            className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium  text-white">Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium  text-white">Phone</label>
-                        <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium  text-white">Company Name</label>
+                        <label className="block  font-medium pb-2  text-white text-md">Type</label>
                         <select
-                            name="company_name"
-                            value={formData.company_name}
+                            name="type"
+                            value={values.type}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2"
                             required
-                        > 
+                        >
                             <option value="" className="text-black bg-[#ffffff41]">Select type</option>
                             <option value="Individual" className="text-black bg-[#ffffff41]">Individual</option>
                             <option value="Company" className="text-black bg-[#ffffff41]">Company</option>
-                            </select>
+                        </select>
+                    </div>
+                    <div>
+                        {values.type === "Individual" ? <> <label className="block  font-medium  text-white text-md">Full Name</label>
+                            <input
+                                type="text"
+                                name="full_name"
+                                value={values.full_name}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
+                                required
+                            /> </> : <>
+                            <label className="block  font-medium pt-4 pb-1 text-white text-md ">Company name</label>
+                            <input
+                                type="text"
+                                name="company_name"
+                                value={values.company_name}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
+                                required
+                            />
+                        </>}
+
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium  text-white">GST No</label>
+                        <label className="block  font-medium  text-white text-md">Email</label>
                         <input
-                            type="text"
-                            name="GST_NO"
-                            value={formData.GST_NO}
+                            type="email"
+                            name="email"
+                            value={values.email}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
+                            required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium  text-white">Type</label>
-                        <select
-                            name="type"
-                            value={formData.type}
+                        <label className="block  font-medium  text-white text-md">Phone</label>
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={values.phone}
                             onChange={handleChange}
+                            onBlur={handleBlur}
+                            className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
+                            required
+                        />
+                    </div>
+
+
+
+            {values.type !== "Individual"  &&    <div>
+                        <label className="block  font-medium  text-white text-md">GST No</label>
+                        <input
+                            type="text"
+                            name="GST_NO"
+                            value={values.GST_NO}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
+                        />
+                    </div>}
+
+                    <div>
+                        <label className="block  font-medium pb-2  text-white text-md">Parties Type</label>
+                        <select
+                            name="parties_type"
+                            value={values.parties_type}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
                             className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2"
                             required
                         >
@@ -155,7 +184,7 @@ const AddParties = ({ showData, setshowData,setCounter }) => {
 
                     <button
                         type="submit"
-                        className="w-full bg-[#ffffff38] text-white py-2 rounded hover:bg-[#ffffff65] transition-all duration-500"
+                        className="w-full bg-[#ffffff38] text-white text-xl py-2 rounded hover:bg-[#ffffff65] transition-all duration-500"
                     >
                         Submit
                     </button>

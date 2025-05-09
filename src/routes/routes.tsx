@@ -4,7 +4,7 @@ import { MdOutlineShoppingCart, MdOutlineSpeed, MdOutlineSell, MdOutlineAttachMo
 import { CgProfile } from "react-icons/cg";
 
 import { RiBillLine } from "react-icons/ri";
-import { TbLockAccess, TbUsersGroup } from "react-icons/tb";
+import { TbLockAccess, TbTruckDelivery, TbUsersGroup } from "react-icons/tb";
 import { SlDirection } from "react-icons/sl";
 import { FaHandsHelping } from "react-icons/fa";
 import { SiScrapy } from "react-icons/si";
@@ -134,7 +134,7 @@ const routes = [
   },
   {
    name:"Dispatch",
-   icon:<FaSalesforce />,
+   icon:<TbTruckDelivery />,
    path:"dispatch",
    element:<Dispatch/>,
    isSublink:false
