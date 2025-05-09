@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { BiX } from "react-icons/bi";
+import { toast } from "react-toastify";
 
 
-const AddParties = ({ showData, setshowData }) => {
+const AddParties = ({ showData, setshowData,setCounter }) => {
     const [cookies] = useCookies();
     const [formData, setFormData] = useState({
         full_name: '',
@@ -35,31 +36,37 @@ const AddParties = ({ showData, setshowData }) => {
                 },
                 body: JSON.stringify(formData)
             });
-
+    
             const data = await res.json();
-            console.log("Saved:", data);
-            setshowData(false);
-          
-            setFormData({
-                full_name: '',
-                email: '',
-                phone: '',
-                company_name: '',
-                GST_NO: '',
-                type: '',
-            });
+    
+            if (res.ok) {
+                toast.success("Party saved successfully!");
+                setshowData(false);
+                setFormData({
+                    full_name: '',
+                    email: '',
+                    phone: '',
+                    company_name: '',
+                    GST_NO: '',
+                    type: '',
+                });
+                setCounter((prev) => prev + 1);
+            } else {
+                toast.error(data?.message || "Failed to save party.");
+            }
         } catch (error) {
             console.error("Error saving party:", error);
+            toast.error("Something went wrong. Please try again.");
         }
     };
+    
 
 
     return (
-        <section className={`${showData ? "block" : "hidden"} absolute top-0 right-0 h-screen w-[35vw]  bg-[#57657f]`}>
+        <section className={`${showData ? "block" : "hidden"} absolute top-0 right-0 h-full w-[35vw] z-50 bg-[#57657f]`}>
             <div className="  flex  flex-col  ">
                 <div className="px-4 flex gap-x-2 items-center font-bold text-[22px] text-white py-3">
                     <BiX onClick={() => setshowData(!showData)} size="30px" />
-
                 </div>
                 <div className="text-xl mt-8 text-center  font-semibold m-auto py-3 px-2 w-[400px] bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
                     <h1>Add Parties</h1>
@@ -106,13 +113,17 @@ const AddParties = ({ showData, setshowData }) => {
 
                     <div>
                         <label className="block text-sm font-medium  text-white">Company Name</label>
-                        <input
-                            type="text"
+                        <select
                             name="company_name"
                             value={formData.company_name}
                             onChange={handleChange}
-                            className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
-                        />
+                            className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2"
+                            required
+                        > 
+                            <option value="" className="text-black bg-[#ffffff41]">Select type</option>
+                            <option value="Individual" className="text-black bg-[#ffffff41]">Individual</option>
+                            <option value="Company" className="text-black bg-[#ffffff41]">Company</option>
+                            </select>
                     </div>
 
                     <div>
