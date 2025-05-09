@@ -2,8 +2,9 @@
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import { BiX } from "react-icons/bi";
+import { BiSolidTrash, BiX } from "react-icons/bi";
 import { toast } from "react-toastify";
+import { FaTrash } from "react-icons/fa";
 
 const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
     const [editId, setEditId] = useState(null);
@@ -15,12 +16,12 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
         email: "",
         phone: "",
         type: "",
-        company_name: "", 
+        company_name: "",
         GST_NO: "",
     });
 
 
-  
+
     const fetchPartiesData = async () => {
         try {
             const res = await fetch(
@@ -33,7 +34,7 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                 }
             );
             const data = await res.json();
-            setPartiesData(data.data); 
+            setPartiesData(data.data);
         } catch (error) {
             console.log(error);
         }
@@ -42,9 +43,9 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
     useEffect(() => {
         fetchPartiesData();
 
-    }, [counter, trigger]); 
+    }, [counter, trigger]);
 
-   
+
     const filteredParties = partiesData.filter((party) => {
         const matchSearch =
             party.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -55,6 +56,7 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
             party.GST_NO?.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchType = selectedType ? party.company_name === selectedType : true;
+
         return matchSearch && matchType;
     });
 
@@ -133,14 +135,14 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                                 key={index}
                                 className={`${index % 2 === 0 ? "bg-[#ffffff40]" : "bg-[#ffffff1f]"} hover:bg-[#ffffff78] transition-colors`}
                             >
-                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.full_name}</td>
-                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.email}</td>
-                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.phone}</td>
-                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.type}</td>
-                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.company_name}</td>
-                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.parties_type}</td>
-                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.GST_NO}</td>
-                                <td className="px-4 py-4 relative pl-6 flex items-center gap-3 text-gray-200">
+                                <td className="px-4 py-4 relative pl-6 text-center  text-gray-200">{party.full_name || " __ "}</td>
+                                <td className="px-4 py-4 relative pl-6 text-center text-gray-200">{party.email || " __ "}</td>
+                                <td className="px-4 py-4 relative pl-6 text-center text-gray-200">{party.phone || " __ "}</td>
+                                <td className="px-4 py-4 relative pl-6 text-center text-gray-200">{party.type || " __ "}</td>
+                                <td className="px-4 py-4 relative pl-6 text-center text-gray-200">{party.company_name || " __ "}</td>
+                                <td className="px-4 py-4 relative pl-6 text-center text-gray-200">{party.parties_type || " __ "}</td>
+                                <td className="px-4 py-4 relative pl-6 text-center text-gray-200">{party.GST_NO || " __ "}</td>
+                                <td className="px-4 py-4 relative pl-6 text-center flex items-center gap-3 text-gray-200">
                                     <button onClick={() => {
                                         setFormData(party);
                                         setEditId(party._id);
@@ -150,10 +152,11 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                                     </button>
 
                                     <button onClick={() => handleDelete(party._id)}>
-                                        <FiTrash2 className="text-red-400 hover:text-red-600 cursor-pointer" />
+                                        <BiSolidTrash className="text-[#e73939] hover:text-red-800 cursor-pointer" />
                                     </button>
                                 </td>
                             </tr>
+
                         ))}
                     </tbody>
                 </table>
@@ -226,9 +229,9 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                                 Company Type
                             </label>
                             <select
-                                name="company_name" 
+                                name="company_name"
                                 value={formData.company_name}
-                                onChange={handleChange} 
+                                onChange={handleChange}
                                 className="w-full bg-transparent border border-gray-100 rounded px-3 py-2 text-white focus:outline-none"
                             >
                                 <option value="Individual" className="text-black">Individual</option>
@@ -237,7 +240,7 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                         </div>
 
 
-                       <div>
+                        <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">
                                 GST No
                             </label>
@@ -261,8 +264,8 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                                 className="w-full bg-transparent border border-gray-100 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             >
-                                <option value="vendor" className="text-black">Vendor</option>
-                                <option value="partner" className="text-black">Partner</option>
+                                <option value="Buyer" className="text-black">Buyer</option>
+                                <option value="Seller" className="text-black">Seller</option>
                             </select>
                         </div>
 
