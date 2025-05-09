@@ -1,11 +1,14 @@
 // @ts-nocheck
 
-import { useState } from "react";
+import { get } from "http";
+import { useEffect, useState } from "react";
+import { Cookies, useCookies } from "react-cookie";
 import { BiX } from "react-icons/bi";
 
+// localhost:8085/api/parties/get
 
-
-const AddNewSale = ({show,setShow}) => {
+const AddNewSale = ({ show, setShow }) => {
+    const [cookies] = useCookies();
     const [formData, setFormData] = useState({
         customer: "",
         product: "",
@@ -14,7 +17,7 @@ const AddNewSale = ({show,setShow}) => {
         gst: "",
         remarks: "",
     });
-
+    const [partiesData, setpartiesData] = useState([])
     const handleChange = (e) => {
         const { name, value, type, files } = e.target;
         setFormData({
@@ -27,11 +30,31 @@ const AddNewSale = ({show,setShow}) => {
         e.preventDefault();
         console.log("Form Submitted", formData);
     };
-    
+
+    const salesPartiesData = async () => {
+        try {
+            const res = await fetch(process.env.REACT_APP_BACKEND_URL + "parties/get",
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${cookies?.access_token}`,
+                    },
+                })
+            const data = await res.json()
+            setpartiesData(data)
+            console.log(data);
+            
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    useEffect(() => {
+        salesPartiesData()
+    },[])
     return (
-        <div className={`absolute  top-0 ${show ? "-right-8" : "-right-[35vw]"}  w-[30vw] transition-all duration-500 h-full bg-[#57657F] text-white   justify-center`}>
+        <div className={`absolute z-50 top-0 ${show ? "right-1" : "hidden"}  w-[30vw] transition-opacity duration-500 h-full bg-[#57657F] text-white   justify-center`}>
             <div className=" p-6 rounded-lg w-full max-w-md relative">
-            <BiX size="30px" onClick={()=>setShow(!show)}   />
+                <BiX size="30px" onClick={() => setShow(!show)} />
                 <h2 className="text-xl text-center mt-4 font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">Add a new Sale</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -95,7 +118,7 @@ const AddNewSale = ({show,setShow}) => {
 
                     <div className="flex justify-between">
                         <button type="submit" className="bg-[#ffffff41] text-white px-4 py-2 rounded hover:">Add Sale</button>
-                        <button type="button" onClick={()=>setShow(!show)}  className=" bg-[#ffffff41] px-4 py-2 rounded  hover:text-gray-200">Cancel</button>
+                        <button type="button" onClick={() => setShow(!show)} className=" bg-[#ffffff41] px-4 py-2 rounded  hover:text-gray-200">Cancel</button>
                     </div>
                 </form>
             </div>
