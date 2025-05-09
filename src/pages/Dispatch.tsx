@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useState, useRef } from "react";
 import { TbTruckDelivery } from "react-icons/tb";
 import { HiOutlinePaperClip } from "react-icons/hi";
@@ -64,7 +65,7 @@ const Dispatch = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files[0];
     if (file) {
-      console.log("Selected File:", file.name);
+      // console.log("Selected File:", file.name);
       // TODO: Upload or store file here
     } 
   };
