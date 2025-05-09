@@ -8,7 +8,7 @@ import axios from "axios";
 import {useToast} from "@chakra-ui/react";
 import { GiConsoleController } from "react-icons/gi";
 
-const AddNewSale = ({ show, setShow, refresh }) => {
+const UpdateSale = ({ editshow, seteditsale, sale }) => {
     const [cookies] = useCookies();
     const toast = useToast();
     const [formData, setFormData] = useState({
@@ -30,14 +30,28 @@ const AddNewSale = ({ show, setShow, refresh }) => {
         setFormData((prevData) => ({ ...prevData, GST: value }));
     };
 
+    useEffect(() => {
+        if (sale) {
+            setFormData({
+                party: sale?.party_id?.[0]?._id || "",
+                product_id: sale?.product_id?.[0]?._id || "",
+                price: sale?.price || "",
+                product_qty: sale?.product_qty || "",
+                product_type: sale?.product_type || "finished goods",
+                GST: sale?.GST || "",
+                comment: sale?.comment || "",
+            });
+        }
+    }, [sale]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (isSubmitting) return;
         setIsSubmitting(true);
         try {
-            await axios.post(
-                `${process.env.REACT_APP_BACKEND_URL}sale/create`,
+            await axios.patch(
+                `${process.env.REACT_APP_BACKEND_URL}sale/update/${sale._id}`,
                 formData,
                 {
                     headers: {
@@ -64,8 +78,8 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                 isClosable: true,
             });
 
-            setShow(!show)
-            await refresh();
+            seteditsale(!editshow)
+            // refresh();
         } catch (error) {
             console.log(error)
             toast({
@@ -118,10 +132,10 @@ const AddNewSale = ({ show, setShow, refresh }) => {
         fetchDropdownData()
     }, [cookies.access_token, toast])
     return (
-        <div className={`absolute z-50 top-0 ${show ? "right-1" : "hidden"}  w-[30vw] transition-opacity duration-500 h-full bg-[#57657F] text-white   justify-center`}>
+        <div className={`absolute z-50 top-0 ${editshow ? "right-1" : "hidden"}  w-[30vw] transition-opacity duration-500 h-full bg-[#57657F] text-white   justify-center`}>
             <div className=" p-6 rounded-lg w-full max-w-md relative">
-                <BiX size="30px" onClick={() => setShow(!show)} />
-                <h2 className="text-xl text-center mt-4 font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">Add a new Sale</h2>
+                <BiX size="30px" onClick={() => seteditsale(!editshow)} />
+                <h2 className="text-xl text-center mt-4 font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">Edit Sale</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-md font-medium mb-2">Party </label>
@@ -194,8 +208,8 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                     </div>
 
                     <div className="flex justify-between">
-                        <button type="submit" className="bg-[#ffffff41] text-white px-4 py-2 rounded hover:" disabled={isSubmitting}>Add Sale</button>
-                        <button type="button" onClick={() => setShow(!show)} className=" bg-[#ffffff41] px-4 py-2 rounded  hover:text-gray-200">Cancel</button>
+                        <button type="submit" className="bg-[#ffffff41] text-white px-4 py-2 rounded hover:" disabled={isSubmitting}>Update Sale</button>
+                        <button type="button" onClick={() => seteditsale(!editshow)} className=" bg-[#ffffff41] px-4 py-2 rounded  hover:text-gray-200">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -203,4 +217,4 @@ const AddNewSale = ({ show, setShow, refresh }) => {
     )
 }
 
-export default AddNewSale
+export default UpdateSale;
