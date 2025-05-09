@@ -11,7 +11,7 @@ import { PartiesFromValidation } from "../../../Validation/PartiesFromValidation
 const AddParties = ({ showData, setshowData, setCounter }) => {
     const [cookies] = useCookies();
 
-    const { values, errors, touched, handleBlur, handleChange, handleSubmit, handleReset } = useFormik({
+    const {values, errors, touched, handleBlur, handleChange, handleSubmit, resetForm} = useFormik({
         initialValues: {
             full_name: '',
             email: '',
@@ -22,8 +22,8 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
             parties_type: ""
         },
         validationSchema: PartiesFromValidation,
-        onSubmit: async(value) => {
-            
+        onSubmit: async (value) => {
+
             try {
                 const res = await fetch(process.env.REACT_APP_BACKEND_URL + "parties/create", {
                     method: "POST",
@@ -39,13 +39,14 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
                 if (res.ok) {
                     toast.success("Party saved successfully!");
                     setshowData(false);
-                    setFormData({
+                    resetForm({
                         full_name: '',
                         email: '',
                         phone: '',
                         company_name: '',
                         GST_NO: '',
                         type: '',
+                        parties_type: '',
                     });
                     setCounter((prev) => prev + 1);
                 } else {
@@ -87,6 +88,23 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
                             <option value="Company" className="text-black bg-[#ffffff41]">Company</option>
                         </select>
                     </div>
+                    {values.type === "Company" && (
+                        <>
+                            <label className="block font-medium text-white text-md">Company Name</label>
+                            <input
+                                type="text"
+                                name="company_name"
+                                value={values.company_name}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
+                            />
+                            {touched.company_name && errors.company_name && (
+                                <p className="text-red-400 text-sm mt-1">{errors.company_name}</p>
+                            )}
+                        </>
+                    )}
+
                     <div>
                         {values.type === "Individual" && (
                             <>
@@ -120,8 +138,8 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
                             required
                         />
                         {touched.email && errors.email && (
-                                    <p className="text-red-400 text-sm mt-1">{errors.email}</p>
-                                )}
+                            <p className="text-red-400 text-sm mt-1">{errors.email}</p>
+                        )}
                     </div>
 
                     <div>
@@ -136,8 +154,8 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
                             required
                         />
                         {touched.phone && errors.phone && (
-                                    <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
-                                )}
+                            <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
+                        )}
                     </div>
 
 
@@ -153,8 +171,8 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
                             className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
                         />
                         {touched.GST_NO && errors.GST_NO && (
-                                    <p className="text-red-400 text-sm mt-1">{errors.GST_NO}</p>
-                                )}
+                            <p className="text-red-400 text-sm mt-1">{errors.GST_NO}</p>
+                        )}
                     </div>}
 
                     <div>
@@ -168,13 +186,12 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
                             required
                         >
                             <option value="" className="text-black bg-[#ffffff41]">Select type</option>
-                            <option value="customer" className="text-black bg-[#ffffff41]">Customer</option>
-                            <option value="vendor" className="text-black bg-[#ffffff41]">Vendor</option>
-                            <option value="partner" className="text-black bg-[#ffffff41]">Partner</option>
+                            <option value="Buyer" className="text-black bg-[#ffffff41]">Buyer</option>
+                            <option value="Seller" className="text-black bg-[#ffffff41]">Seller</option>
                         </select>
                         {touched.parties_type && errors.parties_type && (
-                                    <p className="text-red-400 text-sm mt-1">{errors.parties_type}</p>
-                                )}
+                            <p className="text-red-400 text-sm mt-1">{errors.parties_type}</p>
+                        )}
                     </div>
 
                     <button
