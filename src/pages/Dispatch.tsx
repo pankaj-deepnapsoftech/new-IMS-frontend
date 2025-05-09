@@ -66,7 +66,7 @@ const Dispatch = () => {
     if (file) {
       console.log("Selected File:", file.name);
       // TODO: Upload or store file here
-    }
+    } 
   };
 
   return (
