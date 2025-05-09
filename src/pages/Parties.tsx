@@ -12,8 +12,8 @@ const Parties = () => {
     const [selectedType, setSelectedType] = useState('');
 
     const allparties = () => {
-        settrigger(prev => !prev); // flips boolean
-        setCounter(prev => prev + 1); // forces refresh by changing number
+        settrigger(prev => !prev); 
+        setCounter(prev => prev + 1);
     };
 
     return (

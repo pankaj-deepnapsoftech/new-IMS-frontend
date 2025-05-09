@@ -20,7 +20,7 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
     });
 
 
-    // Fetch parties data from the backend
+  
     const fetchPartiesData = async () => {
         try {
             const res = await fetch(
@@ -33,18 +33,18 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                 }
             );
             const data = await res.json();
-            setPartiesData(data.data); // Set the parties data when fetched
+            setPartiesData(data.data); 
         } catch (error) {
             console.log(error);
         }
     };
 
     useEffect(() => {
-        fetchPartiesData(); // Fetch the data when counter or trigger changes
+        fetchPartiesData();
 
-    }, [counter, trigger]); // Re-run when counter or trigger changes
+    }, [counter, trigger]); 
 
-    // Filter the parties data based on the search term
+   
     const filteredParties = partiesData.filter((party) => {
         const matchSearch =
             party.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -54,11 +54,10 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
             party.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             party.GST_NO?.toLowerCase().includes(searchTerm.toLowerCase());
 
-        const matchType = selectedType ? party.type === selectedType : true;
+        const matchType = selectedType ? party.company_name === selectedType : true;
         return matchSearch && matchType;
     });
 
-    // Handle the deletion of a party
     const handleDelete = async (partyId) => {
         try {
             const res = await fetch(
@@ -133,13 +132,13 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                                 key={index}
                                 className={`${index % 2 === 0 ? "bg-[#ffffff40]" : "bg-[#ffffff1f]"} hover:bg-[#ffffff78] transition-colors`}
                             >
-                                <td className="px-4 py-4 text-gray-200">{party.full_name}</td>
-                                <td className="px-4 py-4 text-gray-200">{party.email}</td>
-                                <td className="px-4 py-4 text-gray-200">{party.phone}</td>
-                                <td className="px-4 py-4 text-gray-200">{party.type}</td>
-                                <td className="px-4 py-4 text-gray-200">{party.company_name}</td>
-                                <td className="px-4 py-4 text-gray-200">{party.GST_NO}</td>
-                                <td className="px-4 py-4 flex items-center gap-3 text-gray-200">
+                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.full_name}</td>
+                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.email}</td>
+                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.phone}</td>
+                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.type}</td>
+                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.company_name}</td>
+                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.GST_NO}</td>
+                                <td className="px-4 py-4 relative pl-6 flex items-center gap-3 text-gray-200">
                                     <button onClick={() => {
                                         setFormData(party);
                                         setEditId(party._id);
