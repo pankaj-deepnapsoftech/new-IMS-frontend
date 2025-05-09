@@ -34,7 +34,6 @@ const Navigation: React.FC = () => {
     }
   }
 
-
   const toggleSubMenusHandler = (path: string) => {
     setOpenSubMenus((prev) => ({
       ...prev,
@@ -169,7 +168,6 @@ const Navigation: React.FC = () => {
           <button onClick={logoutHandler} className="flex items-center text-black shadow-2xl justify-center ml-4 h-[40px] w-[150px] gap-2 bg-gradient-to-r from-white to-white hover:scale-105 font-[700] py-2 rounded-md transition-all">
             Log Out
             <FaSignOutAlt
-            
             />
           </button>
         </div>

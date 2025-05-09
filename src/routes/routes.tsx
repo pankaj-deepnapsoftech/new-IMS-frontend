@@ -4,7 +4,7 @@ import { MdOutlineShoppingCart, MdOutlineSpeed, MdOutlineSell, MdOutlineAttachMo
 import { CgProfile } from "react-icons/cg";
 
 import { RiBillLine } from "react-icons/ri";
-import { TbLockAccess, TbUsersGroup } from "react-icons/tb";
+import { TbLockAccess, TbTruckDelivery, TbUsersGroup } from "react-icons/tb";
 import { SlDirection } from "react-icons/sl";
 import { FaHandsHelping } from "react-icons/fa";
 import { SiScrapy } from "react-icons/si";
@@ -32,6 +32,7 @@ import InventoryApprovals from "../pages/InventoryApprovals";
 import Userprofile from "../pages/Userprofile";
 import Sales from "../pages/Sales";
 import { FaSalesforce } from "react-icons/fa6";
+import Dispatch from "../pages/Dispatch";
 import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
 
@@ -132,6 +133,13 @@ const routes = [
    isSublink:false
   },
   {
+   name:"Dispatch",
+   icon:<TbTruckDelivery />,
+   path:"dispatch",
+   element:<Dispatch/>,
+   isSublink:false
+  },
+  {
     name: "Scrap Management",
     icon: <SiScrapy />,
     path: "scrap",
@@ -192,6 +200,12 @@ const routes = [
     ],
     isSublink: true
   },
+  // {
+  //   name: "Dispatch",
+  //   path: "dispatch",
+  //   element: <Dispatch />,
+  //   isSublink: false
+  // },
   {
     name: "User Profile",
     icon: <CgProfile />,
