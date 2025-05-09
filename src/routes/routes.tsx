@@ -32,6 +32,7 @@ import InventoryApprovals from "../pages/InventoryApprovals";
 import Userprofile from "../pages/Userprofile";
 import Sales from "../pages/Sales";
 import { FaSalesforce } from "react-icons/fa6";
+import Dispatch from "../pages/Dispatch";
 import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
 
@@ -132,6 +133,13 @@ const routes = [
    isSublink:false
   },
   {
+   name:"Dispatch",
+   icon:<FaSalesforce />,
+   path:"dispatch",
+   element:<Dispatch/>,
+   isSublink:false
+  },
+  {
     name: "Scrap Management",
     icon: <SiScrapy />,
     path: "scrap",
@@ -192,6 +200,12 @@ const routes = [
     ],
     isSublink: true
   },
+  // {
+  //   name: "Dispatch",
+  //   path: "dispatch",
+  //   element: <Dispatch />,
+  //   isSublink: false
+  // },
   {
     name: "User Profile",
     icon: <CgProfile />,
