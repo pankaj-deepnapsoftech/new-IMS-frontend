@@ -45,8 +45,6 @@ const routes = [
     element: <Dashboard />,
     isSublink: false
   },
-  
-  
   {
     name: "User Roles",
     icon: <TbLockAccess />,
