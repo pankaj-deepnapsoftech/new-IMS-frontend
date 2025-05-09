@@ -112,18 +112,19 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
     };
 
     return (
-        <section className="h-full text-white p-8">
-            <div className="overflow-x-auto">
-                <table className="min-w-full text-sm rounded-lg overflow-hidden">
+        <section className="h-full w-full text-white ">
+            <div className="overflow-x-auto w-full">
+                <table className="w-full text-sm rounded-lg overflow-hidden">
                     <thead className="bg-[#14243452] text-white">
                         <tr>
-                            <th className="px-4 py-3">Full Name</th>
-                            <th className="px-4 py-3">Email</th>
-                            <th className="px-4 py-3">Phone No.</th>
-                            <th className="px-4 py-3">Type</th>
-                            <th className="px-4 py-3">Company Name</th>
-                            <th className="px-4 py-3">GST No.</th>
-                            <th className="px-4 py-3">Action</th>
+                            <th className="px-2 py-3">Full Name</th>
+                            <th className="px-2 py-3">Email</th>
+                            <th className="px-2 py-3">Phone No.</th>
+                            <th className="px-2 py-3">Type</th>
+                            <th className="px-2 py-3">Company Name</th>
+                            <th className="px-1 py-3">Parties Type</th>
+                            <th className="px-2 py-3">GST No.</th>
+                            <th className="px-2 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,6 +138,7 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                                 <td className="px-4 py-4 relative pl-6 text-gray-200">{party.phone}</td>
                                 <td className="px-4 py-4 relative pl-6 text-gray-200">{party.type}</td>
                                 <td className="px-4 py-4 relative pl-6 text-gray-200">{party.company_name}</td>
+                                <td className="px-4 py-4 relative pl-6 text-gray-200">{party.parties_type}</td>
                                 <td className="px-4 py-4 relative pl-6 text-gray-200">{party.GST_NO}</td>
                                 <td className="px-4 py-4 relative pl-6 flex items-center gap-3 text-gray-200">
                                     <button onClick={() => {
@@ -235,7 +237,7 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                         </div>
 
 
-                        <div>
+                       <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">
                                 GST No
                             </label>
