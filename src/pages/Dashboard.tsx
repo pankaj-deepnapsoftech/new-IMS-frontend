@@ -308,7 +308,7 @@ const dynamicColor = (index: number) => {
 
               <Card
                 primaryColor="white"
-                secondaryColor="#155724"
+                secondaryColor="#155724"  
                 bgColor="bg-gradient-to-tl from-gray-300 to-green-500"
                 textColor="#FF69B4"
                 title="Payments"
