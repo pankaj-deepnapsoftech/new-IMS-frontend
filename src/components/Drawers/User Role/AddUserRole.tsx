@@ -31,7 +31,9 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
     { value: "agent", label: "agent" },
     { value: "production", label: "production" },
     { value: "sale & purchase", label: "sale & purchase" },
-    {value : "sales", label: "sale"}
+    { value: "Parties", label: "Parties" },
+    { value: "Sales", label: "Sales" },
+    { value: "Task", label: "Task" },
   ];
 
   const [addRole] = useAddRoleMutation();
