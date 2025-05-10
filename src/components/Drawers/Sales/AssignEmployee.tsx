@@ -202,6 +202,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                                     </Text>
                                     <HStack>
                                         <Button
+                                        size={"sm"}
                                             bgColor="blue.500"
                                             _hover="blue.400"
                                             onClick={() => handleEdit(task._id, task)}
@@ -209,6 +210,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                                             <FaEdit className="text-white" />
                                         </Button>
                                         <Button
+                                        size={"sm"}
                                             bgColor="red.500"
                                             _hover="red.400"
                                             onClick={() => {

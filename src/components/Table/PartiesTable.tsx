@@ -168,7 +168,7 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                         <BiX onClick={() => setShowData(!showData)} size="30px" />
                     </div>
                     <div className="text-xl mt-8 text-center font-semibold m-auto py-3 px-2 w-[400px] bg-[#ffffff4f] rounded-md text-white mb-6">
-                        <h1>Updated Data</h1>
+                        <h1>Updated Parties</h1>
                     </div>
 
 
@@ -273,7 +273,7 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                             type="submit"
                             className="w-full bg-[#ffffff41] hover:bg-[#ffffff6b] text-white font-medium py-2 rounded transition-all duration-300"
                         >
-                            Update data
+                           Submit
                         </button>
                     </form>
                 </div>
