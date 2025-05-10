@@ -1,4 +1,6 @@
-// ts-@nocheck
+
+
+//@ts-nocheck
 import { useState, useRef } from "react";
 import { TbTruckDelivery } from "react-icons/tb";
 import { HiOutlinePaperClip } from "react-icons/hi";
@@ -65,15 +67,15 @@ const Dispatch = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files[0];
     if (file) {
-      console.log("Selected File:", file.name);
+      // console.log("Selected File:", file.name);
       // TODO: Upload or store file here
-    } 
+    }
   };
 
   return (
     <div className="p-6">
       <h2 className="text-3xl font-semibold mb-10 text-white">
-        Completed Products
+       Dispatch
       </h2>
 
       <div className="flex flex-wrap justify-between items-end mb-6">
@@ -146,7 +148,7 @@ const Dispatch = () => {
             style={{ backgroundColor: "#1e1e2f4f" }}
           >
             <div className="flex justify-between items-start">
-              <div>
+              <div className="space-y-1">
                 <p className="font-semibold">Sale By: RUCHI</p>
                 <p className="text-sm text-white underline">
                   Date: {product.date}
@@ -164,15 +166,14 @@ const Dispatch = () => {
                   {product.quantity}
                 </p>
               </div>
+
               <div className="text-right space-y-1">
-                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                <span className="block bg-sky-800/60 text-white text-xs px-2 py-1 rounded">
                   PAYMENT STATUS: {product.paymentStatus}
                 </span>
-                <br />
-                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                <span className="block bg-sky-800/60 text-white   text-xs px-2 py-1 rounded">
                   PRODUCT STATUS: {product.productStatus}
                 </span>
-                <br />
                 <p>
                   <span className="font-semibold">Price:</span> {product.price}
                 </p>

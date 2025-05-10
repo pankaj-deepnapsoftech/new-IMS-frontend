@@ -8,35 +8,35 @@ const Task = () => {
    <div className="min-h-screen p-6 text-gray-100">
   <h1 className="text-3xl font-bold mb-6">Tasks</h1>
 
-  {/* Filter Bar */}
+ 
   <div className="flex flex-wrap items-center gap-4 mb-8">
-    <select className=" rounded px-4 py-2 bg-gray-600 text-gray-100">
-      <option>Select Status</option>
-      <option>Under Processing</option>
-      <option>Completed</option>
+    <select className=" rounded px-4 py-2 bg-[#ffffff2a] text-gray-100">
+      <option className="text-black">Select Status</option>
+      <option className="text-black">Under Processing</option>
+      <option className="text-black">Completed</option>
     </select>
-    <input type="date" className=" styled-date rounded px-4 py-2 bg-gray-600 text-gray-100" />
+    <input type="date" className=" styled-date rounded px-4 py-2 bg-[#ffffff2a] text-gray-100 placeholder:text-gray-100" />
     <input
       type="text"
       placeholder="Search by Product or Manager"
-      className=" rounded px-4 py-2 flex-grow bg-gray-600 text-gray-100"
+      className=" rounded px-4 py-2 flex-grow bg-[#ffffff2a] text-gray-100"
     />
-    <button className="border border-blue-400 text-blue-400 px-4 py-2 rounded hover:bg-gray-700">
+    <button className="border border-blue-400 text-blue-400 px-4 py-1.5 rounded hover:bg-blue-400 hover:text-white transition-all duration-300">
       ⟳ Refresh
     </button>
   </div>
 
-  {/* Task Card */}
-  <div className=" rounded shadow p-6 bg-gray-600">
+
+  <div className=" rounded-md shadow-md p-6 bg-[#ffffff2a]">
     <div className="flex justify-between items-start">
-      <h2 className="text-xl font-semibold">tag</h2>
+      <h2 className="text-xl font-semibold">Tag</h2>
       <div className="flex flex-col gap-2 text-sm text-right">
-        <span className="bg-green-300 text-green-900 px-2 py-1 rounded font-medium">
+        <button className="bg-blue-400  text-white shadow-md px-2 py-2 rounded-md font-medium">
           TASK: UNDERPROCESSINGD
-        </span>
-        <span className="bg-yellow-300 text-yellow-900 px-2 py-1 rounded font-medium">
+        </button>
+        <button className="bg-blue-400  text-white shadow-md px-2 py-2 rounded-md font-medium">
           TOKEN AMOUNT : PENDING
-        </span>
+        </button>
       </div>
     </div>
 
@@ -51,10 +51,10 @@ const Task = () => {
     </div>
 
     <div className="flex justify-between items-center mt-6">
-      <button className="border border-purple-400 text-purple-400 px-4 py-2 rounded hover:bg-purple-400 hover:text-white transition-all  duration-300">
+      <button className=" text-white bg-blue-400 px-3 py-1.5 rounded-md shadow-md hover:bg-blue-600 hover:text-white transition-all  duration-300">
         Add Token Amount
       </button>
-      <span className="text-sm text-gray-400">Date: 5/8/2025</span>
+      <span className="text-sm text-gray-200">Date: 5/8/2025</span>
     </div>
   </div>
 </div>
