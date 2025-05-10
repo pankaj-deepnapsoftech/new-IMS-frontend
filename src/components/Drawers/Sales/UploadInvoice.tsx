@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 const UploadInvoice = ({ showinvoice, setShowInvoice }) => {
     return (
         <div
-            className={`fixed ${showinvoice ? "block" : "hidden"} inset-0 h-screen items-center justify-center bg-black bg-opacity-40 z-50 flex`}
+            className={`fixed ${showinvoice ? "block" : "hidden"} inset-0 h-screen items-center justify-center bg-[#00000034] bg-opacity-40 z-50 flex`}
         >
             <div className="bg-[#1C3644] rounded-2xl shadow-xl p-6 w-full max-w-md relative text-white">
                 <button
