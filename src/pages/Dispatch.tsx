@@ -1,3 +1,4 @@
+// ts-@nocheck
 import { useState, useRef } from "react";
 import { TbTruckDelivery } from "react-icons/tb";
 import { HiOutlinePaperClip } from "react-icons/hi";

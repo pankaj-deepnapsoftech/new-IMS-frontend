@@ -158,7 +158,7 @@ const Sales = () => {
                 <SalesTable filteredPurchases={filteredPurchases} sendDataToParent={handleDataFromChild} empData={employees} />
             </section>
             <AddNewSale show={show} setShow={setShow} refresh={fetchPurchases} />
-            <UpdateSale editshow={editshow} sale={selectedSale} seteditsale={seteditsale} />
+            <UpdateSale editshow={editshow} sale={selectedSale} seteditsale={seteditsale} refresh={fetchPurchases} />
             <Pagination page={pages} setPage={setPages} length={purchases.length} />
         </>
     )

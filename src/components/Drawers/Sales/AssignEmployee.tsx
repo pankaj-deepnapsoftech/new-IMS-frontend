@@ -11,6 +11,12 @@ import {
     HStack, } from "@chakra-ui/react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+
+
+
+import { useFormik } from "formik";
+import { AssignFormValidation } from "../../../Validation/SalesformValidation";
+
 const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
     const [tasks, setTasks] = useState([]);
     const [formData, setFormData] = useState({
@@ -29,81 +35,82 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({ ...prevData, [name]: value }));
-    };
+    const { values, setValues, errors, touched, handleBlur, handleChange, handleSubmit, resetForm} = useFormik({
+        initialValues: {
+            sale_id: saleData?._id,
+            assined_to: "",
+            assined_process: "",
+            assinedby_comment: "",
+        },
+        enableReinitialize: true, 
+        validationSchema: AssignFormValidation,
+        onSubmit: async (value) => {
+            try {
+                if (!token) throw new Error("Authentication token not found");
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        if (isSubmitting) return;
-        setIsSubmitting(true);
+                if (isEditMode && editTaskId) {
+                    await axios.patch(
+                        `${process.env.REACT_APP_BACKEND_URL}assined/update/${editTaskId}`,
+                        value,
+                        {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }
+                    );
 
-        try {
-            if (!token) throw new Error("Authentication token not found");
+                    toast({
+                        title: "Task Updated",
+                        description: "The task has been successfully updated.",
+                        status: "success",
+                        duration: 3000,
+                        isClosable: true,
+                    });
 
-            if (isEditMode && editTaskId) {
-                await axios.patch(
-                    `${process.env.REACT_APP_BACKEND_URL}assined/update/${editTaskId}`,
-                    formData,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                    setIsEditMode(false);
+                    setEditTaskId(null);
+                } else {
+                    await axios.post(
+                        `${process.env.REACT_APP_BACKEND_URL}assined/create`,
+                        value,
+                        {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }
+                    );
 
+                    toast({
+                        title: "Task Created",
+                        description: "The task has been successfully assigned.",
+                        status: "success",
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                }
+
+                resetForm({
+                    sale_id: saleData?._id,
+                    assined_to: "",
+                    assined_process: "",
+                    assinedby_comment: "",
+                });
+
+                handleClose();
+            } catch (error) {
                 toast({
-                    title: "Task Updated",
-                    description: "The task has been successfully updated.",
-                    status: "success",
+                    title: "Error",
+                    description: "Something went wrong. Please try again.",
+                    status: "error",
                     duration: 3000,
                     isClosable: true,
                 });
-
-                setIsEditMode(false);
-                setEditTaskId(null);
-            } else {
-                await axios.post(
-                    `${process.env.REACT_APP_BACKEND_URL}assined/create`,
-                    formData,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
-
-                toast({
-                    title: "Task Created",
-                    description: "The task has been successfully assigned.",
-                    status: "success",
-                    duration: 3000,
-                    isClosable: true,
-                });
+            } finally {
+                setIsSubmitting(false);
             }
-
-            setFormData({
-                sale_id: saleData?._id,
-                assined_to: "",
-                assined_process: "",
-                assinedby_comment: "",
-            });
-
-            handleClose();
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: "Something went wrong. Please try again.",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-            });
-        } finally {
-            setIsSubmitting(false);
         }
-    };
+    })
 
     const handleEdit = (id, taskData) => {
         setIsEditMode(true);
         setEditTaskId(id);
-        setFormData({
+        setValues({
             sale_id: saleData?._id,
             assined_to: taskData?.assinedto[0]?._id || "",
             assined_process: taskData?.assined_process || "",
@@ -223,8 +230,8 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
 
                         <label className="block text-sm font-medium mb-1 text-gray-300">Select Employee<span className="text-red-500">*</span></label>
                         <select
-                            value={formData.assined_to}
-                            onChange={(e) => setFormData({ ...formData, assined_to: e.target.value })}
+                            name="assined_to"
+                            value={values.assined_to} onChange={handleChange} onBlur={handleBlur}
                             className="w-full bg-[#ffffff23] focus:outline-none border border-gray-600  px-3 py-2 rounded-lg mb-4"
                             required
                         >
@@ -235,22 +242,30 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                                 </option>
                             ))}
                         </select>
+                        {touched.assined_to && errors.assined_to && (
+                            <p className="text-red-400 text-sm mt-1">{errors.assined_to}</p>
+                        )}
 
                         <label className="block text-sm font-medium mb-1 text-gray-300">Define Process<span className="text-red-500">*</span></label>
                         <input
                             name="assined_process"
-                            value={formData.assined_process}
+                            value={values.assined_process}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             type="text"
                             className="w-full bg-[#ffffff23] focus:outline-none border border-gray-600 text-white px-3 py-2 rounded-lg mb-4"
                             placeholder="Enter process name"
                             required
                         />
 
+                        {touched.assined_process && errors.assined_process && (
+                            <p className="text-red-400 text-sm mt-1">{errors.assined_process}</p>
+                        )}
+
                         <label className="block text-sm font-medium mb-1 text-gray-300">Remarks</label>
                         <textarea
                             name="assinedby_comment"
-                            value={formData.assinedby_comment}
+                            value={values.assinedby_comment}
                             onChange={handleChange}
                             className="w-full bg-[#ffffff23] focus:outline-none border border-gray-600 text-white px-3 py-2 rounded-lg mb-4"
                             placeholder="Enter further details (if any)"
@@ -259,7 +274,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                         <button
                             className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg font-semibold transition"
                             disabled={isSubmitting}
-                            onClick={handleFormSubmit}
+                            onClick={handleSubmit}
                         >
                             {isEditMode ? "Update" : "Assign"}
                         </button>

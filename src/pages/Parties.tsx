@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { MdOutlineRefresh } from "react-icons/md";
 import AddParties from "../components/Drawers/Parties/AddParties";
 import PartiesTable from "../components/Table/PartiesTable";
@@ -26,7 +26,7 @@ const Parties = () => {
                         placeholder="Search party..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="px-4 py-2 mr-4 w-fit text-sm border-b bg-[#475569] rounded-sm focus:outline-none text-gray-200 placeholder:text-gray-200"
+                        className="px-6 py-2 mr-2 w-fit text-sm border-b bg-[#475569] rounded-sm focus:outline-none text-gray-200 placeholder:text-gray-200"
                     />
                     <select
                         className="px-6 pl-4 py-1 rounded-sm ml-4 bg-[#475569] text-gray-200 focus:outline-none"
@@ -36,6 +36,15 @@ const Parties = () => {
                         <option value="">Select</option>
                         <option value="Individual">Individual</option>
                         <option value="Company">Company</option>
+                    </select>
+                    <select
+                        className="px-6 pl-4 py-1 rounded-sm ml-4 bg-[#475569] text-gray-200 focus:outline-none"
+                        value={selectedType}
+                        onChange={(e) => setSelectedType(e.target.value)}
+                    >
+                        <option value="">Select</option>
+                        <option value="Buyer">Buyer</option>
+                        <option value="Seller">Seller</option>
                     </select>
                 </div>
                 <div className="text-white flex justify-center gap-4 mt-6">
