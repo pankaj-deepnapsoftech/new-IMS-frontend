@@ -1,0 +1,38 @@
+import * as Yup from 'yup';
+
+export const SalesFormValidation = Yup.object({
+    party: Yup.string()
+        .required('Party selection is required'),
+    product_id: Yup.string()
+        .required('Product selection is required'),
+    price: Yup.number()
+        .typeError('Price must be a number')
+        .positive('Price must be greater than zero')
+        .required('Price is required'),
+
+    product_qty: Yup.number()
+        .typeError('Product quantity must be a number')
+        .integer('Product quantity must be an integer')
+        .positive('Product quantity must be greater than zero')
+        .required('Product quantity is required'),
+
+    // product_type: Yup.string()
+    //     .required('Product type is required'),
+
+    // phone: Yup.string()
+    //     .matches(/^[0-9]{10}$/, 'Phone must be exactly 10 digits')
+    //     .required('Phone number is required'),
+
+    GST: Yup.string()
+        .oneOf(['5', '12', '18'], 'Select a valid GST rate')
+        .required('GST rate is required'),
+});
+
+
+
+export const AssignFormValidation = Yup.object({
+    assined_to: Yup.string()
+        .required('Assign selection is required'),
+    assined_process: Yup.string()
+        .required('Assined process field is required'),
+});

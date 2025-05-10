@@ -7,69 +7,67 @@ import { BiX } from "react-icons/bi";
 import axios from "axios";
 import {useToast} from "@chakra-ui/react";
 import { GiConsoleController } from "react-icons/gi";
+
 import { useFormik } from "formik";
 import { SalesFormValidation } from "../../../Validation/SalesformValidation";
-const AddNewSale = ({ show, setShow, refresh }) => {
+
+const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
     const [cookies] = useCookies();
     const toast = useToast();
+    // const [formData, setFormData] = useState({
+    //     party: "",
+    //     product_id: "",
+    //     price: "",
+    //     product_qty: "",
+    //     product_type: "finished goods",
+    //     GST: "",
+    //     comment: "",
+    // });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [partiesData, setpartiesData] = useState([])
     const [products, setProducts] = useState([]);
     
-
-    const {values, errors, touched, handleBlur, handleChange, handleSubmit, resetForm} = useFormik({
-            initialValues: {
-                party: "",
-                product_id: "",
-                price: "",
-                product_qty: "",
-                product_type: "finished goods",
-                GST: "",
-                comment: "",
-            },
+    const {values, errors, touched, handleBlur, handleChange, handleSubmit} = useFormik({
+        initialValues: {
+            party: sale?.party_id?.[0]?._id || "",
+            product_id: sale?.product_id?.[0]?._id || "",
+            price: sale?.price || "",
+            product_qty: sale?.product_qty || "",
+            product_type: sale?.product_type || "finished goods",
+            GST: sale?.GST || "",
+            comment: sale?.comment || "",
+        },
         validationSchema: SalesFormValidation,
-            onSubmit: async (value) => {
-                try {
-                    const res = await fetch(process.env.REACT_APP_BACKEND_URL + "sale/create", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${cookies?.access_token}`,
-                        },
-                        body: JSON.stringify(value)
-                    });
-    
-                    const data = await res.json();
-    
-                    if (res.ok) {
-                        toast({
-                            title: "Sale Created",
-                            description: "The sale has been created successfully.",
-                            status: "success",
-                            duration: 5000,
-                            isClosable: true,
-                        });
-                        resetForm({
-                            party: "",
-                            product_id: "",
-                            price: "",
-                            product_qty: "",
-                            product_type: "finished goods",
-                            GST: "",
-                            comment: "",
-                        });
-                        setShow(!show)
-                        await refresh();
-                    } else {
-                        toast.error(data?.message || "Failed to save Sale.");
-                    }
+        enableReinitialize: true,
+        onSubmit: async (value) => {
+            try {
 
-                } catch (error) {
-                    console.error("Error saving sale:", error);
-                    toast.error("Something went wrong. Please try again.");
-                }
+                await axios.patch(
+                    `${process.env.REACT_APP_BACKEND_URL}sale/update/${sale._id}`,
+                    value,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${cookies.access_token}`,
+                        },
+                    }
+                );
+
+                toast({
+                    title: "Sale updated successfully",
+                    description: "The sale has been updated successfully.",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                });
+
+                seteditsale(!editshow)
+                await refresh();
+            } catch (error) {
+                console.error("Error saving sale:", error);
+                toast.error("Something went wrong. Please try again.");
             }
-        })
+        }
+    })
 
     const fetchDropdownData = async () => {
         try {
@@ -89,7 +87,6 @@ const AddNewSale = ({ show, setShow, refresh }) => {
             setProducts(filteredProducts || []);
 
         } catch (error) {
-            console.log('testing data', error)
             toast({
                 title: "Error",
                 description: "Failed to fetch data for dropdowns.",
@@ -100,23 +97,20 @@ const AddNewSale = ({ show, setShow, refresh }) => {
         }
     }
 
-    // const handleInputChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setFormData((prevData) => ({ ...prevData, [name]: value }));
-    // };
-
     useEffect(() => {
         fetchDropdownData()
     }, [cookies.access_token, toast])
     return (
-        <div className={`absolute z-50 top-0 ${show ? "right-1" : "hidden"}  w-[30vw] transition-opacity duration-500 h-full bg-[#57657F] text-white   justify-center`}>
+        <div className={`absolute z-50 top-0 ${editshow ? "right-1" : "hidden"}  w-[30vw] transition-opacity duration-500 h-full bg-[#57657F] text-white   justify-center`}>
             <div className=" p-6 rounded-lg w-full max-w-md relative">
-                <BiX size="30px" onClick={() => setShow(!show)} />
-                <h2 className="text-xl text-center mt-4 font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">Add a new Sale</h2>
+                <BiX size="30px" onClick={() => seteditsale(!editshow)} />
+                <h2 className="text-xl text-center mt-4 font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">Edit Sale</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-md font-medium mb-2">Party </label>
                         <select required name="party" value={values.party} onChange={handleChange} onBlur={handleBlur} className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2">
+                            
+
                             <option value="" className="text-black bg-[#ffffff41]">Select a party</option>
                             {partiesData.map((parties: any) => (
                                 <option className="text-black bg-[#ffffff41]" key={parties?._id} value={parties?._id}>
@@ -132,9 +126,7 @@ const AddNewSale = ({ show, setShow, refresh }) => {
 
                     <div>
                         <label className="block text-md font-medium">Product</label>
-                        <select required name="product_id" value={values.product_id}
-                            onChange={handleChange}
-                            onBlur={handleBlur} className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2">
+                        <select required name="product_id" value={values?.product_id} onChange={handleChange} className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2">
                             <option value="" className="text-black bg-[#ffffff41]">Select a product</option>
                             {products.map((product: any) => (
                                 <option className="text-black bg-[#ffffff41]" key={product?._id} value={product?._id}>
@@ -145,7 +137,6 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                         {touched.product_id && errors.product_id && (
                             <p className="text-red-400 text-sm mt-1">{errors.product_id}</p>
                         )}
-
                     </div>
 
                     <div>
@@ -234,8 +225,8 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                     </div>
 
                     <div className="flex justify-between">
-                        <button type="submit" className="bg-[#ffffff41] text-white px-4 py-2 rounded hover:">Add Sale</button>
-                        <button type="button" onClick={() => setShow(!show)} className=" bg-[#ffffff41] px-4 py-2 rounded  hover:text-gray-200">Cancel</button>
+                        <button type="submit" className="bg-[#ffffff41] text-white px-4 py-2 rounded hover:" disabled={isSubmitting}>Update Sale</button>
+                        <button type="button" onClick={() => seteditsale(!editshow)} className=" bg-[#ffffff41] px-4 py-2 rounded  hover:text-gray-200">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -243,4 +234,4 @@ const AddNewSale = ({ show, setShow, refresh }) => {
     )
 }
 
-export default AddNewSale
+export default UpdateSale;
