@@ -152,7 +152,7 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                                     </button>
 
                                     <button onClick={() => handleDelete(party._id)}>
-                                        <BiSolidTrash className="text-[#e73939] hover:text-red-800 cursor-pointer" />
+                                        <BiSolidTrash className="text-[#ee5555] hover:text-red-800 cursor-pointer" />
                                     </button>
                                 </td>
                             </tr>
