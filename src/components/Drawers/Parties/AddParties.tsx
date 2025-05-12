@@ -61,148 +61,155 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
 
 
     return (
-        <section className={`${showData ? "block" : "hidden"} absolute top-0 right-0 h-full w-[35vw] z-50 bg-[#57657f]`}>
-            <div className="  flex  flex-col  ">
-                <div className="px-4 flex gap-x-2 items-center font-bold text-[22px] text-white py-3">
-                    <BiX onClick={() => setshowData(!showData)} size="30px" />
+        <section className={`${showData ? "block" : "hidden"} fixed top-0 right-0 h-full w-[70vw] sm:w-[70vw] md:w-[50vw] lg:w-[35vw] z-50 bg-[#57657f] overflow-y-auto`}>
+        <div className="flex flex-col min-h-full">
+
+            <div className="px-4 flex justify-between items-center text-white py-3">
+                <BiX onClick={() => setshowData(!showData)} size="30px" className="cursor-pointer" />
+            </div>
+
+            <div className="text-center text-white py-3 px-2 mx-4 rounded-md bg-[#ffffff2f] text-lg sm:text-xl font-semibold">
+                <h1>Add Parties</h1>
+            </div>
+    
+
+            <form onSubmit={handleSubmit} className="w-full p-4 sm:p-6 space-y-4 flex-1">
+     
+                <div>
+                    <label className="block font-medium pb-1 text-white text-sm sm:text-md">Type</label>
+                    <select
+                        name="type"
+                        value={values.type}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full border border-gray-50 bg-[#47556913] text-gray-200 rounded px-2 py-2 focus:outline-none"
+                        required
+                    >
+                        <option value="" className="text-black">Select type</option>
+                        <option value="Individual" className="text-black">Individual</option>
+                        <option value="Company" className="text-black">Company</option>
+                    </select>
                 </div>
-                <div className="text-xl mt-8 text-center  font-semibold m-auto py-3 px-2 w-[400px] bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
-                    <h1>Add Parties</h1>
-                </div>
-                <form
-                    className=" w-full p-6   rounded space-y-4"
-                    onSubmit={handleSubmit}
-                >
-                    <div>
-                        <label className="block  font-medium pb-2  text-white text-md">Type</label>
-                        <select
-                            name="type"
-                            value={values.type}
+    
+
+                {values.type === "Company" && (
+                    <>
+                        <label className="block font-medium text-white text-sm sm:text-md">Company Name</label>
+                        <input
+                            type="text"
+                            name="company_name"
+                            value={values.company_name}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2"
-                            required
-                        >
-                            <option value="" className="text-black bg-[#ffffff41]">Select type</option>
-                            <option value="Individual" className="text-black bg-[#ffffff41]">Individual</option>
-                            <option value="Company" className="text-black bg-[#ffffff41]">Company</option>
-                        </select>
-                    </div>
-                    {values.type === "Company" && (
-                        <>
-                            <label className="block font-medium text-white text-md">Company Name</label>
-                            <input
-                                type="text"
-                                name="company_name"
-                                value={values.company_name}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
-                            />
-                            {touched.company_name && errors.company_name && (
-                                <p className="text-red-400 text-sm mt-1">{errors.company_name}</p>
-                            )}
-                        </>
+                            className="w-full border border-gray-50 bg-transparent rounded p-2 text-gray-200"
+                        />
+                        {touched.company_name && errors.company_name && (
+                            <p className="text-red-400 text-sm mt-1">{errors.company_name}</p>
+                        )}
+                    </>
+                )}
+    
+          
+                {values.type === "Individual" && (
+                    <>
+                        <label className="block font-medium text-white text-sm sm:text-md">Full Name</label>
+                        <input
+                            type="text"
+                            name="full_name"
+                            value={values.full_name}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            className="w-full border border-gray-50 bg-transparent rounded p-2 text-gray-200"
+                        />
+                        {touched.full_name && errors.full_name && (
+                            <p className="text-red-400 text-sm mt-1">{errors.full_name}</p>
+                        )}
+                    </>
+                )}
+    
+                {/* Email */}
+                <div>
+                    <label className="block font-medium text-white text-sm sm:text-md">Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value={values.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full border border-gray-50 bg-transparent rounded p-2 text-gray-200"
+                        required
+                    />
+                    {touched.email && errors.email && (
+                        <p className="text-red-400 text-sm mt-1">{errors.email}</p>
                     )}
-
+                </div>
+    
+                {/* Phone */}
+                <div>
+                    <label className="block font-medium text-white text-sm sm:text-md">Phone</label>
+                    <input
+                        type="tel"
+                        name="phone"
+                        value={values.phone}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full border border-gray-50 bg-transparent rounded p-2 text-gray-200"
+                        required
+                    />
+                    {touched.phone && errors.phone && (
+                        <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
+                    )}
+                </div>
+    
+                {/* GST No */}
+                {values.type !== "Individual" && (
                     <div>
-                        {values.type === "Individual" && (
-                            <>
-                                <label className="block font-medium text-white text-md">Full Name</label>
-                                <input
-                                    type="text"
-                                    name="full_name"
-                                    value={values.full_name}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
-                                />
-                                {touched.full_name && errors.full_name && (
-                                    <p className="text-red-400 text-sm mt-1">{errors.full_name}</p>
-                                )}
-                            </>
-                        )}
-
-
-                    </div>
-
-                    <div>
-                        <label className="block  font-medium  text-white text-md">Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={values.email}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
-                            required
-                        />
-                        {touched.email && errors.email && (
-                            <p className="text-red-400 text-sm mt-1">{errors.email}</p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="block  font-medium  text-white text-md">Phone</label>
-                        <input
-                            type="tel"
-                            name="phone"
-                            value={values.phone}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
-                            required
-                        />
-                        {touched.phone && errors.phone && (
-                            <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
-                        )}
-                    </div>
-
-
-
-                    {values.type !== "Individual" && <div>
-                        <label className="block  font-medium  text-white text-md">GST No</label>
+                        <label className="block font-medium text-white text-sm sm:text-md">GST No</label>
                         <input
                             type="text"
                             name="GST_NO"
                             value={values.GST_NO}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            className="mt-1 block w-full border border-gray-50 bg-transparent focus:outline rounded p-2 text-gray-200"
+                            className="w-full border border-gray-50 bg-transparent rounded p-2 text-gray-200"
                         />
                         {touched.GST_NO && errors.GST_NO && (
                             <p className="text-red-400 text-sm mt-1">{errors.GST_NO}</p>
                         )}
-                    </div>}
-
-                    <div>
-                        <label className="block  font-medium pb-2  text-white text-md">Parties Type</label>
-                        <select
-                            name="parties_type"
-                            value={values.parties_type}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2"
-                            required
-                        >
-                            <option value="" className="text-black bg-[#ffffff41]">Select type</option>
-                            <option value="Buyer" className="text-black bg-[#ffffff41]">Buyer</option>
-                            <option value="Seller" className="text-black bg-[#ffffff41]">Seller</option>
-                        </select>
-                        {touched.parties_type && errors.parties_type && (
-                            <p className="text-red-400 text-sm mt-1">{errors.parties_type}</p>
-                        )}
                     </div>
-
-                    <button
-                        type="submit"
-                        className="w-full bg-[#ffffff38] text-white text-xl py-2 rounded hover:bg-[#ffffff65] transition-all duration-500"
+                )}
+    
+                {/* Parties Type Dropdown */}
+                <div>
+                    <label className="block font-medium text-white text-sm sm:text-md">Parties Type</label>
+                    <select
+                        name="parties_type"
+                        value={values.parties_type}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full border border-gray-50 bg-[#47556913] text-gray-200 rounded px-2 py-2 focus:outline-none"
+                        required
                     >
-                        Submit
-                    </button>
-                </form>
-            </div>
-        </section>
+                        <option value="" className="text-black">Select type</option>
+                        <option value="Buyer" className="text-black">Buyer</option>
+                        <option value="Seller" className="text-black">Seller</option>
+                    </select>
+                    {touched.parties_type && errors.parties_type && (
+                        <p className="text-red-400 text-sm mt-1">{errors.parties_type}</p>
+                    )}
+                </div>
+    
+                {/* Submit Button */}
+                <button
+                    type="submit"
+                    className="w-full bg-[#ffffff38] text-white text-lg sm:text-xl py-2 rounded hover:bg-[#ffffff65] transition duration-300"
+                >
+                    Submit
+                </button>
+            </form>
+        </div>
+    </section>
+    
     )
 }
 

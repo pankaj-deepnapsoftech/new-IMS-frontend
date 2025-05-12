@@ -139,7 +139,7 @@ const Dispatch = () => {
           <div className="flex flex-col">
             <label className="text-sm text-white mb-1">Payment Status</label>
             <select
-              className="w-48 bg-[#1e293b] border border-gray-600 text-white text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-48 bg-[#1e293b86] border border-gray-600 text-white text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
             >
@@ -153,7 +153,7 @@ const Dispatch = () => {
           <div className="flex flex-col">
             <label className="text-sm text-white mb-1">Product Status</label>
             <select
-              className="w-48 bg-[#1e293b] border rounded-lg border-gray-600 text-white text-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-48 bg-[#1e293b8c] border rounded-lg border-gray-600 text-white text-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
               value={productFilter}
               onChange={(e) => setProductFilter(e.target.value)}
             >
@@ -247,7 +247,7 @@ const Dispatch = () => {
 
             {showModal && (
                   <form onSubmit={handleSubmit}>
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0000003f] bg-opacity-50">
                 <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg w-full max-w-md relative">
                   <h2 className="text-xl font-semibold mb-4">Dispatch</h2>
                     <div className="mb-4">
@@ -291,7 +291,7 @@ const Dispatch = () => {
                   </div>
                   <button
                     onClick={() => setShowModal(false)}
-                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+                    className="absolute top-2 right-2 text-white hover:text-gray-400"
                   >
                     ✕
                   </button>
@@ -305,11 +305,11 @@ const Dispatch = () => {
                 className="flex items-center gap-2 px-4 py-2 border border-green-500 text-green-600 rounded hover:bg-green-500 hover:text-white transition-all duration-300"
                 onClick={() => setShowModal(true)}
               >
-                <TbTruckDelivery color="green" /> Dispatch
+                <TbTruckDelivery/> Dispatch
               </button>
 
-              <button className="flex items-center gap-2 px-4 py-2 border border-yellow-600 text-yellow-700 rounded hover:bg-yellow-600 hover:text-white transition-all duration-300">
-                <FiEye color="orange" /> View Delivery Proof
+              <button className="flex items-center gap-2 px-4 py-2 border border-yellow-400 text-yellow-500 rounded hover:bg-yellow-500 hover:text-white transition-all duration-300">
+                <FiEye  /> View Delivery Proof
               </button>
               <>
                 <input
@@ -322,7 +322,7 @@ const Dispatch = () => {
                   className="flex items-center gap-2 px-4 py-2 border border-sky-600 text-sky-500 rounded hover:bg-sky-600 hover:text-white transition-all duration-300"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <HiOutlinePaperClip color="skyblue" /> Attach Delivery Proof
+                  <HiOutlinePaperClip  /> Attach Delivery Proof
                 </button>
               </>
             </div>
