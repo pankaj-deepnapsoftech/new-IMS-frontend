@@ -152,7 +152,7 @@ const Sales = () => {
                     </div>
                     <div className=" text-white flex justify-center gap-4 mt-6">
                         <button onClick={()=>setShow(!show)} className="px-6 py-2  rounded-md  shadow-md bg-[#4b87a0d9] hover:bg-[#4b86a083] transition-all duration-500\ " >Add New Sale</button>
-                        <button className="px-4 py-1 border border-white flex items-center rounded-md gap-2 hover:bg-white hover:text-black transition-all duration-500"> <MdOutlineRefresh className="flex" />Refresh</button>
+                        <button onClick={fetchPurchases} className="px-4 py-1 border border-white flex items-center rounded-md gap-2 hover:bg-white hover:text-black transition-all duration-500"> <MdOutlineRefresh  className="flex" />Refresh</button>
                     </div>
                 </div>
                 <SalesTable filteredPurchases={filteredPurchases} sendDataToParent={handleDataFromChild} empData={employees} />
