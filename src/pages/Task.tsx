@@ -41,6 +41,8 @@ const Task = () => {
   const [page, setPage] = useState(1);
   const [showToken, setShowToken] = useState(false)
   const [showUploadInvoice, setShowUploadInvoice] = useState(false)
+  const [saleId, setSaleId] = useState("");
+  const [tokenAmount, setTokenAmount] = useState();
   const role = cookies?.role;
 
   console.log("user_role =", role)
@@ -480,7 +482,11 @@ const Task = () => {
                     transform: "scale(1.02)",
                   }}
                   transition="all 0.3s ease-in-out"
-                  onClick={() => setShowToken(!showToken)}
+                  onClick={() => {
+                    setShowToken(!showToken);
+                    setTokenAmount(task.token_amt);
+                    setSaleId(task.sale_id);
+                  }}
                 // onClick={() => handleTokenClick(task.sale_id, task.token_amt)}
                 >
                   Add Token Amount
@@ -510,7 +516,7 @@ const Task = () => {
                   </Button>
 
                 )}
-                {task?.isSampleApprove && (
+                {/* {task?.isSampleApprove && ( */}
                   <Button
                     onClick={() => {
                       half_payment.onOpen();
@@ -533,8 +539,7 @@ const Task = () => {
                   >
                     Add Half Payment
                   </Button>
-
-                )}
+           
                 <Text fontSize="sm"><strong>Date:</strong> {task.date}</Text>
               </HStack>
             ) : (
@@ -558,7 +563,7 @@ const Task = () => {
 
       </div>
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
-      <AddToken showToken={showToken} setShowToken={setShowToken} />
+      <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
       <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice}/>
     </section>
   )

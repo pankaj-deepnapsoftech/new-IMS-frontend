@@ -36,3 +36,10 @@ export const AssignFormValidation = Yup.object({
     assined_process: Yup.string()
         .required('Assined process field is required'),
 });
+
+
+export const AddtokenamtFormValidation = Yup.object({
+    token_amt: Yup.number()
+        .typeError('Token amount must be a number')
+        .required('Token amount is required'),
+});

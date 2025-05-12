@@ -220,7 +220,7 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                         <label className="block text-sm font-medium">Remarks</label>
                         <input
                             type="text"
-                            name="remarks"
+                            name="comment"
                             value={values.comment}
                             onChange={handleChange}
                             className="w-full border rounded px-3 py-2 bg-[#47556913] focus:outline-none"
