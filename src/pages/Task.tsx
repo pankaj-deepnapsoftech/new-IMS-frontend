@@ -45,6 +45,7 @@ const Task = () => {
   const [showUploadInvoice, setShowUploadInvoice] = useState(false)
   const [saleId, setSaleId] = useState("");
   const [tokenAmount, setTokenAmount] = useState();
+  const [invoicefile, setInvoiceFile] = useState("")
   const role = cookies?.role;
 
 
@@ -52,6 +53,7 @@ const Task = () => {
   const [halfAmountId, sethalfAmountId] = useState("")
   const [halfAmount, sethalfAmount] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const fetchTasks = async () => {
     try {
       const response = await axios.get(
@@ -180,12 +182,6 @@ const Task = () => {
   const handleBOM = (id) => {
     //console.log(id);
     navigate("/production/bom", { state: { id } });
-  };
-
-  const handleInvoiceUpload = (id: any, file: any) => {
-    setSaleId(id);
-    setInvoiceFile(file);
-    invoiceDisclosure.onOpen();
   };
 
   const handleSampleImage = (file: any) => {
@@ -494,7 +490,12 @@ const Task = () => {
                     }}
                     transition="all 0.2s ease-in-out"
                     // onClick={() => handleInvoiceUpload(task.sale_id, task.invoice)}
-                    onClick={()=>setShowUploadInvoice(!showUploadInvoice)}
+                    onClick={()=> {
+                      setShowUploadInvoice(!showUploadInvoice);
+                      setSaleId(task?.sale_id);
+                      setInvoiceFile(task?.invoice);
+                    }
+                     }
                   >
                     Upload Invoice
                   </Button>
@@ -549,7 +550,7 @@ const Task = () => {
       </div>
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
       <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
-      <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice}/>
+      <UploadInvoice  showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice} sale={saleId} invoicefile={invoicefile}  />
       <AddhalfToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
     </section>
   )
