@@ -34,6 +34,8 @@ import {
 import { IoEyeSharp } from "react-icons/io5";
 import { NavLink, useNavigate } from "react-router-dom";
 import AddToken from "../components/Drawers/Task/AddToken";
+import AddhalfToken from "../components/Drawers/Task/AddhalfToken";
+
 import UploadInvoice from "../components/Drawers/Task/UploadInvoice";
 const Task = () => {
   const [cookies] = useCookies();
@@ -221,25 +223,6 @@ const Task = () => {
   //   onAccountpreviewOpen();
   // };
 
-  const handleHalfPayment = async () => {
-    const data = {
-      half_payment: halfAmount,
-      half_payment_status: "pending",
-    }
-    try {
-      half_payment.onClose()
-      const res = await axios.put(`${process.env.REACT_APP_BACKEND_URL}purchase/update/${halfAmountId.sale_id}`, data, {
-        headers: {
-          Authorization: `Bearer ${cookies?.access_token}`,
-        },
-      })
-      toast.success("Half Amount added");
-
-
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
   const handleVerifyImage = async () => {
     const data = {
@@ -262,7 +245,8 @@ const Task = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [cookies?.access_token, page])
+  }, [cookies?.access_token, page]);
+
   return (
     <section>
       <div className="min-h-screen p-6 text-gray-100">
@@ -493,7 +477,7 @@ const Task = () => {
                 </Button>
 
 
-                {task?.isTokenVerify && (
+                {/* {task?.isTokenVerify && ( */}
                   <Button
                     leftIcon={<FaCloudUploadAlt />}
                     bgGradient="linear(to-r, blue.400, blue.600)"
@@ -515,12 +499,13 @@ const Task = () => {
                     Upload Invoice
                   </Button>
 
-                )}
+                {/* )} */}
                 {/* {task?.isSampleApprove && ( */}
                   <Button
                     onClick={() => {
-                      half_payment.onOpen();
-                      sethalfAmountId(task);
+                      setShowToken(!showToken);
+                      setTokenAmount(task?.allsale?.half_payment);
+                      setSaleId(task.sale_id);
                     }}
                     leftIcon={<FaMoneyBillWave />}
                     bgGradient="linear(to-r, teal.400, teal.600)"
@@ -565,6 +550,7 @@ const Task = () => {
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
       <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
       <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice}/>
+      <AddhalfToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
     </section>
   )
 }
