@@ -21,7 +21,8 @@ import { FiSearch } from "react-icons/fi";
 
 const BOM: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
-  const isAllowed = isSuper || allowedroutes.includes("Production");
+  console.log('allowedroutes =', allowedroutes)
+  const isAllowed = isSuper || allowedroutes.includes("production");
   const [cookies] = useCookies();
   const [bomId, setBomId] = useState<string | undefined>();
   const [searchKey, setSearchKey] = useState<string | undefined>();

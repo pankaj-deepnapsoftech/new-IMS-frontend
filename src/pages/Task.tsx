@@ -37,7 +37,10 @@ const Task = () => {
   const [cookies] = useCookies();
   const [tasks, setTasks] = useState([]);
   const [page, setPage] = useState(1);
-  const [showToken, setShowToken] = useState(false)
+  const [showToken, setShowToken] = useState(false);
+  const [saleId, setSaleId] = useState("");
+  const [tokenAmount, setTokenAmount] = useState();
+
   const role = cookies?.role;
 
   console.log("user_role =", role)
@@ -401,7 +404,11 @@ const Task = () => {
                     _hover={{ bgColor: "purple.500" }}
                     className="border border-purple-500 hover:text-white"
                     // onClick={() => handleTokenClick(task.sale_id, task.token_amt)}
-                      onClick={()=> setShowToken(!showToken)}
+                    onClick={() => {
+                      setShowToken(!showToken);
+                      setTokenAmount(task.token_amt);
+                      setSaleId(task.sale_id);
+                    }}
                   >
                     Add Token Amount
                   </Button>
@@ -417,7 +424,7 @@ const Task = () => {
                     Upload Invoice
                   </Button>
                 )}
-                {task?.isSampleApprove && (
+                {/* {task?.isSampleApprove && ( */}
                   <Button
                     bgColor="white"
                     _hover={{ bgColor: "blue.500" }}
@@ -426,7 +433,7 @@ const Task = () => {
                   >
                     Add Half Payment
                   </Button>
-                )}
+                {/* )} */}
                 {task?.customer_pyement_ss && (
                   <Button
                     bgColor="white"
@@ -463,7 +470,7 @@ const Task = () => {
 
       </div>
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
-      <AddToken  showToken={showToken} setShowToken={setShowToken}/>
+      <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
     </section>
   )
 }
