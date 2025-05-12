@@ -2,7 +2,7 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 
-const UploadInvoice = ({ showinvoice, setShowInvoice }) => {
+const UploadInvoice = ({ showUploadInvoice, setShowUploadInvoice }) => {
     const [preview, setPreview] = useState(null);
     const [fileName, setFileName] = useState('');
 
@@ -25,11 +25,11 @@ const UploadInvoice = ({ showinvoice, setShowInvoice }) => {
     };
     return (
         <div
-            className={`fixed ${showinvoice ? "block" : "hidden"} inset-0 h-screen items-center justify-center bg-[#00000065] bg-opacity-40 z-50 flex`}
+            className={`fixed ${showUploadInvoice ? "block" : "hidden"} inset-0 h-screen items-center justify-center bg-[#00000056] bg-opacity-40 z-50 flex`}
         >
             <div className="bg-[#1C3644] rounded-2xl shadow-xl p-6 w-full max-w-md relative text-white">
                 <button
-                    onClick={() => setShowInvoice(!showinvoice)}
+                    onClick={() => setShowUploadInvoice(!showUploadInvoice)}
                     className="absolute top-4 right-4 text-gray-400 hover:text-white"
                     aria-label="Close"
                 >
@@ -87,7 +87,7 @@ const UploadInvoice = ({ showinvoice, setShowInvoice }) => {
                         onClick={() => {
                             setPreview(null);    
                             setFileName('');        
-                            setShowInvoice(false);
+                            setShowUploadInvoice(false);
                         }}
                         className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition"
                     >
