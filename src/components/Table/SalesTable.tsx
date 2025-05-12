@@ -15,7 +15,7 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
         const totalPrice = basePrice + gstVal;
         return totalPrice;
     };
-
+    console.log(filteredPurchases)
     const [selectedSale, setSelectedSale] = useState([]);
     const [showinvoice, setShowInvoice] = useState(false)
     const [paymentshow, setPaymentshow] = useState(false)
@@ -30,11 +30,13 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
                         <div className="flex justify-between flex-wrap gap-4">
                             <div>
                                 <h2 className="font-semibold text-lg text-white">Created By: <span className="text-blue-400">{purchase?.user_id[0]?.first_name || "N/A"}</span></h2>
-                                <p className="text-sm text-gray-300">
+                                <p className="text-sm text-gray-300 ">
                                     <span className="font-semibold">Date:</span> {new Date(purchase?.createdAt).toLocaleDateString()}
                                 </p>
                             </div>
-
+                            <div>
+                                <p className="text-sm bg-gradient-to-r to-green-600 from-green-700 px-4 py-1.5 shadow-md rounded-md">SALE APPROVE : <span className="text-sm uppercase"> {purchase.Status} </span></p>
+                            </div>
                         </div>
 
                         <hr className="my-6 border-gray-600" />
@@ -56,8 +58,8 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
 
                         <div className="flex flex-wrap gap-3 mt-6">
                             <button className="px-4 py-2 border border-gray-500 rounded-md text-sm hover:bg-gray-700" onClick={() => sendDataToParent(purchase)}>Edit</button>
-                            <button className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white" onClick={()=>setIsChecked(!isChecked)}>Approve Sample</button>
-                            <button className="px-4 py-2 border border-orange-500 text-orange-400 rounded-md text-sm hover:bg-orange-600 hover:text-white" onClick={()=>setViewDesign(!isOpen)}>View Design</button>
+                            <button className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white" onClick={() => setIsChecked(!isChecked)}>Approve Sample</button>
+                            <button className="px-4 py-2 border border-orange-500 text-orange-400 rounded-md text-sm hover:bg-orange-600 hover:text-white" onClick={() => setViewDesign(!isOpen)}>View Design</button>
                             <button className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white"><a href="https://images.unsplash.com/photo-1746483966639-b8dafcd05f5b?q=80&w=1288&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" target="_blank" >View Delivery Proof</a></button>
                             <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setShowInvoice(!showinvoice)}>Upload Invoice</button>
                             <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setPaymentshow(!paymentshow)}>View Payment</button>
@@ -73,8 +75,8 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
                 saleData={selectedSale} />
             <ViewPayment paymentshow={paymentshow} setPaymentshow={setPaymentshow} />
             <UploadInvoice showinvoice={showinvoice} setShowInvoice={setShowInvoice} />
-            <ViewDesign isOpen={isOpen}  setViewDesign={setViewDesign}/>
-            <ApproveSample  isChecked={isChecked} setIsChecked={setIsChecked}/>
+            <ViewDesign isOpen={isOpen} setViewDesign={setViewDesign} />
+            <ApproveSample isChecked={isChecked} setIsChecked={setIsChecked} />
         </>
 
     )

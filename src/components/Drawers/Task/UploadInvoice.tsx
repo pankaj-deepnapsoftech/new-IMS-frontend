@@ -1,16 +1,17 @@
 // @ts-nocheck
+
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const UploadInvoice = ({ showUploadInvoice, setShowUploadInvoice }) => {
     const [preview, setPreview] = useState(null);
     const [fileName, setFileName] = useState('');
+    const fileInputRef = useRef(); 
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setFileName(file.name);
-
 
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
@@ -21,6 +22,9 @@ const UploadInvoice = ({ showUploadInvoice, setShowUploadInvoice }) => {
             } else {
                 setPreview(null);
             }
+
+
+            e.target.value = '';
         }
     };
     return (
@@ -29,7 +33,11 @@ const UploadInvoice = ({ showUploadInvoice, setShowUploadInvoice }) => {
         >
             <div className="bg-[#1C3644] rounded-2xl shadow-xl p-6 w-full max-w-md relative text-white">
                 <button
-                    onClick={() => setShowUploadInvoice(!showUploadInvoice)}
+                    onClick={() => {
+                        setPreview(null);
+                        setFileName('');
+                        setShowUploadInvoice(false);
+                    }}
                     className="absolute top-4 right-4 text-gray-400 hover:text-white"
                     aria-label="Close"
                 >
@@ -46,6 +54,7 @@ const UploadInvoice = ({ showUploadInvoice, setShowUploadInvoice }) => {
                     <div className="group border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer transition-all hover:shadow-md hover:border-blue-400 hover:bg-[#142731] relative">
                         <input
                             type="file"
+                            ref={fileInputRef}
                             accept=".pdf,.docx,.png,.jpg,.jpeg"
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                             onChange={handleFileChange}
@@ -85,8 +94,8 @@ const UploadInvoice = ({ showUploadInvoice, setShowUploadInvoice }) => {
                 <div className="flex justify-end gap-3 mt-6">
                     <button
                         onClick={() => {
-                            setPreview(null);    
-                            setFileName('');        
+                            setPreview(null);
+                            setFileName('');
                             setShowUploadInvoice(false);
                         }}
                         className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition"

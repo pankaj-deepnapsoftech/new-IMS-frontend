@@ -45,7 +45,7 @@ const Task = () => {
   const [tokenAmount, setTokenAmount] = useState();
   const role = cookies?.role;
 
-  console.log("user_role =", role)
+
 
   const [halfAmountId, sethalfAmountId] = useState("")
   const [halfAmount, sethalfAmount] = useState(null);
