@@ -43,3 +43,9 @@ export const AddtokenamtFormValidation = Yup.object({
         .typeError('Token amount must be a number')
         .required('Token amount is required'),
 });
+
+export const AddhalftokenFormValidation = Yup.object({
+    half_payment: Yup.number()
+        .typeError('Half token amount must be a number')
+        .required('Half token amount is required'),
+});

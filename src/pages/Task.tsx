@@ -33,6 +33,8 @@ import {
 import { IoEyeSharp } from "react-icons/io5";
 import { NavLink, useNavigate } from "react-router-dom";
 import AddToken from "../components/Drawers/Task/AddToken";
+import AddhalfToken from "../components/Drawers/Task/AddhalfToken";
+
 const Task = () => {
   const [cookies] = useCookies();
   const [tasks, setTasks] = useState([]);
@@ -219,25 +221,6 @@ const Task = () => {
   //   onAccountpreviewOpen();
   // };
 
-  const handleHalfPayment = async () => {
-    const data = {
-      half_payment: halfAmount,
-      half_payment_status: "pending",
-    }
-    try {
-      half_payment.onClose()
-      const res = await axios.put(`${process.env.REACT_APP_BACKEND_URL}purchase/update/${halfAmountId.sale_id}`, data, {
-        headers: {
-          Authorization: `Bearer ${cookies?.access_token}`,
-        },
-      })
-      toast.success("Half Amount added");
-
-
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
   const handleVerifyImage = async () => {
     const data = {
@@ -260,7 +243,8 @@ const Task = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [cookies?.access_token, page])
+  }, [cookies?.access_token, page]);
+
   return (
     <section>
       <div className="min-h-screen p-6 text-gray-100">
@@ -311,7 +295,8 @@ const Task = () => {
                       Payment: {task.payment_status}
                     </Badge>
                   )}
-                  {typeof task?.payment_verify === 'boolean' && (
+                  {
+                    typeof task?.payment_verify === 'boolean' && (
                     <Badge colorScheme={colorChange(task.payment_verify)} fontSize="sm">
                       Payment Verification: {task.payment_verify ? "Verified" : "Not Verified"}
                     </Badge>
@@ -413,7 +398,7 @@ const Task = () => {
                     Add Token Amount
                   </Button>
                   
-                {task?.isTokenVerify && (
+                {/* {task?.isTokenVerify && ( */}
                   <Button
                     bgColor="white"
                     leftIcon={<FaCloudUploadAlt />}
@@ -423,13 +408,19 @@ const Task = () => {
                   >
                     Upload Invoice
                   </Button>
-                )}
+                {/* )} */}
                 {/* {task?.isSampleApprove && ( */}
                   <Button
                     bgColor="white"
                     _hover={{ bgColor: "blue.500" }}
                     className="border border-blue-500 hover:text-white"
-                    onClick={() => { half_payment.onOpen(); sethalfAmountId(task); }}
+                    // onClick={() => { half_payment.onOpen(); 
+                    // sethalfAmountId(task); }}
+                    onClick={() => {
+                      setShowToken(!showToken);
+                      setTokenAmount(task?.allsale?.half_payment);
+                      setSaleId(task.sale_id);
+                    }}
                   >
                     Add Half Payment
                   </Button>
@@ -471,6 +462,7 @@ const Task = () => {
       </div>
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
       <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
+      <AddhalfToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
     </section>
   )
 }
