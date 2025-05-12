@@ -1,8 +1,7 @@
 // @ts-nocheck
 
-import { get } from "http";
 import { useEffect, useState } from "react";
-import { Cookies, useCookies } from "react-cookie";
+import { useCookies } from "react-cookie";
 import { BiX } from "react-icons/bi";
 import axios from "axios";
 import {useToast} from "@chakra-ui/react";
@@ -100,10 +99,6 @@ const AddNewSale = ({ show, setShow, refresh }) => {
         }
     }
 
-    // const handleInputChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setFormData((prevData) => ({ ...prevData, [name]: value }));
-    // };
 
     useEffect(() => {
         fetchDropdownData()
@@ -221,7 +216,7 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                         </div>
                     </div>
 
-                    <div>
+                    <div>   
                         <label className="block text-sm font-medium">Remarks</label>
                         <input
                             type="text"

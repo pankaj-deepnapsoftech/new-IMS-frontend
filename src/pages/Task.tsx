@@ -32,10 +32,12 @@ import {
 } from "@chakra-ui/react";
 import { IoEyeSharp } from "react-icons/io5";
 import { NavLink, useNavigate } from "react-router-dom";
+import AddToken from "../components/Drawers/Task/AddToken";
 const Task = () => {
   const [cookies] = useCookies();
   const [tasks, setTasks] = useState([]);
   const [page, setPage] = useState(1);
+  const [showToken, setShowToken] = useState(false)
   const role = cookies?.role;
 
   console.log("user_role =", role)
@@ -361,7 +363,6 @@ const Task = () => {
               </VStack>
             </HStack>
 
-            {/* Role-Specific Actions */}
             {role?.toLowerCase().includes("prod") ? (
               <HStack className="space-x-3" mt={4}>
                 {task?.design_status === "Pending" && (
@@ -399,7 +400,8 @@ const Task = () => {
                     bgColor="white"
                     _hover={{ bgColor: "purple.500" }}
                     className="border border-purple-500 hover:text-white"
-                    onClick={() => handleTokenClick(task.sale_id, task.token_amt)}
+                    // onClick={() => handleTokenClick(task.sale_id, task.token_amt)}
+                      onClick={()=> setShowToken(!showToken)}
                   >
                     Add Token Amount
                   </Button>
@@ -461,6 +463,7 @@ const Task = () => {
 
       </div>
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
+      <AddToken  showToken={showToken} setShowToken={setShowToken}/>
     </section>
   )
 }
