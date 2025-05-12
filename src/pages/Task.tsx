@@ -477,7 +477,7 @@ const Task = () => {
                 </Button>
 
 
-                {task?.isTokenVerify && (
+                {/* {task?.isTokenVerify && ( */}
                   <Button
                     leftIcon={<FaCloudUploadAlt />}
                     bgGradient="linear(to-r, blue.400, blue.600)"
@@ -499,7 +499,7 @@ const Task = () => {
                     Upload Invoice
                   </Button>
 
-                )}
+                {/* )} */}
                 {/* {task?.isSampleApprove && ( */}
                   <Button
                     onClick={() => {

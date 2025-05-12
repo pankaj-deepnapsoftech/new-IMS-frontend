@@ -28,15 +28,12 @@ export const SalesFormValidation = Yup.object({
         .required('GST rate is required'),
 });
 
-
-
 export const AssignFormValidation = Yup.object({
     assined_to: Yup.string()
         .required('Assign selection is required'),
     assined_process: Yup.string()
         .required('Assined process field is required'),
 });
-
 
 export const AddtokenamtFormValidation = Yup.object({
     token_amt: Yup.number()
@@ -49,3 +46,19 @@ export const AddhalftokenFormValidation = Yup.object({
         .typeError('Half token amount must be a number')
         .required('Half token amount is required'),
 });
+
+export const InvoiceFormValidation = Yup.object({
+
+    invoice: Yup.mixed()
+        .required('Image is required')
+        .test(
+            'fileType',
+            'Only image files are allowed',
+            value => {
+                const file = value as File;
+                return file && ['image/jpeg', 'image/png', 'image/gif'].includes(file.type);
+            }
+        )
+});
+
+
