@@ -43,7 +43,7 @@ const Task = () => {
   const [halfAmountId, sethalfAmountId] = useState("")
   const [halfAmount, sethalfAmount] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const FetchAssineData = async () => {
+  const fetchTasks = async () => {
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}assined/get-assined?page=${page}`,
@@ -254,7 +254,7 @@ const Task = () => {
 
 
   useEffect(() => {
-    FetchAssineData();
+    fetchTasks();
   }, [cookies?.access_token, page])
   return (
     <section>
@@ -274,7 +274,7 @@ const Task = () => {
             placeholder="Search by Product or Manager"
             className=" rounded px-4 py-2 flex-grow bg-[#ffffff2a] text-gray-100"
           />
-          <button className="border border-blue-400 text-blue-400 px-4 py-1.5 rounded hover:bg-blue-400 hover:text-white transition-all duration-300">
+          <button onClick={fetchTasks} className="border border-blue-400 text-blue-400 px-4 py-1.5 rounded hover:bg-blue-400 hover:text-white transition-all duration-300">
             ⟳ Refresh
           </button>
         </div>
