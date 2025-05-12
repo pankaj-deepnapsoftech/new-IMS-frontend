@@ -1,10 +1,12 @@
 
 
 //@ts-nocheck
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { TbTruckDelivery } from "react-icons/tb";
 import { HiOutlinePaperClip } from "react-icons/hi";
 import { FiEye } from "react-icons/fi";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 
 const Dispatch = () => {
   const [paymentFilter, setPaymentFilter] = useState("All");
@@ -12,7 +14,42 @@ const Dispatch = () => {
   const [showModal, setShowModal] = useState(false);
   const [siteLink, setSiteLink] = useState("");
   const [trackingId, setTrackingId] = useState("");
+  const [DispatchData, setDispatchData] = useState([])
+  const [cookies] = useCookies()
+  const [FormData, setFormData] = useState({
+    tracking_id: "",
+    tracking_web: ""
+  })
 
+  const handleSubmit = async (e) => { 
+    e.preventDefault()
+    console.log(FormData)
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}dispatch/createDispatch`,FormData ,{
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies?.access_token}`,
+        },
+      })
+     
+      console.log(response.data)
+      setFormData({
+        tracking_id: "",
+        tracking_web: ""
+      })
+      setShowModal(false)
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((pre) => ({
+      ...pre,
+      [name]: value
+    }))
+  }
   const products = [
     {
       id: 1,
@@ -52,6 +89,24 @@ const Dispatch = () => {
     },
   ];
 
+  const GetDispatch = async () => {
+    try {
+      const data = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch`, {
+        headers: {
+          Authorization: `Bearer ${cookies.access_token}`
+        }
+      })
+      setDispatchData(data.data)
+      console.log(data.data);
+
+    } catch (error) {
+
+    }
+  }
+  useEffect(() => {
+    GetDispatch()
+  }, [])
+
   //Filter-Logic
   const filteredProducts = products.filter((product) => {
     const paymentMatch =
@@ -67,15 +122,14 @@ const Dispatch = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files[0];
     if (file) {
-      // console.log("Selected File:", file.name);
-      // TODO: Upload or store file here
+
     }
   };
 
   return (
     <div className="p-6">
       <h2 className="text-3xl font-semibold mb-10 text-white">
-       Dispatch
+        Dispatch
       </h2>
 
       <div className="flex flex-wrap justify-between items-end mb-6">
@@ -192,31 +246,35 @@ const Dispatch = () => {
             </div>
 
             {showModal && (
+                  <form onSubmit={handleSubmit}>
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                 <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg w-full max-w-md relative">
                   <h2 className="text-xl font-semibold mb-4">Dispatch</h2>
-                  <div className="mb-4">
-                    <label className="block font-medium mb-1">
-                      Delivery Site Link:
-                    </label>
-                    <input
-                      type="text"
-                      value={siteLink}
-                      onChange={(e) => setSiteLink(e.target.value)}
-                      className="w-full border border-gray-300 px-3 py-2 rounded"
-                    />
-                  </div>
-                  <div className="mb-6">
-                    <label className="block font-medium mb-1">
-                      Tracking ID:
-                    </label>
-                    <input
-                      type="text"
-                      value={trackingId}
-                      onChange={(e) => setTrackingId(e.target.value)}
-                      className="w-full border border-gray-300 px-3 py-2 rounded"
-                    />
-                  </div>
+                    <div className="mb-4">
+                      <label className="block font-medium mb-1">
+                        Delivery Site Link:
+                      </label>
+                      <input
+                        value={FormData.tracking_web}
+                        type="text"
+                        name="tracking_web"
+                        onChange={handleFormChange}
+                        className="w-full text-black border border-gray-300 px-3 py-2 rounded"
+                      />
+                    </div>
+                    <div className="mb-6">
+                      <label className="block font-medium mb-1">
+                        Tracking ID:
+                      </label>
+                      <input
+                        value={FormData.tracking_id}
+                        name="tracking_id"
+                        type="text"
+                        onChange={handleFormChange}
+                        className="w-full border text-black border-gray-300 px-3 py-2 rounded"
+                      />
+                    </div>
+            
                   <div className="flex justify-between">
                     <button
                       onClick={() => setShowModal(false)}
@@ -225,12 +283,7 @@ const Dispatch = () => {
                       Cancel
                     </button>
                     <button
-                      onClick={() => {
-                        // Handle submit here
-                        console.log("Site Link:", siteLink);
-                        console.log("Tracking ID:", trackingId);
-                        setShowModal(false);
-                      }}
+                      type="submit"
                       className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                     >
                       Submit & Save
@@ -244,6 +297,7 @@ const Dispatch = () => {
                   </button>
                 </div>
               </div>
+              </form>
             )}
 
             <div className="flex gap-4 mt-4 justify-center space-between">

@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react"
 import AssignEmployee from "../Drawers/Sales/AssignEmployee";
 import UploadInvoice from "../Drawers/Sales/UploadInvoice";
+import ViewPayment from "../Drawers/Sales/ViewPayment";
+import ViewDesign from "../Drawers/Sales/ViewDesign";
+import ApproveSample from "../Drawers/Sales/ApproveSample";
 const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
     const [show, setShow] = useState(false);
 
@@ -14,13 +17,15 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
     };
 
     const [selectedSale, setSelectedSale] = useState([]);
-    const [ showinvoice, setShowInvoice ] = useState(false)
-
+    const [showinvoice, setShowInvoice] = useState(false)
+    const [paymentshow, setPaymentshow] = useState(false)
+    const [isOpen, setViewDesign] = useState(false)
+    const [isChecked, setIsChecked] = useState(false)
     return (
         <>
             {filteredPurchases?.map((purchase: any) => (
                 <section className="relative" key={purchase?._id} >
-                    <UploadInvoice showinvoice={showinvoice} setShowInvoice={setShowInvoice}/>
+
                     <div className="rounded-xl shadow-lg text-white p-6 bg-[#1e1e2f4f] mb-4">
                         <div className="flex justify-between flex-wrap gap-4">
                             <div>
@@ -29,7 +34,7 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
                                     <span className="font-semibold">Date:</span> {new Date(purchase?.createdAt).toLocaleDateString()}
                                 </p>
                             </div>
-                     
+
                         </div>
 
                         <hr className="my-6 border-gray-600" />
@@ -46,16 +51,16 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
                                 purchase?.product_qty,
                                 purchase?.GST
                             ).toFixed(2)}</p>
-                    
+
                         </div>
 
                         <div className="flex flex-wrap gap-3 mt-6">
                             <button className="px-4 py-2 border border-gray-500 rounded-md text-sm hover:bg-gray-700" onClick={() => sendDataToParent(purchase)}>Edit</button>
-                            <button className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white">Approve Sample</button>
-                            <button className="px-4 py-2 border border-orange-500 text-orange-400 rounded-md text-sm hover:bg-orange-600 hover:text-white">View Design</button>
-                            <button className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white">View Delivery Proof</button>
-                            <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={()=> setShowInvoice(!showinvoice)}>Upload Invoice</button>
-                            <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black">View Payment</button>
+                            <button className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white" onClick={()=>setIsChecked(!isChecked)}>Approve Sample</button>
+                            <button className="px-4 py-2 border border-orange-500 text-orange-400 rounded-md text-sm hover:bg-orange-600 hover:text-white" onClick={()=>setViewDesign(!isOpen)}>View Design</button>
+                            <button className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white"><a href="https://images.unsplash.com/photo-1746483966639-b8dafcd05f5b?q=80&w=1288&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" target="_blank" >View Delivery Proof</a></button>
+                            <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setShowInvoice(!showinvoice)}>Upload Invoice</button>
+                            <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setPaymentshow(!paymentshow)}>View Payment</button>
                             <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onClick={() => {
                                 setShow(!show);
                                 setSelectedSale(purchase);
@@ -66,6 +71,10 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
             ))}
             <AssignEmployee show={show} setShow={setShow} employeeData={empData}
                 saleData={selectedSale} />
+            <ViewPayment paymentshow={paymentshow} setPaymentshow={setPaymentshow} />
+            <UploadInvoice showinvoice={showinvoice} setShowInvoice={setShowInvoice} />
+            <ViewDesign isOpen={isOpen}  setViewDesign={setViewDesign}/>
+            <ApproveSample  isChecked={isChecked} setIsChecked={setIsChecked}/>
         </>
 
     )
