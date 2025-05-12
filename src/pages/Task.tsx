@@ -6,7 +6,7 @@ import { useCookies } from "react-cookie"
 import Pagination from "./Pagination";
 import { toast } from "react-toastify";
 
-import { FaCheck, FaCloudUploadAlt, FaUpload } from "react-icons/fa";
+import { FaCheck, FaCheckCircle, FaCloudUploadAlt, FaDollarSign, FaHourglassHalf, FaMoneyBillWave, FaMoneyCheckAlt, FaShieldAlt, FaTimesCircle, FaUpload } from "react-icons/fa";
 import {
   // Box,
   VStack,
@@ -14,6 +14,7 @@ import {
   Text,
   Button,
   Badge,
+  Icon,
   // Input,
   // Modal,
   // ModalOverlay,
@@ -35,14 +36,15 @@ import { NavLink, useNavigate } from "react-router-dom";
 import AddToken from "../components/Drawers/Task/AddToken";
 import AddhalfToken from "../components/Drawers/Task/AddhalfToken";
 
+import UploadInvoice from "../components/Drawers/Task/UploadInvoice";
 const Task = () => {
   const [cookies] = useCookies();
   const [tasks, setTasks] = useState([]);
   const [page, setPage] = useState(1);
-  const [showToken, setShowToken] = useState(false);
+  const [showToken, setShowToken] = useState(false)
+  const [showUploadInvoice, setShowUploadInvoice] = useState(false)
   const [saleId, setSaleId] = useState("");
   const [tokenAmount, setTokenAmount] = useState();
-
   const role = cookies?.role;
 
   console.log("user_role =", role)
@@ -60,7 +62,7 @@ const Task = () => {
           },
         }
       );
-      const tasks = response.data.data.map((task:any) => {
+      const tasks = response.data.data.map((task: any) => {
         const sale = task?.sale_id?.length ? task.sale_id[0] : null;
         const product = sale?.product_id?.length ? sale.product_id[0] : null;
         const assign = task?.assined_by?.length ? task.assined_by[0] : null;
@@ -72,7 +74,7 @@ const Task = () => {
           : null;
 
 
-        
+
 
         return {
           id: task?._id,
@@ -249,19 +251,17 @@ const Task = () => {
     <section>
       <div className="min-h-screen p-6 text-gray-100">
         <h1 className="text-3xl font-bold mb-6">Tasks</h1>
-
-
         <div className="flex flex-wrap items-center gap-4 mb-8">
-          <select className=" rounded px-4 py-2 bg-[#ffffff2a] text-gray-100">
-            <option className="text-black">Select Status</option>
-            <option className="text-black">Under Processing</option>
-            <option className="text-black">Completed</option>
+          <select className=" rounded px-4 py-2 bg-[#646b75] focus:outline-none text-gray-100">
+            <option className="text-white">Select Status</option>
+            <option className="text-white">Under Processing</option>
+            <option className="text-white">Completed</option>
           </select>
-          <input type="date" className=" styled-date rounded px-4 py-2 bg-[#ffffff2a] text-gray-100 placeholder:text-gray-100" />
+          <input type="date" className=" styled-date rounded focus:outline-none px-4 py-2 bg-[#ffffff2a] text-gray-100 placeholder:text-gray-100" />
           <input
             type="text"
             placeholder="Search by Product or Manager"
-            className=" rounded px-4 py-2 flex-grow bg-[#ffffff2a] text-gray-100"
+            className=" focus:outline-none rounded px-4 py-2 flex-grow bg-[#ffffff2a] text-gray-100"
           />
           <button onClick={fetchTasks} className="border border-blue-400 text-blue-400 px-4 py-1.5 rounded hover:bg-blue-400 hover:text-white transition-all duration-300">
             ⟳ Refresh
@@ -269,54 +269,122 @@ const Task = () => {
         </div>
 
         {tasks.map((task: any) => (
-          <div key={task?._id} className="rounded-md shadow-md p-6 bg-[#ffffff2a]">
-            {/* Role-Based Badges */}
+          <div key={task?._id} className="rounded-md shadow-md p-6 bg-[#ffffff2a] mb-4">
+
             <div className="flex flex-wrap gap-2 mt-6">
               {["acc", "account", "accountant", "dispatch", "dis"].includes(role?.toLowerCase()) && (
-                <>
+                <HStack wrap="wrap" spacing={2}>
                   {task?.token_amt && !task?.token_status && (
-                    <Badge colorScheme="orange" fontSize="sm">Token Amount: Pending</Badge>
+                    <Badge
+                      colorScheme="orange"
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Icon as={FaHourglassHalf} />
+                      Token: Pending
+                    </Badge>
                   )}
+
                   {task?.token_amt && task?.token_status && (
-                    <Badge colorScheme="green" fontSize="sm">Token Amount: Paid</Badge>
+                    <Badge
+                      colorScheme="green"
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Icon as={FaCheckCircle} />
+                      Token: Paid
+                    </Badge>
                   )}
-                  {typeof task?.isTokenVerify === 'boolean' && (
-                    <Badge colorScheme={task.isTokenVerify ? "green" : "orange"} fontSize="sm">
+
+                  {typeof task?.isTokenVerify === "boolean" && (
+                    <Badge
+                      colorScheme={task.isTokenVerify ? "green" : "orange"}
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Icon as={task.isTokenVerify ? FaShieldAlt : FaHourglassHalf} />
                       Token Verification: {task.isTokenVerify ? "Verified" : "Pending"}
                     </Badge>
                   )}
+
                   {task?.allsale?.half_payment_status && (
-                    <Badge colorScheme="green" fontSize="sm">
-                      Half Payment Status: {task.allsale.half_payment_status}
+                    <Badge
+                      colorScheme="green"
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Icon as={FaMoneyCheckAlt} />
+                      Half Payment: {task.allsale.half_payment_status}
                     </Badge>
                   )}
+
                   {task?.payment_status && (
-                    <Badge colorScheme={colorChange(task.payment_status)} fontSize="sm">
+                    <Badge
+                      colorScheme={colorChange(task.payment_status)}
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Icon as={FaDollarSign} />
                       Payment: {task.payment_status}
                     </Badge>
                   )}
-                  {
-                    typeof task?.payment_verify === 'boolean' && (
-                    <Badge colorScheme={colorChange(task.payment_verify)} fontSize="sm">
+
+                  {typeof task?.payment_verify === "boolean" && (
+                    <Badge
+                      colorScheme={colorChange(task.payment_verify)}
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Icon as={task.payment_verify ? FaCheckCircle : FaTimesCircle} />
                       Payment Verification: {task.payment_verify ? "Verified" : "Not Verified"}
                     </Badge>
                   )}
-                </>
+                </HStack>
               )}
             </div>
 
-            {/* Detail Columns */}
+
             <HStack justify="space-between" spacing={3} mt={3} flexWrap="wrap" align="start" gap={4}>
               <VStack align="start" w={{ base: "100%", md: "48%" }}>
                 {(role === "Accountant" || role === "Sales" || role === "admin") && (
-                  <Text fontSize="sm"><strong>Product Price:</strong> {task?.productPrice}</Text>
+                  <Text fontSize="sm" ><strong>Product Price:</strong> {task?.productPrice}</Text>
                 )}
-                <Text fontSize="sm"><strong>Quantity:</strong> {task?.productQuantity}</Text>
+                <Text fontSize="sm" ><strong>Quantity:</strong> {task?.productQuantity}</Text>
                 {["acc", "account", "accountant", "dispatch", "dis"].includes(role?.toLowerCase()) && (
                   <>
-                    <Text fontSize="sm"><strong>Customer:</strong> {task?.customer_name}</Text>
-                    <Text fontSize="sm"><strong>Sale By:</strong> {task?.sale_by}</Text>
-                    <Text fontSize="sm"><strong>Assigned By:</strong> {task?.assignedBy}</Text>
+                    <Text fontSize="sm" ><strong>Customer:</strong> {task?.customer_name}</Text>
+                    <Text fontSize="sm" ><strong>Sale By:</strong> {task?.sale_by}</Text>
+                    <Text fontSize="sm" ><strong>Assigned By:</strong> {task?.assignedBy}</Text>
                   </>
                 )}
               </VStack>
@@ -327,14 +395,14 @@ const Task = () => {
                   <Text fontSize="sm"><strong>Remarks:</strong> {task.assinedby_comment}</Text>
                 )}
                 {task?.sample_bom_name && (
-                  <Text fontSize="sm" color="blue"><strong className="text-black">Sample BOM Name:</strong> {task.sample_bom_name}</Text>
+                  <Text fontSize="sm" color="gray.200"><strong className="text-white">Sample BOM Name:</strong> {task.sample_bom_name}</Text>
                 )}
                 {task?.bom_name && (
-                  <Text fontSize="sm" color="blue"><strong className="text-black">BOM Name:</strong> {task.bom_name}</Text>
+                  <Text fontSize="sm" color="gray.200"><strong className="text-white">BOM Name:</strong> {task.bom_name}</Text>
                 )}
                 {task?.token_ss && (
                   <Text
-                    className="text-blue-500 underline text-sm cursor-pointer"
+                    className="text-green-500 font-[600]  text-sm underline underline-offset-4 cursor-pointer"
                     onClick={() => handlePayment(task.sale_id, task.token_ss, task.isTokenVerify, task.id, "token")}
                   >
                     View Token Proof
@@ -383,61 +451,80 @@ const Task = () => {
                     Accept Task
                   </Button>
                 )}
-                
+
+                <Button
+                  bgGradient="linear(to-r, purple.400, purple.600)"
+                  color="white"
+                  fontWeight="bold"
+                  px="6"
+                  py="3"
+                  borderRadius="md"
+                  boxShadow="lg"
+                  _hover={{
+                    bgGradient: "linear(to-r, purple.600, purple.800)",
+                    boxShadow: "xl",
+                    transform: "scale(1.02)",
+                  }}
+                  transition="all 0.3s ease-in-out"
+                  onClick={() => {
+                    setShowToken(!showToken);
+                    setTokenAmount(task.token_amt);
+                    setSaleId(task.sale_id);
+                  }}
+                // onClick={() => handleTokenClick(task.sale_id, task.token_amt)}
+                >
+                  Add Token Amount
+                </Button>
+
+
+                {task?.isTokenVerify && (
                   <Button
-                    bgColor="white"
-                    _hover={{ bgColor: "purple.500" }}
-                    className="border border-purple-500 hover:text-white"
-                    // onClick={() => handleTokenClick(task.sale_id, task.token_amt)}
-                    onClick={() => {
-                      setShowToken(!showToken);
-                      setTokenAmount(task.token_amt);
-                      setSaleId(task.sale_id);
-                    }}
-                  >
-                    Add Token Amount
-                  </Button>
-                  
-                {/* {task?.isTokenVerify && ( */}
-                  <Button
-                    bgColor="white"
                     leftIcon={<FaCloudUploadAlt />}
-                    _hover={{ bgColor: "blue.500" }}
-                    className="border border-blue-500 hover:text-white"
-                    onClick={() => handleInvoiceUpload(task.sale_id, task.invoice)}
+                    bgGradient="linear(to-r, blue.400, blue.600)"
+                    color="white"
+                    fontWeight="semibold"
+                    px="6"
+                    py="3"
+                    borderRadius="md"
+                    boxShadow="md"
+                    _hover={{
+                      bgGradient: "linear(to-r, blue.500, blue.700)",
+                      boxShadow: "lg",
+                      transform: "translateY(-2px)",
+                    }}
+                    transition="all 0.2s ease-in-out"
+                    // onClick={() => handleInvoiceUpload(task.sale_id, task.invoice)}
+                    onClick={()=>setShowUploadInvoice(!showUploadInvoice)}
                   >
                     Upload Invoice
                   </Button>
-                {/* )} */}
+
+                )}
                 {/* {task?.isSampleApprove && ( */}
                   <Button
-                    bgColor="white"
-                    _hover={{ bgColor: "blue.500" }}
-                    className="border border-blue-500 hover:text-white"
-                    // onClick={() => { half_payment.onOpen(); 
-                    // sethalfAmountId(task); }}
                     onClick={() => {
                       setShowToken(!showToken);
                       setTokenAmount(task?.allsale?.half_payment);
                       setSaleId(task.sale_id);
                     }}
+                    leftIcon={<FaMoneyBillWave />}
+                    bgGradient="linear(to-r, teal.400, teal.600)"
+                    color="white"
+                    fontWeight="semibold"
+                    px="6"
+                    py="3"
+                    borderRadius="md"
+                    boxShadow="md"
+                    _hover={{
+                      bgGradient: "linear(to-r, teal.500, teal.700)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "lg",
+                    }}
+                    transition="all 0.2s ease-in-out"
                   >
                     Add Half Payment
                   </Button>
-                {/* )} */}
-                {task?.customer_pyement_ss && (
-                  <Button
-                    bgColor="white"
-                    leftIcon={<IoEyeSharp />}
-                    _hover={{ bgColor: "orange.500" }}
-                    className="border border-orange-500 hover:text-white"
-                    onClick={() =>
-                      handlePayment(task.sale_id, task.customer_pyement_ss, task.payment_verify, task.id, "payment")
-                    }
-                  >
-                    View Payment
-                  </Button>
-                )}
+           
                 <Text fontSize="sm"><strong>Date:</strong> {task.date}</Text>
               </HStack>
             ) : (
@@ -448,7 +535,7 @@ const Task = () => {
                       Accept Task
                     </Button>
                   )}
-                  
+
                 </VStack>
 
                 <VStack align="end">
@@ -462,6 +549,7 @@ const Task = () => {
       </div>
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
       <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
+      <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice}/>
       <AddhalfToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
     </section>
   )

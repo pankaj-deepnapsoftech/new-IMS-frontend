@@ -21,17 +21,17 @@ const Dispatch = () => {
     tracking_web: ""
   })
 
-  const handleSubmit = async (e) => { 
+  const handleSubmit = async (e) => {
     e.preventDefault()
     console.log(FormData)
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}dispatch/createDispatch`,FormData ,{
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}dispatch/createDispatch`, FormData, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${cookies?.access_token}`,
         },
       })
-     
+
       console.log(response.data)
       setFormData({
         tracking_id: "",
@@ -246,10 +246,10 @@ const Dispatch = () => {
             </div>
 
             {showModal && (
-                  <form onSubmit={handleSubmit}>
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0000003f] bg-opacity-50">
-                <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg w-full max-w-md relative">
-                  <h2 className="text-xl font-semibold mb-4">Dispatch</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0000003f] bg-opacity-50">
+                  <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg w-full max-w-md relative">
+                    <h2 className="text-xl font-semibold mb-4">Dispatch</h2>
                     <div className="mb-4">
                       <label className="block font-medium mb-1">
                         Delivery Site Link:
@@ -259,7 +259,7 @@ const Dispatch = () => {
                         type="text"
                         name="tracking_web"
                         onChange={handleFormChange}
-                        className="w-full text-black border border-gray-300 px-3 py-2 rounded"
+                        className="w-full text-gray-200 border bg-transparent focus:outline border-gray-300 px-3 py-2 rounded"
                       />
                     </div>
                     <div className="mb-6">
@@ -271,32 +271,32 @@ const Dispatch = () => {
                         name="tracking_id"
                         type="text"
                         onChange={handleFormChange}
-                        className="w-full border text-black border-gray-300 px-3 py-2 rounded"
+                        className="w-full border text-gray-200 bg-transparent focus:outline border-gray-300 px-3 py-2 rounded"
                       />
                     </div>
-            
-                  <div className="flex justify-between">
+
+                    <div className="flex justify-between">
+                      <button
+                        onClick={() => setShowModal(false)}
+                        className="px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-white"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                      >
+                        Submit & Save
+                      </button>
+                    </div>
                     <button
                       onClick={() => setShowModal(false)}
-                      className="px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-white"
+                      className="absolute top-2 right-2 text-white hover:text-gray-400"
                     >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                    >
-                      Submit & Save
+                      ✕
                     </button>
                   </div>
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="absolute top-2 right-2 text-white hover:text-gray-400"
-                  >
-                    ✕
-                  </button>
                 </div>
-              </div>
               </form>
             )}
 
@@ -305,11 +305,11 @@ const Dispatch = () => {
                 className="flex items-center gap-2 px-4 py-2 border border-green-500 text-green-600 rounded hover:bg-green-500 hover:text-white transition-all duration-300"
                 onClick={() => setShowModal(true)}
               >
-                <TbTruckDelivery/> Dispatch
+                <TbTruckDelivery /> Dispatch
               </button>
 
               <button className="flex items-center gap-2 px-4 py-2 border border-yellow-400 text-yellow-500 rounded hover:bg-yellow-500 hover:text-white transition-all duration-300">
-                <FiEye  /> View Delivery Proof
+                <a href="https://rtpasbackend.deepmart.shop/images/delivery-74712863-4179-4830-bdc0-9c60f8b31fbd.jpg" target="_blank" className="flex items-center gap-2" > <FiEye /> View Delivery Proof</a>
               </button>
               <>
                 <input
@@ -322,7 +322,7 @@ const Dispatch = () => {
                   className="flex items-center gap-2 px-4 py-2 border border-sky-600 text-sky-500 rounded hover:bg-sky-600 hover:text-white transition-all duration-300"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <HiOutlinePaperClip  /> Attach Delivery Proof
+                  <HiOutlinePaperClip /> Attach Delivery Proof
                 </button>
               </>
             </div>
