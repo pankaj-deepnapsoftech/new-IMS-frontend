@@ -7,7 +7,7 @@ import { useToast, Badge } from '@chakra-ui/react';
 import { AddhalftokenFormValidation } from "../../../Validation/SalesformValidation";
 import { useFormik } from "formik";
 import { useState } from "react";
-const AddhalfToken = ({ showToken, setShowToken, tokenAmount, sale, refresh }) => {
+const AddhalfToken = ({ showhalfToken, setShowhalfToken, tokenAmount, sale, refresh }) => {
   const toast = useToast();
   const [cookies] = useCookies();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -40,7 +40,7 @@ const AddhalfToken = ({ showToken, setShowToken, tokenAmount, sale, refresh }) =
               half_payment: "",
           });
 
-          setShowToken(!showToken)
+          setShowhalfToken(!showhalfToken)
           refresh();
         } catch (error) {
           console.error('Error submitting amount:', error);
@@ -59,11 +59,11 @@ const AddhalfToken = ({ showToken, setShowToken, tokenAmount, sale, refresh }) =
   })
 
     return (
-        <section className={`fixed ${showToken ? "flex" : "hidden"} inset-0 z-50 h-screen items-center justify-center bg-black bg-opacity-60`}>
+      <section className={`fixed ${showhalfToken ? "flex" : "hidden"} inset-0 z-50 h-screen items-center justify-center bg-black bg-opacity-60`}>
         <div className="bg-[#1C3644] text-white w-full max-w-md p-6 rounded-2xl shadow-2xl space-y-6 relative">
 
             <button
-            onClick={() => setShowToken(false)}
+            onClick={() => setShowhalfToken(false)}
             className="absolute top-4 right-4 text-white hover:text-red-400 transition"
             >
             <X size={24} />

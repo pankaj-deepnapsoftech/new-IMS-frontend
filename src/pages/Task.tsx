@@ -44,6 +44,7 @@ const Task = () => {
   const [tasks, setTasks] = useState([]);
   const [page, setPage] = useState(1);
   const [showToken, setShowToken] = useState(false)
+  const [showhalfToken, setShowhalfToken] = useState(false)
   const [showUploadInvoice, setShowUploadInvoice] = useState(false)
   const [saleId, setSaleId] = useState("");
   const [tokenAmount, setTokenAmount] = useState();
@@ -520,7 +521,7 @@ const Task = () => {
                 {/* {task?.isSampleApprove && ( */}
                 <Button
                   onClick={() => {
-                    setShowToken(!showToken);
+                      setShowhalfToken(!showhalfToken);
                     setTokenAmount(task?.allsale?.half_payment);
                     setSaleId(task.sale_id);
                   }}
@@ -567,7 +568,7 @@ const Task = () => {
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
       <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
       <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice} sale={saleId} invoicefile={invoicefile} />
-      <AddhalfToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
+      <AddhalfToken showhalfToken={showhalfToken} setShowhalfToken={setShowhalfToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
     </section>
   )
 }
