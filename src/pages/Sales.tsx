@@ -107,8 +107,6 @@ const Sales = () => {
                     <h1 className="text-white font-semibold text-3xl text-center mb-8">
                         Sales
                     </h1>
-
-     
                     <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-6">
                         <input
                             type="text"
