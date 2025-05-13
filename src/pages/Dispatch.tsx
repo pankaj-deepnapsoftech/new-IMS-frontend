@@ -11,8 +11,11 @@ import { toast } from "react-toastify";
 import { X } from "lucide-react";
 import { DispatchFormSchema } from "../Validation/DispatchFormValidation";
 import { useFormik } from "formik";
+import Loading from "../ui/Loading";
+import EmptyData from "../ui/emptyData";
 const Dispatch = () => {  
   const [paymentFilter, setPaymentFilter] = useState("All");
+  const[isLoading, setIsLoading] = useState(true)
   const [productFilter, setProductFilter] = useState("All");
   const [showModal, setShowModal] = useState(false);
   const [siteLink, setSiteLink] = useState("");
@@ -34,6 +37,7 @@ const Dispatch = () => {
     },
     validationSchema: DispatchFormSchema,
     onSubmit: async (values) => {
+    
       console.log(values)
       try {
         const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}dispatch/createDispatch`, values, {
@@ -49,13 +53,6 @@ const Dispatch = () => {
       } catch (error) {
         console.log(error)
       }
-      //   console.log(response)
-      //   resetForm()
-      //   setShowModal(false)
-      // } catch (error) {
-      //   console.log(error)
-      // }
-
     }
   })
 
@@ -63,6 +60,7 @@ const Dispatch = () => {
 
   const GetDispatch = async () => {
     try {
+      setIsLoading(true)
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch`, {
         headers: {
           Authorization: `Bearer ${cookies.access_token}`
@@ -71,8 +69,10 @@ const Dispatch = () => {
       setData(response?.data?.data)
       // console.log(data.data)
     } catch (error) {
-
-    }
+        console.log(error)
+    }finally{
+      setIsLoading(false)
+  }
   }
   useEffect(() => {
     GetDispatch()
@@ -94,6 +94,13 @@ const Dispatch = () => {
     return totalPrice;
   };
 
+
+  if(isLoading){
+    return <Loading/>
+  }
+  if(!data || data.length === 0){
+    return <EmptyData/>
+  }
   return (
     <>
     <div className="p-6">
@@ -137,9 +144,10 @@ const Dispatch = () => {
         <div className="mt-4 md:mt-0">
           <button
             className="flex items-center gap-2 px-4 py-2 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-500 hover:text-white transition-colors"
-            onClick={() => {
+            onClick={() =>  {
               setPaymentFilter("All");
               setProductFilter("All");
+              GetDispatch()
             }}
           >
             <svg
@@ -224,7 +232,7 @@ const Dispatch = () => {
                 </div>
               </div>
 
-              <div className="flex gap-4 mt-4 justify-center">
+              <div className="flex gap-4 mt-4 justify-end">
                 {acc?.Sale_id[0]?.payment_verify === true && (
                   <button
                     className="flex items-center gap-2 px-4 py-2 border border-green-500 text-green-600 rounded hover:bg-green-500 hover:text-white transition-all duration-300"
@@ -274,7 +282,7 @@ const Dispatch = () => {
               <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg w-full max-w-md relative">
                 <h2 className="text-xl font-semibold mb-4 text-white">Dispatch</h2>
                 <div className="mb-4">
-                  <label className="block font-medium mb-1">
+                  <label className="block font-medium mb-1 text-white">
                     Delivery Site Link:
                   </label>
                   <input
@@ -291,7 +299,7 @@ const Dispatch = () => {
                 </div>
 
                 <div className="mb-6">
-                  <label className="block font-medium mb-1">
+                  <label className="block font-medium mb-1 text-white">
                     Tracking ID:
                   </label>
                   <input
@@ -309,7 +317,7 @@ const Dispatch = () => {
 
                 <div className="flex justify-between">
                   <button
-                    onClick={() => setShowModal(false)}
+                    onClick={() =>{ setShowModal(false);  resetForm();}}
                     className="px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-white"
                   >
                     Cancel
@@ -322,7 +330,7 @@ const Dispatch = () => {
                   </button>
                 </div>
                 <button
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {setShowModal(false);  resetForm()}}
                   className="absolute top-2 right-2 text-white hover:text-gray-400"
                 >
                   ✕
