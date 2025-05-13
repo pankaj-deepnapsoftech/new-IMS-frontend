@@ -21,6 +21,10 @@ const Dispatch = () => {
   const [data, setData] = useState([]);
   const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("");
   const [selectedProductStatus, setSelectedProductStatus] = useState("");
+
+  const [showattachment, setShowAttachment] = useState(false)
+  const [preview, setPreview] = useState(null);
+  const [fileName, setFileName] = useState('');
   
   const role = cookies?.role;
   const { handleBlur, handleChange, handleSubmit, resetForm, values, errors, touched } = useFormik({
@@ -59,12 +63,12 @@ const Dispatch = () => {
 
   const GetDispatch = async () => {
     try {
-      const data = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch`, {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch`, {
         headers: {
           Authorization: `Bearer ${cookies.access_token}`
         }
       })
-      setDispatchData(data.data)
+      setData(response?.data?.data)
       // console.log(data.data)
     } catch (error) {
 
@@ -74,16 +78,6 @@ const Dispatch = () => {
     GetDispatch()
   }, [])
 
-
-  const filteredProducts = products.filter((product) => {
-    const paymentMatch =
-      paymentFilter === "All" ||
-      product.paymentStatus.toUpperCase() === paymentFilter.toUpperCase();
-    const productMatch =
-      productFilter === "All" ||
-      product.productStatus.toUpperCase() === productFilter.toUpperCase();
-    return paymentMatch && productMatch;
-  });
   const fileInputRef = useRef(null);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
