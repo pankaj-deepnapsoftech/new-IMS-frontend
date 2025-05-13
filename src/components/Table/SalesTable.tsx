@@ -15,7 +15,7 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
         const totalPrice = basePrice + gstVal;
         return totalPrice;
     };
-
+    console.log(filteredPurchases)
     const [selectedSale, setSelectedSale] = useState([]);
     const [showinvoice, setShowInvoice] = useState(false)
     const [paymentshow, setPaymentshow] = useState(false)
@@ -30,11 +30,13 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
                         <div className="flex justify-between flex-wrap gap-4">
                             <div>
                                 <h2 className="font-semibold text-lg text-white">Created By: <span className="text-blue-400">{purchase?.user_id[0]?.first_name || "N/A"}</span></h2>
-                                <p className="text-sm text-gray-300">
+                                <p className="text-sm text-gray-300 ">
                                     <span className="font-semibold">Date:</span> {new Date(purchase?.createdAt).toLocaleDateString()}
                                 </p>
                             </div>
-
+                            <div>
+                                <p className="text-sm bg-gradient-to-r to-green-600 from-green-700 px-4 py-1.5 shadow-md rounded-md">SALE APPROVE : <span className="text-sm uppercase"> {purchase.Status} </span></p>
+                            </div>
                         </div>
 
                         <hr className="my-6 border-gray-600" />
