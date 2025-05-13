@@ -156,6 +156,7 @@ const Sales = () => {
                             filteredPurchases={filteredPurchases}
                             sendDataToParent={handleDataFromChild}
                             empData={employees}
+                            isLoading={isLoading} 
                         />
                     </div>
                 </div>
