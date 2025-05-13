@@ -45,12 +45,12 @@ const Dispatch = () => {
       } catch (error) {
         console.log(error)
       }
-        console.log(response)
-        resetForm()
-        setShowModal(false)
-      } catch (error) {
-        console.log(error)
-      }
+      //   console.log(response)
+      //   resetForm()
+      //   setShowModal(false)
+      // } catch (error) {
+      //   console.log(error)
+      // }
 
     }
   })
@@ -101,6 +101,7 @@ const Dispatch = () => {
   };
 
   return (
+    <>
     <div className="p-6">
       <h2 className="text-3xl font-semibold mb-10 text-white">
         Dispatch
