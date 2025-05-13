@@ -37,6 +37,8 @@ import AddToken from "../components/Drawers/Task/AddToken";
 import AddhalfToken from "../components/Drawers/Task/AddhalfToken";
 
 import UploadInvoice from "../components/Drawers/Task/UploadInvoice";
+import Loading from "../ui/Loading";
+import EmptyData from "../ui/emptyData";
 const Task = () => {
   const [cookies] = useCookies();
   const [tasks, setTasks] = useState([]);
@@ -53,9 +55,10 @@ const Task = () => {
   const [halfAmountId, sethalfAmountId] = useState("")
   const [halfAmount, sethalfAmount] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
+  const [isLoading, setIsLoading] = useState(true);
   const fetchTasks = async () => {
     try {
+      setIsLoading(true)
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}assined/get-assined?page=${page}`,
         {
@@ -116,8 +119,12 @@ const Task = () => {
     } catch (error) {
       console.log(error);
 
+    } finally {
+      setIsLoading(false);
     }
   }
+
+
   const navigate = useNavigate();
 
   const handleAccept = async (id) => {
@@ -242,6 +249,15 @@ const Task = () => {
   useEffect(() => {
     fetchTasks();
   }, [cookies?.access_token, page]);
+
+
+  if (isLoading) {
+    return <Loading />
+  }
+  if (!tasks || tasks.length === 0) { 
+    return <EmptyData />
+   }
+
 
   return (
     <section>
@@ -474,58 +490,58 @@ const Task = () => {
 
 
                 {/* {task?.isTokenVerify && ( */}
-                  <Button
-                    leftIcon={<FaCloudUploadAlt />}
-                    bgGradient="linear(to-r, blue.400, blue.600)"
-                    color="white"
-                    fontWeight="semibold"
-                    px="6"
-                    py="3"
-                    borderRadius="md"
-                    boxShadow="md"
-                    _hover={{
-                      bgGradient: "linear(to-r, blue.500, blue.700)",
-                      boxShadow: "lg",
-                      transform: "translateY(-2px)",
-                    }}
-                    transition="all 0.2s ease-in-out"
-                    // onClick={() => handleInvoiceUpload(task.sale_id, task.invoice)}
-                    onClick={()=> {
-                      setShowUploadInvoice(!showUploadInvoice);
-                      setSaleId(task?.sale_id);
-                      setInvoiceFile(task?.invoice);
-                    }
-                     }
-                  >
-                    Upload Invoice
-                  </Button>
+                <Button
+                  leftIcon={<FaCloudUploadAlt />}
+                  bgGradient="linear(to-r, blue.400, blue.600)"
+                  color="white"
+                  fontWeight="semibold"
+                  px="6"
+                  py="3"
+                  borderRadius="md"
+                  boxShadow="md"
+                  _hover={{
+                    bgGradient: "linear(to-r, blue.500, blue.700)",
+                    boxShadow: "lg",
+                    transform: "translateY(-2px)",
+                  }}
+                  transition="all 0.2s ease-in-out"
+                  // onClick={() => handleInvoiceUpload(task.sale_id, task.invoice)}
+                  onClick={() => {
+                    setShowUploadInvoice(!showUploadInvoice);
+                    setSaleId(task?.sale_id);
+                    setInvoiceFile(task?.invoice);
+                  }
+                  }
+                >
+                  Upload Invoice
+                </Button>
 
                 {/* )} */}
                 {/* {task?.isSampleApprove && ( */}
-                  <Button
-                    onClick={() => {
-                      setShowToken(!showToken);
-                      setTokenAmount(task?.allsale?.half_payment);
-                      setSaleId(task.sale_id);
-                    }}
-                    leftIcon={<FaMoneyBillWave />}
-                    bgGradient="linear(to-r, teal.400, teal.600)"
-                    color="white"
-                    fontWeight="semibold"
-                    px="6"
-                    py="3"
-                    borderRadius="md"
-                    boxShadow="md"
-                    _hover={{
-                      bgGradient: "linear(to-r, teal.500, teal.700)",
-                      transform: "translateY(-2px)",
-                      boxShadow: "lg",
-                    }}
-                    transition="all 0.2s ease-in-out"
-                  >
-                    Add Half Payment
-                  </Button>
-           
+                <Button
+                  onClick={() => {
+                    setShowToken(!showToken);
+                    setTokenAmount(task?.allsale?.half_payment);
+                    setSaleId(task.sale_id);
+                  }}
+                  leftIcon={<FaMoneyBillWave />}
+                  bgGradient="linear(to-r, teal.400, teal.600)"
+                  color="white"
+                  fontWeight="semibold"
+                  px="6"
+                  py="3"
+                  borderRadius="md"
+                  boxShadow="md"
+                  _hover={{
+                    bgGradient: "linear(to-r, teal.500, teal.700)",
+                    transform: "translateY(-2px)",
+                    boxShadow: "lg",
+                  }}
+                  transition="all 0.2s ease-in-out"
+                >
+                  Add Half Payment
+                </Button>
+
                 <Text fontSize="sm"><strong>Date:</strong> {task.date}</Text>
               </HStack>
             ) : (
@@ -550,7 +566,7 @@ const Task = () => {
       </div>
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
       <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
-      <UploadInvoice  showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice} sale={saleId} invoicefile={invoicefile}  />
+      <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice} sale={saleId} invoicefile={invoicefile} />
       <AddhalfToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
     </section>
   )

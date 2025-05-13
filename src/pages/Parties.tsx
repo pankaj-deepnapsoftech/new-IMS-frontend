@@ -2,20 +2,46 @@
 import { MdOutlineRefresh } from "react-icons/md";
 import AddParties from "../components/Drawers/Parties/AddParties";
 import PartiesTable from "../components/Table/PartiesTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
+import Pagination from "./Pagination";
 
 const Parties = () => {
     const [showData, setshowData] = useState(false);
     const [counter, setCounter] = useState(0);
-    const [trigger, settrigger] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedType, setSelectedType] = useState('');
     const [selectedRole, setSelectedRole] = useState('');
-
-    const allparties = () => {
-        settrigger(prev => !prev);
-        setCounter(prev => prev + 1);
+    const [partiesData, setPartiesData] = useState([]);
+    const [cookies] = useCookies();
+    const [isLoading, setIsLoading] = useState(true);
+    const [pages, setPages] = useState(1)
+    const fetchPartiesData = async () => {
+        try {
+            setIsLoading(true)
+            const res = await fetch(
+                `${process.env.REACT_APP_BACKEND_URL}parties/get`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${cookies.access_token}`,
+                    },
+                }
+            );
+            const data = await res.json();
+            setPartiesData(data.data);
+        } catch (error) {
+            console.log(error);
+        
+        }finally {
+            setIsLoading(false);
+        }
     };
+
+    useEffect(() => {
+        fetchPartiesData();
+    }, [counter]);
+
 
     return (
         <section className="w-full px-4 py-6">
@@ -63,7 +89,7 @@ const Parties = () => {
                     Add New Parties
                 </button>
                 <button
-                    onClick={allparties}
+                    onClick={fetchPartiesData}
                     className="w-full md:w-auto px-4 py-2 text-white border border-white flex items-center justify-center rounded-md gap-2 hover:bg-white hover:text-black transition-all duration-300"
                 >
                     <MdOutlineRefresh />
@@ -71,17 +97,19 @@ const Parties = () => {
                 </button>
             </div>
 
-            {/* Table */}
             <PartiesTable
                 counter={counter}
-                trigger={trigger}
                 searchTerm={searchTerm}
                 selectedType={selectedType}
                 selectedRole={selectedRole}
+                partiesData={partiesData}
+                setPartiesData={setPartiesData}
+                isLoading={isLoading}
             />
 
-            {/* Drawer */}
+            
             <AddParties showData={showData} setshowData={setshowData} setCounter={setCounter} />
+            <Pagination page={pages} setPage={setPages} length={partiesData.length} />
         </section>
     );
 };

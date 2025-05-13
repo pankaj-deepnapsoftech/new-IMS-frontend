@@ -6,7 +6,9 @@ import UploadInvoice from "../Drawers/Sales/UploadInvoice";
 import ViewPayment from "../Drawers/Sales/ViewPayment";
 import ViewDesign from "../Drawers/Sales/ViewDesign";
 import ApproveSample from "../Drawers/Sales/ApproveSample";
-const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
+import Loading from "../../ui/Loading";
+import EmptyData from "../../ui/emptyData";
+const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) => {
     const [show, setShow] = useState(false);
 
     const calculateTotalPrice = (price: number, qty: number, gst: number) => {
@@ -21,6 +23,16 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
     const [paymentshow, setPaymentshow] = useState(false)
     const [isOpen, setViewDesign] = useState(false)
     const [isChecked, setIsChecked] = useState(false)
+
+    
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (!filteredPurchases || filteredPurchases.length === 0) {
+    return <EmptyData />;
+  }
+
     return (
         <>
             {filteredPurchases?.map((purchase: any) => (

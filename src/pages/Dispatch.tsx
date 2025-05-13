@@ -7,6 +7,9 @@ import { HiOutlinePaperClip } from "react-icons/hi";
 import { FiEye } from "react-icons/fi";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { useFormik } from "formik";
+import { DispatchFormSchema } from "../Validation/DispatchFormValidation";
+import { X } from "lucide-react";
 
 const Dispatch = () => {
   const [paymentFilter, setPaymentFilter] = useState("All");
@@ -15,41 +18,40 @@ const Dispatch = () => {
   const [siteLink, setSiteLink] = useState("");
   const [trackingId, setTrackingId] = useState("");
   const [DispatchData, setDispatchData] = useState([])
+  const [showattachment, setShowAttachment] = useState(false)
+  const [preview, setPreview] = useState(null);
+  const [fileName, setFileName] = useState('');
+
   const [cookies] = useCookies()
-  const [FormData, setFormData] = useState({
-    tracking_id: "",
-    tracking_web: ""
+
+
+  const { handleBlur, handleChange, handleSubmit, resetForm, values, errors, touched } = useFormik({
+    initialValues: {
+      tracking_id: "",
+      tracking_web: ""
+    },
+    validationSchema: DispatchFormSchema,
+    onSubmit: async (values) => {
+      console.log(values)
+      try {
+        const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}dispatch/createDispatch`, values, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        })
+
+        console.log(response)
+        resetForm()
+        setShowModal(false)
+      } catch (error) {
+        console.log(error)
+      }
+
+    }
   })
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    console.log(FormData)
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}dispatch/createDispatch`, FormData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies?.access_token}`,
-        },
-      })
 
-      console.log(response.data)
-      setFormData({
-        tracking_id: "",
-        tracking_web: ""
-      })
-      setShowModal(false)
-    } catch (error) {
-      console.log(error)
-    }
-
-  }
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((pre) => ({
-      ...pre,
-      [name]: value
-    }))
-  }
   const products = [
     {
       id: 1,
@@ -97,8 +99,7 @@ const Dispatch = () => {
         }
       })
       setDispatchData(data.data)
-      console.log(data.data);
-
+      // console.log(data.data)
     } catch (error) {
 
     }
@@ -107,7 +108,7 @@ const Dispatch = () => {
     GetDispatch()
   }, [])
 
-  //Filter-Logic
+
   const filteredProducts = products.filter((product) => {
     const paymentMatch =
       paymentFilter === "All" ||
@@ -126,6 +127,23 @@ const Dispatch = () => {
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileName(file.name);
+
+
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setPreview(null);
+      }
+    }
+  };
   return (
     <div className="p-6">
       <h2 className="text-3xl font-semibold mb-10 text-white">
@@ -255,24 +273,33 @@ const Dispatch = () => {
                         Delivery Site Link:
                       </label>
                       <input
-                        value={FormData.tracking_web}
+                        value={values.tracking_web}
                         type="text"
+                        onBlur={handleBlur}
                         name="tracking_web"
-                        onChange={handleFormChange}
+                        onChange={handleChange}
                         className="w-full text-gray-200 border bg-transparent focus:outline border-gray-300 px-3 py-2 rounded"
                       />
+                      {touched.tracking_web && errors.tracking_web && (
+                        <div className="text-red-500 text-sm ">{errors.tracking_web}</div>
+                      )}
                     </div>
+
                     <div className="mb-6">
                       <label className="block font-medium mb-1">
                         Tracking ID:
                       </label>
                       <input
-                        value={FormData.tracking_id}
+                        value={values.tracking_id}
                         name="tracking_id"
                         type="text"
-                        onChange={handleFormChange}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
                         className="w-full border text-gray-200 bg-transparent focus:outline border-gray-300 px-3 py-2 rounded"
                       />
+                      {touched.tracking_id && errors.tracking_id && (
+                        <div className="text-red-500 text-sm ">{errors.tracking_id}</div>
+                      )}
                     </div>
 
                     <div className="flex justify-between">
@@ -312,15 +339,12 @@ const Dispatch = () => {
                 <a href="https://rtpasbackend.deepmart.shop/images/delivery-74712863-4179-4830-bdc0-9c60f8b31fbd.jpg" target="_blank" className="flex items-center gap-2" > <FiEye /> View Delivery Proof</a>
               </button>
               <>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  style={{ display: "none" }}
-                />
+
                 <button
                   className="flex items-center gap-2 px-4 py-2 border border-sky-600 text-sky-500 rounded hover:bg-sky-600 hover:text-white transition-all duration-300"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => {
+                    setShowAttachment(true)
+                  }}
                 >
                   <HiOutlinePaperClip /> Attach Delivery Proof
                 </button>
@@ -329,8 +353,85 @@ const Dispatch = () => {
           </div>
         ))
       )}
+      {showattachment && (
+        <div
+          className={`fixed  inset-0 h-screen items-center justify-center bg-[#00000065] bg-opacity-40 z-50 flex`}
+        >
+          <div className="bg-[#1C3644] rounded-2xl shadow-xl p-6 w-full max-w-md relative text-white">
+            <button
+              onClick={() => {setShowAttachment(!showattachment); setPreview(null);
+                setFileName('')}}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white"
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+
+            <h2 className="text-2xl font-semibold mb-4">Upload Attach</h2>
+
+            <div className="mb-6">
+              <label className="block text-lg font-semibold mb-3">
+                Upload File
+              </label>
+
+              <div className="group border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer transition-all hover:shadow-md hover:border-blue-400 hover:bg-[#142731] relative">
+                <input
+                  type="file"
+                  accept=".pdf,.docx,.png,.jpg,.jpeg"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  onChange={handleFileChange}
+                />
+
+                <div className="flex flex-col items-center justify-center gap-3 pointer-events-none">
+                  {preview ? (
+                    <img src={preview} alt="Preview" className="w-32 h-32 object-cover rounded-md" />
+                  ) : (
+                    <svg
+                      className="w-12 h-12 text-gray-400 group-hover:text-blue-400 transition"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M7 16V4a1 1 0 011-1h8a1 1 0 011 1v12m4 4H4a1 1 0 01-1-1v-3h18v3a1 1 0 01-1 1z"
+                      />
+                    </svg>
+                  )}
+                  <p className="text-sm text-gray-400">
+                    {fileName
+                      ? `Selected: ${fileName}`
+                      : <>Drag and drop your file here, or{' '}
+                        <span className="text-blue-400 hover:underline">browse</span></>
+                    }
+                  </p>
+                  <p className="text-xs text-gray-400">Supported formats: PDF, DOCX, PNG</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setPreview(null);
+                  setFileName('');
+                  setShowAttachment(false);
+                }}
+                className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition"
+              >
+                Cancel
+              </button>
+              <button className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition">
+                Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  );
-};
+  )
+}
 
 export default Dispatch;

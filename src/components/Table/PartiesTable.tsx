@@ -1,16 +1,23 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiEdit } from "react-icons/fi";
 import { BiSolidTrash, BiX } from "react-icons/bi";
 import { toast } from "react-toastify";
-import { FaTrash } from "react-icons/fa";
+import { Console } from "console";
+import { useCookies } from "react-cookie";
+import Loading from "../../ui/Loading";
+import EmptyData from "../../ui/emptyData";
+import Parties from "../../pages/Parties";
 
-const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
-    const [editId, setEditId] = useState(null);
-    const [partiesData, setPartiesData] = useState([]);
-    const [cookies] = useCookies();
+
+const PartiesTable = ({ searchTerm, selectedType, partiesData, setPartiesData, isLoading }) => {
+    const [editId, setEditId] = useState("");
+    const [deleteId, setdeleteId] = useState('')
+    const [cookies] = useCookies()
     const [showData, setShowData] = useState(false);
+    const [showDeletePage, setshowDeletePage] = useState(false);
+    const [isConfirmed, setIsConfirmed] = useState(false);
+
     const [formData, setFormData] = useState({
         full_name: "",
         email: "",
@@ -19,31 +26,6 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
         company_name: "",
         GST_NO: "",
     });
-
-
-
-    const fetchPartiesData = async () => {
-        try {
-            const res = await fetch(
-                `${process.env.REACT_APP_BACKEND_URL}parties/get`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${cookies.access_token}`,
-                    },
-                }
-            );
-            const data = await res.json();
-            setPartiesData(data.data);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    useEffect(() => {
-        fetchPartiesData();
-
-    }, [counter, trigger]);
 
 
     const filteredParties = partiesData.filter((party) => {
@@ -61,6 +43,9 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
     });
 
     const handleDelete = async (partyId) => {
+        // console.log(partyId);
+
+
         try {
             const res = await fetch(
                 `${process.env.REACT_APP_BACKEND_URL}parties/delete/${partyId}`,
@@ -71,7 +56,7 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                     },
                 }
             );
-
+    
             if (res.ok) {
                 setPartiesData((prev) =>
                     prev.filter((party) => party._id !== partyId)
@@ -79,6 +64,8 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
             } else {
                 console.error("Failed to delete:", await res.text());
             }
+            setshowDeletePage(false)
+            setIsConfirmed(false)
         } catch (error) {
             console.error("Error deleting party:", error);
         }
@@ -113,6 +100,16 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
         }
     };
 
+
+    if (isLoading) {
+        return <Loading />
+    }
+    if (!filteredParties || filteredParties.length === 0) {
+        return <EmptyData />
+    }
+
+
+
     return (
         <section className="h-full w-full text-white ">
             <div className="overflow-x-auto w-full">
@@ -143,15 +140,23 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                                 <td className="px-4 py-4 relative pl-6 text-center text-gray-200">{party.parties_type || " __ "}</td>
                                 <td className="px-4 py-4 relative pl-6 text-center text-gray-200">{party.GST_NO || " __ "}</td>
                                 <td className="px-4 py-4 relative pl-6 text-center flex items-center gap-3 text-gray-200">
-                                    <button onClick={() => {
-                                        setFormData(party);
-                                        setEditId(party._id);
-                                        setShowData(true);
-                                    }}>
+                                    <button
+                                        onClick={() => {
+
+                                            setFormData(party);
+                                            setEditId(party._id);
+                                            setShowData(true);
+                                        }}
+                                    >
                                         <FiEdit className="text-blue-400 hover:text-blue-600 cursor-pointer" />
                                     </button>
 
-                                    <button onClick={() => handleDelete(party._id)}>
+                                    <button
+                                        onClick={() => {
+                                            setshowDeletePage(true);
+                                            setEditId(party._id);
+                                        }}
+                                    >
                                         <BiSolidTrash className="text-[#ee5555] hover:text-red-800 cursor-pointer" />
                                     </button>
                                 </td>
@@ -273,11 +278,53 @@ const PartiesTable = ({ counter, trigger, searchTerm, selectedType }) => {
                             type="submit"
                             className="w-full bg-[#ffffff41] hover:bg-[#ffffff6b] text-white font-medium py-2 rounded transition-all duration-300"
                         >
-                           Submit
+                            Submit
                         </button>
                     </form>
                 </div>
             )}
+            {showDeletePage && (
+                <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center">
+                    <div className="bg-[#1C3644] rounded-lg shadow-xl p-6 w-full max-w-md">
+                        <h2 className="text-lg font-semibold text-white mb-4">Confirm Deletion</h2>
+                        <p className="text-sm text-white mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
+
+                        <div className="flex items-center space-x-4">
+                            <label className="flex items-center space-x-2 text-sm text-white">
+                                <input
+                                    type="checkbox"
+                                    name="confirmDelete1"
+                                    className="form-checkbox text-red-600"
+                                    checked={isConfirmed}
+                                    onChange={(e) => setIsConfirmed(e.target.checked)}
+                                />
+                                <span> Are you sure</span>
+                            </label>
+                        </div>
+
+                        <div className="mt-6 flex justify-end space-x-3">
+                            <button
+                                onClick={() => setshowDeletePage(!showDeletePage)}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => handleDelete(editId)}
+                                disabled={!isConfirmed}
+                                className={`px-4 py-2 text-sm font-medium text-white rounded transition 
+                     ${isConfirmed ? 'bg-red-600 hover:bg-red-700' : 'bg-red-300 cursor-not-allowed'}`}
+                            >
+
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+            )}
+
         </section>
     );
 };
