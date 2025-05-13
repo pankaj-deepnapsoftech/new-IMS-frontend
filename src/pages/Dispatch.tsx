@@ -66,8 +66,9 @@ const Dispatch = () => {
       toast.error(error);
     }
   }
+
   useEffect(() => {
-    GetDispatch()
+    GetDispatch();
   }, [])
 
   //Filter-Logic
@@ -143,7 +144,6 @@ const Dispatch = () => {
               className="flex items-center gap-2 px-4 py-2 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-500 hover:text-white transition-colors"
               onClick={() => {
                 setPaymentFilter("All");
-                setProductFilter("All");
               }}
             >
               <svg
@@ -191,7 +191,7 @@ const Dispatch = () => {
               <div className="text-right space-y-1">
                 {acc?.bom?.sale_id[0]?.paymet_status && (
                 <span className="block bg-sky-800/60 text-white text-xs px-2 py-1 rounded">
-                    PAYMENT STATUS: {acc?.bom?.sale_id[0]?.paymet_status === "Paied"
+                    PAYMENT STATUS : {acc?.bom?.sale_id[0]?.paymet_status === "Paied"
                       ? "Paid"
                       : acc?.bom?.sale_id[0]?.paymet_status}
                 </span>
