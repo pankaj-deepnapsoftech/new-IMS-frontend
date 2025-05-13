@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import { X } from "lucide-react";
 import { DispatchFormSchema } from "../Validation/DispatchFormValidation";
 import { useFormik } from "formik";
-const Dispatch = () => {
+const Dispatch = () => {  
   const [paymentFilter, setPaymentFilter] = useState("All");
   const [productFilter, setProductFilter] = useState("All");
   const [showModal, setShowModal] = useState(false);
@@ -245,7 +245,7 @@ const Dispatch = () => {
                     </a>
                   </button>
                 )}
-                {acc?.Sale_id[0]?.tracking_id && acc?.Sale_id[0]?.tracking_web && (
+                {/* {acc?.Sale_id[0]?.tracking_id && acc?.Sale_id[0]?.tracking_web && (
                   <div>
                     <input
                       type="file"
@@ -260,7 +260,7 @@ const Dispatch = () => {
                       <HiOutlinePaperClip /> Attach Delivery Proof
                     </button>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           </>
@@ -272,7 +272,7 @@ const Dispatch = () => {
           <form onSubmit={handleSubmit}>
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0000003f] bg-opacity-50">
               <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg w-full max-w-md relative">
-                <h2 className="text-xl font-semibold mb-4">Dispatch</h2>
+                <h2 className="text-xl font-semibold mb-4 text-white">Dispatch</h2>
                 <div className="mb-4">
                   <label className="block font-medium mb-1">
                     Delivery Site Link:
