@@ -45,12 +45,12 @@ const Dispatch = () => {
       } catch (error) {
         console.log(error)
       }
-        console.log(response)
-        resetForm()
-        setShowModal(false)
-      } catch (error) {
-        console.log(error)
-      }
+      //   console.log(response)
+      //   resetForm()
+      //   setShowModal(false)
+      // } catch (error) {
+      //   console.log(error)
+      // }
 
     }
   })
