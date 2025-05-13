@@ -52,25 +52,72 @@ const Dispatch = () => {
   })
 
 
+  const products = [
+    {
+      id: 1,
+      date: "5/7/2025",
+      customer: "Neeraj",
+      productName: "tag",
+      quantity: 1000,
+      price: 100000,
+      gst: "0%",
+      deliveryStatus: "yes",
+      paymentStatus: "UNPAID",
+      productStatus: "DELIVERED",
+    },
+    {
+      id: 2,
+      date: "5/7/2025",
+      customer: "Neeraj",
+      productName: "tag",
+      quantity: 1000,
+      price: 100000,
+      gst: "0%",
+      deliveryStatus: "yes",
+      paymentStatus: "PAID",
+      productStatus: "DISPATCH",
+    },
+    {
+      id: 3,
+      date: "5/7/2025",
+      customer: "Neeraj",
+      productName: "tag",
+      quantity: 1000,
+      price: 100000,
+      gst: "0%",
+      deliveryStatus: "yes",
+      paymentStatus: "PAID",
+      productStatus: "DELIVERED",
+    },
+  ];
+
   const GetDispatch = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch`, {
+      const data = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch`, {
         headers: {
           Authorization: `Bearer ${cookies.access_token}`
         }
       })
-      setData(response.data?.data);  
+      setDispatchData(data.data)
+      // console.log(data.data)
     } catch (error) {
-      toast.error(error);
+
     }
   }
-
   useEffect(() => {
-    GetDispatch();
+    GetDispatch()
   }, [])
 
-  //Filter-Logic
- 
+
+  const filteredProducts = products.filter((product) => {
+    const paymentMatch =
+      paymentFilter === "All" ||
+      product.paymentStatus.toUpperCase() === paymentFilter.toUpperCase();
+    const productMatch =
+      productFilter === "All" ||
+      product.productStatus.toUpperCase() === productFilter.toUpperCase();
+    return paymentMatch && productMatch;
+  });
   const fileInputRef = useRef(null);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,148 +127,139 @@ const Dispatch = () => {
     }
   };
 
-  // Filter data based on selected dropdown values
-  const filteredData = data?.filter((acc: any) => {
-    const paymentStatus = acc?.bom?.sale_id[0]?.paymet_status || "";
-    const productStatus = acc?.bom?.sale_id[0]?.product_status || "";
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileName(file.name);
 
-    return (
-      (selectedPaymentStatus === "" ||
-        paymentStatus === selectedPaymentStatus) &&
-      (selectedProductStatus === "" || productStatus === selectedProductStatus)
-    );
-  });
 
-  const calculateTotal = (price: number, qty: number, gst: number) => {
-    const basePrice = price * qty;
-    const gstval = (basePrice * gst) / 100;
-    const totalPrice = basePrice + gstval;
-    return totalPrice;
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setPreview(null);
+      }
+    }
   };
-
   return (
-    <>
-      <div className="p-6">
-        <h2 className="text-3xl font-semibold mb-10 text-white">Dispatch</h2>
+    <div className="p-6">
+      <h2 className="text-3xl font-semibold mb-10 text-white">
+        Dispatch
+      </h2>
 
-        <div className="flex flex-wrap justify-between items-end mb-6">
-          {/* Filters */}
-          <div className="flex gap-6 flex-wrap">
-            {/* Payment Status */}
-            <div className="flex flex-col">
-              <label className="text-sm text-white mb-1">Payment Status</label>
-              <select
-                className="w-48 bg-[#1e293b86] border border-gray-600 text-white text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                value={selectedPaymentStatus}
-                onChange={(e) => setSelectedPaymentStatus(e.target.value)}
-              >
-                <option>All</option>
-                <option value="Pending">Pending</option>
-                <option value="Paied">Paid</option>
-              </select>
-            </div>
-
-            {/* Product Status */}
-            <div className="flex flex-col">
-              <label className="text-sm text-white mb-1">Product Status</label>
-              <select
-                className="w-48 bg-[#1e293b8c] border rounded-lg border-gray-600 text-white text-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                value={selectedProductStatus}
-                onChange={(e) => setSelectedProductStatus(e.target.value)}
-              >
-                <option>All</option>
-                <option value="Dispatch">Dispatch</option>
-                <option value="Delivered">Delivered</option>
-              </select>
-            </div>
+      <div className="flex flex-wrap justify-between items-end mb-6">
+        {/* Filters */}
+        <div className="flex gap-6 flex-wrap">
+          {/* Payment Status */}
+          <div className="flex flex-col">
+            <label className="text-sm text-white mb-1">Payment Status</label>
+            <select
+              className="w-48 bg-[#1e293b86] border border-gray-600 text-white text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              value={paymentFilter}
+              onChange={(e) => setPaymentFilter(e.target.value)}
+            >
+              <option>All</option>
+              <option>Paid</option>
+              <option>Unpaid</option>
+            </select>
           </div>
 
-          {/* Refresh Button */}
-          <div className="mt-4 md:mt-0">
-            <button
-              className="flex items-center gap-2 px-4 py-2 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-500 hover:text-white transition-colors"
-              onClick={() => {
-                setPaymentFilter("All");
-              }}
+          {/* Product Status */}
+          <div className="flex flex-col">
+            <label className="text-sm text-white mb-1">Product Status</label>
+            <select
+              className="w-48 bg-[#1e293b8c] border rounded-lg border-gray-600 text-white text-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              value={productFilter}
+              onChange={(e) => setProductFilter(e.target.value)}
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0 1 14-14l1 1"
-                />
-              </svg>
-              Refresh
-            </button>
+              <option>All</option>
+              <option>Dispatch</option>
+              <option>Delivered</option>
+            </select>
           </div>
         </div>
 
-        {/* Display Filtered Products */}
-        {filteredData?.map((acc: any) => (
+        {/* Refresh Button */}
+        <div className="mt-4 md:mt-0">
+          <button
+            className="flex items-center gap-2 px-4 py-2 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-500 hover:text-white transition-colors"
+            onClick={() => {
+              setPaymentFilter("All");
+              setProductFilter("All");
+            }}
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0 1 14-14l1 1"
+              />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Display Filtered Products */}
+      {filteredProducts.length === 0 ? (
+        <p className="text-white">No products match the filters.</p>
+      ) : (
+        filteredProducts.map((product, index) => (
           <div
-            key={acc?._id}
+            key={index}
             className="border-l-4 border-green-600 shadow-sm p-4 mb-4 rounded-md text-white"
             style={{ backgroundColor: "#1e1e2f4f" }}
           >
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <p className="font-semibold">Sale By: {acc?.bom?.sale_id[0]?.user_id[0]?.first_name || "N/A"}</p>
-                <p className="text-sm text-white underline">Date: {new Date(
-                  acc?.bom?.sale_id[0]?.createdAt
-                ).toLocaleDateString()}</p>
-                <p>
-                  <span className="font-semibold">Party:</span> {acc?.bom?.sale_id[0]?.customer_id[0]?.full_name || "N/A"}
+                <p className="font-semibold">Sale By: RUCHI</p>
+                <p className="text-sm text-white underline">
+                  Date: {product.date}
                 </p>
                 <p>
-                  <span className="font-semibold">Product Name:</span> {acc?.bom?.sale_id[0]?.product_id[0]?.name || "N/A"}
+                  <span className="font-semibold">Customer:</span>{" "}
+                  {product.customer}
                 </p>
                 <p>
-                  <span className="font-semibold">Quantity:</span> {acc?.bom?.sale_id[0]?.product_qty || "N/A"}
+                  <span className="font-semibold">Product Name:</span>{" "}
+                  {product.productName}
+                </p>
+                <p>
+                  <span className="font-semibold">Quantity:</span>{" "}
+                  {product.quantity}
                 </p>
               </div>
 
               <div className="text-right space-y-1">
-                {acc?.bom?.sale_id[0]?.paymet_status && (
                 <span className="block bg-sky-800/60 text-white text-xs px-2 py-1 rounded">
-                    PAYMENT STATUS : {acc?.bom?.sale_id[0]?.paymet_status === "Paied"
-                      ? "Paid"
-                      : acc?.bom?.sale_id[0]?.paymet_status}
+                  PAYMENT STATUS: {product.paymentStatus}
                 </span>
-                )}
-                {acc?.bom?.sale_id[0]?.product_status && (
-                  <span className="block bg-sky-800/60 text-white text-xs px-2 py-1 rounded">
-                    PRODUCT STATUS: {acc?.bom?.sale_id[0]?.product_status}
-                  </span>
-                )}
-                {(role == "Accountant" || role == "Sales" || role == "admin") ? (
+                <span className="block bg-sky-800/60 text-white   text-xs px-2 py-1 rounded">
+                  PRODUCT STATUS: {product.productStatus}
+                </span>
                 <p>
-                    <span className="font-semibold">Price:</span> {acc?.bom?.sale_id[0]?.price *
-                      acc?.bom?.sale_id[0]?.product_qty || "N/A"}
+                  <span className="font-semibold">Price:</span> {product.price}
                 </p>
-                ) : null}
                 <p>
-                  <span className="font-semibold">GST:</span> {acc?.bom?.sale_id[0]?.GST}%
+                  <span className="font-semibold">GST:</span> {product.gst}
                 </p>
-                {(acc?.bom?.sale_id[0]?.delivery_status_by_customer) ? (
                 <p>
-                    <span className="font-semibold">Delivery Status:</span> {acc?.bom?.sale_id[0]?.delivery_status_comment_by_customer}
+                  <span className="font-semibold">Delivery Status:</span>{" "}
+                  {product.deliveryStatus}
                 </p>
-                ) : null}
-                {(role == "Accountant" || role == "Sales" || role == "admin") ? (
                 <p>
-                    <span className="font-semibold">Total Price:</span> {calculateTotal(
-                      acc?.bom?.sale_id[0]?.price,
-                      acc?.bom?.sale_id[0]?.product_qty,
-                      acc?.bom?.sale_id[0]?.GST
-                    )}
+                  <span className="font-semibold">Total Price:</span>{" "}
+                  {product.price}
                 </p>
-                ) : null}
               </div>
             </div>
 
@@ -296,38 +334,24 @@ const Dispatch = () => {
               >
                 <TbTruckDelivery /> Dispatch
               </button>
-              )}
-              {(acc?.bom?.sale_id[0]?.customer_order_ss || acc?.bom?.sale_id[0]?.dispatcher_order_ss) && (
+
               <button className="flex items-center gap-2 px-4 py-2 border border-yellow-400 text-yellow-500 rounded hover:bg-yellow-500 hover:text-white transition-all duration-300">
-                <a
-                  href="https://rtpasbackend.deepmart.shop/images/delivery-74712863-4179-4830-bdc0-9c60f8b31fbd.jpg"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2"
-                >
-                  <FiEye /> View Delivery Proof
-                </a>
+                <a href="https://rtpasbackend.deepmart.shop/images/delivery-74712863-4179-4830-bdc0-9c60f8b31fbd.jpg" target="_blank" className="flex items-center gap-2" > <FiEye /> View Delivery Proof</a>
               </button>
-              )}
-              {acc?.bom?.sale_id[0]?.tracking_id && acc?.bom?.sale_id[0]?.tracking_web && (
-                <div>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                    style={{ display: "none" }}
-                  />
-                  <button
-                    className="flex items-center gap-2 px-4 py-2 border border-sky-600 text-sky-500 rounded hover:bg-sky-600 hover:text-white transition-all duration-300"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <HiOutlinePaperClip /> Attach Delivery Proof
-                  </button>
-                </div>
-              )}
+              <>
+
+                <button
+                  className="flex items-center gap-2 px-4 py-2 border border-sky-600 text-sky-500 rounded hover:bg-sky-600 hover:text-white transition-all duration-300"
+                  onClick={() => {
+                    setShowAttachment(true)
+                  }}
+                >
+                  <HiOutlinePaperClip /> Attach Delivery Proof
+                </button>
+              </>
             </div>
           </div>
-        )
+        ))
       )}
       {showattachment && (
         <div
@@ -407,7 +431,6 @@ const Dispatch = () => {
         </div>
       )}
     </div>
-    </>
   )
 }
 
