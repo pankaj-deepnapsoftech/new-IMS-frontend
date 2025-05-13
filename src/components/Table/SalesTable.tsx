@@ -40,7 +40,7 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
                         <hr className="my-6 border-gray-600" />
 
                         <div className="space-y-2 text-sm text-gray-200">
-                            <p className="text-gray-300"><span className="font-semibold text-white">Customer:</span>  {purchase?.party_id?.[0]?.full_name || "N/A"}</p>
+                            <p className="text-gray-300"><span className="font-semibold text-white">Party:</span>  {purchase?.party_id?.[0]?.full_name || "N/A"}</p>
                             <p className="text-gray-300"><span className="font-semibold text-white">Product Name:</span> {purchase?.product_id[0]?.name || "N/A"}</p>
                             <p className="text-gray-300"><span className="font-semibold text-white">Product Price:</span> {purchase?.price || "N/A"}</p>
                             <p className="text-gray-300"><span className="font-semibold text-white">Quantity:</span> {purchase?.product_qty}</p>
@@ -56,24 +56,49 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData }) => {
 
                         <div className="flex flex-wrap gap-3 mt-6">
                             <button className="px-4 py-2 border border-gray-500 rounded-md text-sm hover:bg-gray-700" onClick={() => sendDataToParent(purchase)}>Edit</button>
-                            <button className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white" onClick={()=>setIsChecked(!isChecked)}>Approve Sample</button>
-                            <button className="px-4 py-2 border border-orange-500 text-orange-400 rounded-md text-sm hover:bg-orange-600 hover:text-white" onClick={()=>setViewDesign(!isOpen)}>View Design</button>
-                            <button className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white"><a href="https://images.unsplash.com/photo-1746483966639-b8dafcd05f5b?q=80&w=1288&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" target="_blank" >View Delivery Proof</a></button>
+
+                            {/* {purchase?.token_ss &&
+                                purchase?.boms[0]?.production_processes?.every(
+                                    (processGroup) =>
+                                        processGroup?.processes?.every(
+                                            (process) => process?.done === true
+                                        )
+                                ) ? ( */}
+
+                            { purchase?.boms[0]?.production_processes?.every(
+                                    (processGroup) =>
+                                        processGroup?.processes?.every(
+                                            (process) => process?.done === true
+                                        )
+                                ) ? (
+                                <button className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white" onClick={()=>setIsChecked(!isChecked)}>Approve Sample</button>
+                            ) : null}
+
+                            {/* <button className="px-4 py-2 border border-orange-500 text-orange-400 rounded-md text-sm hover:bg-orange-600 hover:text-white" onClick={()=>setViewDesign(!isOpen)}>View Design</button> */}
+                            {/* <button className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white"><a href="https://images.unsplash.com/photo-1746483966639-b8dafcd05f5b?q=80&w=1288&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" target="_blank" >View Delivery Proof</a></button> */}
+
+                            {/* {purchase?.isTokenVerify && ( */}
+
                             <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setShowInvoice(!showinvoice)}>Upload Invoice</button>
-                            <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setPaymentshow(!paymentshow)}>View Payment</button>
+
+                            {/* )} */}
+
+                            {/* <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setPaymentshow(!paymentshow)}>View Payment</button> */}
+
                             <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onClick={() => {
                                 setShow(!show);
                                 setSelectedSale(purchase);
                             }}>Assign</button>
+
                         </div>
                     </div>
                 </section>
             ))}
             <AssignEmployee show={show} setShow={setShow} employeeData={empData}
                 saleData={selectedSale} />
-            <ViewPayment paymentshow={paymentshow} setPaymentshow={setPaymentshow} />
+            {/* <ViewPayment paymentshow={paymentshow} setPaymentshow={setPaymentshow} /> */}
             <UploadInvoice showinvoice={showinvoice} setShowInvoice={setShowInvoice} />
-            <ViewDesign isOpen={isOpen}  setViewDesign={setViewDesign}/>
+            {/* <ViewDesign isOpen={isOpen}  setViewDesign={setViewDesign}/> */}
             <ApproveSample  isChecked={isChecked} setIsChecked={setIsChecked}/>
         </>
 

@@ -549,7 +549,7 @@ const Task = () => {
       </div>
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
       <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
-      <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice}/>
+      <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice} />
       <AddhalfToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
     </section>
   )
