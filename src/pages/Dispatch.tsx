@@ -59,23 +59,31 @@ const Dispatch = () => {
 
   const GetDispatch = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch`, {
+      const data = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch`, {
         headers: {
           Authorization: `Bearer ${cookies.access_token}`
         }
       })
-      setData(response.data?.data);  
+      setDispatchData(data.data)
+      // console.log(data.data)
     } catch (error) {
-      toast.error(error);
+
     }
   }
-
   useEffect(() => {
-    GetDispatch();
+    GetDispatch()
   }, [])
 
-  //Filter-Logic
- 
+
+  const filteredProducts = products.filter((product) => {
+    const paymentMatch =
+      paymentFilter === "All" ||
+      product.paymentStatus.toUpperCase() === paymentFilter.toUpperCase();
+    const productMatch =
+      productFilter === "All" ||
+      product.productStatus.toUpperCase() === productFilter.toUpperCase();
+    return paymentMatch && productMatch;
+  });
   const fileInputRef = useRef(null);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,66 +102,69 @@ const Dispatch = () => {
 
   return (
     <>
-      <div className="p-6">
-        <h2 className="text-3xl font-semibold mb-10 text-white">Dispatch</h2>
+    <div className="p-6">
+      <h2 className="text-3xl font-semibold mb-10 text-white">
+        Dispatch
+      </h2>
 
-        <div className="flex flex-wrap justify-between items-end mb-6">
-          {/* Filters */}
-          <div className="flex gap-6 flex-wrap">
-            {/* Payment Status */}
-            <div className="flex flex-col">
-              <label className="text-sm text-white mb-1">Payment Status</label>
-              <select
-                className="w-48 bg-[#1e293b86] border border-gray-600 text-white text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                value={selectedPaymentStatus}
-                onChange={(e) => setSelectedPaymentStatus(e.target.value)}
-              >
-                <option>All</option>
-                <option value="Pending">Pending</option>
-                <option value="Paied">Paid</option>
-              </select>
-            </div>
-
-            {/* Product Status */}
-            <div className="flex flex-col">
-              <label className="text-sm text-white mb-1">Product Status</label>
-              <select
-                className="w-48 bg-[#1e293b8c] border rounded-lg border-gray-600 text-white text-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                value={selectedProductStatus}
-                onChange={(e) => setSelectedProductStatus(e.target.value)}
-              >
-                <option>All</option>
-                <option value="Dispatch">Dispatch</option>
-                <option value="Delivered">Delivered</option>
-              </select>
-            </div>
+      <div className="flex flex-wrap justify-between items-end mb-6">
+        {/* Filters */}
+        <div className="flex gap-6 flex-wrap">
+          {/* Payment Status */}
+          <div className="flex flex-col">
+            <label className="text-sm text-white mb-1">Payment Status</label>
+            <select
+              className="w-48 bg-[#1e293b86] border border-gray-600 text-white text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              value={paymentFilter}
+              onChange={(e) => setPaymentFilter(e.target.value)}
+            >
+              <option>All</option>
+              <option>Paid</option>
+              <option>Unpaid</option>
+            </select>
           </div>
 
-          {/* Refresh Button */}
-          <div className="mt-4 md:mt-0">
-            <button
-              className="flex items-center gap-2 px-4 py-2 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-500 hover:text-white transition-colors"
-              onClick={() => {
-                setPaymentFilter("All");
-              }}
+          {/* Product Status */}
+          <div className="flex flex-col">
+            <label className="text-sm text-white mb-1">Product Status</label>
+            <select
+              className="w-48 bg-[#1e293b8c] border rounded-lg border-gray-600 text-white text-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              value={productFilter}
+              onChange={(e) => setProductFilter(e.target.value)}
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0 1 14-14l1 1"
-                />
-              </svg>
-              Refresh
-            </button>
+              <option>All</option>
+              <option>Dispatch</option>
+              <option>Delivered</option>
+            </select>
           </div>
         </div>
+
+        {/* Refresh Button */}
+        <div className="mt-4 md:mt-0">
+          <button
+            className="flex items-center gap-2 px-4 py-2 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-500 hover:text-white transition-colors"
+            onClick={() => {
+              setPaymentFilter("All");
+              setProductFilter("All");
+            }}
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0 1 14-14l1 1"
+              />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
 
         {/* Display Filtered Products */}
         {data?.map((acc: any) => (
