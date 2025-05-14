@@ -287,7 +287,7 @@ const Task = () => {
             <div className="flex flex-wrap gap-2 mt-6">
               {["acc", "account", "accountant", "dispatch", "dis"].includes(role?.toLowerCase()) && (
                 <HStack wrap="wrap" spacing={2}>
-                  {task?.token_amt && !task?.token_status && (
+                  {/* {task?.token_amt && !task?.token_status && (
                     <Badge
                       colorScheme="orange"
                       fontSize="sm"
@@ -301,9 +301,9 @@ const Task = () => {
                       <Icon as={FaHourglassHalf} />
                       Token: Pending
                     </Badge>
-                  )}
+                  )} */}
 
-                  {task?.token_amt && task?.token_status && (
+                  {/* {task?.token_amt && task?.token_status && (
                     <Badge
                       colorScheme="green"
                       fontSize="sm"
@@ -317,9 +317,9 @@ const Task = () => {
                       <Icon as={FaCheckCircle} />
                       Token: Paid
                     </Badge>
-                  )}
+                  )} */}
 
-                  {typeof task?.isTokenVerify === "boolean" && (
+                  {/* {typeof task?.isTokenVerify === "boolean" && (
                     <Badge
                       colorScheme={task.isTokenVerify ? "green" : "orange"}
                       fontSize="sm"
@@ -333,9 +333,9 @@ const Task = () => {
                       <Icon as={task.isTokenVerify ? FaShieldAlt : FaHourglassHalf} />
                       Token Verification: {task.isTokenVerify ? "Verified" : "Pending"}
                     </Badge>
-                  )}
+                  )} */}
 
-                  {task?.allsale?.half_payment_status && (
+                  {/* {task?.allsale?.half_payment_status && (
                     <Badge
                       colorScheme="green"
                       fontSize="sm"
@@ -349,9 +349,9 @@ const Task = () => {
                       <Icon as={FaMoneyCheckAlt} />
                       Half Payment: {task.allsale.half_payment_status}
                     </Badge>
-                  )}
+                  )} */}
 
-                  {task?.payment_status && (
+                  {/* {task?.payment_status && (
                     <Badge
                       colorScheme={colorChange(task.payment_status)}
                       fontSize="sm"
@@ -365,9 +365,9 @@ const Task = () => {
                       <Icon as={FaDollarSign} />
                       Payment: {task.payment_status}
                     </Badge>
-                  )}
+                  )} */}
 
-                  {typeof task?.payment_verify === "boolean" && (
+                  {/* {typeof task?.payment_verify === "boolean" && (
                     <Badge
                       colorScheme={colorChange(task.payment_verify)}
                       fontSize="sm"
@@ -381,7 +381,7 @@ const Task = () => {
                       <Icon as={task.payment_verify ? FaCheckCircle : FaTimesCircle} />
                       Payment Verification: {task.payment_verify ? "Verified" : "Not Verified"}
                     </Badge>
-                  )}
+                  )} */}
                 </HStack>
               )}
             </div>
@@ -395,7 +395,7 @@ const Task = () => {
                 <Text fontSize="sm" ><strong>Quantity:</strong> {task?.productQuantity}</Text>
                 {["acc", "account", "accountant", "dispatch", "dis"].includes(role?.toLowerCase()) && (
                   <>
-                    <Text fontSize="sm" ><strong>Customer:</strong> {task?.customer_name}</Text>
+                    <Text fontSize="sm" ><strong>Party:</strong> {task?.customer_name}</Text>
                     <Text fontSize="sm" ><strong>Sale By:</strong> {task?.sale_by}</Text>
                     <Text fontSize="sm" ><strong>Assigned By:</strong> {task?.assignedBy}</Text>
                   </>
@@ -413,22 +413,22 @@ const Task = () => {
                 {task?.bom_name && (
                   <Text fontSize="sm" color="gray.200"><strong className="text-white">BOM Name:</strong> {task.bom_name}</Text>
                 )}
-                {task?.token_ss && (
+                {/* {task?.token_ss && (
                   <Text
                     className="text-green-500 font-[600]  text-sm underline underline-offset-4 cursor-pointer"
                     onClick={() => handlePayment(task.sale_id, task.token_ss, task.isTokenVerify, task.id, "token")}
                   >
                     View Token Proof
                   </Text>
-                )}
-                {task?.allsale?.half_payment_image && (
+                )} */}
+                {/* {task?.allsale?.half_payment_image && (
                   <Text
                     className="text-blue-500 underline text-sm cursor-pointer"
                     onClick={() => { onViewHalfPaymentssOpen(); sethalfAmountId(task) }}
                   >
                     View Half Payment
                   </Text>
-                )}
+                )} */}
               </VStack>
             </HStack>
 
@@ -451,11 +451,11 @@ const Task = () => {
                     Task Done
                   </Button>
                 )}
-                {role === "Production" && task?.sample_image && (
+                {/* {role === "Production" && task?.sample_image && (
                   <Button colorScheme="teal" size="sm" onClick={() => handleSampleImage(task.sample_image)}>
                     Preview Sample Image
                   </Button>
-                )}
+                )} */}
               </HStack>
             ) : ["accountant", "acc"].includes(role?.toLowerCase()) ? (
               <HStack justify="space-between" mt={3} flexWrap="wrap" align="center" gap={4}>
@@ -465,7 +465,7 @@ const Task = () => {
                   </Button>
                 )}
 
-                <Button
+                {/* <Button
                   bgGradient="linear(to-r, purple.400, purple.600)"
                   color="white"
                   fontWeight="bold"
@@ -487,11 +487,11 @@ const Task = () => {
                 // onClick={() => handleTokenClick(task.sale_id, task.token_amt)}
                 >
                   Add Token Amount
-                </Button>
+                </Button> */}
 
 
                 {/* {task?.isTokenVerify && ( */}
-                <Button
+                {/* <Button
                   leftIcon={<FaCloudUploadAlt />}
                   bgGradient="linear(to-r, blue.400, blue.600)"
                   color="white"
@@ -515,11 +515,11 @@ const Task = () => {
                   }
                 >
                   Upload Invoice
-                </Button>
+                </Button> */}
 
                 {/* )} */}
                 {/* {task?.isSampleApprove && ( */}
-                <Button
+                {/* <Button
                   onClick={() => {
                       setShowhalfToken(!showhalfToken);
                     setTokenAmount(task?.allsale?.half_payment);
@@ -541,7 +541,7 @@ const Task = () => {
                   transition="all 0.2s ease-in-out"
                 >
                   Add Half Payment
-                </Button>
+                </Button> */}
 
                 <Text fontSize="sm"><strong>Date:</strong> {task.date}</Text>
               </HStack>
@@ -566,9 +566,9 @@ const Task = () => {
 
       </div>
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
-      <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
+      {/* <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
       <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice} sale={saleId} invoicefile={invoicefile} />
-      <AddhalfToken showhalfToken={showhalfToken} setShowhalfToken={setShowhalfToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
+      <AddhalfToken showhalfToken={showhalfToken} setShowhalfToken={setShowhalfToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} /> */}
     </section>
   )
 }

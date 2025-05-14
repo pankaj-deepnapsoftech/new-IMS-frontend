@@ -46,9 +46,9 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
                                     <span className="font-semibold">Date:</span> {new Date(purchase?.createdAt).toLocaleDateString()}
                                 </p>
                             </div>
-                            <div>
+                            {/* <div>
                                 <p className="text-sm bg-gradient-to-r to-green-600 from-green-700 px-4 py-1.5 shadow-md rounded-md">SALE APPROVE : <span className="text-sm uppercase"> {purchase.Status} </span></p>
-                            </div>
+                            </div> */}
                         </div>
 
                         <hr className="my-6 border-gray-600" />
@@ -93,7 +93,7 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
 
                             {/* {purchase?.isTokenVerify && ( */}
 
-                            <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setShowInvoice(!showinvoice)}>Upload Invoice</button>
+                            {/* <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setShowInvoice(!showinvoice)}>Upload Invoice</button> */}
 
                             {/* )} */}
 
@@ -111,7 +111,7 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
             <AssignEmployee show={show} setShow={setShow} employeeData={empData}
                 saleData={selectedSale} />
             {/* <ViewPayment paymentshow={paymentshow} setPaymentshow={setPaymentshow} /> */}
-            <UploadInvoice showinvoice={showinvoice} setShowInvoice={setShowInvoice} />
+            {/* <UploadInvoice showinvoice={showinvoice} setShowInvoice={setShowInvoice} /> */}
             {/* <ViewDesign isOpen={isOpen}  setViewDesign={setViewDesign}/> */}
             <ApproveSample  isChecked={isChecked} setIsChecked={setIsChecked}/>
         </>
