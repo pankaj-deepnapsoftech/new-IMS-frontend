@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Cell,
   Column,
@@ -51,6 +51,10 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
   deleteProformaInvoiceHandler,
   openUpdateProformaInvoiceDrawer
 }) => {
+
+  const [showDeletePage, setshowDeletePage] = useState(false);
+  const [deleteId, setdeleteId] = useState('')
+
   const columns = useMemo(
     () => [
       { Header: "Created By", accessor: "creator" },
@@ -94,18 +98,30 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
     usePagination
   );
 
+  const dynamicBg = (index) => {
+    return index % 2 !== 0 ? "#ffffff40" : "#ffffff1f";
+  };
+
+
   return (
     <div>
       {isLoadingProformaInvoices && <Loading />}
       {proformaInvoices.length === 0 && !isLoadingProformaInvoices && (
-        <EmptyData/>
+        <EmptyData />
       )}
       {!isLoadingProformaInvoices && proformaInvoices.length > 0 && (
         <div>
           <div className="flex justify-end mb-2">
             <Select
+              color="white"
               onChange={(e) => setPageSize(e.target.value)}
               width="80px"
+              sx={{
+                option: {
+                  backgroundColor: "#444e5b", // Default background
+                  color: "white",
+                },
+              }}
             >
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -114,9 +130,10 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
               <option value={100000}>All</option>
             </Select>
           </div>
-          <TableContainer maxHeight="600px" overflowY="auto">
+          <TableContainer maxHeight="600px" overflowY="auto" borderRadius="md"
+            boxShadow="lg" bg="#14243452">
             <Table variant="simple" {...getTableProps()}>
-              <Thead className="text-sm font-semibold">
+              <Thead bg="#14243452" className="text-sm font-semibold">
                 {headerGroups.map(
                   (
                     hg: HeaderGroup<{
@@ -135,12 +152,9 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
                           return (
                             <Th
                               textTransform="capitalize"
-                              fontSize="12px"
-                              fontWeight="700"
-                              color="black"
-                              backgroundColor="#fafafa"
-                              borderLeft="1px solid #d7d7d7"
-                              borderRight="1px solid #d7d7d7"
+                              fontSize="14px"
+                              fontWeight="600"
+                              color="white"
                               {...column.getHeaderProps(
                                 column.getSortByToggleProps()
                               )}
@@ -162,12 +176,10 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
                         })}
                         <Th
                           textTransform="capitalize"
-                          fontSize="12px"
-                          fontWeight="700"
-                          color="black"
-                          backgroundColor="#fafafa"
-                          borderLeft="1px solid #d7d7d7"
-                          borderRight="1px solid #d7d7d7"
+                          fontSize="14px"
+                          fontWeight="600"
+                          color="white"
+
                         >
                           Actions
                         </Th>
@@ -177,17 +189,24 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
                 )}
               </Thead>
               <Tbody {...getTableBodyProps()}>
-                {page.map((row: any) => {
+                {page.map((row: any, index) => {
                   prepareRow(row);
 
                   return (
                     <Tr
                       className="relative hover:bg-[#e4e4e4] hover:cursor-pointer text-base lg:text-sm"
                       {...row.getRowProps()}
+
+                      _hover={{
+                        bg: "#ffffff78",
+                        cursor: "pointer",
+                        transition: "all 0.2s",
+                      }}
+                      bgColor={dynamicBg(index)}
                     >
                       {row.cells.map((cell: Cell) => {
                         return (
-                          <Td fontWeight="500" {...cell.getCellProps()}>
+                          <Td fontWeight="500" {...cell.getCellProps()} border="none" className="text-gray-300">
                             {cell.column.id !== "createdAt" &&
                               cell.column.id !== "updatedAt" &&
                               cell.column.id !== "customer" &&
@@ -232,7 +251,7 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
                           </Td>
                         );
                       })}
-                      <Td className="flex gap-x-2">
+                      <Td className="flex gap-x-2 text-gray-300" border="none">
                         {openProformaInvoiceDetailsHandler && (
                           <MdOutlineVisibility
                             className="hover:scale-110"
@@ -256,7 +275,12 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
                             className="hover:scale-110"
                             size={16}
                             onClick={() =>
-                              deleteProformaInvoiceHandler(row.original?._id)
+                            // deleteProformaInvoiceHandler(row.original?._id)
+
+                            {
+                              setdeleteId(row.original._id);
+                              setshowDeletePage(true)
+                            }
                             }
                           />
                         )}
@@ -288,6 +312,34 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
             </button>
           </div>
         </div>
+      )}
+
+      {showDeletePage && (
+        <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center">
+          <div className="bg-[#1C3644] rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h2 className="text-lg font-semibold text-white mb-4">Confirm Deletion</h2>
+            <p className="text-sm text-white mb-6">Are you sure you want to delete this item ?</p>
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={() => setshowDeletePage(!showDeletePage)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  deleteProformaInvoiceHandler(deleteId);
+                  setshowDeletePage(false)
+                }}
+                className={`px-4 py-2 text-sm font-medium text-white rounded transition  bg-red-600 hover:bg-red-700 `}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+
       )}
     </div>
   );

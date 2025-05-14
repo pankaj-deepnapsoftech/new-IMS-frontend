@@ -13,7 +13,6 @@ const api = createApi({
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
-
       return headers;
     },
   }),

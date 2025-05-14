@@ -45,7 +45,6 @@ const Task = () => {
   const [page, setPage] = useState(1);
   const [showToken, setShowToken] = useState(false)
   const [showhalfToken, setShowhalfToken] = useState(false)
-  const [showUploadInvoice, setShowUploadInvoice] = useState(false)
   const [saleId, setSaleId] = useState("");
   const [tokenAmount, setTokenAmount] = useState();
   const [invoicefile, setInvoiceFile] = useState("")
@@ -435,7 +434,7 @@ const Task = () => {
             {role?.toLowerCase().includes("prod") ? (
               <HStack className="space-x-3" mt={4}>
                 {task?.design_status === "Pending" && (
-                  <Button colorScheme="teal" size="sm" onClick={() => handleAccept(task.id)} disabled={isSubmitting}>
+                  <Button className={`${isSubmitting ? "cursor-not-allowed" : ""}`} colorScheme="teal" size="sm" onClick={() => handleAccept(task.id)} disabled={isSubmitting}>
                     Accept Task
                   </Button>
                 )}

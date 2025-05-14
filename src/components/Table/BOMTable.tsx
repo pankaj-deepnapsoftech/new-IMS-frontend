@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Cell,
   Column,
@@ -51,6 +51,11 @@ const BOMTable: React.FC<BOMTableProps> = ({
   deleteBomHandler,
   approveBomHandler,
 }) => {
+
+
+  const [showDeletePage, setshowDeletePage] = useState(false);
+  const [deleteId, setdeleteId] = useState('')
+
   const columns = useMemo(
     () => [
       { Header: "BOM Name", accessor: "bom_name" },
@@ -194,11 +199,11 @@ const BOMTable: React.FC<BOMTableProps> = ({
                         bg: "#ffffff78",
                         cursor: "pointer",
                       }}
-                     
+
                     >
                       {row.cells.map((cell: Cell) => {
                         return (
-                          <Td fontWeight="500" {...cell.getCellProps()}  border="none">
+                          <Td fontWeight="500" {...cell.getCellProps()} border="none">
                             {cell.column.id !== "createdAt" &&
                               cell.column.id !== "updatedAt" &&
                               cell.render("Cell")}
@@ -222,7 +227,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                           </Td>
                         );
                       })}
-                      <Td className="flex gap-x-2 text-gray-200"  border="none">
+                      <Td className="flex gap-x-2 text-gray-200" border="none">
                         {openBomDetailsDrawerHandler && (
                           <MdOutlineVisibility
                             className="hover:scale-110"
@@ -245,7 +250,14 @@ const BOMTable: React.FC<BOMTableProps> = ({
                           <MdDeleteOutline
                             className="hover:scale-110"
                             size={16}
-                            onClick={() => deleteBomHandler(row.original?._id)}
+                            onClick={() =>
+                            
+                            {
+                              setdeleteId(row.original._id);
+                              setshowDeletePage(true)
+                            }
+                            }
+
                           />
                         )}
                         {approveBomHandler && (
@@ -284,6 +296,33 @@ const BOMTable: React.FC<BOMTableProps> = ({
           </div>
         </div>
       )}
+          {showDeletePage && (
+                <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center">
+                    <div className="bg-[#1C3644] rounded-lg shadow-xl p-6 w-full max-w-md">
+                        <h2 className="text-lg font-semibold text-white mb-4">Confirm Deletion</h2>
+                        <p className="text-sm text-white mb-6">Are you sure you want to delete this item ?</p>
+                        <div className="mt-6 flex justify-end space-x-3">
+                            <button
+                                onClick={() => setshowDeletePage(!showDeletePage)}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() =>{ deleteBomHandler(deleteId);
+                                setshowDeletePage(false)
+                                }}
+
+                                className={`px-4 py-2 text-sm font-medium text-white rounded transition  bg-red-600 hover:bg-red-700 `}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+            )}
     </div>
   );
 };

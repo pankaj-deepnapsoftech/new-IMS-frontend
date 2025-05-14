@@ -95,7 +95,7 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
 
           {isLoading && <Loading />}
           {!isLoading && (
-            <div className="white">
+            <div className="text-white">
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Created By</p>
                 <p className="text-gray-200">{creator?.first_name + ' ' + creator?.last_name}</p>

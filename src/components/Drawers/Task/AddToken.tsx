@@ -20,6 +20,8 @@ const AddToken = ({ showToken, setShowToken, tokenAmount, sale, refresh }) => {
       },
     validationSchema: AddtokenamtFormValidation,
       onSubmit: async (value) => {
+        if(isSubmitting) return ;
+        setIsSubmitting(true)
         try {
           const response = await axios.patch(
             `${process.env.REACT_APP_BACKEND_URL}sale/addToken/${sale}`,
@@ -103,10 +105,10 @@ const AddToken = ({ showToken, setShowToken, tokenAmount, sale, refresh }) => {
                 <div className="flex justify-center gap-4 pt-2">
                   <button 
                     onClick={handleSubmit}
-                    className="px-6 py-2 rounded-lg font-semibold bg-green-600 hover:bg-green-700 transition"
+                    className={` ${isSubmitting ? "cursor-not-allowed" : " "} px-6 py-2 rounded-lg font-semibold bg-green-600 hover:bg-green-700 transition`}
                     disabled={isSubmitting}
                   >
-                    Submit
+                    Submit 
                   </button>
 
                 </div>

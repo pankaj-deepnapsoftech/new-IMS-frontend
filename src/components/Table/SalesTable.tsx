@@ -19,7 +19,6 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
     };
     console.log(filteredPurchases)
     const [selectedSale, setSelectedSale] = useState([]);
-    const [showinvoice, setShowInvoice] = useState(false)
     const [paymentshow, setPaymentshow] = useState(false)
     const [isOpen, setViewDesign] = useState(false)
     const [isChecked, setIsChecked] = useState(false)

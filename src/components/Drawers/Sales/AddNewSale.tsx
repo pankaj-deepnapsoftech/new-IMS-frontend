@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { BiX } from "react-icons/bi";
 import axios from "axios";
-import {useToast} from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 import { GiConsoleController } from "react-icons/gi";
 import { useFormik } from "formik";
 import { SalesFormValidation } from "../../../Validation/SalesformValidation";
@@ -14,61 +14,65 @@ const AddNewSale = ({ show, setShow, refresh }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [partiesData, setpartiesData] = useState([])
     const [products, setProducts] = useState([]);
-    
 
-    const {values, errors, touched, handleBlur, handleChange, handleSubmit, resetForm} = useFormik({
-            initialValues: {
-                party: "",
-                product_id: "",
-                price: "",
-                product_qty: "",
-                product_type: "finished goods",
-                GST: "",
-                comment: "",
-            },
+
+    const { values, errors, touched, handleBlur, handleChange, handleSubmit, resetForm } = useFormik({
+        initialValues: {
+            party: "",
+            product_id: "",
+            price: "",
+            product_qty: "",
+            product_type: "finished goods",
+            GST: "",
+            comment: "",
+        },
         validationSchema: SalesFormValidation,
-            onSubmit: async (value) => {
-                try {
-                    const res = await fetch(process.env.REACT_APP_BACKEND_URL + "sale/create", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${cookies?.access_token}`,
-                        },
-                        body: JSON.stringify(value)
-                    });
-    
-                    const data = await res.json();
-    
-                    if (res.ok) {
-                        toast({
-                            title: "Sale Created",
-                            description: "The sale has been created successfully.",
-                            status: "success",
-                            duration: 5000,
-                            isClosable: true,
-                        });
-                        resetForm({
-                            party: "",
-                            product_id: "",
-                            price: "",
-                            product_qty: "",
-                            product_type: "finished goods",
-                            GST: "",
-                            comment: "",
-                        });
-                        setShow(!show)
-                        await refresh();
-                    } else {
-                        toast.error(data?.message || "Failed to save Sale.");
-                    }
+        onSubmit: async (value) => {
+            if (isSubmitting) return;
+            setIsSubmitting(true);
+            try {
+                const res = await fetch(process.env.REACT_APP_BACKEND_URL + "sale/create", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${cookies?.access_token}`,
+                    },
+                    body: JSON.stringify(value)
+                });
 
-                } catch (error) {
-                    console.error("Error saving sale:", error);
-                    toast.error("Something went wrong. Please try again.");
+                const data = await res.json();
+
+                if (res.ok) {
+                    toast({
+                        title: "Sale Created",
+                        description: "The sale has been created successfully.",
+                        status: "success",
+                        duration: 5000,
+                        isClosable: true,
+                    });
+                    resetForm({
+                        party: "",
+                        product_id: "",
+                        price: "",
+                        product_qty: "",
+                        product_type: "finished goods",
+                        GST: "",
+                        comment: "",
+                    });
+                    setShow(!show)
+                    await refresh();
+                } else {
+                    toast.error(data?.message || "Failed to save Sale.");
                 }
+
+            } catch (error) {
+                console.error("Error saving sale:", error);
+                toast.error("Something went wrong. Please try again.");
+            } finally {
+                setIsSubmitting(false);
             }
-        })
+        }
+    })
 
     const fetchDropdownData = async () => {
         try {
@@ -118,7 +122,7 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                                     {parties?.full_name} {parties?.company_name ? ` - ${parties?.company_name}` : null}
                                 </option>
                             ))}
-                            
+
                         </select>
                         {touched.party && errors.party && (
                             <p className="text-red-400 text-sm mt-1">{errors.party}</p>
@@ -216,7 +220,7 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                         </div>
                     </div>
 
-                    <div>   
+                    <div>
                         <label className="block text-sm font-medium">Remarks</label>
                         <input
                             type="text"
@@ -229,7 +233,16 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                     </div>
 
                     <div className="flex justify-between">
-                        <button type="submit" className="bg-[#ffffff41] text-white px-4 py-2 rounded hover:">Add Sale</button>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className={`px-4 py-2 rounded text-white transition ${isSubmitting
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-[#ffffff41] hover:bg-[#ffffff6b]" 
+                                }`}
+                        >
+                             Add Sale
+                        </button>
                         <button type="button" onClick={() => setShow(!show)} className=" bg-[#ffffff41] px-4 py-2 rounded  hover:text-gray-200">Cancel</button>
                     </div>
                 </form>

@@ -420,8 +420,6 @@ const IndirectProducts: React.FC = () => {
 </div>
 
 
-
-
       <div>
         <ProductTable
           isLoadingProducts={isLoadingProducts}

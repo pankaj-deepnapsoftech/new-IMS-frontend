@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Cell,
   Column,
@@ -51,6 +51,11 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   openProcessDetailsDrawerHandler,
   deleteProcessHandler,
 }) => {
+
+
+  const [showDeletePage, setshowDeletePage] = useState(false);
+  const [deleteId, setdeleteId] = useState('')
+
   const columns = useMemo(
     () => [
       { Header: "Created By", accessor: "creator" },
@@ -67,19 +72,19 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
 
   const statusStyles = {
     "raw material approval pending": {
-      
+
       text: "#F03E3E",
     },
     "raw materials approved": {
-      
+
       text: "#3392F8",
     },
     "work in progress": {
-      
+
       text: "#E48C27",
     },
     completed: {
-      
+
       text: "#409503",
     },
   };
@@ -170,7 +175,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                               fontSize="14px"
                               fontWeight="600"
                               color="white"
-                            
+
                               {...column.getHeaderProps(
                                 column.getSortByToggleProps()
                               )}
@@ -195,7 +200,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                           fontSize="14px"
                           fontWeight="600"
                           color="white"
-                        
+
                         >
                           Actions
                         </Th>
@@ -205,7 +210,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                 )}
               </Thead>
               <Tbody {...getTableBodyProps()}>
-                {page.map((row: any,index) => {
+                {page.map((row: any, index) => {
                   prepareRow(row);
 
                   return (
@@ -258,10 +263,10 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                               <span>{row.original.item.name}</span>
                             )}
                             {cell.column.id === "rm_store" && (
-                              <span>{row.original.rm_store.name}</span>
+                              <span>{row.original.rm_store?.name || "N/A"}</span>
                             )}
                             {cell.column.id === "fg_store" && (
-                              <span>{row.original.fg_store.name}</span>
+                              <span>{row.original.fg_store?.name || "N/A"}</span>
                             )}
                             {cell.column.id === "scrap_store" && (
                               <span>{row.original.scrap_store.name}</span>
@@ -305,8 +310,13 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                             className="hover:scale-110"
                             size={16}
                             onClick={() =>
-                              deleteProcessHandler(row.original?._id)
+                            
+                            {
+                              setdeleteId(row.original._id);
+                              setshowDeletePage(true)
                             }
+                            }
+
                           />
                         )}
                       </Td>
@@ -338,6 +348,33 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
           </div>
         </div>
       )}
+          {showDeletePage && (
+                <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center">
+                    <div className="bg-[#1C3644] rounded-lg shadow-xl p-6 w-full max-w-md">
+                        <h2 className="text-lg font-semibold text-white mb-4">Confirm Deletion</h2>
+                        <p className="text-sm text-white mb-6">Are you sure you want to delete this item ?</p>
+                        <div className="mt-6 flex justify-end space-x-3">
+                            <button
+                                onClick={() => setshowDeletePage(!showDeletePage)}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() =>{ deleteProcessHandler(deleteId);
+                                setshowDeletePage(false)
+                                }}
+
+                                className={`px-4 py-2 text-sm font-medium text-white rounded transition  bg-red-600 hover:bg-red-700 `}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+            )}
     </div>
   );
 };

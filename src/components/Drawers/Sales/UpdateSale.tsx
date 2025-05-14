@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Cookies, useCookies } from "react-cookie";
 import { BiX } from "react-icons/bi";
 import axios from "axios";
-import {useToast} from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 import { GiConsoleController } from "react-icons/gi";
 
 import { useFormik } from "formik";
@@ -14,20 +14,11 @@ import { SalesFormValidation } from "../../../Validation/SalesformValidation";
 const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
     const [cookies] = useCookies();
     const toast = useToast();
-    // const [formData, setFormData] = useState({
-    //     party: "",
-    //     product_id: "",
-    //     price: "",
-    //     product_qty: "",
-    //     product_type: "finished goods",
-    //     GST: "",
-    //     comment: "",
-    // });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [partiesData, setpartiesData] = useState([])
     const [products, setProducts] = useState([]);
-    
-    const {values, errors, touched, handleBlur, handleChange, handleSubmit} = useFormik({
+
+    const { values, errors, touched, handleBlur, handleChange, handleSubmit } = useFormik({
         initialValues: {
             party: sale?.party_id?.[0]?._id || "",
             product_id: sale?.product_id?.[0]?._id || "",
@@ -40,6 +31,8 @@ const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
         validationSchema: SalesFormValidation,
         enableReinitialize: true,
         onSubmit: async (value) => {
+            if (isSubmitting) return;
+            setIsSubmitting(true)
             try {
 
                 await axios.patch(
@@ -65,6 +58,8 @@ const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
             } catch (error) {
                 console.error("Error saving sale:", error);
                 toast.error("Something went wrong. Please try again.");
+            } finally {
+                setIsSubmitting(false)
             }
         }
     })
@@ -104,12 +99,12 @@ const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
         <div className={`absolute z-50 top-0 ${editshow ? "right-1" : "hidden"}  w-[30vw] transition-opacity duration-500 h-full bg-[#57657F] text-white   justify-center`}>
             <div className=" p-6 rounded-lg w-full max-w-md relative">
                 <BiX size="30px" onClick={() => seteditsale(!editshow)} />
-                <h2 className="text-xl text-center mt-4 font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">Edit Sale</h2>
+                <h2 className="text-xl text-center mt-4 font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">Update Sale</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-md font-medium mb-2">Party </label>
                         <select required name="party" value={values.party} onChange={handleChange} onBlur={handleBlur} className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2">
-                            
+
 
                             <option value="" className="text-black bg-[#ffffff41]">Select a party</option>
                             {partiesData.map((parties: any) => (
@@ -117,7 +112,7 @@ const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
                                     {parties?.full_name} {parties?.company_name ? ` - ${parties?.company_name}` : null}
                                 </option>
                             ))}
-                            
+
                         </select>
                         {touched.party && errors.party && (
                             <p className="text-red-400 text-sm mt-1">{errors.party}</p>
@@ -225,7 +220,12 @@ const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
                     </div>
 
                     <div className="flex justify-between">
-                        <button type="submit" className="bg-[#ffffff41] text-white px-4 py-2 rounded hover:" disabled={isSubmitting}>Update Sale</button>
+                        <button type="submit" disabled={isSubmitting}
+                            className={`px-4 py-2 rounded text-white transition ${isSubmitting
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-[#ffffff41] hover:bg-[#ffffff6b]"
+                                }`}
+                        >Submit</button>
                         <button type="button" onClick={() => seteditsale(!editshow)} className=" bg-[#ffffff41] px-4 py-2 rounded  hover:text-gray-200">Cancel</button>
                     </div>
                 </form>

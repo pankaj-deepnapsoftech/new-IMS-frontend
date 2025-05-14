@@ -233,7 +233,7 @@ const AddProcess: React.FC<AddProcess> = ({
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="white">BOM</FormLabel>
-              <Select styles={customStyles} value={bom} options={bomOptions} onChange={(d: any) => setBom(d)} required />
+              <Select  styles={customStyles} value={bom} options={bomOptions} onChange={(d: any) => setBom(d)} required />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="white">Current Stock</FormLabel>
