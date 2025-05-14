@@ -8,7 +8,8 @@ import {
     Badge,
     Button,
     useToast,
-    HStack, } from "@chakra-ui/react";
+    HStack,
+} from "@chakra-ui/react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
@@ -25,7 +26,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
         assined_process: "",
         assinedby_comment: "",
     });
-
+    console.log(employeeData)
     const [isEditMode, setIsEditMode] = useState(false);
     const [editTaskId, setEditTaskId] = useState(null);
 
@@ -35,17 +36,17 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { values, setValues, errors, touched, handleBlur, handleChange, handleSubmit, resetForm} = useFormik({
+    const { values, setValues, errors, touched, handleBlur, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
             sale_id: saleData?._id,
             assined_to: "",
             assined_process: "",
             assinedby_comment: "",
         },
-        enableReinitialize: true, 
+        enableReinitialize: true,
         validationSchema: AssignFormValidation,
         onSubmit: async (value) => {
-            if(isSubmitting) return;
+            if (isSubmitting) return;
             setIsSubmitting(true)
             try {
                 if (!token) throw new Error("Authentication token not found");
@@ -204,7 +205,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                                     </Text>
                                     <HStack>
                                         <Button
-                                        size={"sm"}
+                                            size={"sm"}
                                             bgColor="blue.500"
                                             _hover="blue.400"
                                             onClick={() => handleEdit(task._id, task)}
@@ -212,7 +213,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                                             <FaEdit className="text-white" />
                                         </Button>
                                         <Button
-                                        size={"sm"}
+                                            size={"sm"}
                                             bgColor="red.500"
                                             _hover="red.400"
                                             onClick={() => {
@@ -224,7 +225,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                                             <MdDelete className="text-white" />
                                         </Button>
                                     </HStack>
-                            </div>
+                                </div>
                             ))}
                         </div>
                     )}
@@ -240,11 +241,27 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                             required
                         >
                             <option value="" className="text-black bg-[#ffffff23]">Select an employee</option>
-                            {employeeData.map((emp) => (
-                                <option className="text-black bg-[#ffffff23]" key={emp?._id} value={emp?._id}>
-                                    {emp?.first_name} - {emp?.role?.role || ""}
-                                </option>
-                            ))}
+                            {
+                                employeeData
+                                    .filter(emp => {
+                                        const role = emp?.role?.role?.toLowerCase() || "";
+                                        return (
+                                            role.includes("production") ||
+                                            role.includes("dispatcher") ||
+                                            role.includes("inventory")
+                                        );
+                                    })
+                                    .map(emp => (
+                                        <option
+                                            className="text-black bg-[#ffffff23]"
+                                            key={emp?._id}
+                                            value={emp?._id}
+                                        >
+                                            {emp?.first_name} - {emp?.role?.role || ""}
+                                        </option>
+                                    ))
+                            }
+
                         </select>
                         {touched.assined_to && errors.assined_to && (
                             <p className="text-red-400 text-sm mt-1">{errors.assined_to}</p>
