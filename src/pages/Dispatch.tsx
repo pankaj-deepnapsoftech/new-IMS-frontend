@@ -185,16 +185,16 @@ const Dispatch = () => {
                   <p>
                     <span className="font-semibold">Party:</span> {acc?.Sale_id[0]?.customer_id[0]?.full_name || "N/A"}
                   </p>
-                  {/* <p>
-                  <span className="font-semibold">Product Name:</span> {acc?.sale_id[0]?.product_id[0]?.name || "N/A"}
-                </p> */}
+                  <p>
+                  <span className="font-semibold">Product Name:</span> {acc?.Sale_id[0]?.product_id[0]?.name || "N/A"}
+                </p>
                   <p>
                     <span className="font-semibold">Quantity:</span> {acc?.Sale_id[0]?.product_qty || "N/A"}
                   </p>
                 </div>
 
                 <div className="text-right space-y-1">
-                  {acc?.Sale_id[0]?.paymet_status && (
+                  {/* {acc?.Sale_id[0]?.paymet_status && (
                     <span className="block bg-sky-800/60 text-white text-xs px-2 py-1 rounded">
                       PAYMENT STATUS : {acc?.Sale_id[0]?.paymet_status === "Paied"
                         ? "Paid"
@@ -205,7 +205,7 @@ const Dispatch = () => {
                     <span className="block bg-sky-800/60 text-white text-xs px-2 py-1 rounded">
                       PRODUCT STATUS: {acc?.bom?.Sale_id[0]?.product_status}
                     </span>
-                  )}
+                  )} */}
                   {(role == "Accountant" || role == "Sales" || role == "admin") ? (
                     <p>
                       <span className="font-semibold">Price:</span> {acc?.Sale_id[0]?.price *
