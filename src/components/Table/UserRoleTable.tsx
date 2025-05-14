@@ -54,8 +54,12 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
   const dynamicBg = (index) => {
     return index % 2 !== 0 ? "#ffffff40" : "#ffffff1f";
   };
+
+  
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState('')
+
+
   const {
     getTableProps,
     getTableBodyProps,

@@ -21,6 +21,8 @@ const AddhalfToken = ({ showhalfToken, setShowhalfToken, tokenAmount, sale, refr
       },
       validationSchema: AddhalftokenFormValidation,
       onSubmit: async (value) => {
+        if(isSubmitting) return ;
+        setIsSubmitting(true)
         try {
             const response = await axios.put(`${process.env.REACT_APP_BACKEND_URL}sale/update/${sale}`, value, {
                 headers: {
@@ -99,7 +101,7 @@ const AddhalfToken = ({ showhalfToken, setShowhalfToken, tokenAmount, sale, refr
                 <div className="flex justify-center gap-4 pt-2">
                     <button 
                     onClick={handleSubmit}
-                    className="px-6 py-2 rounded-lg font-semibold bg-green-600 hover:bg-green-700 transition"
+                    className={` ${isSubmitting ? "cursor-not-allowed" : " "}  px-6 py-2 rounded-lg font-semibold bg-green-600 hover:bg-green-700 transition`}
                     disabled={isSubmitting}
                     >
                     Submit

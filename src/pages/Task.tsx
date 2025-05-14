@@ -45,7 +45,6 @@ const Task = () => {
   const [page, setPage] = useState(1);
   const [showToken, setShowToken] = useState(false)
   const [showhalfToken, setShowhalfToken] = useState(false)
-  const [showUploadInvoice, setShowUploadInvoice] = useState(false)
   const [saleId, setSaleId] = useState("");
   const [tokenAmount, setTokenAmount] = useState();
   const [invoicefile, setInvoiceFile] = useState("")
@@ -435,7 +434,7 @@ const Task = () => {
             {role?.toLowerCase().includes("prod") ? (
               <HStack className="space-x-3" mt={4}>
                 {task?.design_status === "Pending" && (
-                  <Button colorScheme="teal" size="sm" onClick={() => handleAccept(task.id)} disabled={isSubmitting}>
+                  <Button className={`${isSubmitting ? "cursor-not-allowed" : ""}`} colorScheme="teal" size="sm" onClick={() => handleAccept(task.id)} disabled={isSubmitting}>
                     Accept Task
                   </Button>
                 )}
@@ -491,31 +490,7 @@ const Task = () => {
 
 
                 {/* {task?.isTokenVerify && ( */}
-                <Button
-                  leftIcon={<FaCloudUploadAlt />}
-                  bgGradient="linear(to-r, blue.400, blue.600)"
-                  color="white"
-                  fontWeight="semibold"
-                  px="6"
-                  py="3"
-                  borderRadius="md"
-                  boxShadow="md"
-                  _hover={{
-                    bgGradient: "linear(to-r, blue.500, blue.700)",
-                    boxShadow: "lg",
-                    transform: "translateY(-2px)",
-                  }}
-                  transition="all 0.2s ease-in-out"
-                  // onClick={() => handleInvoiceUpload(task.sale_id, task.invoice)}
-                  onClick={() => {
-                    setShowUploadInvoice(!showUploadInvoice);
-                    setSaleId(task?.sale_id);
-                    setInvoiceFile(task?.invoice);
-                  }
-                  }
-                >
-                  Upload Invoice
-                </Button>
+           
 
                 {/* )} */}
                 {/* {task?.isSampleApprove && ( */}
@@ -567,7 +542,6 @@ const Task = () => {
       </div>
       <Pagination page={page} setPage={setPage} length={tasks?.length} />
       <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
-      <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice} sale={saleId} invoicefile={invoicefile} />
       <AddhalfToken showhalfToken={showhalfToken} setShowhalfToken={setShowhalfToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
     </section>
   )

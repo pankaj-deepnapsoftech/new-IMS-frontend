@@ -10,7 +10,7 @@ import { PartiesFromValidation } from "../../../Validation/PartiesFromValidation
 
 const AddParties = ({ showData, setshowData, setCounter }) => {
     const [cookies] = useCookies();
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const {values, errors, touched, handleBlur, handleChange, handleSubmit, resetForm} = useFormik({
         initialValues: {
             full_name: '',
@@ -23,7 +23,8 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
         },
         validationSchema: PartiesFromValidation,
         onSubmit: async (value) => {
-
+         if(isSubmitting) return ;
+         setIsSubmitting(true)
             try {
                 const res = await fetch(process.env.REACT_APP_BACKEND_URL + "parties/create", {
                     method: "POST",
@@ -55,6 +56,8 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
             } catch (error) {
                 console.error("Error saving party:", error);
                 toast.error("Something went wrong. Please try again.");
+            }finally {
+                setIsSubmitting(false);
             }
         }
     })
@@ -198,13 +201,16 @@ const AddParties = ({ showData, setshowData, setCounter }) => {
                         <p className="text-red-400 text-sm mt-1">{errors.parties_type}</p>
                     )}
                 </div>
-    
-                {/* Submit Button */}
+
                 <button
                     type="submit"
-                    className="w-full bg-[#ffffff38] text-white text-lg sm:text-xl py-2 rounded hover:bg-[#ffffff65] transition duration-300"
+                    disabled={isSubmitting}
+                    className={`px-4 py-2 rounded text-white transition ${isSubmitting
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-[#ffffff41] hover:bg-[#ffffff6b]" 
+                        }`}
                 >
-                    Submit
+                    Add Sale
                 </button>
             </form>
         </div>

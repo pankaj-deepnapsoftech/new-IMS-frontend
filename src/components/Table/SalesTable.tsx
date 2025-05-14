@@ -19,7 +19,6 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
     };
     console.log(filteredPurchases)
     const [selectedSale, setSelectedSale] = useState([]);
-    const [showinvoice, setShowInvoice] = useState(false)
     const [paymentshow, setPaymentshow] = useState(false)
     const [isOpen, setViewDesign] = useState(false)
     const [isChecked, setIsChecked] = useState(false)
@@ -93,7 +92,7 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
 
                             {/* {purchase?.isTokenVerify && ( */}
 
-                            <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setShowInvoice(!showinvoice)}>Upload Invoice</button>
+                        
 
                             {/* )} */}
 
@@ -110,9 +109,7 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
             ))}
             <AssignEmployee show={show} setShow={setShow} employeeData={empData}
                 saleData={selectedSale} />
-            {/* <ViewPayment paymentshow={paymentshow} setPaymentshow={setPaymentshow} /> */}
-            <UploadInvoice showinvoice={showinvoice} setShowInvoice={setShowInvoice} />
-            {/* <ViewDesign isOpen={isOpen}  setViewDesign={setViewDesign}/> */}
+          
             <ApproveSample  isChecked={isChecked} setIsChecked={setIsChecked}/>
         </>
 

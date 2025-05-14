@@ -11,7 +11,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import moment from "moment";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
 import { FcApproval, FcDatabase } from "react-icons/fc";
@@ -56,6 +56,10 @@ const StoreTable: React.FC<StoreTableProps> = ({
   deleteStoreHandler,
   approveStoreHandler,
 }) => {
+
+  const [showDeletePage, setshowDeletePage] = useState(false);
+  const [deleteId, setdeleteId] = useState('')
+  
   const columns: Column<{
     name: string;
     gst_number: string;
@@ -297,8 +301,11 @@ const StoreTable: React.FC<StoreTableProps> = ({
                             className="hover:scale-110"
                             size={16}
                             onClick={() =>
-                              deleteStoreHandler(row.original?._id)
-                            }
+                              
+                              {  setdeleteId(row.original._id);
+                                setshowDeletePage(true)}
+                              }
+                            
                           />
                         )}
                         {approveStoreHandler && (
@@ -339,6 +346,34 @@ const StoreTable: React.FC<StoreTableProps> = ({
           </div>
         </div>
       )}
+
+{showDeletePage && (
+                <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center">
+                    <div className="bg-[#1C3644] rounded-lg shadow-xl p-6 w-full max-w-md">
+                        <h2 className="text-lg font-semibold text-white mb-4">Confirm Deletion</h2>
+                        <p className="text-sm text-white mb-6">Are you sure you want to delete this item ?</p>
+                        <div className="mt-6 flex justify-end space-x-3">
+                            <button
+                                onClick={() => setshowDeletePage(!showDeletePage)}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() =>{ deleteStoreHandler(deleteId);
+                                setshowDeletePage(false)
+                                }}
+
+                                className={`px-4 py-2 text-sm font-medium text-white rounded transition  bg-red-600 hover:bg-red-700 `}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+            )}
     </div>
   );
 };

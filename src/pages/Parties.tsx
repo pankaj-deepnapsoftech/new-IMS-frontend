@@ -44,7 +44,7 @@ const Parties = () => {
 
 
     return (
-        <section className="w-full px-4 py-6">
+        <section className="w-full  py-6">
             <h1 className="text-white font-semibold text-2xl md:text-3xl text-center mb-6">
                 Parties
             </h1>
@@ -105,6 +105,7 @@ const Parties = () => {
                 partiesData={partiesData}
                 setPartiesData={setPartiesData}
                 isLoading={isLoading}
+                fetchPartiesData={fetchPartiesData}
             />
 
             

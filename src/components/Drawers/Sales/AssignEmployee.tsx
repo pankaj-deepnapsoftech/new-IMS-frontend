@@ -45,6 +45,8 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
         enableReinitialize: true, 
         validationSchema: AssignFormValidation,
         onSubmit: async (value) => {
+            if(isSubmitting) return;
+            setIsSubmitting(true)
             try {
                 if (!token) throw new Error("Authentication token not found");
 
@@ -274,7 +276,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                         />
 
                         <button
-                            className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg font-semibold transition"
+                            className={` ${isSubmitting ? "cursor-not-allowed" : ''}  w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg font-semibold transition`}
                             disabled={isSubmitting}
                             onClick={handleSubmit}
                         >

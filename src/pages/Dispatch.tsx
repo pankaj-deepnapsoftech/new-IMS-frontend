@@ -24,7 +24,7 @@ const Dispatch = () => {
   const [data, setData] = useState([]);
   const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("");
   const [selectedProductStatus, setSelectedProductStatus] = useState("");
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showattachment, setShowAttachment] = useState(false)
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState('');
@@ -37,8 +37,8 @@ const Dispatch = () => {
     },
     validationSchema: DispatchFormSchema,
     onSubmit: async (values) => {
-    
-      console.log(values)
+     if(isSubmitting) return ;
+     setIsSubmitting(true)
       try {
         const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}dispatch/createDispatch`, values, {
           headers: {
@@ -52,6 +52,8 @@ const Dispatch = () => {
         setShowModal(false)
       } catch (error) {
         console.log(error)
+      }finally{
+        setIsSubmitting(false)
       }
     }
   })
@@ -324,7 +326,9 @@ const Dispatch = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    disabled={isSubmitting}
+
+                    className={`${isSubmitting ? "cursor-not-allowed" : ""}  px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700`}
                   >
                     Submit & Save
                   </button>

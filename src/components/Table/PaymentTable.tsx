@@ -48,6 +48,10 @@ const PaymentTable: React.FC<AgentTableProps> = ({
   openPaymentDetailsDrawerHandler,
   openUpdatePaymentDrawer,
 }) => {
+
+  
+
+
   const columns = useMemo(
     () => [
       { Header: "Created By", accessor: "creator" },
