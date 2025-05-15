@@ -115,7 +115,7 @@ const Parties = () => {
 
             
             <AddParties showData={showData} setshowData={setshowData} setCounter={setCounter} />
-            <Pagination page={pages} setPage={setPages} length={partiesData.length} TotalPage={TotalPage} />
+            <Pagination page={pages} setPage={setPages} TotalPage={TotalPage} />
         </section>
     );
 };
