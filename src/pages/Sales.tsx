@@ -25,6 +25,7 @@ const Sales = () => {
     const [filteredPurchases, setFilteredPurchases] = useState([]);
     const [selectedSale, setSelectedSale] = useState([]);
     const [employees, setEmployees] = useState<any[]>([]);
+    const [totalPages, setTotalPages] = useState(0);
 
     const handleDataFromChild = (data) => {
         setSelectedSale(data);
@@ -45,6 +46,10 @@ const Sales = () => {
             });
 
             setPurchases(response.data.data);
+               
+            const totalItems = response.data.totalData || 0;
+            const itemsPerPage = 10;
+            setTotalPages(Math.ceil(totalItems / itemsPerPage));
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || error.message || "Failed to fetch sale data";
             toast.error(errorMessage);
@@ -52,6 +57,7 @@ const Sales = () => {
             setIsLoading(false);
         }
     };
+    
 
     const fetchEmployees = async () => {
         try {
@@ -165,7 +171,8 @@ const Sales = () => {
 
             <AddNewSale show={show} setShow={setShow} refresh={fetchPurchases} />
             <UpdateSale editshow={editshow} sale={selectedSale} seteditsale={seteditsale} refresh={fetchPurchases} />
-            <Pagination page={pages} setPage={setPages} length={purchases.length} />
+            <Pagination page={pages} setPage={setPages} TotalPage={totalPages} />
+
         </>
     );
 };

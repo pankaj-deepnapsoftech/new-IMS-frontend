@@ -64,22 +64,25 @@ const Dispatch = () => {
 
   const GetDispatch = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch?limit=${limit}&page=${pages}`, {
         headers: {
           Authorization: `Bearer ${cookies.access_token}`
         }
-      })
-      setData(response?.data?.data)
-      let totalpage = Math.ceil(data.totalData / limit);
-      setTotalPage(totalpage)
-   
+      });
+
+      setData(response?.data?.data); // This is your array of dispatch records
+      const totalData = response?.data?.totalData || 0;
+      const totalPages = Math.ceil(totalData / limit);
+      setTotalPage(totalPages);
+
     } catch (error) {
-      console.log(error)
+      console.log(error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+  
   useEffect(() => {
     GetDispatch()
   }, [pages,limit])

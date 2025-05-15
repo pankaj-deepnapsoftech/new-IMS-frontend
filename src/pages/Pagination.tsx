@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from "react";
-import { Box, Button, HStack, Text, VStack, IconButton } from "@chakra-ui/react";
+import {  Button, HStack, Text, VStack, IconButton } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
 const Pagination = ({ page, setPage, TotalPage }) => {

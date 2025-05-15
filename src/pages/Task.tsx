@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // @ts-nocheck 
 
 import axios from "axios"
@@ -48,6 +50,9 @@ const Task = () => {
   const [saleId, setSaleId] = useState("");
   const [tokenAmount, setTokenAmount] = useState();
   const [invoicefile, setInvoiceFile] = useState("")
+  const [limit, setlimit] = useState(10)
+  const [TotalPage, setTotalPage] = useState(0)
+
   const role = cookies?.role;
 
 
@@ -60,7 +65,7 @@ const Task = () => {
     try {
       setIsLoading(true)
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}assined/get-assined?page=${page}`,
+        `${process.env.REACT_APP_BACKEND_URL}assined/get-assined?limit=${limit}&page=${page}`,
         {
           headers: {
             Authorization: `Bearer ${cookies?.access_token}`,
@@ -116,6 +121,11 @@ const Task = () => {
         };
       });
       setTasks(tasks);
+      let totalData = response?.data?.totalData || 0;
+      let totalPages = Math.ceil(totalData / limit);
+      setTotalPage(totalPages);
+
+      console.log(totalPage)
     } catch (error) {
       console.log(error);
 
@@ -248,15 +258,16 @@ const Task = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [cookies?.access_token, page]);
+
+  }, [cookies?.access_token, page, limit]);
 
 
   if (isLoading) {
     return <Loading />
   }
-  if (!tasks || tasks.length === 0) { 
+  if (!tasks || tasks.length === 0) {
     return <EmptyData />
-   }
+  }
 
 
   return (
@@ -564,7 +575,7 @@ const Task = () => {
         ))}
 
       </div>
-      <Pagination page={page} setPage={setPage} length={tasks?.length} />
+      <Pagination page={page} setPage={setPage} TotalPage={TotalPage} />
       {/* <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
       <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice} sale={saleId} invoicefile={invoicefile} />
       <AddhalfToken showhalfToken={showhalfToken} setShowhalfToken={setShowhalfToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} /> */}
