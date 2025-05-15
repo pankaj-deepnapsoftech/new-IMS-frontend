@@ -16,11 +16,13 @@ const Parties = () => {
     const [cookies] = useCookies();
     const [isLoading, setIsLoading] = useState(true);
     const [pages, setPages] = useState(1)
+    const [TotalPage,setTotalPage] = useState(0)
+    const [limit,setLimit] = useState(10)
     const fetchPartiesData = async () => {
         try {
             setIsLoading(true)
             const res = await fetch(
-                `${process.env.REACT_APP_BACKEND_URL}parties/get`,
+                `${process.env.REACT_APP_BACKEND_URL}parties/get?limit=${limit}&page=${pages}`,
                 {
                     method: "GET",
                     headers: {
@@ -30,6 +32,8 @@ const Parties = () => {
             );
             const data = await res.json();
             setPartiesData(data.data);
+            let totalPage = Math.ceil(data.totalData / limit)
+            setTotalPage(totalPage)
         } catch (error) {
             console.log(error);
         
@@ -40,7 +44,7 @@ const Parties = () => {
 
     useEffect(() => {
         fetchPartiesData();
-    }, [counter]);
+    }, [counter,pages,limit]);
 
 
     return (
@@ -49,7 +53,7 @@ const Parties = () => {
                 Parties
             </h1>
 
-            {/* Filter Inputs */}
+           
             <div className="flex flex-col md:flex-row md:items-center justify-center gap-4 mb-6">
                 <input
                     type="text"
@@ -106,11 +110,12 @@ const Parties = () => {
                 setPartiesData={setPartiesData}
                 isLoading={isLoading}
                 fetchPartiesData={fetchPartiesData}
+                setLimit={setLimit}
             />
 
             
             <AddParties showData={showData} setshowData={setshowData} setCounter={setCounter} />
-            <Pagination page={pages} setPage={setPages} length={partiesData.length} />
+            <Pagination page={pages} setPage={setPages} length={partiesData.length} TotalPage={TotalPage} />
         </section>
     );
 };

@@ -12,7 +12,7 @@ import { MdDeleteOutline, MdEdit } from "react-icons/md";
 import { useTable } from "react-table";
 
 
-const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData, setPartiesData, isLoading }) => {
+const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData, setPartiesData, isLoading, setLimit }) => {
     const [editId, setEditId] = useState("");
     const [deleteId, setdeleteId] = useState('')
     const [cookies] = useCookies()
@@ -50,7 +50,6 @@ const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData,
 
 
 
-
     const [formData, setFormData] = useState({
         full_name: "",
         email: "",
@@ -78,7 +77,7 @@ const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData,
     const handleDelete = async (partyId) => {
         // console.log(partyId);
 
-        if(isSubmitting) return ;
+        if (isSubmitting) return;
         setIsSubmitting(true)
 
         try {
@@ -103,7 +102,7 @@ const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData,
             setIsConfirmed(false)
         } catch (error) {
             console.error("Error deleting party:", error);
-        }finally{
+        } finally {
             setIsSubmitting(false)
         }
     };
@@ -157,12 +156,12 @@ const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData,
 
                 <div className="flex justify-end mb-2 mt-2 bg-transparent">
                     <select
-                        onChange={(e) => setPageSize(Number(e.target.value))}
+                        onChange={(e) => setLimit(Number(e.target.value))}
                         className=" border bg-transparent px-3 rounded-md py-1 focus:outline-none"
                     >
-                        {[10, 20, 50, 100, 100000].map((size) => (
+                        {[10, 20, 50, 100].map((size) => (
                             <option className="text-white bg-[#444e5b]" key={size} value={size} >
-                                {size === 100000 ? "All" : size}
+                                {size === 100 ? "All" : size}
                             </option>
                         ))}
                     </select>
@@ -341,8 +340,8 @@ const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData,
                             type="submit"
                             disabled={isSubmitting}
                             className={`w-full px-4 py-2 rounded text-white transition-all duration-300 ${isSubmitting
-                                    ? "bg-gray-400 cursor-not-allowed"
-                                    : "bg-[#ffffff41] hover:bg-[#ffffff6b]"
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-[#ffffff41] hover:bg-[#ffffff6b]"
                                 }`}
                         >
                             Submit
@@ -366,7 +365,7 @@ const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData,
                             <button
                                 onClick={() => handleDelete(editId)}
                                 disabled={isSubmitting}
-                                className={` ${ isSubmitting ? "cursor-not-allowed" : " "} px-4 py-2 text-sm font-medium text-white rounded transition  bg-red-600 hover:bg-red-700 `}
+                                className={` ${isSubmitting ? "cursor-not-allowed" : " "} px-4 py-2 text-sm font-medium text-white rounded transition  bg-red-600 hover:bg-red-700 `}
                             >
                                 Delete
                             </button>
