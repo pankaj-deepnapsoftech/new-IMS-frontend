@@ -31,7 +31,7 @@ const Layout: React.FC = () => {
       setCookie("access_token", data.token, { maxAge: 86400 });
       dispatch(userExists(data.user));
     } catch (err: any) {
-      navigate('/login');
+      navigate("/login");
       toast.error(err?.message || "Something went wrong");
     }
   };
@@ -45,20 +45,29 @@ const Layout: React.FC = () => {
   }, []);
 
   return (
-    <div>
-     <Header/>
-
-      <div className="h-[95vh]  flex ">
-        <div
-          className="h-[inherit]  border: none overflow-x-hidden overflow-y-auto w-0 md:w-[245px] "
-          style={{ boxShadow: "0 0 20px 3px #96beee26" }}
-        >
-        </div>
-        <div className="flex-1 h-full w-[100%] overflow-auto scrollbar-hidden ">
+    <div className="min-h-screen bg-gray-50">
+      <div className="flex h-screen">
+        {/* Sidebar for Desktop */}
+        <div className="hidden lg:block w-64 flex-shrink-0">
           <Navigation />
-          <Container>
-            <Outlet />
-          </Container>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="lg:hidden">
+          <Navigation />
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Header */}
+          <Header />
+          
+          {/* Page Content */}
+          <div className="flex-1 overflow-auto">
+            <Container>
+              <Outlet />
+            </Container>
+          </div>
         </div>
       </div>
     </div>

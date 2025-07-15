@@ -4,12 +4,7 @@ interface ContainerProps {
 
 const Container: React.FC<ContainerProps> = ({ children }) => {
   return (
-    <div
-      className="w-full m-0 px-6 py-4 rounded overflow-auto h-full scrollbar-hidden " 
-      style={{ boxShadow: "0 0 20px 3px rgba(221, 230, 240, 0.15)" }}
-    >
-      {children}
-    </div>
+    <div className="w-full h-full p-2 lg:p-3 overflow-auto">{children}</div>
   );
 };
 
