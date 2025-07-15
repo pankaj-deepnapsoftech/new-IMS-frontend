@@ -139,7 +139,7 @@ const UserRole: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50 p-2 lg:p-3">
       {/* Add User Role */}
       {isAddRoleDrawerOpened && (
         <AddUserRole
@@ -163,19 +163,59 @@ const UserRole: React.FC = () => {
         />
       )}
 
-      <div className="flex flex-col  md:justify-between md:items-center gap-y-2">
-        {/* Title */}
-        <span className="text-2xl md:text-3xl pb-6 text-white font-bold max-[800px]:text-center">User Roles</span>
+      {/* Header Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          {/* Title Section */}
+          <div className="flex items-center gap-4">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                User Roles
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Manage user roles and permissions
+              </p>
+            </div>
+          </div>
 
-        <div className="flex flex-col md:flex-row gap-2 mt-2 md:mt-0">
-         
-          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button
               onClick={openAddRoleDrawerHandler}
-              bg="#4b87a0d9"
-              color="white"
-              className="w-full md:w-auto"
-              _hover={{ bg: "white", textColor: "black" }}
+              colorScheme="blue"
+              size="md"
+              leftIcon={
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              }
+              className="shadow-lg hover:shadow-xl transition-all duration-200"
+              _hover={{ transform: "translateY(-1px)" }}
             >
               Add New Role
             </Button>
@@ -183,30 +223,35 @@ const UserRole: React.FC = () => {
               onClick={fetchRolesHandler}
               leftIcon={<MdOutlineRefresh />}
               variant="outline"
-              color="white"
-              borderColor="white"
-              className="w-full md:w-auto"
-              _hover={{ bg: "white", color: "#2D3748" }}
+              colorScheme="gray"
+              size="md"
+              className="border-gray-300 hover:border-gray-400 transition-all duration-200"
+              _hover={{ bg: "gray.50", transform: "translateY(-1px)" }}
             >
               Refresh
             </Button>
           </div>
+        </div>
 
-          {/* Search */}
-          <div className="relative w-full md:w-auto flex-1">
-            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-200" />
+        {/* Search Section */}
+        <div className="mt-4 flex justify-center sm:justify-end">
+          <div className="relative w-full max-w-md">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FiSearch className="h-5 w-5 text-gray-400" />
+            </div>
             <input
-              className="pl-10 pr-4 py-2 w-full text-sm border-b bg-[#475569] shadow-sm focus:outline-none text-gray-200 placeholder:text-gray-200"
+              type="text"
+              className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
               placeholder="Search roles..."
-              value={searchKey}
+              value={searchKey || ""}
               onChange={(e) => setSearchKey(e.target.value)}
             />
           </div>
         </div>
-
       </div>
 
-      <div>
+      {/* Table Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <UserRoleTable
           roles={filteredRoles}
           isLoadingRoles={isLoadingRoles}
