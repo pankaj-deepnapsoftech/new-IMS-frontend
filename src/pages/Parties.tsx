@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // @ts-nocheck
 import { MdOutlineRefresh } from "react-icons/md";
 import AddParties from "../components/Drawers/Parties/AddParties";
