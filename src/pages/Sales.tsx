@@ -45,7 +45,7 @@ const Sales = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            setPurchases(response.data.data);
+            setPurchases(response?.data?.data);
                
             const totalItems = response.data.totalData || 0;
             const itemsPerPage = 10;

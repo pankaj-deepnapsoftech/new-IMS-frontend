@@ -45,6 +45,14 @@ const routes = [
     element: <Dashboard />,
     isSublink: false
   },
+
+  {
+    name: "Employees",
+    icon: <FaPeopleGroup />,
+    path: "employee",
+    element: <Employees />,
+    isSublink: false
+  },
   {
     name: "User Roles",
     icon: <TbLockAccess />,
@@ -53,10 +61,17 @@ const routes = [
     isSublink: false
   },
   {
-    name: "Employees",
-    icon: <FaPeopleGroup />,
-    path: "employee",
-    element: <Employees />,
+    name: "Parties",
+    icon: <IoIosPeople />,
+    path: "parties",
+    element: <Parties />
+
+  },
+  {
+    name: "Sales Order",
+    icon: <FaSalesforce />,
+    path: "sales",
+    element: <Sales />,
     isSublink: false
   },
   {
@@ -91,12 +106,6 @@ const routes = [
     path: "inventory",
     sublink: [
       {
-        name: "Indirect",
-        icon: <FaHandsHelping />,
-        path: "indirect",
-        element: <IndirectProducts />,
-      },
-      {
         name: "Direct",
         icon: <SlDirection />,
         path: "direct",
@@ -109,7 +118,13 @@ const routes = [
         element: <WIPProducts />,
       },
       {
-        name: "Approvals",
+        name: "Indirect",
+        icon: <FaHandsHelping />,
+        path: "indirect",
+        element: <IndirectProducts />,
+      },
+      {
+        name: "Inventory Approvals",
         icon: <FaRegCheckCircle />,
         path: "approval",
         element: <InventoryApprovals />,
@@ -117,20 +132,7 @@ const routes = [
     ],
     isSublink: true
   },
-  {
-  name:"Parties",
-  icon:<IoIosPeople/>  ,
-  path:"parties",
-  element:<Parties/>
-
-  },
-  {
-   name:"Sales",
-   icon:<FaSalesforce />,
-   path:"sales",
-   element:<Sales/>,
-   isSublink:false
-  },
+ 
   {
    name:"Task",
    icon:<MdTask />,
@@ -160,7 +162,7 @@ const routes = [
     isSublink: false
   },
   {
-    name: "Approval",
+    name: "Admin Approval",
     icon: <FaRegCheckCircle />,
     path: "approval",
     element: <Approvals />,

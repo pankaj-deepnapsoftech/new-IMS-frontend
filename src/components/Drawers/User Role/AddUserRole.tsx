@@ -18,7 +18,7 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
   closeDrawerHandler,
   fetchUserRolesHandler,
 }) => {
-  const [cookies, setCookie] = useCookies();
+  // const [cookies, setCookie] = useCookies();
   const [isAddingRole, setIsAddingRole] = useState<boolean>(false);
   const [role, setRole] = useState<string | undefined>();
   const [description, setDescription] = useState<string | undefined>();
@@ -114,7 +114,6 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
       >
         <h1 className="px-4 flex gap-x-2 items-center font-bold text-[22px] text-white py-3">
           <BiX onClick={closeDrawerHandler} size="30px" />
-
         </h1>
 
         <div className="mt-8 px-5 ">
