@@ -9,7 +9,6 @@ import logo from "../../assets/images/logo/logo.png";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
 
-
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
   const [cookie, _, removeCookie] = useCookies();
@@ -27,12 +26,11 @@ const Navigation: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-
   const handleCloseMenu = () => {
     if (window.innerWidth < 800) {
-      setCheckMenu(false)
+      setCheckMenu(false);
     }
-  }
+  };
 
   const toggleSubMenusHandler = (path: string) => {
     setOpenSubMenus((prev) => ({
@@ -52,123 +50,173 @@ const Navigation: React.FC = () => {
   return (
     <>
       {/* Mobile Menu Button */}
-      <div className="absolute top-4 left-4 z-50 md:hidden ">
-        <div onClick={() => setCheckMenu(!checkMenu)}>
+      <div className="fixed top-4 left-4 z-50 lg:hidden">
+        <button
+          onClick={() => setCheckMenu(!checkMenu)}
+          className="p-3 rounded-xl bg-white shadow-lg border border-gray-200 hover:bg-gray-50 hover:shadow-xl transition-all duration-300 hover:scale-105"
+        >
           {checkMenu ? (
-            <IoCloseSharp
-              size={30}
-              className={` absolute left-[12rem] text-white ${showIcon ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
-                }`}
-            />
+            <IoCloseSharp size={24} className="text-gray-700" />
           ) : (
-            <RiMenu2Line size={30} className="text-white" />
+            <RiMenu2Line size={24} className="text-gray-700" />
           )}
-        </div>
+        </button>
       </div>
+
+      {/* Mobile Overlay */}
+      {checkMenu && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden transition-opacity duration-300"
+          onClick={() => setCheckMenu(false)}
+        />
+      )}
 
       {/* Sidebar */}
       <div
-        className={`bg-gradient-to-b from-[#252531] to-[#214555] backdrop-blur-xl text-white h-full overflow-auto scrollbar-hidden  
-         md:block  ${checkMenu ? "block" : "hidden"
-          } 
-             fixed z-40 w-64 md:w-auto top-0 left-0 px-3 py-3`}
+        className={`bg-white border-r border-gray-200 shadow-xl h-full overflow-y-auto
+         lg:block lg:relative lg:translate-x-0
+         ${checkMenu ? "translate-x-0" : "-translate-x-full"}
+         fixed z-40 w-80 lg:w-64 top-0 left-0 transition-transform duration-300 ease-in-out`}
       >
-
         {/* Logo */}
-        <div className="pt-4 pb-4">
-          <img src={logo} alt="blogger" className="w-[190px] filter invert" />
+        <div className="p-6 border-b border-gray-100">
+          <img
+            src={logo}
+            alt="Logo"
+            className="w-[190px] h-auto filter brightness-0"
+          />
         </div>
-        <hr className=" border-1.5 w-[180px] ml-4  relative top-10 border-gray-300" />
 
         {/* Menu List */}
-        <ul className="pt-[50px]">
-          {routes.map((route, ind) => {
-            const isAllowed =
-              isSuper || allowedroutes.includes(route.path.replaceAll("/", ""));
+        <div className="px-4 py-6">
+          <ul className="space-y-2">
+            {routes.map((route, ind) => {
+              const isAllowed =
+                isSuper ||
+                allowedroutes.includes(route.path.replaceAll("/", ""));
 
-            if (route.isSublink) {
-              return (
-                <div key={ind}>
-                  <li
-                    className="flex gap-x-2 pl-3 pr-9 py-3 rounded-lg hover:bg-gradient-to-b from-[#83838383] to-[#83838383] hover:text-white text-[15px] font-semibold"
-                    onClick={() => toggleSubMenusHandler(route.path)}
+              if (route.isSublink) {
+                return (
+                  <div key={ind}>
+                    <li
+                      className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 group
+                        ${
+                          isAllowed
+                            ? "hover:bg-blue-50 hover:text-blue-700 text-gray-700"
+                            : "text-gray-400 cursor-not-allowed"
+                        }`}
+                      onClick={() =>
+                        isAllowed && toggleSubMenusHandler(route.path)
+                      }
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{route.icon}</span>
+                        <span className="font-medium">{route.name}</span>
+                      </div>
+                      {isAllowed && (
+                        <span className="transition-transform duration-200">
+                          {openSubMenus[route.path] ? (
+                            <FaAngleUp className="text-sm" />
+                          ) : (
+                            <FaAngleDown className="text-sm" />
+                          )}
+                        </span>
+                      )}
+                    </li>
+                    {openSubMenus[route.path] && (
+                      <div className="ml-4 mt-2 space-y-1">
+                        {route.sublink?.map((sublink, index) => (
+                          <NavLink
+                            onClick={handleCloseMenu}
+                            key={index}
+                            to={route.path + "/" + sublink.path}
+                            className={({ isActive }) =>
+                              `block px-4 py-2 rounded-lg transition-all duration-200 ${
+                                isActive
+                                  ? "bg-blue-100 text-blue-700 border-l-4 border-blue-500"
+                                  : isAllowed
+                                  ? "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+                                  : "text-gray-400 cursor-not-allowed"
+                              }`
+                            }
+                            style={{
+                              pointerEvents: isAllowed ? "auto" : "none",
+                            }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-lg">{sublink.icon}</span>
+                              <span className="font-medium">
+                                {sublink.name}
+                              </span>
+                            </div>
+                          </NavLink>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              } else if (route.name === "Approval" && isSuper) {
+                return (
+                  <NavLink
+                    onClick={handleCloseMenu}
+                    key={ind}
+                    to={route.path || ""}
+                    className={({ isActive }) =>
+                      `block px-4 py-3 rounded-lg transition-all duration-200 ${
+                        isActive
+                          ? "bg-blue-100 text-blue-700 border-l-4 border-blue-500"
+                          : isAllowed
+                          ? "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                          : "text-gray-400 cursor-not-allowed"
+                      }`
+                    }
                     style={{
-                      cursor: isAllowed ? "pointer" : "not-allowed",
-                      opacity: isAllowed ? 1 : 0.5,
                       pointerEvents: isAllowed ? "auto" : "none",
                     }}
                   >
-                    <span className="text-[25px]">{route.icon}</span>
-                    <span>{route.name}</span>
-                    <span className="pt-1">
-                      {openSubMenus[route.path] ? <FaAngleUp /> : <FaAngleDown />}
-                    </span>
-                  </li>
-                  {openSubMenus[route.path] &&
-                    route.sublink?.map((sublink, index) => (
-                      <NavLink
-                        onClick={handleCloseMenu}
-                        key={index}
-                        to={route.path + "/" + sublink.path}
-                        style={{
-                          cursor: isAllowed ? "pointer" : "not-allowed",
-                          opacity: isAllowed ? 1 : 0.5,
-                          pointerEvents: isAllowed ? "auto" : "none",
-                        }}
-                      >
-                        <li className="flex gap-x-2 pl-5 pr-9 py-3 rounded-lg hover:bg-gradient-to-b from-[#83838383] to-[#83838383] hover:text-white text-[15px] font-semibold">
-                          <span className="text-[25px]">{sublink.icon}</span>
-                          <span>{sublink.name}</span>
-                        </li>
-                      </NavLink>
-                    ))}
-                </div>
-              );
-            } else if (route.name === "Approval" && isSuper) {
-              return (
-                <NavLink
-                  onClick={handleCloseMenu}
-                  key={ind}
-                  to={route.path || ""}
-                  style={{
-                    cursor: isAllowed ? "pointer" : "not-allowed",
-                    opacity: isAllowed ? 1 : 0.5,
-                    pointerEvents: isAllowed ? "auto" : "none",
-                  }}
-                >
-                  <li className="flex gap-x-2 pl-3 pr-9 py-3 rounded-lg hover:bg-gradient-to-b from-[#83838383] to-[#83838383] hover:text-white text-[15px] font-semibold">
-                    <span className="text-[25px]">{route.icon}</span>
-                    <span>{route.name}</span>
-                  </li>
-                </NavLink>
-              );
-            } else if (route.name !== "Approval") {
-              return (
-                <NavLink
-                  onClick={handleCloseMenu}
-                  key={ind}
-                  to={route.path || ""}
-                  style={{
-                    cursor: isAllowed ? "pointer" : "not-allowed",
-                    opacity: isAllowed ? 1 : 0.5,
-                    pointerEvents: isAllowed ? "auto" : "none",
-                  }}
-                >
-                  <li className="flex gap-x-2 pl-3 pr-9 py-3 rounded-lg hover:bg-gradient-to-b from-[#83838383] to-[#83838383] hover:text-whitetext-[15px] font-semibold">
-                    <span className="text-[25px]">{route.icon}</span>
-                    <span>{route.name}</span>
-                  </li>
-                </NavLink>
-              );
-            }
-          })}
-        </ul>
-        <hr className="my-4 border-1.5 w-[180px] ml-4 relative top-0 border-gray-300" />
-        <div className="mt-[40px]">
-          <button onClick={logoutHandler} className="flex items-center text-black shadow-2xl justify-center ml-4 h-[40px] w-[150px] gap-2 bg-gradient-to-r from-white to-white hover:scale-105 font-[700] py-2 rounded-md transition-all">
+                    <li className="flex items-center gap-3">
+                      <span className="text-xl">{route.icon}</span>
+                      <span className="font-medium">{route.name}</span>
+                    </li>
+                  </NavLink>
+                );
+              } else if (route.name !== "Approval") {
+                return (
+                  <NavLink
+                    onClick={handleCloseMenu}
+                    key={ind}
+                    to={route.path || ""}
+                    className={({ isActive }) =>
+                      `block px-4 py-3 rounded-lg transition-all duration-200 ${
+                        isActive
+                          ? "bg-blue-100 text-blue-700 border-l-4 border-blue-500"
+                          : isAllowed
+                          ? "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                          : "text-gray-400 cursor-not-allowed"
+                      }`
+                    }
+                    style={{
+                      pointerEvents: isAllowed ? "auto" : "none",
+                    }}
+                  >
+                    <li className="flex items-center gap-3">
+                      <span className="text-xl">{route.icon}</span>
+                      <span className="font-medium">{route.name}</span>
+                    </li>
+                  </NavLink>
+                );
+              }
+            })}
+          </ul>
+        </div>
+
+        <div className="p-4 border-t border-gray-100 bg-white">
+          <button
+            onClick={logoutHandler}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 rounded-lg font-medium transition-all duration-200 hover:shadow-md"
+          >
+            <FaSignOutAlt className="text-sm" />
             Log Out
-            <FaSignOutAlt
-            />
           </button>
         </div>
       </div>

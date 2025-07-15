@@ -2,56 +2,59 @@ import { Avatar } from "@chakra-ui/react";
 import { BiLogOutCircle, BiX } from "react-icons/bi";
 import { Link } from "react-router-dom";
 interface UserDetailsMenuProps {
-  email: string,
-  firstname: string,
-  lastname: string,
-  logoutHandler: () => void,
-  closeUserDetailsMenu: () => void,
+  email: string;
+  firstname: string;
+  lastname: string;
+  logoutHandler: () => void;
+  closeUserDetailsMenu: () => void;
 }
 
 const UserDetailsMenu: React.FC<UserDetailsMenuProps> = ({
-  email, firstname, lastname, logoutHandler, closeUserDetailsMenu
+  email,
+  firstname,
+  lastname,
+  logoutHandler,
+  closeUserDetailsMenu,
 }) => {
   return (
-    <div
-      className="bg-white px-3 py-3 z-30 rounded-lg"
-      style={{
-        boxShadow:
-          "0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05)",
-      }}
-    >
+    <div className="bg-white rounded-xl shadow-xl border border-gray-200 min-w-[280px] overflow-hidden">
+      {/* User Profile Section */}
       <Link to="/userprofile">
         <div
           onClick={closeUserDetailsMenu}
-          className="cursor-pointer flex border-b py-2 px-3 rounded-md hover:bg-[#e3e3e3]"
+          className="flex items-center p-4 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100"
         >
-          <Avatar backgroundColor="#4b87a0d9" size="md" name={firstname + ' ' + lastname} />
-          <div className="pl-2">
-            <p className="text-lg font-semibold mb-1">
-              {firstname + ' ' + lastname}
+          <Avatar
+            size="md"
+            name={firstname + " " + lastname}
+            className="border-2 border-blue-200"
+          />
+          <div className="ml-3">
+            <p className="text-sm font-semibold text-gray-900">
+              {firstname + " " + lastname}
             </p>
-            <p className="mt-[-4px] font-semibold">{email}</p>
+            <p className="text-xs text-gray-600 mt-1">{email}</p>
           </div>
         </div>
       </Link>
 
-      <div
-        className="cursor-pointer px-3 py-1 rounded-md hover:bg-[#e3e3e3] mt-2 font-semibold text-lg flex items-center gap-x-2 border-b"
-        onClick={logoutHandler}
-      >
-        <span>
-          <BiLogOutCircle />
-        </span>
-        Logout
-      </div>
-      <div
-        onClick={closeUserDetailsMenu}
-        className="cursor-pointer px-3 py-1 rounded-md hover:bg-[#e3e3e3] mt-2 font-semibold text-lg flex items-center gap-x-2"
-      >
-        <span className="">
-          <BiX />
-        </span>
-        Close
+      {/* Menu Actions */}
+      <div className="p-2">
+        <button
+          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200"
+          onClick={logoutHandler}
+        >
+          <BiLogOutCircle className="text-base" />
+          Logout
+        </button>
+
+        <button
+          onClick={closeUserDetailsMenu}
+          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200 mt-1"
+        >
+          <BiX className="text-base" />
+          Close
+        </button>
       </div>
     </div>
   );
