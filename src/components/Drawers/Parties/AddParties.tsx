@@ -1,222 +1,275 @@
-// @ts-nocheck 
+// @ts-nocheck
 
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
 import { BiX } from "react-icons/bi";
 import { toast } from "react-toastify";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 import { PartiesFromValidation } from "../../../Validation/PartiesFromValidation";
 
-
-const AddParties = ({ showData, setshowData, setCounter }) => {
+const AddParties = ({ showData, setshowData, setCounter, edittable, setEditTable, fetchPartiesData }) => {
+    const [consigneeNames, setConsigneeNames] = useState([""]);
+    const [gstIns, setGstIns] = useState([""]);
+    const [contactNumbers, setContactNumbers] = useState([""]);
+    const [deliveryAddresses, setDeliveryAddresses] = useState([""]);
+    const [emailIds, setEmailIds] = useState([""]);
     const [cookies] = useCookies();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const {values, errors, touched, handleBlur, handleChange, handleSubmit, resetForm} = useFormik({
+
+    useEffect(() => {
+        if (edittable) {
+            setConsigneeNames(edittable.consignee_name || [""]);
+            setGstIns(edittable.gst_in || [""]);
+            setContactNumbers(edittable.contact_number || [""]);
+            setDeliveryAddresses(edittable.delivery_address || [""]);
+            setEmailIds(edittable.email_id || [""]);
+        } else {
+            setConsigneeNames([""]);
+            setGstIns([""]);
+            setContactNumbers([""]);
+            setDeliveryAddresses([""]);
+            setEmailIds([""]);
+        }
+    }, [edittable]);
+
+    const formik = useFormik({
         initialValues: {
-            full_name: '',
-            email: '',
-            phone: '',
-            company_name: '',
-            GST_NO: '',
-            type: '',
-            parties_type: ""
+            type: edittable?.type || "",
+            parties_type: edittable?.parties_type || "",
+            gst_add: edittable?.gst_add || "",
+            shipped_to: edittable?.shipped_to || "",
+            bill_to: edittable?.bill_to || "",
+            company_name: edittable?.company_name
         },
-        validationSchema: PartiesFromValidation,
-        onSubmit: async (value) => {
-         if(isSubmitting) return ;
-         setIsSubmitting(true)
+        enableReinitialize: true,
+        validationSchema:PartiesFromValidation,
+        onSubmit: async (values, { resetForm }) => {
+            if (isSubmitting) return;
+            setIsSubmitting(true);
+
+            const payload = {
+                ...values,
+                consignee_name: consigneeNames,
+                gst_in: gstIns,
+                contact_number: contactNumbers,
+                delivery_address: deliveryAddresses,
+                email_id: emailIds,
+            };
+
             try {
-                const res = await fetch(process.env.REACT_APP_BACKEND_URL + "parties/create", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${cookies?.access_token}`,
-                    },
-                    body: JSON.stringify(value)
-                });
+                let res;
 
-                const data = await res.json();
-
-                if (res.ok) {
-                    toast.success("Party saved successfully!");
-                    setshowData(false);
-                    resetForm({
-                        full_name: '',
-                        email: '',
-                        phone: '',
-                        company_name: '',
-                        GST_NO: '',
-                        type: '',
-                        parties_type: '',
-                    });
-                    setCounter((prev) => prev + 1);
+                if (edittable?._id) {
+                    res = await axios.put(
+                        `${process.env.REACT_APP_BACKEND_URL}parties/put/${edittable._id}`,
+                        payload,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${cookies?.access_token}`,
+                            },
+                        }
+                    );
                 } else {
-                    toast.error(data?.message || "Failed to save party.");
+                    res = await axios.post(
+                        `${process.env.REACT_APP_BACKEND_URL}parties/create`,
+                        payload,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${cookies?.access_token}`,
+                            },
+                        }
+                    );
                 }
+
+                toast.success(res?.data?.message);
+                fetchPartiesData();
+                resetForm();
+                setshowData(false);
+                setEditTable(null);
             } catch (error) {
-                console.error("Error saving party:", error);
-                toast.error("Something went wrong. Please try again.");
-            }finally {
+                console.error(error);
+                toast.error(error?.message || "Something went wrong!");
+            } finally {
                 setIsSubmitting(false);
             }
-        }
-    })
+        },
+    });
 
+    const renderFieldList = (label, values, setValues) => (
+        <div className="space-y-2">
+            <label className="block font-medium text-sm sm:text-md text-white">{label}</label>
+            {values.map((value, index) => (
+                <input
+                    key={index}
+                    type="text"
+                    value={value}
+                    onChange={(e) => {
+                        const newValues = [...values];
+                        newValues[index] = e.target.value;
+                        setValues(newValues);
+                    }}
+                    className="w-full border border-gray-100 bg-white/10 text-white rounded p-2"
+                />
+            ))}
+            <button
+                type="button"
+                onClick={() => setValues([...values, ""])}
+                className="mt-1 inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm rounded transition"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add More
+            </button>
+        </div>
+    );
 
     return (
-        <section className={`${showData ? "block" : "hidden"} fixed top-0 right-0 h-full w-[70vw] sm:w-[70vw] md:w-[50vw] lg:w-[35vw] z-50 bg-[#57657f] overflow-y-auto`}>
-        <div className="flex flex-col min-h-full">
-
-            <div className="px-4 flex justify-between items-center text-white py-3">
-                <BiX onClick={() => setshowData(!showData)} size="30px" className="cursor-pointer" />
-            </div>
-
-            <div className="text-center text-white py-3 px-2 mx-4 rounded-md bg-[#ffffff2f] text-lg sm:text-xl font-semibold">
-                <h1>Add Parties</h1>
-            </div>
-    
-
-            <form onSubmit={handleSubmit} className="w-full p-4 sm:p-6 space-y-4 flex-1">
-     
-                <div>
-                    <label className="block font-medium pb-1 text-white text-sm sm:text-md">Type</label>
-                    <select
-                        name="type"
-                        value={values.type}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full border border-gray-50 bg-[#47556913] text-gray-200 rounded px-2 py-2 focus:outline-none"
-                        required
-                    >
-                        <option value="" className="text-black">Select type</option>
-                        <option value="Individual" className="text-black">Individual</option>
-                        <option value="Company" className="text-black">Company</option>
-                    </select>
+        <section className={`${showData ? "block" : "hidden"} fixed top-0 right-0 h-full w-[70vw] sm:w-[70vw] md:w-[50vw] lg:w-[35vw] z-50 bg-[#2f3642] overflow-y-auto`}>
+            <div className="flex flex-col min-h-full text-white">
+              
+                <div className="flex items-center justify-between px-4 py-3 border-b border-white/20">
+                    <h1 className="text-lg font-semibold">Add Parties</h1>
+                    <BiX onClick={() => setshowData(false)} size="30px" className="cursor-pointer" />
                 </div>
-    
 
-                {values.type === "Company" && (
-                    <>
-                        <label className="block font-medium text-white text-sm sm:text-md">Company Name</label>
-                        <input
-                            type="text"
-                            name="company_name"
-                            value={values.company_name}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            className="w-full border border-gray-50 bg-transparent rounded p-2 text-gray-200"
-                        />
-                        {touched.company_name && errors.company_name && (
-                            <p className="text-red-400 text-sm mt-1">{errors.company_name}</p>
-                        )}
-                    </>
-                )}
-    
-          
-                {values.type === "Individual" && (
-                    <>
-                        <label className="block font-medium text-white text-sm sm:text-md">Full Name</label>
-                        <input
-                            type="text"
-                            name="full_name"
-                            value={values.full_name}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            className="w-full border border-gray-50 bg-transparent rounded p-2 text-gray-200"
-                        />
-                        {touched.full_name && errors.full_name && (
-                            <p className="text-red-400 text-sm mt-1">{errors.full_name}</p>
-                        )}
-                    </>
-                )}
-    
-                {/* Email */}
-                <div>
-                    <label className="block font-medium text-white text-sm sm:text-md">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={values.email}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full border border-gray-50 bg-transparent rounded p-2 text-gray-200"
-                        required
-                    />
-                    {touched.email && errors.email && (
-                        <p className="text-red-400 text-sm mt-1">{errors.email}</p>
-                    )}
-                </div>
-    
-                {/* Phone */}
-                <div>
-                    <label className="block font-medium text-white text-sm sm:text-md">Phone</label>
-                    <input
-                        type="tel"
-                        name="phone"
-                        value={values.phone}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full border border-gray-50 bg-transparent rounded p-2 text-gray-200"
-                        required
-                    />
-                    {touched.phone && errors.phone && (
-                        <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
-                    )}
-                </div>
-    
-                {/* GST No */}
-                {values.type !== "Individual" && (
-                    <div>
-                        <label className="block font-medium text-white text-sm sm:text-md">GST No</label>
-                        <input
-                            type="text"
-                            name="GST_NO"
-                            value={values.GST_NO}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            className="w-full border border-gray-50 bg-transparent rounded p-2 text-gray-200"
-                        />
-                        {touched.GST_NO && errors.GST_NO && (
-                            <p className="text-red-400 text-sm mt-1">{errors.GST_NO}</p>
+                
+                <form onSubmit={formik.handleSubmit} className="space-y-6 p-4 sm:p-6">
+                 
+                    <div className="space-y-4 bg-white/5 p-4 rounded-md shadow-sm">
+                        <h2 className="text-md font-semibold border-b border-white/20 pb-2">Basic Information</h2>
+
+                        <div>
+                            <label className="block text-sm font-medium">Type</label>
+                            <select
+                                name="type"
+                                value={formik.values.type}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                className="w-full border bg-white/10 text-white rounded p-2"
+                            >
+                                <option  className="text-black" value="">Select type</option>
+                                <option  className="text-black" value="Individual">Individual</option>
+                                <option  className="text-black" value="Company">Company</option>
+                            </select>
+                            {formik.touched.type && formik.errors.type && (
+                                <p className="text-sm text-red-400 mt-1">{formik.errors.type}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium">Party Type</label>
+                            <select
+                                name="parties_type"
+                                value={formik.values.parties_type}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                className="w-full border bg-white/10 text-white rounded p-2"
+                            >
+                                <option className="text-black" value="">Select party type</option>
+                                <option className="text-black" value="Buyer">Buyer</option>
+                                <option className="text-black" value="Seller">Seller</option>
+                            </select>
+                            {formik.touched.parties_type && formik.errors.parties_type && (
+                                <p className="text-sm text-red-400 mt-1">{formik.errors.parties_type}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium">GST Address</label>
+                            <input
+                                type="text"
+                                name="gst_add"
+                                value={formik.values.gst_add}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                className="w-full border bg-white/10 text-white rounded p-2"
+                            />
+                            {formik.touched.gst_add && formik.errors.gst_add && (
+                                <p className="text-sm text-red-400 mt-1">{formik.errors.gst_add}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium">Shipped To</label>
+                            <input
+                                type="text"
+                                name="shipped_to"
+                                value={formik.values.shipped_to}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                className="w-full border bg-white/10 text-white rounded p-2"
+                            />
+                            {formik.touched.shipped_to && formik.errors.shipped_to && (
+                                <p className="text-sm text-red-400 mt-1">{formik.errors.shipped_to}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium">Bill To</label>
+                            <input
+                                type="text"
+                                name="bill_to"
+                                value={formik.values.bill_to}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                className="w-full border bg-white/10 text-white rounded p-2"
+                            />
+                            {formik.touched.bill_to && formik.errors.bill_to && (
+                                <p className="text-sm text-red-400 mt-1">{formik.errors.bill_to}</p>
+                            )}
+                        </div>
+
+                        {formik.values.type === "Company" && (
+                            <div>
+                                <label className="block text-sm font-medium">Company Name</label>
+                                <input
+                                    type="text"
+                                    name="company_name"
+                                    value={formik.values.company_name}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    className="w-full border bg-white/10 text-white rounded p-2"
+                                />
+                                {formik.touched.company_name && formik.errors.company_name && (
+                                    <p className="text-sm text-red-400 mt-1">{formik.errors.company_name}</p>
+                                )}
+                            </div>
                         )}
                     </div>
-                )}
-    
-                {/* Parties Type Dropdown */}
-                <div>
-                    <label className="block font-medium text-white text-sm sm:text-md">Parties Type</label>
-                    <select
-                        name="parties_type"
-                        value={values.parties_type}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full border border-gray-50 bg-[#47556913] text-gray-200 rounded px-2 py-2 focus:outline-none"
-                        required
-                    >
-                        <option value="" className="text-black">Select type</option>
-                        <option value="Buyer" className="text-black">Buyer</option>
-                        <option value="Seller" className="text-black">Seller</option>
-                    </select>
-                    {touched.parties_type && errors.parties_type && (
-                        <p className="text-red-400 text-sm mt-1">{errors.parties_type}</p>
-                    )}
-                </div>
 
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`px-4 py-2 rounded text-white transition ${isSubmitting
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-[#ffffff41] hover:bg-[#ffffff6b]" 
-                        }`}
-                >
-                    Add Sale
-                </button>
-            </form>
-        </div>
-    </section>
-    
-    )
-}
+                    
+                    <div className="space-y-6 bg-white/5 p-4 rounded-md shadow-sm">
+                        <h2 className="text-md font-semibold border-b border-white/20 pb-2">Additional Details</h2>
 
-export default AddParties
+                        {renderFieldList("Consignee Name", consigneeNames, setConsigneeNames)}
+                        {renderFieldList("GST IN", gstIns, setGstIns)}
+                        {renderFieldList("Contact Number", contactNumbers, setContactNumbers)}
+                        {renderFieldList("Delivery Address", deliveryAddresses, setDeliveryAddresses)}
+                        {renderFieldList("Email ID", emailIds, setEmailIds)}
+                    </div>
+
+                  
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className={`px-6 py-2 rounded bg-white/30 hover:bg-white/50 transition-colors text-gray-900 font-semibold disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                            {isSubmitting ? "Submitting..." : "Submit"}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    );
+};
+
+export default AddParties;

@@ -68,6 +68,13 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
         description,
         permissions: modifiedPermissions,
       }).unwrap();
+      // console.log({
+      //   _id: roleId,
+      //   role,
+      //   description,
+      //   permissions: modifiedPermissions,
+      // });
+
       toast.success(response.message);
       fetchUserRolesHandler();
       closeDrawerHandler();
