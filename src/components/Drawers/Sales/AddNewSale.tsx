@@ -76,7 +76,7 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                 }
             }
         })
-
+  
     const fetchDropdownData = async () => {
         try {
             const [partiesRes, productRes] = await Promise.all([
