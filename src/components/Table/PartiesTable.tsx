@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { FiEdit } from "react-icons/fi";
 import { BiSolidTrash, BiX } from "react-icons/bi";
 import { toast } from "react-toastify";
-
 import { useCookies } from "react-cookie";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
@@ -11,111 +10,104 @@ import Parties from "../../pages/Parties";
 import { MdDeleteOutline, MdEdit } from "react-icons/md";
 import { useTable } from "react-table";
 import axios from "axios";
+import { colors } from "../../theme/colors";
 
+const PartiesTable = ({
+  fetchPartiesData,
+  searchTerm,
+  selectedType,
+  partiesData,
+  setPartiesData,
+  isLoading,
+  setLimit,
+  selectedRole,
+  setEditTable,
+  setshowData,
+}) => {
+  // const [deleteId, setdeleteId] = useState('')
+  const [deleteId, setDeleteId] = useState("");
+  const [cookies] = useCookies();
+  const [showDeletePage, setshowDeletePage] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const columns = useMemo(() => [
+  //     { Header: "Full name", accessor: "full_name" },
+  //     { Header: "Email", accessor: "email" },
+  //     { Header: "Phone No.", accessor: "phone" },
+  //     { Header: "Type", accessor: "type" },
+  //     { Header: "Company Name", accessor: "company_name" },
+  //     { Header: "Parties Type", accessor: "parties_type" },
+  //     { Header: "", accessor: "type" },
+  //   ], []);
 
-const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData, setPartiesData, isLoading, setLimit, selectedRole, setEditTable, setshowData }) => {
+  // const {
+  //   getTableProps,
+  //   getTableBodyProps,
+  //   headerGroups,
+  //   rows,
+  //   prepareRow,
+  //   page, // instead of rows, use page for pagination
+  //   setPageSize, // <-- this is what you need
+  //   state: { pageSize },
+  // } = useTable(
+  //   {
+  //     columns,
+  //     data,
+  //     initialState: { pageSize: 10 }, // optional default
+  //   },
+  //   usePagination
+  // );
 
-    // const [deleteId, setdeleteId] = useState('')
-    const [deleteId, setDeleteId] = useState('')
-    const [cookies] = useCookies()
-    const [showDeletePage, setshowDeletePage] = useState(false);
-    const [isConfirmed, setIsConfirmed] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    // const columns = useMemo(() => [
-    //     { Header: "Full name", accessor: "full_name" },
-    //     { Header: "Email", accessor: "email" },
-    //     { Header: "Phone No.", accessor: "phone" },
-    //     { Header: "Type", accessor: "type" },
-    //     { Header: "Company Name", accessor: "company_name" },
-    //     { Header: "Parties Type", accessor: "parties_type" },
-    //     { Header: "", accessor: "type" },
-    //   ], []);
+  const filteredParties = partiesData.filter((party) => {
+    const matchSearch =
+      party?.consignee_name?.[0]
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      party?.email_id?.[0].toLowerCase().includes(searchTerm.toLowerCase()) ||
+      party?.contact_number?.[0]
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      party?.type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      party?.company_name?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // const {
-    //   getTableProps,
-    //   getTableBodyProps,
-    //   headerGroups,
-    //   rows,
-    //   prepareRow,
-    //   page, // instead of rows, use page for pagination
-    //   setPageSize, // <-- this is what you need
-    //   state: { pageSize },
-    // } = useTable(
-    //   {
-    //     columns,
-    //     data,
-    //     initialState: { pageSize: 10 }, // optional default
-    //   },
-    //   usePagination
-    // );
+    const matchType = selectedType ? party?.type === selectedType : true;
+    const matchRole = selectedRole
+      ? party?.parties_type === selectedRole
+      : true;
 
+    return matchSearch && matchType && matchRole;
+  });
 
+  const handleDelete = async (partyId) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-
-
-
-    const filteredParties = partiesData.filter((party) => {
-        const matchSearch =
-            party?.consignee_name?.[0].toLowerCase().includes(searchTerm.toLowerCase()) ||
-            party?.email_id?.[0].toLowerCase().includes(searchTerm.toLowerCase()) ||
-            party?.contact_number?.[0].toLowerCase().includes(searchTerm.toLowerCase()) ||
-            party?.type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            party?.company_name?.toLowerCase().includes(searchTerm.toLowerCase())
-
-        const matchType = selectedType ? party?.type === selectedType : true;
-        const matchRole = selectedRole ? party?.parties_type === selectedRole : true
-
-        return matchSearch && matchType && matchRole;
-    });
-
-
-
-
-    const handleDelete = async (partyId) => {
-
-        if (isSubmitting) return;
-        setIsSubmitting(true)
-
-        try {
-            const res = await fetch(
-                `${process.env.REACT_APP_BACKEND_URL}parties/delete/${partyId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${cookies.access_token}`,
-                    },
-                }
-            );
-
-            if (res?.ok) {
-                setPartiesData((prev) =>
-                    prev.filter((party) => party._id !== partyId)
-                );
-            } else {
-                console.error(error?.message);
-            }
-            setshowDeletePage(false)
-            setIsConfirmed(false)
-        } catch (error) {
-            console.error("Error deleting party:", error);
-        } finally {
-            setIsSubmitting(false)
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}parties/delete/${partyId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${cookies.access_token}`,
+          },
         }
-    };
+      );
 
-
-
-
-
-    if (isLoading) {
-        return <Loading />
+      if (res?.ok) {
+        setPartiesData((prev) => prev.filter((party) => party._id !== partyId));
+      } else {
+        console.error(error?.message);
+      }
+      setshowDeletePage(false);
+      setIsConfirmed(false);
+    } catch (error) {
+      console.error("Error deleting party:", error);
+    } finally {
+      setIsSubmitting(false);
     }
-    if (!filteredParties || filteredParties.length === 0) {
-        return <EmptyData />
-    }
+  };
 
-
-
+  if (isLoading) {
     return (
         <section className="h-full w-full text-white ">
                 <div className="flex justify-end mb-2 mt-2 bg-transparent">
@@ -225,6 +217,442 @@ const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData,
 
         </section>
     );
+  }
+
+  if (!filteredParties || filteredParties.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div
+          className="rounded-full p-6 mb-4"
+          style={{ backgroundColor: colors.gray[100] }}
+        >
+          <svg
+            className="w-12 h-12"
+            style={{ color: colors.gray[400] }}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+        </div>
+        <h3
+          className="text-lg font-semibold mb-2"
+          style={{ color: colors.text.primary }}
+        >
+          No parties found
+        </h3>
+        <p className="max-w-md" style={{ color: colors.text.muted }}>
+          {searchTerm || selectedType || selectedRole
+            ? "No parties match your current filters. Try adjusting your search criteria."
+            : "Get started by adding your first party to manage your business relationships."}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      {/* Header with count and page size selector */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-6">
+          <div>
+            <h3
+              className="text-lg font-semibold"
+              style={{ color: colors.text.primary }}
+            >
+              {filteredParties.length} Part
+              {filteredParties.length !== 1 ? "ies" : "y"} Found
+            </h3>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span
+            className="text-sm font-medium"
+            style={{ color: colors.text.secondary }}
+          >
+            Show:
+          </span>
+          <select
+            onChange={(e) => setLimit(Number(e.target.value))}
+            className="px-3 py-2 text-sm rounded-lg border transition-colors"
+            style={{
+              backgroundColor: colors.input.background,
+              borderColor: colors.border.light,
+              color: colors.text.primary,
+            }}
+          >
+            {[10, 20, 50, 100].map((size) => (
+              <option key={size} value={size}>
+                {size === 100 ? "All" : size}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Enhanced Table */}
+      <div
+        className="rounded-xl shadow-sm overflow-hidden"
+        style={{
+          backgroundColor: colors.background.card,
+          border: `1px solid ${colors.border.light}`,
+        }}
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead style={{ backgroundColor: colors.table.header }}>
+              <tr style={{ borderBottom: `1px solid ${colors.table.border}` }}>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Date Added
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Consignee Name
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Company Name
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Email
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Phone No.
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Type
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Parties Type
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  GST No.
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  GST Address
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Delivery Address
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Shipped To
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Bill To
+                </th>
+                <th
+                  className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredParties.map((party, index) => (
+                <tr
+                  key={party._id || index}
+                  className="transition-colors hover:shadow-sm"
+                  style={{
+                    backgroundColor:
+                      index % 2 === 0
+                        ? colors.background.card
+                        : colors.table.stripe,
+                    borderBottom: `1px solid ${colors.table.border}`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = colors.table.hover;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      index % 2 === 0
+                        ? colors.background.card
+                        : colors.table.stripe;
+                  }}
+                >
+                  <td
+                    className="px-4 py-3 text-sm whitespace-nowrap"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    {party.createdAt
+                      ? new Date(party.createdAt).toLocaleDateString()
+                      : "—"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
+                    style={{ color: colors.text.primary }}
+                    title={party.consignee_name}
+                  >
+                    {party.consignee_name || "—"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                    style={{ color: colors.text.secondary }}
+                    title={party.company_name}
+                  >
+                    {party.company_name || "—"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                    style={{ color: colors.text.secondary }}
+                    title={party.email_id}
+                  >
+                    {party.email_id || "—"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm whitespace-nowrap"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    {party.contact_number || "—"}
+                  </td>
+                  <td className="px-4 py-3 text-sm whitespace-nowrap">
+                    <span
+                      className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
+                      style={{
+                        backgroundColor:
+                          party.type === "Customer"
+                            ? colors.success[100]
+                            : party.type === "Supplier"
+                            ? colors.primary[100]
+                            : colors.gray[100],
+                        color:
+                          party.type === "Customer"
+                            ? colors.success[700]
+                            : party.type === "Supplier"
+                            ? colors.primary[700]
+                            : colors.gray[700],
+                      }}
+                    >
+                      {party.type || "—"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm whitespace-nowrap">
+                    <span
+                      className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
+                      style={{
+                        backgroundColor: colors.secondary[100],
+                        color: colors.secondary[700],
+                      }}
+                    >
+                      {party.parties_type || "—"}
+                    </span>
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm font-mono whitespace-nowrap"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    {party.gst_in || "—"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                    style={{ color: colors.text.secondary }}
+                    title={party.gst_add}
+                  >
+                    {party.gst_add || "—"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                    style={{ color: colors.text.secondary }}
+                    title={party.delivery_address}
+                  >
+                    {party.delivery_address || "—"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                    style={{ color: colors.text.secondary }}
+                    title={party.shipped_to}
+                  >
+                    {party.shipped_to || "—"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                    style={{ color: colors.text.secondary }}
+                    title={party.bill_to}
+                  >
+                    {party.bill_to || "—"}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => {
+                          setEditTable(party);
+                          setshowData(true);
+                        }}
+                        className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                        style={{
+                          color: colors.primary[600],
+                          backgroundColor: colors.primary[50],
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            colors.primary[100];
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            colors.primary[50];
+                        }}
+                        title="Edit party"
+                      >
+                        <MdEdit size={16} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setshowDeletePage(true);
+                          setDeleteId(party._id);
+                        }}
+                        className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                        style={{
+                          color: colors.error[600],
+                          backgroundColor: colors.error[50],
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            colors.error[100];
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            colors.error[50];
+                        }}
+                        title="Delete party"
+                      >
+                        <MdDeleteOutline size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Enhanced Delete Modal */}
+      {showDeletePage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-md mx-4 rounded-xl shadow-xl"
+            style={{ backgroundColor: colors.background.card }}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Confirm Deletion
+                </h2>
+              </div>
+
+              <div className="mb-6">
+                <div
+                  className="rounded-lg p-4 mb-4"
+                  style={{ backgroundColor: colors.error[50] }}
+                >
+                  <div className="flex items-center gap-3">
+                    <svg
+                      className="w-6 h-6 flex-shrink-0"
+                      style={{ color: colors.error[500] }}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
+                    </svg>
+                    <div>
+                      <p
+                        className="font-medium"
+                        style={{ color: colors.error[800] }}
+                      >
+                        Delete Party
+                      </p>
+                      <p
+                        className="text-sm"
+                        style={{ color: colors.error[600] }}
+                      >
+                        This action cannot be undone. All party data will be
+                        permanently removed.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setshowDeletePage(false)}
+                  className="flex-1 px-4 py-2 rounded-lg border transition-all duration-200"
+                  style={{
+                    borderColor: colors.border.medium,
+                    color: colors.text.secondary,
+                    backgroundColor: colors.background.card,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(deleteId)}
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50"
+                  style={{
+                    backgroundColor: colors.error[500],
+                    color: colors.text.inverse,
+                  }}
+                >
+                  {isSubmitting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default PartiesTable;

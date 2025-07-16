@@ -3,11 +3,10 @@ import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import { useState } from "react";
 import Select from "react-select";
-import {
-  useAddRoleMutation
-} from "../../../redux/api/api";
+import { useAddRoleMutation } from "../../../redux/api/api";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
+import { colors } from "../../../theme/colors";
 // import Select from "react-select";
 interface AddUserRoleProps {
   fetchUserRolesHandler: () => void;
@@ -22,7 +21,9 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
   const [isAddingRole, setIsAddingRole] = useState<boolean>(false);
   const [role, setRole] = useState<string | undefined>();
   const [description, setDescription] = useState<string | undefined>();
-  const [permissions, setPermissions] = useState<{ value: string, label: string }[]>([]);
+  const [permissions, setPermissions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
   const permissionOptions = [
     { value: "inventory", label: "inventory" },
@@ -41,10 +42,7 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
   const addRoleHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !role ||
-      role.trim().length === 0
-    ) {
+    if (!role || role.trim().length === 0) {
       toast.error("Please provide all the required fields");
       return;
     }
@@ -52,14 +50,16 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
       toast.error("Select atleast 1 permission");
       return;
     }
-    const modifiedPermissions = permissions.map((permission: any) => permission.value);
+    const modifiedPermissions = permissions.map(
+      (permission: any) => permission.value
+    );
 
     try {
       setIsAddingRole(true);
       const response = await addRole({
         role,
         description,
-        permissions: modifiedPermissions
+        permissions: modifiedPermissions,
       }).unwrap();
       toast.success(response.message);
       fetchUserRolesHandler();
@@ -75,76 +75,130 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
-      backgroundColor: "transparent",
-      borderColor: "#a9a9a9",
-      color: "#fff",
+      backgroundColor: "white",
+      borderColor: "#d1d5db",
+      color: "#374151",
+      minHeight: "40px",
+      "&:hover": {
+        borderColor: "#9ca3af",
+      },
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#FFF" : "#d3d3d3", // dark gray on focus, light gray default
-      color: "#000", // text color
+      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+      color: "#374151",
+      "&:hover": {
+        backgroundColor: "#f3f4f6",
+      },
     }),
     multiValue: (provided: any) => ({
       ...provided,
-      backgroundColor: "#fff",
-      color: "#fff",
+      backgroundColor: "#e5e7eb",
+      color: "#374151",
+    }),
+    multiValueLabel: (provided: any) => ({
+      ...provided,
+      color: "#374151",
+    }),
+    multiValueRemove: (provided: any) => ({
+      ...provided,
+      color: "#6b7280",
+      "&:hover": {
+        backgroundColor: "#ef4444",
+        color: "white",
+      },
     }),
     menu: (provided: any) => ({
       ...provided,
-      zIndex: 9999, // ensures dropdown doesn't get hidden
+      zIndex: 9999,
+      backgroundColor: "white",
+      border: "1px solid #d1d5db",
     }),
     placeholder: (provided: any) => ({
       ...provided,
-      color: "#fff", // light gray placeholder
+      color: "#9ca3af",
     }),
-   
   };
-
-
-
 
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f] right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center font-bold text-[22px] text-white py-3">
-          <BiX onClick={closeDrawerHandler} size="30px" />
-        </h1>
+        <div
+          className="flex items-center justify-between p-6 border-b"
+          style={{ borderColor: colors.border.light }}
+        >
+          <h1
+            className="text-xl font-semibold"
+            style={{ color: colors.text.primary }}
+          >
+            Add New Role
+          </h1>
+          <button
+            onClick={closeDrawerHandler}
+            className="p-2 rounded-lg transition-colors duration-200"
+            style={{
+              color: colors.text.secondary,
+              backgroundColor: colors.gray[100],
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[200];
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[100];
+            }}
+          >
+            <BiX size={20} />
+          </button>
+        </div>
 
         <div className="mt-8 px-5 ">
-          <h2 className="text-xl text-center  font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
-            Add New Role
-          </h2>
-
           <form onSubmit={addRoleHandler}>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Role</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Role
+              </FormLabel>
               <Input
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 type="text"
                 placeholder="Role"
-                color="white"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Description</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Description
+              </FormLabel>
               <Input
-               border="0.1px solid white"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 type="text"
                 placeholder="Description"
-                color="white"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Permissions</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Permissions
+              </FormLabel>
               <Select
                 required
                 className="rounded mt-2 border "
@@ -152,7 +206,6 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
                 placeholder="Select"
                 value={permissions}
                 name="item_name"
-                
                 onChange={(d: any) => {
                   setPermissions(d);
                 }}
@@ -164,10 +217,10 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
               isLoading={isAddingRole}
               type="submit"
               className="mt-5"
-              color="black"
-              backgroundColor="#ffffff8a"
-              _hover={{ bg: "#d1d2d5" }}
-            >   
+              colorScheme="blue"
+              size="md"
+              width="full"
+            >
               Submit
             </Button>
           </form>

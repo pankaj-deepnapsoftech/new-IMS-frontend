@@ -1,6 +1,6 @@
 // @ts-nocheck
+import React, { useMemo } from "react";
 import {
-  Select,
   Table,
   TableContainer,
   Tbody,
@@ -8,9 +8,8 @@ import {
   Th,
   Thead,
   Tr,
+  Select,
 } from "@chakra-ui/react";
-import moment from "moment";
-import { useMemo } from "react";
 import {
   usePagination,
   useSortBy,
@@ -21,8 +20,10 @@ import {
   Cell,
 } from "react-table";
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import moment from "moment";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
+import { colors } from "../../theme/colors";
 
 interface ScrapTableProps {
   scraps: Array<{
@@ -83,148 +84,194 @@ const ScrapTable: React.FC<ScrapTableProps> = ({
   const dynamicBg = (index: number) =>
     index % 2 !== 0 ? "#ffffff40" : "#ffffff1f";
 
+  if (isLoadingScraps) {
+    return <Loading />;
+  }
+
+  if (!isLoadingScraps && scraps.length === 0) {
+    return <EmptyData />;
+  }
+
   return (
-    <div>
-      {isLoadingScraps && <Loading />}
-      {!isLoadingScraps && scraps.length === 0 && <EmptyData />}
-      {!isLoadingScraps && scraps.length > 0 && (
-        <div>
-          {/* Page Size Selector */}
-          <div className="flex justify-end mb-2 mt-2">
-            <Select
-              onChange={(e) => setPageSize(Number(e.target.value))}
-              width="80px"
-              size="sm"
-              color="white"
-              border="1px solid gray"
-              borderRadius="md"
-              sx={{
-                option: {
-                  backgroundColor: "#444e5b", // Default background
-                  color: "white",
-                },
+    <div className="space-y-4">
+      {/* Page Size Selector */}
+      <div className="flex justify-end">
+        <Select
+          onChange={(e) => setPageSize(Number(e.target.value))}
+          width="120px"
+          size="sm"
+          bg={colors.cardBackground}
+          color={colors.textPrimary}
+          borderColor={colors.border}
+          _hover={{ borderColor: colors.primary }}
+          _focus={{
+            borderColor: colors.primary,
+            boxShadow: `0 0 0 1px ${colors.primary}`,
+          }}
+        >
+          {[10, 20, 50, 100, 100000].map((size) => (
+            <option
+              key={size}
+              value={size}
+              style={{
+                backgroundColor: colors.cardBackground,
+                color: colors.textPrimary,
               }}
             >
-              {[10, 20, 50, 100, 100000].map((size) => (
-                <option value={size} key={size}>
-                  {size === 100000 ? "All" : size}
-                </option>
-              ))}
-            </Select>
-          </div>
+              {size === 100000 ? "All" : size}
+            </option>
+          ))}
+        </Select>
+      </div>
 
-          {/* Table */}
-          <TableContainer
-            maxHeight="600px"
-            overflowY="auto"
-            className="bg-[#14243452] rounded-md"
-          >
-            <Table variant="simple" {...getTableProps()}>
-              <Thead className="text-sm font-semibold" bg="#14243452">
-                {headerGroups.map((hg: HeaderGroup<any>) => (
-                  <Tr {...hg.getHeaderGroupProps()}>
-                    {hg.headers.map((column: any) => (
-                      <Th
-                        textTransform="capitalize"
-                        fontSize="14px"
-                        fontWeight="600"
-                        color="white"
-                        {...column.getHeaderProps(
-                          column.getSortByToggleProps()
-                        )}
-                      >
-                        <p className="flex items-center gap-1 text-[14px] text-gray-200 font-[600]">
-                          {column.render("Header")}
-                          {column.isSorted &&
-                            (column.isSortedDesc ? (
-                              <FaCaretDown />
-                            ) : (
-                              <FaCaretUp />
-                            ))}
-                        </p>
-                      </Th>
-                    ))}
-                  </Tr>
+      {/* Table */}
+      <TableContainer
+        bg={colors.cardBackground}
+        borderRadius="lg"
+        border={`1px solid ${colors.border}`}
+        maxHeight="600px"
+        overflowY="auto"
+        className="shadow-lg"
+      >
+        <Table variant="simple" {...getTableProps()}>
+          <Thead bg={colors.tableHeader} position="sticky" top="0" zIndex="1">
+            {headerGroups.map((hg: HeaderGroup<any>) => (
+              <Tr {...hg.getHeaderGroupProps()}>
+                {hg.headers.map((column: any) => (
+                  <Th
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    color={colors.textPrimary}
+                    fontSize="sm"
+                    fontWeight="semibold"
+                    textTransform="none"
+                    borderColor={colors.border}
+                    py={4}
+                    px={4}
+                    cursor="pointer"
+                    _hover={{ bg: colors.hoverBackground }}
+                  >
+                    <div className="flex items-center gap-2">
+                      {column.render("Header")}
+                      {column.isSorted &&
+                        (column.isSortedDesc ? (
+                          <FaCaretDown className="text-xs" />
+                        ) : (
+                          <FaCaretUp className="text-xs" />
+                        ))}
+                    </div>
+                  </Th>
                 ))}
-              </Thead>
+              </Tr>
+            ))}
+          </Thead>
 
-              <Tbody {...getTableBodyProps()}>
-                {page.map((row: any, index: number) => {
-                  prepareRow(row);
-                  return (
-                    <Tr
-                      {...row.getRowProps()}
-                      bg={dynamicBg(index)}
-                      _hover={{
-                        bg: "#ffffff78",
-                        cursor: "pointer",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      {row.cells.map((cell: Cell) => {
-                        const colId = cell.column.id;
-                        const original = row.original;
+          <Tbody {...getTableBodyProps()}>
+            {page.map((row: any, index: number) => {
+              prepareRow(row);
+              return (
+                <Tr
+                  {...row.getRowProps()}
+                  bg={
+                    index % 2 === 0
+                      ? colors.cardBackground
+                      : colors.alternateRow
+                  }
+                  _hover={{
+                    bg: colors.hoverBackground,
+                    cursor: openScrapDetailsDrawerHandler
+                      ? "pointer"
+                      : "default",
+                  }}
+                  onClick={() =>
+                    openScrapDetailsDrawerHandler?.(row.original.id)
+                  }
+                >
+                  {row.cells.map((cell: Cell) => {
+                    const colId = cell.column.id;
+                    const original = row.original;
 
-                        let displayValue;
-                        if (colId === "item") {
-                          displayValue = original.item.name;
-                        } else if (colId === "bom") {
-                          displayValue = original.bom.bom_name;
-                        } else if (colId === "finished_good") {
-                          displayValue = original.bom.finished_good.item.name;
-                        } else if (colId === "createdAt") {
-                          displayValue = moment(original.createdAt).format(
-                            "DD/MM/YYYY"
-                          );
-                        } else if (colId === "updatedAt") {
-                          displayValue = moment(original.updatedAt).format(
-                            "DD/MM/YYYY"
-                          );
-                        } else {
-                          displayValue = cell.render("Cell");
+                    let displayValue;
+                    if (colId === "item") {
+                      displayValue = original.item?.name || "N/A";
+                    } else if (colId === "bom") {
+                      displayValue = original.bom?.bom_name || "N/A";
+                    } else if (colId === "finished_good") {
+                      displayValue =
+                        original.bom?.finished_good?.item?.name || "N/A";
+                    } else if (colId === "estimated_quantity") {
+                      displayValue = original.estimated_quantity || "0";
+                    } else if (colId === "produced_quantity") {
+                      displayValue = original.produced_quantity || "0";
+                    } else if (colId === "total_part_cost") {
+                      displayValue = original.total_part_cost
+                        ? `₹${original.total_part_cost}`
+                        : "₹0";
+                    } else if (colId === "createdAt") {
+                      displayValue = original.createdAt
+                        ? moment(original.createdAt).format("DD/MM/YYYY")
+                        : "N/A";
+                    } else if (colId === "updatedAt") {
+                      displayValue = original.updatedAt
+                        ? moment(original.updatedAt).format("DD/MM/YYYY")
+                        : "N/A";
+                    } else {
+                      displayValue = cell.render("Cell");
+                    }
+
+                    return (
+                      <Td
+                        {...cell.getCellProps()}
+                        color={colors.textSecondary}
+                        fontSize="sm"
+                        borderColor={colors.border}
+                        py={3}
+                        px={4}
+                        className="whitespace-nowrap truncate max-w-xs"
+                        title={
+                          typeof displayValue === "string" ? displayValue : ""
                         }
+                      >
+                        {displayValue}
+                      </Td>
+                    );
+                  })}
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </Table>
+      </TableContainer>
 
-                        return (
-                          <Td
-                            fontWeight="600"
-                            fontSize="14px"
-                            color="gray.200"
-                            border="none"
-                            {...cell.getCellProps()}
-                          >
-                            {displayValue}
-                          </Td>
-                        );
-                      })}
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
-          </TableContainer>
+      {/* Pagination */}
+      <div className="flex items-center justify-center gap-4">
+        <button
+          onClick={previousPage}
+          disabled={!canPreviousPage}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            canPreviousPage
+              ? `bg-${colors.primary} text-white hover:bg-opacity-90`
+              : "bg-gray-600 text-gray-400 cursor-not-allowed"
+          }`}
+        >
+          Previous
+        </button>
 
-          {/* Pagination */}
-          <div className="w-max mx-auto my-7 flex items-center gap-4">
-            <button
-              onClick={previousPage}
-              disabled={!canPreviousPage}
-              className="bg-[#2D3748] text-white text-sm md:text-lg px-4 py-1 rounded-3xl border border-[#2D3748] disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed"
-            >
-              Prev
-            </button>
-            <span className="text-sm md:text-lg text-gray-300">
-              {pageIndex + 1} of {pageCount}
-            </span>
-            <button
-              onClick={nextPage}
-              disabled={!canNextPage}
-              className="bg-[#2D3748] text-white text-sm md:text-lg px-4 py-1 rounded-3xl border border-[#2D3748] disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+        <span className="text-sm" style={{ color: colors.textSecondary }}>
+          Page {pageIndex + 1} of {pageCount}
+        </span>
+
+        <button
+          onClick={nextPage}
+          disabled={!canNextPage}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            canNextPage
+              ? `bg-${colors.primary} text-white hover:bg-opacity-90`
+              : "bg-gray-600 text-gray-400 cursor-not-allowed"
+          }`}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

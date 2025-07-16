@@ -1,5 +1,5 @@
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
-import { MdOutlineRefresh } from "react-icons/md";
+import { MdOutlineRefresh, MdAdd } from "react-icons/md";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   useDeleteProductMutation,
@@ -21,6 +21,7 @@ import UpdateProduct from "../components/Drawers/Product/UpdateProduct";
 import ProductDetails from "../components/Drawers/Product/ProductDetails";
 import WIPProductTable from "../components/Table/WIPProductTable";
 import { FiSearch } from "react-icons/fi";
+import { colors } from "../theme/colors";
 
 const WIPProducts: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -180,7 +181,7 @@ const WIPProducts: React.FC = () => {
     // // @ts-ignore
     const results = data.filter(
       (d: any) =>
-      (d.name?.toLowerCase()?.includes(searchTxt) ||
+        d.name?.toLowerCase()?.includes(searchTxt) ||
         d.item.product_id?.toLowerCase()?.includes(searchTxt) ||
         d.item.category?.toLowerCase()?.includes(searchTxt) ||
         d.item.uom?.toLowerCase()?.includes(searchTxt) ||
@@ -200,7 +201,7 @@ const WIPProducts: React.FC = () => {
             ?.split("-")
             ?.reverse()
             ?.join("")
-            ?.includes(searchTxt?.replaceAll("/", "") || "")))
+            ?.includes(searchTxt?.replaceAll("/", "") || ""))
     );
     setFilteredData(results);
   }, [searchKey, productServiceFilter, storeFilter]);
@@ -214,7 +215,10 @@ const WIPProducts: React.FC = () => {
   }
 
   return (
-    <div className="  mx-2 rounded-md h-full">
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: colors.background.page }}
+    >
       {/* Add Product Drawer */}
       {isAddProductDrawerOpened && (
         <AddProduct
@@ -238,50 +242,111 @@ const WIPProducts: React.FC = () => {
         />
       )}
 
-      {/* Products Page */}
-      <div className="w-full">
-        <h1 className="text-center text-white font-extrabold text-3xl pt-4 pb-6">
-          WIP (Work In Progress) Inventory
-        </h1>
+      <div className="p-2 lg:p-3">
+        {/* Header Section */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1
+                className="text-2xl lg:text-3xl font-bold"
+                style={{ color: colors.text.primary }}
+              >
+                WIP Products
+              </h1>
+              <p
+                className="text-sm mt-1"
+                style={{ color: colors.text.secondary }}
+              >
+                Work In Progress inventory management
+              </p>
+            </div>
 
-        <div className="w-full flex flex-col md:flex-row justify-center items-center gap-4 px-4">
-          {/* Search Box */}
-          <div className="relative w-full md:w-[250px]">
-            <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-200" />
-            <input
-              className="pl-10 pr-4 py-2 w-full text-gray-200 text-sm border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-              placeholder="Search roles..."
-              value={searchKey}
-              onChange={(e) => setSearchKey(e.target.value)}
-            />
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={fetchProductsHandler}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                style={{
+                  borderColor: colors.border.medium,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[50];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.background.card;
+                }}
+              >
+                <MdOutlineRefresh size="20px" />
+                Refresh
+              </button>
+            </div>
           </div>
 
-          {/* Refresh Button */}
-          <Button
-            fontSize="14px"
-            paddingX="12px"
-            paddingY="6px"
-            width={{ base: "100%", md: "120px" }}
-            onClick={fetchProductsHandler}
-            leftIcon={<MdOutlineRefresh />}
-            color="white"
-            borderColor="white"
-            variant="outline"
-            _hover={{ bg: "#2D3748" }}
-          >
-            Refresh
-          </Button>
+          {/* Search Row */}
+          <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
+            {/* Search Input */}
+            <div className="flex-1 max-w-md">
+              {/* <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Search WIP Products
+              </label> */}
+              <div className="relative">
+                <FiSearch
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                  style={{ color: colors.text.secondary }}
+                />
+                <input
+                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor =
+                      colors.input.borderFocus;
+                    e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = colors.input.border;
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                  placeholder="Search by name, ID, category..."
+                  value={searchKey || ""}
+                  onChange={(e) => setSearchKey(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <WIPProductTable
-          isLoadingProducts={isLoadingProducts}
-          products={filteredData}
-          openUpdateProductDrawerHandler={openUpdateProductDrawerHandler}
-          openProductDetailsDrawerHandler={openProductDetailsDrawerHandler}
-          deleteProductHandler={deleteProductHandler}
-        />
+        {/* Table Section */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <WIPProductTable
+            isLoadingProducts={isLoadingProducts}
+            products={filteredData}
+            openUpdateProductDrawerHandler={openUpdateProductDrawerHandler}
+            openProductDetailsDrawerHandler={openProductDetailsDrawerHandler}
+            deleteProductHandler={deleteProductHandler}
+          />
+        </div>
       </div>
     </div>
   );

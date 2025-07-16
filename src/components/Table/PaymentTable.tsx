@@ -152,6 +152,8 @@ const PaymentTable: React.FC<AgentTableProps> = ({
                               {...column.getHeaderProps(
                                 column.getSortByToggleProps()
                               )}
+                              px={4}
+                              py={3}
                             >
                               <p className="flex">
                                 {column.render("Header")}
@@ -176,6 +178,8 @@ const PaymentTable: React.FC<AgentTableProps> = ({
                           backgroundColor="#fafafa"
                           borderLeft="1px solid #d7d7d7"
                           borderRight="1px solid #d7d7d7"
+                          px={4}
+                          py={3}
                         >
                           Actions
                         </Th>
@@ -195,7 +199,12 @@ const PaymentTable: React.FC<AgentTableProps> = ({
                     >
                       {row.cells.map((cell: Cell) => {
                         return (
-                          <Td fontWeight="500" {...cell.getCellProps()}>
+                          <Td
+                            fontWeight="500"
+                            {...cell.getCellProps()}
+                            px={4}
+                            py={3}
+                          >
                             {cell.column.id !== "createdAt" &&
                               cell.column.id !== "updatedAt" &&
                               cell.column.id !== "creator" &&
@@ -235,7 +244,7 @@ const PaymentTable: React.FC<AgentTableProps> = ({
                           </Td>
                         );
                       })}
-                      <Td className="flex gap-x-2">
+                      <Td className="flex gap-x-2" px={4} py={3}>
                         {openPaymentDetailsDrawerHandler && (
                           <MdOutlineVisibility
                             className="hover:scale-110"

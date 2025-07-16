@@ -72,6 +72,7 @@ const Task = () => {
           },
         }
       );
+      console.log("testing", res)
       const tasks = response.data.data.map((task: any) => {
         const sale = task?.sale_id?.length ? task.sale_id[0] : null;
         const product = sale?.product_id?.length ? sale.product_id[0] : null;
@@ -125,7 +126,7 @@ const Task = () => {
       let totalPages = Math.ceil(totalData / limit);
       setTotalPage(totalPages);
 
-      console.log(totalPage)
+      // console.log(totalPage)
     } catch (error) {
       console.log(error);
 
@@ -133,6 +134,8 @@ const Task = () => {
       setIsLoading(false);
     }
   }
+
+
 
 
   const navigate = useNavigate();
@@ -461,11 +464,11 @@ const Task = () => {
                     Task Done
                   </Button>
                 )}
-                {role === "Production" && task?.sample_image && (
+                {/* {role === "Production" && task?.sample_image && (
                   <Button colorScheme="teal" size="sm" onClick={() => handleSampleImage(task.sample_image)}>
                     Preview Sample Image
                   </Button>
-                )}
+                )} */}
               </HStack>
             ) : ["accountant", "acc"].includes(role?.toLowerCase()) ? (
               <HStack justify="space-between" mt={3} flexWrap="wrap" align="center" gap={4}>

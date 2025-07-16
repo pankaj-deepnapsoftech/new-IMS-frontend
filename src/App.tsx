@@ -11,50 +11,51 @@ import { useSelector } from "react-redux";
 import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => {
-
   const { allowedroutes, isSuper } = useSelector((state: any) => state.auth);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-[#2c2a3f] via-[#1a394b] to-[#274b48]">
- <div className="backdrop-blur-md bg-white/10 min-h-screen">
-      <ToastContainer />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/" element={<Layout />}>
-            {routes.map((route, ind) => {
-              const isAllowed = isSuper || allowedroutes.includes(route.path.replaceAll('/', ''));
-              if (route.isSublink) {
-                return (
-                  <Route key={ind} path={route.path} element={route.element}>
-                    {route.sublink &&
-                      route.sublink.map((sublink, index) => {
-                        return (
-                          <Route
-                            key={index}
-                            path={sublink.path}
-                            element={sublink.element}
-                          ></Route>
-                        );
-                      })}
-                  </Route>
-                );
-              } else {
-                return (
-                  <Route
-                    index={route.name === "Dashboard" ? true : false}
-                    key={ind}
-                    path={route.path}
-                    element={route.element}
-                  ></Route>
-                );
-              }
-            })}
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+    <div className="relative min-h-[99vh] bg-gray-50">
+      <div className="min-h-screen">
+        <ToastContainer />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={<Layout />}>
+              {routes.map((route, ind) => {
+                const isAllowed =
+                  isSuper ||
+                  allowedroutes.includes(route.path.replaceAll("/", ""));
+                if (route.isSublink) {
+                  return (
+                    <Route key={ind} path={route.path} element={route.element}>
+                      {route.sublink &&
+                        route.sublink.map((sublink, index) => {
+                          return (
+                            <Route
+                              key={index}
+                              path={sublink.path}
+                              element={sublink.element}
+                            ></Route>
+                          );
+                        })}
+                    </Route>
+                  );
+                } else {
+                  return (
+                    <Route
+                      index={route.name === "Dashboard" ? true : false}
+                      key={ind}
+                      path={route.path}
+                      element={route.element}
+                    ></Route>
+                  );
+                }
+              })}
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
       </div>
     </div>
   );

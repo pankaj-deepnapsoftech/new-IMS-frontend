@@ -1,8 +1,10 @@
+// @ts-nocheck
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { MdOutlineRefresh } from "react-icons/md";
 import AgentTable from "../components/Table/AgentTable";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { colors } from "../theme/colors";
 import {
   closeAddBuyerDrawer,
   closeBuyerDetailsDrawer,
@@ -170,170 +172,222 @@ const Buyers: React.FC = () => {
   }, [searchKey]);
 
   if (!isAllowed) {
-    return <div className="text-center text-red-500">You are not allowed to access this route.</div>
+    return (
+      <div className="text-center text-red-500">
+        You are not allowed to access this route.
+      </div>
+    );
   }
 
   return (
-    <div className="rounded-md mb-3 px-3">
-      {/* Add Buyer Drawer */}
-      {isAddBuyerDrawerOpened && (
-        <AddBuyer
-          fetchBuyersHandler={fetchBuyersHandler}
-          closeDrawerHandler={closeAddBuyerDrawerHandler}
-        />
-      )}
-      {/* Update Buyer Drawer */}
-      {isUpdateBuyerDrawerOpened && (
-        <UpdateBuyer
-          buyerId={buyerId}
-          closeDrawerHandler={closeUpdateBuyerDrawerHandler}
-          fetchBuyersHandler={fetchBuyersHandler}
-        />
-      )}
-      {/* Buyer Details Drawer */}
-      {isBuyerDetailsDrawerOpened && (
-        <BuyerDetails
-          buyerId={buyerId}
-          closeDrawerHandler={closeBuyerDetailsDrawerHandler}
-        />
-      )}
-      <div >
-        <h1 className="text-center font-[700] text-white pb-4 text-3xl pt-2">
-          Buyers
-        </h1>
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: colors.background.page }}
+    >
+      <div className="p-2 lg:p-3">
+        {/* Add Buyer Drawer */}
+        {isAddBuyerDrawerOpened && (
+          <AddBuyer
+            fetchBuyersHandler={fetchBuyersHandler}
+            closeDrawerHandler={closeAddBuyerDrawerHandler}
+          />
+        )}
+        {/* Update Buyer Drawer */}
+        {isUpdateBuyerDrawerOpened && (
+          <UpdateBuyer
+            buyerId={buyerId}
+            closeDrawerHandler={closeUpdateBuyerDrawerHandler}
+            fetchBuyersHandler={fetchBuyersHandler}
+          />
+        )}
+        {/* Buyer Details Drawer */}
+        {isBuyerDetailsDrawerOpened && (
+          <BuyerDetails
+            buyerId={buyerId}
+            closeDrawerHandler={closeBuyerDetailsDrawerHandler}
+          />
+        )}
 
-        <div className="mt-2 flex flex-col md:flex-row justify-center md:justify-center gap-y-2 md:gap-y-0 gap-x-2 w-full">
-          {/* Search */}
-          <div className="relative w-full md:w-64">
-            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-200" />
-            <input
-              className="pl-10 pr-4 py-2 w-full text-sm border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-              placeholder="Search roles..."
-              value={searchKey}
-              onChange={(e) => setSearchKey(e.target.value)}
-            />
-          </div>
-
-          {/* Refresh Button */}
-          <Button
-            fontSize={{ base: "14px", md: "14px" }}
-            paddingX={{ base: "10px", md: "12px" }}
-            paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "100%", md: 100 }}
-            onClick={fetchBuyersHandler}
-            leftIcon={<MdOutlineRefresh />}
-            color="#fff"
-            borderColor="#fff"
-            variant="outline"
-            _hover={{ bg: "white", color: "#2D3748" }}
-          >
-            Refresh
-          </Button>
-
-          {/* Add New Buyer Button */}
-          <Button
-            fontSize={{ base: "14px", md: "14px" }}
-            paddingX={{ base: "10px", md: "12px" }}
-            paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "100%", md: 200 }}
-            onClick={openAddBuyerDrawerHandler}
-            color="white"
-            backgroundColor="#4b87a0d9"
-            _hover={{ bg: "#fff", textColor: "#000" }}
-          >
-            Add New Buyer
-          </Button>
-
-          {/* Bulk Upload Button */}
-          <div className="w-full md:w-[200px] relative">
-            <Button
-              fontSize={{ base: "14px", md: "14px" }}
-              paddingX={{ base: "10px", md: "12px" }}
-              paddingY={{ base: "0", md: "3px" }}
-              width="100%"
-              onClick={() => setShowBulkUploadMenu(true)}
-              color="white"
-              backgroundColor="#4b87a0d9"
-              rightIcon={<AiFillFileExcel size={22} />}
-              _hover={{ bg: "#fff", textColor: "#000" }}
+        {/* Main Header */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <div className="text-center">
+            <h1
+              className="text-2xl lg:text-3xl font-bold"
+              style={{ color: colors.text.primary }}
             >
-              Bulk Upload
-            </Button>
-
-            {/* Bulk Upload Dropdown */}
-            {showBulkUploadMenu && (
-              <div className="absolute z-50 mt-1 border border-[#a9a9a9] rounded p-2 bg-white w-[250px]">
-                <form>
-                  <FormControl>
-                    <FormLabel fontWeight="bold">Choose File (.csv)</FormLabel>
-                    <Input
-                      ref={fileRef}
-                      borderWidth={1}
-                      borderColor={"#a9a9a9"}
-                      paddingTop={1}
-                      type="file"
-                      accept=".csv, .xlsx"
-                    />
-                  </FormControl>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Button
-                      type="submit"
-                      fontSize={{ base: "14px", md: "14px" }}
-                      onClick={bulkUploadHandler}
-                      color="white"
-                      backgroundColor="#2D3748"
-                      className="mt-1"
-                      rightIcon={<AiFillFileExcel size={22} />}
-                      isLoading={bulkUploading}
-                      _hover={{ bg: "#2D3748ba" }}
-                    >
-                      Upload
-                    </Button>
-                    <Button
-                      type="button"
-                      fontSize={{ base: "14px", md: "14px" }}
-                      onClick={() => setShowBulkUploadMenu(false)}
-                      color="white"
-                      backgroundColor="#2D3748"
-                      className="mt-1"
-                      rightIcon={<RxCross2 size={22} />}
-                      _hover={{ bg: "#2D3748ba" }}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                  <a href={SampleCSV}>
-                    <Button
-                      type="button"
-                      fontSize={{ base: "14px", md: "14px" }}
-                      width={{ base: "100%", md: 190 }}
-                      color="white"
-                      backgroundColor="#2D3748"
-                      className="mt-1"
-                      rightIcon={<AiFillFileExcel size={22} />}
-                      _hover={{ bg: "#2D3748ba" }}
-                    >
-                      Sample CSV
-                    </Button>
-                  </a>
-                </form>
-              </div>
-            )}
+              Buyer Management
+            </h1>
+            <p
+              className="text-sm mt-1"
+              style={{ color: colors.text.secondary }}
+            >
+              Manage customer and buyer information
+            </p>
           </div>
-
         </div>
 
-      </div>
+        {/* Actions and Search */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 flex-1">
+              <div className="relative">
+                <FiSearch
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                  style={{ color: colors.text.secondary }}
+                />
+                <input
+                  className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Search buyers..."
+                  value={searchKey || ""}
+                  onChange={(e) => setSearchKey(e.target.value)}
+                />
+              </div>
+            </div>
 
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={fetchBuyersHandler}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                style={{
+                  borderColor: colors.border.medium,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                }}
+              >
+                <MdOutlineRefresh size="16px" />
+                Refresh
+              </button>
 
-      <div>
-        <AgentTable
-          agents={filteredBuyers}
-          openUpdateAgentDrawerHandler={openUpdateBuyerDrawerHandler}
-          openAgentDetailsDrawerHandler={openBuyerDetailsDrawerHandler}
-          isLoadingAgents={isLoadingBuyers}
-          deleteAgentHandler={deleteBuyerHandler}
-        />
+              <button
+                onClick={openAddBuyerDrawerHandler}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: colors.primary[500],
+                  color: colors.text.inverse,
+                }}
+              >
+                Add New Buyer
+              </button>
+
+              <div className="relative">
+                <button
+                  onClick={() => setShowBulkUploadMenu((prev) => !prev)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                  style={{
+                    backgroundColor: colors.secondary[500],
+                    color: colors.text.inverse,
+                  }}
+                >
+                  <AiFillFileExcel size="16px" />
+                  Bulk Upload
+                </button>
+
+                {/* Bulk Upload Dropdown */}
+                {showBulkUploadMenu && (
+                  <div
+                    className="absolute z-50 mt-2 w-80 shadow-lg rounded-xl p-4"
+                    style={{
+                      backgroundColor: colors.background.card,
+                      borderColor: colors.border.light,
+                    }}
+                  >
+                    <form>
+                      <div className="mb-4">
+                        <label
+                          className="block text-sm font-medium mb-2"
+                          style={{ color: colors.text.primary }}
+                        >
+                          Choose File (.csv)
+                        </label>
+                        <input
+                          ref={fileRef}
+                          type="file"
+                          accept=".csv, .xlsx"
+                          className="w-full text-sm p-2 border rounded-lg"
+                          style={{
+                            backgroundColor: colors.input.background,
+                            borderColor: colors.input.border,
+                            color: colors.text.primary,
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex gap-3 mb-3">
+                        <button
+                          type="button"
+                          onClick={bulkUploadHandler}
+                          disabled={bulkUploading}
+                          className="flex-1 px-4 py-2 rounded-lg font-medium transition-colors"
+                          style={{
+                            backgroundColor: colors.success[500],
+                            color: colors.text.inverse,
+                          }}
+                        >
+                          {bulkUploading ? "Uploading..." : "Upload"}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setShowBulkUploadMenu(false)}
+                          className="flex-1 px-4 py-2 rounded-lg font-medium border transition-colors"
+                          style={{
+                            borderColor: colors.border.medium,
+                            color: colors.text.primary,
+                            backgroundColor: colors.background.card,
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+
+                      <a
+                        href={SampleCSV}
+                        className="text-sm underline"
+                        style={{ color: colors.primary[500] }}
+                      >
+                        Download Sample CSV
+                      </a>
+                    </form>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Buyer Table */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <AgentTable
+            agents={filteredBuyers}
+            openUpdateAgentDrawerHandler={openUpdateBuyerDrawerHandler}
+            openAgentDetailsDrawerHandler={openBuyerDetailsDrawerHandler}
+            isLoadingAgents={isLoadingBuyers}
+            deleteAgentHandler={deleteBuyerHandler}
+          />
+        </div>
       </div>
     </div>
   );

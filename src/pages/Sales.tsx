@@ -25,7 +25,7 @@ const Sales = () => {
     const [filteredPurchases, setFilteredPurchases] = useState([]);
     // const [selectedSale, setSelectedSale] = useState([]);
     const [employees, setEmployees] = useState<any[]>([]);
-    const [editTable,setEditTable] = useState(null)
+    const [editTable, setEditTable] = useState(null)
     // const handleDataFromChild = (data) => {
     //     setSelectedSale(data);
     //     seteditsale(true);
@@ -44,7 +44,7 @@ const Sales = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setPurchases(response?.data?.data);
-      
+
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || error.message || "Failed to fetch sale data";
             toast.error(errorMessage);
@@ -52,7 +52,7 @@ const Sales = () => {
             setIsLoading(false);
         }
     };
-    
+
 
     const fetchEmployees = async () => {
         try {
@@ -75,7 +75,7 @@ const Sales = () => {
     useEffect(() => {
         fetchPurchases(page);
         fetchEmployees();
-    }, [page]); 
+    }, [page]);
 
     useEffect(() => {
         const filtered = purchases.filter((purchase) => {
@@ -137,7 +137,7 @@ const Sales = () => {
 
                     <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-6">
                         <button
-                            onClick={() => { setShow(!show); setEditTable(null)}}
+                            onClick={() => { setShow(!show); setEditTable(null) }}
                             className="w-full md:w-auto px-6 text-white py-2 rounded-md shadow-md bg-[#4b87a0d9] hover:bg-[#4b86a083] transition-all duration-300"
                         >
                             Add New Sale
@@ -151,15 +151,15 @@ const Sales = () => {
                         </button>
                     </div>
 
-       
+
                     <div className="overflow-x-auto">
                         <SalesTable
                             setShow={setShow}
                             setEditTable={setEditTable}
                             filteredPurchases={filteredPurchases}
-                          
+
                             empData={employees}
-                            isLoading={isLoading} 
+                            isLoading={isLoading}
                         />
                     </div>
                 </div>

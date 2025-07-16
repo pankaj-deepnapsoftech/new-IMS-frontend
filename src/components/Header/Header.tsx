@@ -30,39 +30,45 @@ const Header: React.FC = () => {
   };
   // console.log("User Data:", { firstname, lastname, email });
   return (
-    <div className="relative  flex justify-end max-[800px]:justify-end items-center py-2 px-3 "
-  
-    > 
-    
-      <div className="flex gap-x-5 items-center   ">
-        <IoIosNotifications size={40} color="white" />
+    <div className="relative bg-white border-b border-gray-200 shadow-sm">
+      <div className="flex justify-between items-center h-16 px-4 lg:px-6">
 
-        <Avatar
-          cursor="pointer"
-          size="md"
-          name={firstname ? firstname + " " + lastname : ""}
-          onClick={() => setShowUserDetails((prev) => !prev)}
-          
-        />
-        {showUserDetails && (
-          <ClickMenu
-            top={70}
-            right={30}
-            closeContextMenuHandler={() => setShowUserDetails(false)}
-          >
-            <UserDetailsMenu
-              email={email}
-              firstname={firstname}
-              lastname={lastname}
-              logoutHandler={logoutHandler}
-              closeUserDetailsMenu={() => setShowUserDetails(false)}
+        {/* Header Actions */}
+        <div className="flex items-center gap-4 ml-auto">
+          {/* Notifications */}
+          <button className="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+            <IoIosNotifications size={24} />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+
+          {/* User Avatar */}
+          <div className="relative">
+            <Avatar
+              cursor="pointer"
+              size="md"
+              name={firstname ? firstname + " " + lastname : ""}
+              onClick={() => setShowUserDetails((prev) => !prev)}
+              className="border-2 border-gray-200 hover:border-blue-300 transition-colors duration-200"
             />
-          </ClickMenu>
-        )}
+            {showUserDetails && (
+              <ClickMenu
+                top={70}
+                right={0}
+                closeContextMenuHandler={() => setShowUserDetails(false)}
+              >
+                <UserDetailsMenu
+                  email={email}
+                  firstname={firstname}
+                  lastname={lastname}
+                  logoutHandler={logoutHandler}
+                  closeUserDetailsMenu={() => setShowUserDetails(false)}
+                />
+              </ClickMenu>
+            )}
+          </div>
+        </div>
       </div>
-
-  </div>
-  
+    </div>
   );
 };
 

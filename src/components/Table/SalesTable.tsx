@@ -21,7 +21,7 @@ const SalesTable = ({ filteredPurchases, empData, isLoading, setEditTable, setSh
     const [paymentshow, setPaymentshow] = useState(false)
     const [isOpen, setViewDesign] = useState(false)
     const [isChecked, setIsChecked] = useState(false)
-   
+
 
     const handleSampleDesign = (designFile) => {
         if (designFile) {
@@ -31,14 +31,14 @@ const SalesTable = ({ filteredPurchases, empData, isLoading, setEditTable, setSh
         }
     };
 
-    
-  if (isLoading) {
-    return <Loading />;
-  }
 
-  if (!filteredPurchases || filteredPurchases.length === 0) {
-    return <EmptyData />;
-  }
+    if (isLoading) {
+        return <Loading />;
+    }
+
+    if (!filteredPurchases || filteredPurchases.length === 0) {
+        return <EmptyData />;
+    }
 
     return (
         <>
@@ -105,43 +105,43 @@ const SalesTable = ({ filteredPurchases, empData, isLoading, setEditTable, setSh
                             {/* )} */}
 
                             {/* <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setPaymentshow(!paymentshow)}>View Payment</button> */}
-{/* 
+                            {/* 
                             <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onClick={() => {
                                 setShow(!show);
                                 setSelectedSale(purchase);
                             }}>Assign</button> */}
 
-                          
-                                <button
-                                    className="px-4 py-2 border border-gray-500 rounded-md text-sm hover:bg-gray-700"
+
+                            <button
+                                className="px-4 py-2 border border-gray-500 rounded-md text-sm hover:bg-gray-700"
                                 onClick={() => { setShow(true); setEditTable(purchase); }}
-                                >
-                                    Edit
-                                </button>
+                            >
+                                Edit
+                            </button>
 
-                                {purchase?.boms[0]?.production_processes?.every(
-                                    (processGroup) =>
-                                        processGroup?.processes?.every((process) => process?.done === true)
-                                ) ? (
-                                    <button
-                                        className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white"
-                                        onClick={() => setIsChecked(!isChecked)}
-                                    >
-                                        Approve Sample
-                                    </button>
-                                ) : null}
-
+                            {purchase?.boms[0]?.production_processes?.every(
+                                (processGroup) =>
+                                    processGroup?.processes?.every((process) => process?.done === true)
+                            ) ? (
                                 <button
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
-                                    onClick={() => {
-                                        setShowAssign(!showassign);
-                                        setSelectedSale(purchase);
-                                    }}
+                                    className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white"
+                                    onClick={() => setIsChecked(!isChecked)}
                                 >
-                                    Assign
+                                    Approve Sample
                                 </button>
+                            ) : null}
 
-                              
+                            <button
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                                onClick={() => {
+                                    setShowAssign(!showassign);
+                                    setSelectedSale(purchase);
+                                }}
+                            >
+                                Assign
+                            </button>
+
+
                             <div>
                                 <button
                                     className="px-4 py-2 border border-purple-500 text-purple-400 rounded-md text-sm hover:bg-purple-600 hover:text-white"
@@ -150,13 +150,13 @@ const SalesTable = ({ filteredPurchases, empData, isLoading, setEditTable, setSh
                                     Sample Design
                                 </button>
                             </div>
-                                <button
-                                    className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white"
-                                    onClick={() => handleUpdatedDesign(purchase)}
-                                >
-                                    Updated Design
-                                </button>
-                          
+                            <button
+                                className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white"
+                                onClick={() => handleUpdatedDesign(purchase)}
+                            >
+                                Updated Design
+                            </button>
+
 
                         </div>
                     </div>
@@ -167,7 +167,7 @@ const SalesTable = ({ filteredPurchases, empData, isLoading, setEditTable, setSh
             {/* <ViewPayment paymentshow={paymentshow} setPaymentshow={setPaymentshow} /> */}
             {/* <UploadInvoice showinvoice={showinvoice} setShowInvoice={setShowInvoice} /> */}
             {/* <ViewDesign isOpen={isOpen}  setViewDesign={setViewDesign}/> */}
-            <ApproveSample  isChecked={isChecked} setIsChecked={setIsChecked}/>
+            <ApproveSample isChecked={isChecked} setIsChecked={setIsChecked} />
         </>
 
     )

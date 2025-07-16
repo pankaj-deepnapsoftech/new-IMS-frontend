@@ -19,6 +19,7 @@ import { FaArrowUpLong, FaArrowDownLong } from "react-icons/fa6";
 import { usePagination, useSortBy, useTable, Column } from "react-table";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
+import { colors } from "../../theme/colors";
 
 interface ProductTableProps {
   products: Array<any>;
@@ -58,7 +59,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
     []
   );
   const [showDeletePage, setshowDeletePage] = useState(false);
-  const [deleteId, setdeleteId] = useState('')
+  const [deleteId, setdeleteId] = useState("");
 
   const inventoryCategoryStyles = {
     indirect: { text: "#e70000" },
@@ -84,234 +85,596 @@ const ProductTable: React.FC<ProductTableProps> = ({
     usePagination
   );
 
-  const dynamicBg = (index) => (index % 2 !== 0 ? "#ffffff40" : "#ffffff1f");
-
   return (
-    <div>
-      {isLoadingProducts && <Loading />}
-      {!isLoadingProducts && products.length === 0 && <EmptyData />}
-      {!isLoadingProducts && products.length > 0 && (
-        <div>
-          <div className="flex justify-end mb-2">
-            <Select onChange={(e) => setPageSize(Number(e.target.value))} width="80px" color="white "
-              size="sm"
-              borderRadius="md"
-              border="1px solid gray" sx={{
-                option: {
-                  backgroundColor: "#444e5b", // Default background
-                  color: "white",
-                },
-              }}>
-
-              {[10, 20, 50, 100, 100000].map((n) => (
-                <option key={n} value={n}>
-                  {n === 100000 ? "All" : n}
-                </option>
-              ))}
-            </Select>
-
-
-          </div>
-
-          <TableContainer
-            overflowY="auto"
-            borderRadius="md"
-            className="mx-3 bg-[#14243452]"
-          >
-            <Table variant="unstyled" {...getTableProps()}>
-              <Thead className="text-sm font-semibold bg-[#14243452]">
-                {headerGroups.map((hg) => (
-                  <Tr {...hg.getHeaderGroupProps()}>
-                    {hg.headers.map((column: any) => (
-                      <Th
-                        textTransform="capitalize"
-                        fontSize="14px"
-                        fontWeight="600"
-                        color="white"
-                        {...column.getHeaderProps(
-                          column.getSortByToggleProps()
-                        )}
-                      >
-                        <p className="flex items-center gap-1">
-                          {column.render("Header")}
-                          {column.isSorted &&
-                            (column.isSortedDesc ? (
-                              <FaCaretDown />
-                            ) : (
-                              <FaCaretUp />
-                            ))}
-                        </p>
-                      </Th>
-                    ))}
-                    <Th
-                      textTransform="capitalize"
-                      fontSize="14px"
-                      fontWeight="600"
-                      color="white"
-                    // bg="#14243452"
-                    >
-                      Actions
-                    </Th>
-                  </Tr>
-                ))}
-              </Thead>
-              <Tbody {...getTableBodyProps()}>
-                {page.map((row, index) => {
-                  prepareRow(row);
-                  return (
-                    <Tr
-                      {...row.getRowProps()}
-                      bgColor={dynamicBg(index)}
-                      className="font-[600] hover:cursor-pointer text-gray-200 text-[14px]"
-                      _hover={{
-                        bg: "#ffffff78",
-                        cursor: "pointer",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      {row.cells.map((cell) => {
-                        const colId = cell.column.id;
-                        const original = row.original;
-                        return (
-                          <Td fontWeight="500" {...cell.getCellProps()} border="none">
-                            {colId === "createdAt" && original?.createdAt
-                              ? moment(original?.createdAt).format("DD/MM/YYYY")
-                              : colId === "updatedAt" && original?.updatedAt
-                                ? moment(original?.updatedAt).format("DD/MM/YYYY")
-                                : colId === "inventory_category" && original.inventory_category
-                                  ? (
-                                    <span
-                                      className="px-2 py-1 rounded-md font-[600]"
-                                      style={{
-                                        backgroundColor:
-                                          inventoryCategoryStyles[original.inventory_category]?.bg,
-                                        color:
-                                          inventoryCategoryStyles[original.inventory_category]?.text,
-                                      }}
-                                    >
-                                      {original.inventory_category[0].toUpperCase() +
-                                        original.inventory_category.slice(1)}
-                                    </span>
-                                  )
-                                  : colId === "change" && original.change_type
-                                    ? (
-                                      <p className="flex gap-1 items-center">
-                                        {original.change_type === "increase" ? (
-                                          <FaArrowUpLong color="#0dac51" size={20} />
-                                        ) : (
-                                          <FaArrowDownLong color="#c70505" size={20} />
-                                        )}
-                                        <span
-                                          style={{
-                                            color:
-                                              original.change_type === "increase"
-                                                ? "#0dac51"
-                                                : "#c70505",
-                                          }}
-                                        >
-                                          {original.quantity_changed}
-                                        </span>
-                                      </p>
-                                    )
-                                    : cell.render("Cell")}
-                          </Td>
-                        );
-                      })}
-                      <Td border="none" className="flex gap-x-2 items-center">
-                        {openProductDetailsDrawerHandler && (
-                          <MdOutlineVisibility
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              openProductDetailsDrawerHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                        {openUpdateProductDrawerHandler && (
-                          <MdEdit
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              openUpdateProductDrawerHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                        {deleteProductHandler && (
-                          <MdDeleteOutline
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                            { setdeleteId(row.original?._id);
-                             setshowDeletePage(true)}
-                            }
-                          />
-                        )}
-                        {approveProductHandler && (
-                          <FcApproval
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              approveProductHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                      </Td>
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
-          </TableContainer>
-
-          <div className="w-[max-content] m-auto my-7">
-            <button
-              className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
-              disabled={!canPreviousPage}
-              onClick={previousPage}
+    <div className="p-6">
+      {isLoadingProducts && (
+        <div className="flex items-center justify-center py-20">
+          <div className="flex items-center gap-3">
+            <div
+              className="animate-spin rounded-full h-8 w-8 border-b-2"
+              style={{ borderColor: colors.primary[500] }}
+            ></div>
+            <span
+              className="font-medium"
+              style={{ color: colors.text.secondary }}
             >
-              Prev
-            </button>
-            <span className="mx-3 text-gray-200 text-sm">
-              {pageIndex + 1} of {pageCount}
+              Loading products...
             </span>
-            <button
-              className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed"
-              disabled={!canNextPage}
-              onClick={nextPage}
-            >
-              Next
-            </button>
           </div>
         </div>
       )}
 
-{showDeletePage && (
-                <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center">
-                    <div className="bg-[#1C3644] rounded-lg shadow-xl p-6 w-full max-w-md">
-                        <h2 className="text-lg font-semibold text-white mb-4">Confirm Deletion</h2>
-                        <p className="text-sm text-white mb-6">Are you sure you want to delete this role ?</p>
-                        <div className="mt-6 flex justify-end space-x-3">
-                            <button
-                                onClick={() => setshowDeletePage(!showDeletePage)}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
+      {!isLoadingProducts && products.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div
+            className="rounded-full p-6 mb-4"
+            style={{ backgroundColor: colors.gray[100] }}
+          >
+            <svg
+              className="w-12 h-12"
+              style={{ color: colors.gray[400] }}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+              />
+            </svg>
+          </div>
+          <h3
+            className="text-lg font-semibold mb-2"
+            style={{ color: colors.text.primary }}
+          >
+            No products found
+          </h3>
+          <p className="max-w-md" style={{ color: colors.text.muted }}>
+            Get started by adding your first product to manage your inventory.
+          </p>
+        </div>
+      )}
+
+      {!isLoadingProducts && products.length > 0 && (
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-6">
+              <div>
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  {products.length} Product{products.length !== 1 ? "s" : ""}{" "}
+                  Found
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.text.secondary }}
+              >
+                Show:
+              </span>
+              <select
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                className="px-3 py-2 text-sm rounded-lg border transition-colors"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor: colors.border.light,
+                  color: colors.text.primary,
+                }}
+              >
+                {[10, 20, 50, 100, 100000].map((size) => (
+                  <option key={size} value={size}>
+                    {size === 100000 ? "All" : size}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Enhanced Table */}
+          <div
+            className="rounded-xl shadow-sm overflow-hidden"
+            style={{
+              backgroundColor: colors.background.card,
+              border: `1px solid ${colors.border.light}`,
+            }}
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead style={{ backgroundColor: colors.table.header }}>
+                  <tr
+                    style={{ borderBottom: `1px solid ${colors.table.border}` }}
+                  >
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      ID
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Name
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Category
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Inventory Category
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Type
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      UOM
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Price
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Current Stock
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Last Change
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Created On
+                    </th>
+                    <th
+                      className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {page.map((row, index) => {
+                    prepareRow(row);
+                    return (
+                      <tr
+                        key={row.id}
+                        className="transition-colors hover:shadow-sm"
+                        style={{
+                          backgroundColor:
+                            index % 2 === 0
+                              ? colors.background.card
+                              : colors.table.stripe,
+                          borderBottom: `1px solid ${colors.table.border}`,
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            colors.table.hover;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            index % 2 === 0
+                              ? colors.background.card
+                              : colors.table.stripe;
+                        }}
+                      >
+                        <td
+                          className="px-4 py-3 text-sm font-mono whitespace-nowrap"
+                          style={{ color: colors.text.secondary }}
+                        >
+                          {row.original.product_id || "—"}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm font-medium whitespace-nowrap max-w-xs truncate"
+                          style={{ color: colors.text.primary }}
+                          title={row.original.name}
+                        >
+                          {row.original.name || "—"}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap"
+                          style={{ color: colors.text.secondary }}
+                        >
+                          {row.original.category || "—"}
+                        </td>
+                        <td className="px-4 py-3 text-sm whitespace-nowrap">
+                          {row.original.inventory_category && (
+                            <span
+                              className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
+                              style={{
+                                backgroundColor:
+                                  row.original.inventory_category === "direct"
+                                    ? colors.success[100]
+                                    : colors.error[100],
+                                color:
+                                  row.original.inventory_category === "direct"
+                                    ? colors.success[700]
+                                    : colors.error[700],
+                              }}
                             >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() =>{ deleteProductHandler(deleteId);
-                                setshowDeletePage(false)
+                              {row.original.inventory_category
+                                .charAt(0)
+                                .toUpperCase() +
+                                row.original.inventory_category.slice(1)}
+                            </span>
+                          )}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap"
+                          style={{ color: colors.text.secondary }}
+                        >
+                          {row.original.item_type || "—"}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap"
+                          style={{ color: colors.text.secondary }}
+                        >
+                          {row.original.uom || "—"}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm font-medium whitespace-nowrap"
+                          style={{ color: colors.success[600] }}
+                        >
+                          ₹{row.original.price || "0"}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap"
+                          style={{ color: colors.text.secondary }}
+                        >
+                          {row.original.current_stock || "0"}
+                        </td>
+                        <td className="px-4 py-3 text-sm whitespace-nowrap">
+                          {row.original.change_type && (
+                            <div className="flex gap-1 items-center whitespace-nowrap">
+                              {row.original.change_type === "increase" ? (
+                                <FaArrowUpLong
+                                  size={16}
+                                  style={{ color: colors.success[500] }}
+                                />
+                              ) : (
+                                <FaArrowDownLong
+                                  size={16}
+                                  style={{ color: colors.error[500] }}
+                                />
+                              )}
+                              <span
+                                style={{
+                                  color:
+                                    row.original.change_type === "increase"
+                                      ? colors.success[600]
+                                      : colors.error[600],
                                 }}
+                              >
+                                {row.original.quantity_changed}
+                              </span>
+                            </div>
+                          )}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap"
+                          style={{ color: colors.text.secondary }}
+                        >
+                          {row.original.createdAt
+                            ? moment(row.original.createdAt).format(
+                                "DD/MM/YYYY"
+                              )
+                            : "—"}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-center gap-2">
+                            {openProductDetailsDrawerHandler && (
+                              <button
+                                onClick={() =>
+                                  openProductDetailsDrawerHandler(
+                                    row.original._id
+                                  )
+                                }
+                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  color: colors.secondary[600],
+                                  backgroundColor: colors.secondary[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.secondary[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.secondary[50];
+                                }}
+                                title="View product details"
+                              >
+                                <MdOutlineVisibility size={16} />
+                              </button>
+                            )}
+                            {openUpdateProductDrawerHandler && (
+                              <button
+                                onClick={() =>
+                                  openUpdateProductDrawerHandler(
+                                    row.original._id
+                                  )
+                                }
+                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  color: colors.primary[600],
+                                  backgroundColor: colors.primary[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.primary[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.primary[50];
+                                }}
+                                title="Edit product"
+                              >
+                                <MdEdit size={16} />
+                              </button>
+                            )}
+                            {deleteProductHandler && (
+                              <button
+                                onClick={() => {
+                                  setdeleteId(row.original._id);
+                                  setshowDeletePage(true);
+                                }}
+                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  color: colors.error[600],
+                                  backgroundColor: colors.error[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.error[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.error[50];
+                                }}
+                                title="Delete product"
+                              >
+                                <MdDeleteOutline size={16} />
+                              </button>
+                            )}
+                            {approveProductHandler && (
+                              <button
+                                onClick={() =>
+                                  approveProductHandler(row.original._id)
+                                }
+                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  color: colors.success[600],
+                                  backgroundColor: colors.success[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.success[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.success[50];
+                                }}
+                                title="Approve product"
+                              >
+                                <FcApproval size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-                                className={`px-4 py-2 text-sm font-medium text-white rounded transition  bg-red-600 hover:bg-red-700 `}
-                            >
-                                Delete
-                            </button>
-                        </div>
+          {/* Enhanced Pagination */}
+          <div
+            className="flex items-center justify-center px-6 py-4 border-t mt-4"
+            style={{
+              backgroundColor: colors.gray[50],
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <button
+                disabled={!canPreviousPage}
+                onClick={previousPage}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                  border: `1px solid ${colors.border.light}`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = colors.gray[50];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor =
+                      colors.background.card;
+                  }
+                }}
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+                Previous
+              </button>
+
+              <span
+                className="mx-4 text-sm"
+                style={{ color: colors.text.secondary }}
+              >
+                Page {pageIndex + 1} of {pageCount}
+              </span>
+
+              <button
+                disabled={!canNextPage}
+                onClick={nextPage}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                  border: `1px solid ${colors.border.light}`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = colors.gray[50];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor =
+                      colors.background.card;
+                  }
+                }}
+              >
+                Next
+                <svg
+                  className="w-4 h-4 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Enhanced Delete Modal */}
+      {showDeletePage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-md mx-4 rounded-xl shadow-xl"
+            style={{ backgroundColor: colors.background.card }}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Confirm Deletion
+                </h2>
+              </div>
+
+              <div className="mb-6">
+                <div
+                  className="rounded-lg p-4 mb-4"
+                  style={{ backgroundColor: colors.error[50] }}
+                >
+                  <div className="flex items-center gap-3">
+                    <svg
+                      className="w-6 h-6 flex-shrink-0"
+                      style={{ color: colors.error[500] }}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
+                    </svg>
+                    <div>
+                      <p
+                        className="font-medium"
+                        style={{ color: colors.error[800] }}
+                      >
+                        Delete Product
+                      </p>
+                      <p
+                        className="text-sm"
+                        style={{ color: colors.error[600] }}
+                      >
+                        This action cannot be undone. All product data will be
+                        permanently removed.
+                      </p>
                     </div>
+                  </div>
                 </div>
+              </div>
 
-
-            )}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setshowDeletePage(false)}
+                  className="flex-1 px-4 py-2 rounded-lg border transition-all duration-200"
+                  style={{
+                    borderColor: colors.border.medium,
+                    color: colors.text.secondary,
+                    backgroundColor: colors.background.card,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    deleteProductHandler(deleteId);
+                    setshowDeletePage(false);
+                  }}
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-200"
+                  style={{
+                    backgroundColor: colors.error[500],
+                    color: colors.text.inverse,
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

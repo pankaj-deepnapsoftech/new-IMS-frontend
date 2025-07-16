@@ -32,18 +32,18 @@ const Parties = () => {
                 }
             );
             const data = await res.json();
-            setPartiesData(data?.data);           
+            setPartiesData(data?.data);
         } catch (error) {
             console.log(error);
-        
-        }finally {
+
+        } finally {
             setIsLoading(false);
         }
     };
 
     useEffect(() => {
         fetchPartiesData(page);
-    }, [counter,page]);
+    }, [counter, page]);
 
 
     return (
@@ -51,7 +51,7 @@ const Parties = () => {
             <h1 className="text-white font-semibold text-2xl md:text-3xl text-center mb-6">
                 Parties
             </h1>
-           
+
             <div className="flex flex-col md:flex-row md:items-center justify-center gap-4 mb-6">
                 <input
                     type="text"
@@ -82,10 +82,10 @@ const Parties = () => {
                 </select>
             </div>
 
-          
+
             <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-6">
                 <button
-                    onClick={() => { setshowData(!showData); setEditTable(null)}}
+                    onClick={() => { setshowData(!showData); setEditTable(null) }}
                     className="w-full md:w-auto px-6 py-2  text-white rounded-md shadow-md bg-[#4b87a0d9] hover:bg-[#4b86a083] transition-all duration-300"
                 >
                     Add New Parties
@@ -110,10 +110,10 @@ const Parties = () => {
                 setPartiesData={setPartiesData}
                 isLoading={isLoading}
                 fetchPartiesData={fetchPartiesData}
-               
+
             />
 
-            
+
             <AddParties fetchPartiesData={fetchPartiesData} setEditTable={setEditTable} edittable={edittable} showData={showData} setshowData={setshowData} setCounter={setCounter} />
             <Pagination page={page} setPage={setPage} hasNextPage={partiesData?.length === 10} />
         </section>
