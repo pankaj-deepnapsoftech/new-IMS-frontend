@@ -139,7 +139,7 @@ const ProformaInvoice: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-3 lg:p-6">
+    <div className="min-h-screen bg-gray-50 p-2 lg:p-3">
       {isAddProformaInvoiceDrawerOpened && (
         <AddProformaInvoice
           closeDrawerHandler={closeAddProformaInvoiceDrawerHandler}

@@ -7,6 +7,7 @@ import { useUpdateEmployeeMutation } from "../../../redux/api/api";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import Loading from "../../../ui/Loading";
+import { colors } from "../../../theme/colors";
 
 interface UpdateEmployeeProps {
   employeeId: string | undefined;
@@ -131,19 +132,35 @@ const UpdateEmployee: React.FC<UpdateEmployeeProps> = ({
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3">
-          <BiX
+        <div
+          className="flex items-center justify-between p-6 border-b"
+          style={{ borderColor: colors.border.light }}
+        >
+          <h1
+            className="text-xl font-semibold"
+            style={{ color: colors.text.primary }}
+          >
+            Update Employee
+          </h1>
+          <button
             onClick={closeDrawerHandler}
-            size="26px"
-            className="text-gray-600 hover:text-gray-800 cursor-pointer"
-          />
-        </h1>
+            className="p-2 rounded-lg transition-colors duration-200"
+            style={{
+              color: colors.text.secondary,
+              backgroundColor: colors.gray[100],
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[200];
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[100];
+            }}
+          >
+            <BiX size={20} />
+          </button>
+        </div>
 
         <div className="mt-8 px-5">
-          <h2 className="text-xl text-center font-semibold py-3 px-4 bg-blue-50 border border-blue-200 rounded-md text-blue-800 mb-6">
-            Update Employee
-          </h2>
-
           {isLoadingEmployee && <Loading />}
           {!isLoadingEmployee && (
             <form onSubmit={updateEmployeeHandler}>
