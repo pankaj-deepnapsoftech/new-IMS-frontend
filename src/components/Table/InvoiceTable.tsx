@@ -172,6 +172,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                         {...column.getHeaderProps(
                           column.getSortByToggleProps()
                         )}
+                        px={4}
+                        py={3}
                         style={{
                           color: colors.table.headerText,
                           fontWeight: "600",
@@ -197,6 +199,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                       </Th>
                     ))}
                     <Th
+                      px={4}
+                      py={3}
                       style={{
                         color: colors.table.headerText,
                         fontWeight: "600",
@@ -238,6 +242,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                             color: colors.text.primary,
                             fontSize: "14px",
                           }}
+                          px={4}
+                          py={3}
                         >
                           {/* Creator Name */}
                           {cell.column.id === "creator" &&
@@ -304,6 +310,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           padding: "16px",
                           borderBottom: `1px solid ${colors.table.border}`,
                         }}
+                        px={4}
+                        py={3}
                       >
                         <div className="flex items-center gap-2">
                           {openInvoiceDetailsHandler && (

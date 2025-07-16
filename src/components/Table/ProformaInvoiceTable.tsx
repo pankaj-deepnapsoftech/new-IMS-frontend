@@ -221,6 +221,8 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                                 color={colors.table.headerText}
                                 fontWeight="600"
                                 whiteSpace="nowrap"
+                                px={4}
+                                py={3}
                               >
                                 <div className="flex items-center gap-1">
                                   {column.render("Header")}
@@ -244,6 +246,8 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                             fontWeight="600"
                             color={colors.table.headerText}
                             whiteSpace="nowrap"
+                            px={4}
+                            py={3}
                           >
                             Actions
                           </Th>
@@ -281,7 +285,8 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                               {...cell.getCellProps()}
                               fontSize="14px"
                               color={colors.text.primary}
-                              p={3}
+                              px={4}
+                              py={3}
                             >
                               {cell.column.id !== "createdAt" &&
                                 cell.column.id !== "updatedAt" &&
@@ -329,7 +334,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                             </Td>
                           );
                         })}
-                        <Td p={3}>
+                        <Td px={4} py={3}>
                           <div className="flex items-center gap-2">
                             {openProformaInvoiceDetailsHandler && (
                               <Tooltip label="View Details" placement="top">

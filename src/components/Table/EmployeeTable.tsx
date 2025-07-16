@@ -210,6 +210,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                           color="gray.700"
                           fontWeight="600"
                           whiteSpace="nowrap"
+                          px={4}
+                          py={3}
                           style={
                             column.id === "role"
                               ? { minWidth: "180px" }
@@ -236,6 +238,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                         fontWeight="600"
                         color="gray.700"
                         whiteSpace="nowrap"
+                        px={4}
+                        py={3}
                       >
                         Actions
                       </Th>
@@ -266,7 +270,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                             {...cell.getCellProps()}
                             fontSize="14px"
                             color={colors.text.primary}
-                            p={3}
+                            px={4}
+                            py={3}
                           >
                             {cell.column.id === "createdAt" ||
                             cell.column.id === "updatedAt" ? (
@@ -349,7 +354,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                             )}
                           </Td>
                         ))}
-                        <Td p={3}>
+                        <Td px={4} py={3}>
                           <div className="flex items-center gap-2">
                             {openEmployeeDetailsDrawerHandler && (
                               <Tooltip label="View Details" placement="top">

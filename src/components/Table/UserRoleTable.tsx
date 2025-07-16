@@ -204,6 +204,8 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                           color="gray.700"
                           fontWeight="600"
                           whiteSpace="nowrap"
+                          px={4}
+                          py={3}
                         >
                           <div className="flex items-center  gap-1">
                             {column.render("Header")}
@@ -221,6 +223,8 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                         fontWeight="600"
                         color="gray.700"
                         whiteSpace="nowrap"
+                        px={4}
+                        py={3}
                       >
                         Actions
                       </Th>
@@ -251,7 +255,8 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                             {...cell.getCellProps()}
                             fontSize="14px"
                             color={colors.text.primary}
-                            p={3}
+                            px={4}
+                            py={3}
                           >
                             {cell.column.id === "createdAt" ||
                             cell.column.id === "updatedAt" ? (
@@ -286,7 +291,7 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                             )}
                           </Td>
                         ))}
-                        <Td p={3}>
+                        <Td px={4} py={3}>
                           <div className="flex items-center gap-2">
                             {openRoleDetailsDrawerHandler && (
                               <Tooltip label="View Details" placement="top">

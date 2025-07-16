@@ -1,5 +1,6 @@
 // @ts-nocheck
-import { MdOutlineRefresh } from "react-icons/md";
+import { MdOutlineRefresh, MdAdd } from "react-icons/md";
+import { FiSearch } from "react-icons/fi";
 import AddNewSale from "../components/Drawers/Sales/AddNewSale";
 import UpdateSale from "../components/Drawers/Sales/UpdateSale";
 import { useState, useEffect } from "react";
@@ -9,172 +10,325 @@ import Pagination from "./Pagination";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { colors } from "../theme/colors";
 
 const Sales = () => {
-    const [pages, setPages] = useState(1);
-    const [show, setShow] = useState(false);
-    const [editshow, seteditsale] = useState(false);
-    const [cookies] = useCookies(["access_token", "role"]);
-    const [purchases, setPurchases] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const role = cookies?.role;
-    const token = cookies.access_token;
-    const [filterText, setFilterText] = useState("");
-    const [filterDate, setFilterDate] = useState("");
-    const [filterStatus, setFilterStatus] = useState("");
-    const [filteredPurchases, setFilteredPurchases] = useState([]);
-    const [selectedSale, setSelectedSale] = useState([]);
-    const [employees, setEmployees] = useState<any[]>([]);
-    const [totalPages, setTotalPages] = useState(0);
+  const [pages, setPages] = useState(1);
+  const [show, setShow] = useState(false);
+  const [editshow, seteditsale] = useState(false);
+  const [cookies] = useCookies(["access_token", "role"]);
+  const [purchases, setPurchases] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const role = cookies?.role;
+  const token = cookies.access_token;
+  const [filterText, setFilterText] = useState("");
+  const [filterDate, setFilterDate] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filteredPurchases, setFilteredPurchases] = useState([]);
+  const [selectedSale, setSelectedSale] = useState([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
 
-    const handleDataFromChild = (data) => {
-        setSelectedSale(data);
-        seteditsale(true);
-    };
+  const handleDataFromChild = (data) => {
+    setSelectedSale(data);
+    seteditsale(true);
+  };
 
-    const fetchPurchases = async () => {
-        try {
-            setIsLoading(true);
-            if (!token) throw new Error("Authentication token not found");
+  const fetchPurchases = async () => {
+    try {
+      setIsLoading(true);
+      if (!token) throw new Error("Authentication token not found");
 
-            const url = role === "admin"
-                ? `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=${pages}`
-                : `${process.env.REACT_APP_BACKEND_URL}sale/getOne?page=${pages}`;
+      const url =
+        role === "admin"
+          ? `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=${pages}`
+          : `${process.env.REACT_APP_BACKEND_URL}sale/getOne?page=${pages}`;
 
-            const response = await axios.get(url, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-            setPurchases(response.data.data);
-               
-            const totalItems = response.data.totalData || 0;
-            const itemsPerPage = 10;
-            setTotalPages(Math.ceil(totalItems / itemsPerPage));
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.message || error.message || "Failed to fetch sale data";
-            toast.error(errorMessage);
-        } finally {
-            setIsLoading(false);
+      setPurchases(response.data.data);
+
+      const totalItems = response.data.totalData || 0;
+      const itemsPerPage = 10;
+      setTotalPages(Math.ceil(totalItems / itemsPerPage));
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch sale data";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchEmployees = async () => {
+    try {
+      if (!token) throw new Error("Authentication token not found");
+
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}auth/all`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-    };
-    
+      );
 
-    const fetchEmployees = async () => {
-        try {
-            if (!token) throw new Error("Authentication token not found");
+      const filteredEmployees = (response.data.users || []).filter(
+        (user) => user.role
+      );
+      setEmployees(filteredEmployees);
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to fetch employees"
+      );
+    }
+  };
 
-            const response = await axios.get(
-                `${process.env.REACT_APP_BACKEND_URL}auth/all`,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+  useEffect(() => {
+    fetchPurchases();
+    fetchEmployees();
+  }, [pages]);
 
-            const filteredEmployees = (response.data.users || []).filter(user => user.role);
-            setEmployees(filteredEmployees);
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || error.message || "Failed to fetch employees");
-        }
-    };
+  useEffect(() => {
+    const filtered = purchases.filter((purchase) => {
+      const matchesText =
+        !filterText ||
+        [
+          purchase?.user_id?.[0]?.first_name,
+          purchase?.product_id?.[0]?.name,
+          purchase?.party_id?.[0]?.full_name,
+        ]
+          .filter(Boolean)
+          .some((field) =>
+            field.toLowerCase().includes(filterText.toLowerCase())
+          );
 
-    useEffect(() => {
-        fetchPurchases();
-        fetchEmployees();
-    }, [pages]);
+      const matchesDate =
+        !filterDate ||
+        new Date(purchase?.createdAt).toISOString().split("T")[0] ===
+          filterDate;
 
-    useEffect(() => {
-        const filtered = purchases.filter((purchase) => {
-            const matchesText = !filterText || [
-                purchase?.user_id?.[0]?.first_name,
-                purchase?.product_id?.[0]?.name,
-                purchase?.party_id?.[0]?.full_name,
-            ]
-                .filter(Boolean)
-                .some(field =>
-                    field.toLowerCase().includes(filterText.toLowerCase())
-                );
+      const matchesStatus =
+        !filterStatus ||
+        purchase?.Status?.toLowerCase() === filterStatus.toLowerCase();
 
-            const matchesDate = !filterDate ||
-                new Date(purchase?.createdAt).toISOString().split("T")[0] === filterDate;
+      return matchesText && matchesDate && matchesStatus;
+    });
 
-            const matchesStatus = !filterStatus ||
-                purchase?.Status?.toLowerCase() === filterStatus.toLowerCase();
+    setFilteredPurchases(filtered);
+  }, [filterText, filterDate, filterStatus, purchases]);
 
-            return matchesText && matchesDate && matchesStatus;
-        });
+  return (
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: colors.background.page }}
+    >
+      <div className="p-2 lg:p-3">
+        {/* Header Section */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1
+                className="text-2xl lg:text-3xl font-bold"
+                style={{ color: colors.text.primary }}
+              >
+                Sales Management
+              </h1>
+              <p
+                className="text-sm mt-1"
+                style={{ color: colors.text.secondary }}
+              >
+                Track and manage all sales transactions
+              </p>
+            </div>
 
-        setFilteredPurchases(filtered);
-    }, [filterText, filterDate, filterStatus, purchases]);
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setShow(!show)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: colors.button.primary,
+                  color: colors.text.inverse,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.primaryHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.button.primary;
+                }}
+              >
+                <MdAdd size="20px" />
+                Add Sale
+              </button>
 
-    return (
-        <>
-            <section className="w-full pb-8 relative px-4">
-                <div className="max-w-7xl mx-auto">
-                    <h1 className="text-white font-semibold text-3xl text-center mb-8">
-                        Sales
-                    </h1>
-                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-6">
-                        <input
-                            type="text"
-                            placeholder="Search sale..."
-                            value={filterText}
-                            onChange={(e) => setFilterText(e.target.value)}
-                            className="w-full md:w-60 px-4 py-2 text-sm border-b bg-[#475569] rounded-sm focus:outline-none text-gray-200 placeholder:text-gray-200"
-                        />
+              <button
+                onClick={fetchPurchases}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                style={{
+                  borderColor: colors.border.medium,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[50];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.background.card;
+                }}
+              >
+                <MdOutlineRefresh size="20px" />
+                Refresh
+              </button>
+            </div>
+          </div>
 
-                        <input
-                            type="date"
-                            value={filterDate}
-                            onChange={(e) => setFilterDate(e.target.value)}
-                            className="w-full md:w-52 styled-date px-4 py-2 bg-[#475569] text-gray-200 rounded-sm focus:outline-none"
-                        />
+          {/* Search and Filters Row */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Search Input */}
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Search Sales
+              </label>
+              <div className="relative">
+                <FiSearch
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                  style={{ color: colors.text.secondary }}
+                />
+                <input
+                  type="text"
+                  placeholder="Search sale..."
+                  value={filterText}
+                  onChange={(e) => setFilterText(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor =
+                      colors.input.borderFocus;
+                    e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = colors.input.border;
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+            </div>
 
-                        <select
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="w-full md:w-52 px-4 py-2 bg-[#475569] text-gray-200 rounded-sm focus:outline-none"
-                        >
-                            <option value="">Filter by sale status</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Approval">Approval</option>
-                        </select>
-                    </div>
+            {/* Date Filter */}
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Filter by Date
+              </label>
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor: colors.input.border,
+                  color: colors.text.primary,
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = colors.input.borderFocus;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = colors.input.border;
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              />
+            </div>
 
-                    <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-6">
-                        <button
-                            onClick={() => setShow(!show)}
-                            className="w-full md:w-auto px-6 text-white py-2 rounded-md shadow-md bg-[#4b87a0d9] hover:bg-[#4b86a083] transition-all duration-300"
-                        >
-                            Add New Sale
-                        </button>
-                        <button
-                            onClick={fetchPurchases}
-                            className="w-full md:w-auto px-4 py-2 text-white border border-white flex items-center justify-center rounded-md gap-2 hover:bg-white hover:text-black transition-all duration-300"
-                        >
-                            <MdOutlineRefresh />
-                            Refresh
-                        </button>
-                    </div>
+            {/* Status Filter */}
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Status
+              </label>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor: colors.input.border,
+                  color: colors.text.primary,
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = colors.input.borderFocus;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = colors.input.border;
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Approval">Approval</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-       
-                    <div className="overflow-x-auto">
-                        <SalesTable
-                            filteredPurchases={filteredPurchases}
-                            sendDataToParent={handleDataFromChild}
-                            empData={employees}
-                            isLoading={isLoading} 
-                        />
-                    </div>
-                </div>
-            </section>
+        {/* Table Section */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <SalesTable
+            filteredPurchases={filteredPurchases}
+            sendDataToParent={handleDataFromChild}
+            empData={employees}
+            isLoading={isLoading}
+          />
+        </div>
 
+        {/* Pagination */}
+        <div className="mt-6">
+          <Pagination page={pages} setPage={setPages} TotalPage={totalPages} />
+        </div>
+      </div>
 
-            <AddNewSale show={show} setShow={setShow} refresh={fetchPurchases} />
-            <UpdateSale editshow={editshow} sale={selectedSale} seteditsale={seteditsale} refresh={fetchPurchases} />
-            <Pagination page={pages} setPage={setPages} TotalPage={totalPages} />
-
-        </>
-    );
+      {/* Modals/Drawers */}
+      <AddNewSale show={show} setShow={setShow} refresh={fetchPurchases} />
+      <UpdateSale
+        editshow={editshow}
+        sale={selectedSale}
+        seteditsale={seteditsale}
+        refresh={fetchPurchases}
+      />
+    </div>
+  );
 };
 
 export default Sales;
