@@ -33,164 +33,246 @@ const SalesTable = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 bg-[#f9fafb]">
       {filteredPurchases?.map((purchase: any, index: number) => (
         <div
           key={purchase?._id}
-          className="rounded-lg shadow-lg p-6 transition-all duration-200 hover:shadow-xl"
+          className="rounded-xl border-l-4 transition-all duration-200 hover:shadow-lg"
           style={{
-            backgroundColor: colors.cardBackground,
-            border: `1px solid ${colors.border}`,
+            backgroundColor: colors.background?.card || colors.cardBackground,
+            borderLeftColor: colors.success?.[500] || colors.success,
+            boxShadow: colors.shadow?.sm || "0 1px 3px rgba(0, 0, 0, 0.1)",
           }}
         >
-          <div className="flex justify-between flex-wrap gap-4 mb-6">
-            <div>
-              <h2
-                className="font-semibold text-lg mb-2"
-                style={{ color: colors.textPrimary }}
+          <div className="p-6">
+            <div className="flex justify-between items-start mb-4">
+              <div className="space-y-3 flex-1">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <h3
+                      className="text-lg font-semibold"
+                      style={{
+                        color: colors.text?.primary || colors.textPrimary,
+                      }}
+                    >
+                      Sale #{purchase?._id?.slice(-8) || "N/A"}
+                    </h3>
+                    <p
+                      className="text-sm"
+                      style={{
+                        color: colors.text?.secondary || colors.textSecondary,
+                      }}
+                    >
+                      Created by:{" "}
+                      <span
+                        className="font-medium"
+                        style={{
+                          color: colors.primary?.[600] || colors.primary,
+                        }}
+                      >
+                        {purchase?.user_id?.[0]?.first_name || "N/A"}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p
+                      className="text-sm"
+                      style={{
+                        color: colors.text?.secondary || colors.textSecondary,
+                      }}
+                    >
+                      Date: {new Date(purchase?.createdAt).toLocaleDateString()}
+                    </p>
+                    <div
+                      className="inline-block px-3 py-1 rounded-full text-xs font-medium mt-1"
+                      style={{
+                        backgroundColor:
+                          purchase?.Status === "Approved"
+                            ? colors.success?.[100] || colors.success + "20"
+                            : colors.warning?.[100] || colors.warning + "20",
+                        color:
+                          purchase?.Status === "Approved"
+                            ? colors.success?.[700] || colors.success
+                            : colors.warning?.[700] || colors.warning,
+                      }}
+                    >
+                      {purchase?.Status || "Pending"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span
+                        className="font-medium"
+                        style={{
+                          color: colors.text?.primary || colors.textPrimary,
+                        }}
+                      >
+                        Party:
+                      </span>
+                      <span
+                        style={{
+                          color: colors.text?.secondary || colors.textSecondary,
+                        }}
+                      >
+                        {purchase?.party_id?.[0]?.full_name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span
+                        className="font-medium"
+                        style={{
+                          color: colors.text?.primary || colors.textPrimary,
+                        }}
+                      >
+                        Product:
+                      </span>
+                      <span
+                        style={{
+                          color: colors.text?.secondary || colors.textSecondary,
+                        }}
+                      >
+                        {purchase?.product_id?.[0]?.name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span
+                        className="font-medium"
+                        style={{
+                          color: colors.text?.primary || colors.textPrimary,
+                        }}
+                      >
+                        Unit Price:
+                      </span>
+                      <span
+                        style={{
+                          color: colors.text?.secondary || colors.textSecondary,
+                        }}
+                      >
+                        ₹{purchase?.price || "0"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span
+                        className="font-medium"
+                        style={{
+                          color: colors.text?.primary || colors.textPrimary,
+                        }}
+                      >
+                        Quantity:
+                      </span>
+                      <span
+                        style={{
+                          color: colors.text?.secondary || colors.textSecondary,
+                        }}
+                      >
+                        {purchase?.product_qty || "0"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span
+                        className="font-medium"
+                        style={{
+                          color: colors.text?.primary || colors.textPrimary,
+                        }}
+                      >
+                        GST:
+                      </span>
+                      <span
+                        style={{
+                          color: colors.text?.secondary || colors.textSecondary,
+                        }}
+                      >
+                        {purchase?.GST || "0"}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span
+                        className="font-medium text-lg"
+                        style={{
+                          color: colors.text?.primary || colors.textPrimary,
+                        }}
+                      >
+                        Total:
+                      </span>
+                      <span
+                        className="font-bold text-lg"
+                        style={{
+                          color: colors.success?.[600] || colors.success,
+                        }}
+                      >
+                        ₹
+                        {calculateTotalPrice(
+                          purchase?.price,
+                          purchase?.product_qty,
+                          purchase?.GST
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div
+              className="flex gap-3 justify-end pt-4 border-t"
+              style={{ borderColor: colors.border?.light || colors.border }}
+            >
+              <button
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 hover:shadow-md"
+                style={{
+                  borderColor: colors.border?.medium || colors.border,
+                  color: colors.text?.secondary || colors.textSecondary,
+                  backgroundColor:
+                    colors.background?.card || colors.cardBackground,
+                }}
+                onClick={() => sendDataToParent(purchase)}
               >
-                Created By:{" "}
-                <span style={{ color: colors.primary }}>
-                  {purchase?.user_id[0]?.first_name || "N/A"}
-                </span>
-              </h2>
-              <p className="text-sm" style={{ color: colors.textSecondary }}>
-                <span className="font-semibold">Date:</span>{" "}
-                {new Date(purchase?.createdAt).toLocaleDateString()}
-              </p>
+                Edit Sale
+              </button>
+
+              {purchase?.boms &&
+                purchase?.boms[0]?.production_processes?.every((processGroup) =>
+                  processGroup?.processes?.every(
+                    (process) => process?.done === true
+                  )
+                ) && (
+                  <button
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 hover:shadow-md"
+                    style={{
+                      borderColor: colors.success?.[500] || colors.success,
+                      color: colors.success?.[600] || colors.success,
+                      backgroundColor:
+                        colors.success?.[50] || colors.success + "20",
+                    }}
+                    onClick={() => setIsChecked(!isChecked)}
+                  >
+                    Approve Sample
+                  </button>
+                )}
+
+              <button
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 hover:shadow-md"
+                style={{
+                  borderColor: colors.primary?.[500] || colors.primary,
+                  color: colors.primary?.[600] || colors.primary,
+                  backgroundColor:
+                    colors.primary?.[50] || colors.primary + "20",
+                }}
+                onClick={() => {
+                  setShow(!show);
+                  setSelectedSale(purchase);
+                }}
+              >
+                Assign Employee
+              </button>
             </div>
-          </div>
-
-          <hr style={{ borderColor: colors.border }} className="my-4" />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            <div className="space-y-2">
-              <p style={{ color: colors.textSecondary }}>
-                <span
-                  className="font-semibold"
-                  style={{ color: colors.textPrimary }}
-                >
-                  Party:
-                </span>{" "}
-                {purchase?.party_id?.[0]?.full_name || "N/A"}
-              </p>
-              <p style={{ color: colors.textSecondary }}>
-                <span
-                  className="font-semibold"
-                  style={{ color: colors.textPrimary }}
-                >
-                  Product Name:
-                </span>{" "}
-                {purchase?.product_id[0]?.name || "N/A"}
-              </p>
-              <p style={{ color: colors.textSecondary }}>
-                <span
-                  className="font-semibold"
-                  style={{ color: colors.textPrimary }}
-                >
-                  Product Price:
-                </span>{" "}
-                ₹{purchase?.price || "N/A"}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <p style={{ color: colors.textSecondary }}>
-                <span
-                  className="font-semibold"
-                  style={{ color: colors.textPrimary }}
-                >
-                  Quantity:
-                </span>{" "}
-                {purchase?.product_qty}
-              </p>
-              <p style={{ color: colors.textSecondary }}>
-                <span
-                  className="font-semibold"
-                  style={{ color: colors.textPrimary }}
-                >
-                  Subtotal:
-                </span>{" "}
-                ₹{purchase?.price * purchase?.product_qty}
-              </p>
-              <p style={{ color: colors.textSecondary }}>
-                <span
-                  className="font-semibold"
-                  style={{ color: colors.textPrimary }}
-                >
-                  GST:
-                </span>{" "}
-                {purchase?.GST}%
-              </p>
-            </div>
-            <div className="space-y-2">
-              <p style={{ color: colors.textSecondary }}>
-                <span
-                  className="font-semibold"
-                  style={{ color: colors.textPrimary }}
-                >
-                  Total Price:
-                </span>
-                <span
-                  className="font-bold text-lg ml-2"
-                  style={{ color: colors.success }}
-                >
-                  ₹
-                  {calculateTotalPrice(
-                    purchase?.price,
-                    purchase?.product_qty,
-                    purchase?.GST
-                  ).toFixed(2)}
-                </span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <button
-              className="px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-opacity-90"
-              style={{
-                backgroundColor: colors.secondary,
-                color: colors.textPrimary,
-                border: `1px solid ${colors.border}`,
-              }}
-              onClick={() => sendDataToParent(purchase)}
-            >
-              Edit
-            </button>
-
-            {purchase?.boms &&
-              purchase?.boms[0]?.production_processes?.every((processGroup) =>
-                processGroup?.processes?.every(
-                  (process) => process?.done === true
-                )
-              ) && (
-                <button
-                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-opacity-90"
-                  style={{
-                    backgroundColor: colors.success,
-                    color: "white",
-                    border: `1px solid ${colors.success}`,
-                  }}
-                  onClick={() => setIsChecked(!isChecked)}
-                >
-                  Approve Sample
-                </button>
-              )}
-
-            <button
-              className="px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-opacity-90"
-              style={{
-                backgroundColor: colors.primary,
-                color: "white",
-                border: `1px solid ${colors.primary}`,
-              }}
-              onClick={() => {
-                setShow(!show);
-                setSelectedSale(purchase);
-              }}
-            >
-              Assign Employee
-            </button>
           </div>
         </div>
       ))}
