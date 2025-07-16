@@ -8,72 +8,75 @@ import { useToast } from "@chakra-ui/react";
 import { GiConsoleController } from "react-icons/gi";
 import { useFormik } from "formik";
 import { SalesFormValidation } from "../../../Validation/SalesformValidation";
+import { IoClose } from "react-icons/io5";
 const AddNewSale = ({ show, setShow, refresh }) => {
     const [cookies] = useCookies();
     const toast = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [partiesData, setpartiesData] = useState([])
     const [products, setProducts] = useState([]);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [imagesfile,setImageFile] = useState(null)
 
-
-    const { values, errors, touched, handleBlur, handleChange, handleSubmit, resetForm } = useFormik({
-        initialValues: {
-            party: "",
-            product_id: "",
-            price: "",
-            product_qty: "",
-            product_type: "finished goods",
-            GST: "",
-            comment: "",
-        },
-        validationSchema: SalesFormValidation,
-        onSubmit: async (value) => {
-            if (isSubmitting) return;
-            setIsSubmitting(true);
-            try {
-                const res = await fetch(process.env.REACT_APP_BACKEND_URL + "sale/create", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${cookies?.access_token}`,
-                    },
-                    body: JSON.stringify(value)
-                });
-
-                const data = await res.json();
-
-                if (res.ok) {
-                    toast({
-                        title: "Sale Created",
-                        description: "The sale has been created successfully.",
-                        status: "success",
-                        duration: 5000,
-                        isClosable: true,
+    const { values, errors, touched, handleBlur, handleChange, handleSubmit, resetForm, setFieldValue }
+        = useFormik({
+            initialValues: {
+                party: "",
+                product_id: "",
+                price: "",
+                product_qty: "",
+                product_type: "finished goods",
+                GST: "",
+                comment: "",
+            },
+            validationSchema: SalesFormValidation,
+            onSubmit: async (value) => {
+                if (isSubmitting) return;
+                setIsSubmitting(true);
+                try {
+                    const res = await fetch(process.env.REACT_APP_BACKEND_URL + "sale/create", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${cookies?.access_token}`,
+                        },
+                        body: JSON.stringify(value)
                     });
-                    resetForm({
-                        party: "",
-                        product_id: "",
-                        price: "",
-                        product_qty: "",
-                        product_type: "finished goods",
-                        GST: "",
-                        comment: "",
-                    });
-                    setShow(!show)
-                    await refresh();
-                } else {
-                    toast.error(data?.message || "Failed to save Sale.");
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        toast({
+                            title: "Sale Created",
+                            description: "The sale has been created successfully.",
+                            status: "success",
+                            duration: 5000,
+                            isClosable: true,
+                        });
+                        resetForm({
+                            party: "",
+                            product_id: "",
+                            price: "",
+                            product_qty: "",
+                            product_type: "finished goods",
+                            GST: "",
+                            comment: "",
+                        });
+                        setShow(!show)
+                        await refresh();
+                    } else {
+                        toast.error(data?.message || "Failed to save Sale.");
+                    }
+
+                } catch (error) {
+                    console.error("Error saving sale:", error);
+                    toast.error("Something went wrong. Please try again.");
+                } finally {
+                    setIsSubmitting(false);
                 }
-
-            } catch (error) {
-                console.error("Error saving sale:", error);
-                toast.error("Something went wrong. Please try again.");
-            } finally {
-                setIsSubmitting(false);
             }
-        }
-    })
-
+        })
+  
     const fetchDropdownData = async () => {
         try {
             const [partiesRes, productRes] = await Promise.all([
@@ -86,7 +89,7 @@ const AddNewSale = ({ show, setShow, refresh }) => {
             ]);
 
             const filteredProducts = (productRes.data.products || []).filter(
-                (product: any) => product.category == "finished goods"
+                (product: any) => product?.category == "finished goods"
             );
             setpartiesData(partiesRes.data.data || []);
             setProducts(filteredProducts || []);
@@ -101,42 +104,74 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                 isClosable: true,
             });
         }
-    }
-
+    } 
+    console.log(partiesData)
 
     useEffect(() => {
         fetchDropdownData()
-    }, [cookies.access_token, toast])
+    }, [cookies?.access_token, toast])
+
+    // console.log(products)
+
     return (
-        <div className={`absolute z-50 top-0 ${show ? "right-1" : "hidden"}  w-[30vw] transition-opacity duration-500 h-full bg-[#57657F] text-white   justify-center`}>
-            <div className=" p-6 rounded-lg w-full max-w-md relative">
-                <BiX size="30px" onClick={() => setShow(!show)} />
-                <h2 className="text-xl text-center mt-4 font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">Add a new Sale</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
+        <div
+            className={`absolute z-50 top-0 ${show ? "right-1" : "hidden"} w-[30vw] h-full bg-[#57657F] text-white transition-opacity duration-500 flex justify-center`}
+        >
+            <div className="p-6 w-full max-w-md relative">
+                <BiX size="30px" className="absolute top-4 right-4 cursor-pointer" onClick={() => setShow(!show)} />
+
+                <h2 className="text-2xl text-center font-semibold py-3 bg-white/30 rounded-md mb-6">
+                    Add a New Sale
+                </h2>
+
+                <form onSubmit={handleSubmit} className="space-y-5">
+
+                  
                     <div>
-                        <label className="block text-md font-medium mb-2">Party </label>
-                        <select required name="party" value={values.party} onChange={handleChange} onBlur={handleBlur} className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2">
-                            <option value="" className="text-black bg-[#ffffff41]">Select a party</option>
-                            {partiesData.map((parties: any) => (
-                                <option className="text-black bg-[#ffffff41]" key={parties?._id} value={parties?._id}>
-                                    {parties?.full_name} {parties?.company_name ? ` - ${parties?.company_name}` : null}
+                        <label className="block text-sm font-medium mb-1">Party</label>
+                        <select
+                            required
+                            name="party"
+                            value={values.party}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            className="w-full bg-white/10 border border-white/10 text-white rounded px-3 py-2 focus:outline-none"
+                        >
+                            <option value="" className="text-black">Select a party</option>
+                            {partiesData.map((party: any) => (
+                                <option key={party?._id} value={party?._id} className="text-black">
+                                    {party?.consignee_name} {party?.company_name ? `- (${party.company_name})` : ""}
                                 </option>
                             ))}
-
                         </select>
                         {touched.party && errors.party && (
                             <p className="text-red-400 text-sm mt-1">{errors.party}</p>
                         )}
                     </div>
 
+                    
                     <div>
-                        <label className="block text-md font-medium">Product</label>
-                        <select required name="product_id" value={values.product_id}
-                            onChange={handleChange}
-                            onBlur={handleBlur} className="w-full border border-gray-50 bg-[#47556913] focus:outline-none  text-gray-200 rounded px-2  py-2">
-                            <option value="" className="text-black bg-[#ffffff41]">Select a product</option>
+                        <label className="block text-sm font-medium mb-1">Product</label>
+                        <select
+                            required
+                            name="product_id"
+                            value={values.product_id}
+                            onChange={(e) => {
+                                const selectedProductId = e.target.value;
+                                const selectedProduct = products.find(prod => prod._id === selectedProductId);
+                                setFieldValue("product_id", selectedProductId);
+                                if (selectedProduct?.uom) {
+                                    setFieldValue("uom", selectedProduct.uom);
+                                } else {
+                                    setFieldValue("uom", ""); // fallback if no UOM
+                                }
+                            }}
+                            onBlur={handleBlur}
+                            className="w-full bg-white/10 border border-white/10 text-white rounded px-3 py-2 focus:outline-none"
+                        >
+                            <option value="" className="text-black">Select a product</option>
                             {products.map((product: any) => (
-                                <option className="text-black bg-[#ffffff41]" key={product?._id} value={product?._id}>
+                                <option key={product?._id} value={product?._id} className="text-black">
                                     {product?.name}
                                 </option>
                             ))}
@@ -144,18 +179,76 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                         {touched.product_id && errors.product_id && (
                             <p className="text-red-400 text-sm mt-1">{errors.product_id}</p>
                         )}
+                    </div>
+
+                  
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Product Image</label>
+                        <input
+                            type="file"
+                            name="product_image"
+                            accept="image/*"
+                            onChange={(e)=>{
+                                const file = e.target.files[0]
+                              if(file){
+                                  const url = URL.createObjectURL(file)
+                                  setImagePreview(url)
+                                  setImageFile(file)
+                                setFieldValue("prodict_image", file)
+                              }
+                                // console.log(URL.createObjectURL)
+                            }}
+                            className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none"
+                        />
+                        {
+                            imagePreview && (
+
+                                <div className="mt-3 relative">
+                                    <img
+                                        src={imagePreview}
+                                        alt="Preview"
+                                        className="w-full max-h-40 rounded-md object-contain border border-white/20 "
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setImagePreview(null);
+                                            setImageFile(null);
+                                            setFieldValue("product_image", null);
+                                        }}
+                                        className="absolute  top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white text-xs px-1.5 rounded-full"
+                                    >
+                                        <IoClose size={17} />
+                                    </button>
+                                </div>
+                            )
+                        }
 
                     </div>
 
+                 
                     <div>
-                        <label className="block text-md font-medium">Price </label>
+                        <label className="block text-sm font-medium mb-1">Unit of Measurement (UOM)</label>
+                        <input
+                            type="text"
+                            name="uom"
+                            value={values.uom}
+                            readOnly
+                            className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none cursor-not-allowed"
+                            placeholder="Auto-filled from product"
+                        />
+                    </div>
+
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Price</label>
                         <input
                             type="number"
                             name="price"
                             value={values.price}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            className="w-full border rounded px-3 py-2 bg-[#47556913] focus:outline-none"
+                            className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none"
                             required
                         />
                         {touched.price && errors.price && (
@@ -163,91 +256,83 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                         )}
                     </div>
 
+                    {/* Product Quantity */}
                     <div>
-                        <label className="block text-sm font-medium">Product Quantity </label>
+                        <label className="block text-sm font-medium mb-1">Product Quantity</label>
                         <input
                             type="number"
                             name="product_qty"
                             value={values.product_qty}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            className="w-full border rounded px-3 py-2 bg-[#47556913] focus:outline-none"
+                            className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none"
                             required
                         />
                         {touched.product_qty && errors.product_qty && (
                             <p className="text-red-400 text-sm mt-1">{errors.product_qty}</p>
                         )}
                     </div>
+
+                    {/* GST */}
                     <div>
-                        <label className="block text-sm font-medium">GST Type</label>
-                        <div className="flex space-x-4 mt-1">
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="GST"
-                                    value="18"
-                                    checked={values.GST === '18'}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                /> GST (18%)
-                            </label>
-
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="GST"
-                                    value="12"
-                                    checked={values.GST === '12'}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                /> GST (12%)
-                            </label>
-
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="GST"
-                                    value="5"
-                                    checked={values.GST === '5'}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                /> GST (5%)
-                            </label>
-
-                            {touched.GST && errors.GST && (
-                                <p className="text-red-400 text-sm mt-1">{errors.GST}</p>
-                            )}
+                        <label className="block text-sm font-medium mb-1">GST Type</label>
+                        <div className="flex items-center gap-4 mt-2">
+                            {[18, 12, 5].map((rate) => (
+                                <label key={rate} className="flex items-center gap-1">
+                                    <input
+                                        type="radio"
+                                        name="GST"
+                                        value={rate}
+                                        checked={values.GST === String(rate)}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                    <span>{rate}%</span>
+                                </label>
+                            ))}
                         </div>
+                        {touched.GST && errors.GST && (
+                            <p className="text-red-400 text-sm mt-1">{errors.GST}</p>
+                        )}
                     </div>
 
+                    {/* Remarks */}
                     <div>
-                        <label className="block text-sm font-medium">Remarks</label>
+                        <label className="block text-sm font-medium mb-1">Remarks</label>
                         <input
                             type="text"
                             name="comment"
                             value={values.comment}
                             onChange={handleChange}
-                            className="w-full border rounded px-3 py-2 bg-[#47556913] focus:outline-none"
-                            placeholder="Further Details (if any)"
+                            className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none"
+                            placeholder="Further details (optional)"
                         />
                     </div>
 
-                    <div className="flex justify-between">
+                    {/* Buttons */}
+                    <div className="flex justify-between mt-6">
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className={`px-4 py-2 rounded text-white transition ${isSubmitting
+                            className={`px-4 py-2 rounded transition text-white ${isSubmitting
                                 ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-[#ffffff41] hover:bg-[#ffffff6b]" 
+                                : "bg-white/30 hover:bg-white/50"
                                 }`}
                         >
-                             Add Sale
+                            Add Sale
                         </button>
-                        <button type="button" onClick={() => setShow(!show)} className=" bg-[#ffffff41] px-4 py-2 rounded  hover:text-gray-200">Cancel</button>
+                        <button
+                            type="button"
+                            onClick={() => setShow(!show)}
+                            className="px-4 py-2 rounded bg-white/30 hover:bg-white/50 text-white"
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
+
     )
 }
 

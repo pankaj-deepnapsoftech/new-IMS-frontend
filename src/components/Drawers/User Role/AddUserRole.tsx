@@ -17,7 +17,7 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
   closeDrawerHandler,
   fetchUserRolesHandler,
 }) => {
-  const [cookies, setCookie] = useCookies();
+  // const [cookies, setCookie] = useCookies();
   const [isAddingRole, setIsAddingRole] = useState<boolean>(false);
   const [role, setRole] = useState<string | undefined>();
   const [description, setDescription] = useState<string | undefined>();

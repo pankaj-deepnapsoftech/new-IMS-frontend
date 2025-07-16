@@ -48,32 +48,30 @@ const Sales = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setPurchases(response.data.data);
-
-      const totalItems = response.data.totalData || 0;
-      const itemsPerPage = 10;
-      setTotalPages(Math.ceil(totalItems / itemsPerPage));
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to fetch sale data";
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+            setPurchases(response?.data?.data);
+               
+            const totalItems = response.data.totalData || 0;
+            const itemsPerPage = 10;
+            setTotalPages(Math.ceil(totalItems / itemsPerPage));
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || error.message || "Failed to fetch sale data";
+            toast.error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
 
   const fetchEmployees = async () => {
     try {
       if (!token) throw new Error("Authentication token not found");
 
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}auth/all`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+            const response = await axios.get(
+                `${process.env.REACT_APP_BACKEND_URL}auth/all`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
 
       const filteredEmployees = (response.data.users || []).filter(
         (user) => user.role

@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/exhaustive-deps */
 // @ts-nocheck
 import { MdOutlineRefresh, MdAdd } from "react-icons/md";
 import { FiSearch } from "react-icons/fi";
@@ -10,6 +11,41 @@ import Pagination from "./Pagination";
 import { colors } from "../theme/colors";
 
 const Parties = () => {
+    const [showData, setshowData] = useState(false);
+    const [counter, setCounter] = useState(0);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedType, setSelectedType] = useState('');
+    const [selectedRole, setSelectedRole] = useState('');
+    const [partiesData, setPartiesData] = useState([]);
+    const [cookies] = useCookies();
+    const [isLoading, setIsLoading] = useState(true);
+    const [pages, setPages] = useState(1)
+    const [TotalPage,setTotalPage] = useState(0)
+    const [limit,setLimit] = useState(10)
+    const [edittable, setEditTable] = useState(null)
+    const fetchPartiesData = async () => {
+        try {
+            setIsLoading(true)
+            const res = await fetch(
+                `${process.env.REACT_APP_BACKEND_URL}parties/get?limit=${limit}&page=${pages}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${cookies.access_token}`,
+                    },
+                }
+            );
+            const data = await res.json();
+            setPartiesData(data.data);
+            let totalPage = Math.ceil(data.totalData / limit)
+            setTotalPage(totalPage)
+        } catch (error) {
+            console.log(error);
+        
+        }finally {
+            setIsLoading(false);
+        }
+    };
   const [showData, setshowData] = useState(false);
   const [counter, setCounter] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
