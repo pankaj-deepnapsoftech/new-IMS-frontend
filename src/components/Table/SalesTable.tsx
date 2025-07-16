@@ -1,36 +1,40 @@
 // @ts-nocheck
 
-import { useState } from "react";
+import { useState, useEffect } from "react"
 import AssignEmployee from "../Drawers/Sales/AssignEmployee";
+import UploadInvoice from "../Drawers/Sales/UploadInvoice";
+import ViewPayment from "../Drawers/Sales/ViewPayment";
+import ViewDesign from "../Drawers/Sales/ViewDesign";
 import ApproveSample from "../Drawers/Sales/ApproveSample";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
-import { colors } from "../../theme/colors";
+const SalesTable = ({ filteredPurchases, empData, isLoading, setEditTable, setShow }) => {
+    const [showassign, setShowAssign] = useState(false);
+    const calculateTotalPrice = (price: number, qty: number, gst: number) => {
+        const basePrice = price * qty;
+        const gstVal = (basePrice * gst) / 100;
+        const totalPrice = basePrice + gstVal;
+        return totalPrice;
+    };
+    console.log(filteredPurchases)
+    const [selectedSale, setSelectedSale] = useState([]);
+    const [paymentshow, setPaymentshow] = useState(false)
+    const [isOpen, setViewDesign] = useState(false)
+    const [isChecked, setIsChecked] = useState(false)
 
-const SalesTable = ({
-  filteredPurchases,
-  sendDataToParent,
-  empData,
-  isLoading,
-}) => {
-  const [show, setShow] = useState(false);
-  const [selectedSale, setSelectedSale] = useState([]);
-  const [isChecked, setIsChecked] = useState(false);
 
-  const calculateTotalPrice = (price: number, qty: number, gst: number) => {
-    const basePrice = price * qty;
-    const gstVal = (basePrice * gst) / 100;
-    const totalPrice = basePrice + gstVal;
-    return totalPrice;
-  };
+    const handleSampleDesign = (designFile) => {
+        if (designFile) {
+            window.open(designFile, '_blank');
+        } else {
+            alert("Design file not available.");
+        }
+    };
 
-  if (isLoading) {
-    return <Loading />;
-  }
 
-  if (!filteredPurchases || filteredPurchases.length === 0) {
-    return <EmptyData />;
-  }
+    if (isLoading) {
+        return <Loading />;
+    }
 
   return (
     <div className="space-y-6 bg-[#f9fafb]">
@@ -277,15 +281,102 @@ const SalesTable = ({
         </div>
       ))}
 
-      <AssignEmployee
-        show={show}
-        setShow={setShow}
-        employeeData={empData}
-        saleData={selectedSale}
-      />
-      <ApproveSample isChecked={isChecked} setIsChecked={setIsChecked} />
-    </div>
-  );
-};
+                        <div className="flex flex-wrap justify-between gap-3 mt-6">
+                            {/* <button className="px-4 py-2 border border-gray-500 rounded-md text-sm hover:bg-gray-700" onClick={() => sendDataToParent(purchase)}>Edit</button> */}
 
-export default SalesTable;
+                            {/* {purchase?.token_ss &&
+                                purchase?.boms[0]?.production_processes?.every(
+                                    (processGroup) =>
+                                        processGroup?.processes?.every(
+                                            (process) => process?.done === true
+                                        )
+                                ) ? ( */}
+
+                            {/* { purchase?.boms[0]?.production_processes?.every(
+                                    (processGroup) =>
+                                        processGroup?.processes?.every(
+                                            (process) => process?.done === true
+                                        )
+                                ) ? (
+                                <button className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white" onClick={()=>setIsChecked(!isChecked)}>Approve Sample</button>
+                            ) : null} */}
+
+                            {/* <button className="px-4 py-2 border border-orange-500 text-orange-400 rounded-md text-sm hover:bg-orange-600 hover:text-white" onClick={()=>setViewDesign(!isOpen)}>View Design</button> */}
+                            {/* <button className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white"><a href="https://images.unsplash.com/photo-1746483966639-b8dafcd05f5b?q=80&w=1288&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" target="_blank" >View Delivery Proof</a></button> */}
+
+                            {/* {purchase?.isTokenVerify && ( */}
+
+                            {/* <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setShowInvoice(!showinvoice)}>Upload Invoice</button> */}
+
+                            {/* )} */}
+
+                            {/* <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setPaymentshow(!paymentshow)}>View Payment</button> */}
+                            {/* 
+                            <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onClick={() => {
+                                setShow(!show);
+                                setSelectedSale(purchase);
+                            }}>Assign</button> */}
+
+
+                            <button
+                                className="px-4 py-2 border border-gray-500 rounded-md text-sm hover:bg-gray-700"
+                                onClick={() => { setShow(true); setEditTable(purchase); }}
+                            >
+                                Edit
+                            </button>
+
+                            {purchase?.boms[0]?.production_processes?.every(
+                                (processGroup) =>
+                                    processGroup?.processes?.every((process) => process?.done === true)
+                            ) ? (
+                                <button
+                                    className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white"
+                                    onClick={() => setIsChecked(!isChecked)}
+                                >
+                                    Approve Sample
+                                </button>
+                            ) : null}
+
+                            <button
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                                onClick={() => {
+                                    setShowAssign(!showassign);
+                                    setSelectedSale(purchase);
+                                }}
+                            >
+                                Assign
+                            </button>
+
+
+                            <div>
+                                <button
+                                    className="px-4 py-2 border border-purple-500 text-purple-400 rounded-md text-sm hover:bg-purple-600 hover:text-white"
+                                    onClick={() => handleSampleDesign(purchase?.productFile)}
+                                >
+                                    Sample Design
+                                </button>
+                            </div>
+                            <button
+                                className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white"
+                                onClick={() => handleUpdatedDesign(purchase)}
+                            >
+                                Updated Design
+                            </button>
+
+
+                        </div>
+                    </div>
+                </section>
+            ))}
+            <AssignEmployee show={showassign} setShow={setShowAssign} employeeData={empData}
+                saleData={selectedSale} />
+            {/* <ViewPayment paymentshow={paymentshow} setPaymentshow={setPaymentshow} /> */}
+            {/* <UploadInvoice showinvoice={showinvoice} setShowInvoice={setShowInvoice} /> */}
+            {/* <ViewDesign isOpen={isOpen}  setViewDesign={setViewDesign}/> */}
+            <ApproveSample isChecked={isChecked} setIsChecked={setIsChecked} />
+        </>
+
+    )
+}
+
+export default SalesTable

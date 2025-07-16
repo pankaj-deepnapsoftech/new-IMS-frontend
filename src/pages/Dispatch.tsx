@@ -23,9 +23,8 @@ const Dispatch = () => {
   const [trackingId, setTrackingId] = useState("");
   const [cookies] = useCookies();
   const [data, setData] = useState([]);
-  const [pages, setPages] = useState(1);
-  const [TotalPage, setTotalPage] = useState(0);
-  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1)
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showattachment, setShowAttachment] = useState(false);
   const [preview, setPreview] = useState(null);
@@ -80,9 +79,9 @@ const Dispatch = () => {
           }
         );
 
-        console.log(response);
-        resetForm();
-        setShowModal(false);
+    
+        resetForm()
+        setShowModal(false)
       } catch (error) {
         console.log(error);
       } finally {
@@ -94,19 +93,14 @@ const Dispatch = () => {
   const GetDispatch = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch?limit=${limit}&page=${pages}`,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies.access_token}`,
-          },
-        }
-      );
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch?page=${page}&&limit=2`, {
+        headers: {
+          Authorization: `Bearer ${cookies.access_token}`
+        }}
+      )
 
-      setData(response?.data?.data); // This is your array of dispatch records
-      const totalData = response?.data?.totalData || 0;
-      const totalPages = Math.ceil(totalData / limit);
-      setTotalPage(totalPages);
+      setData(response?.data?.data); 
+
     } catch (error) {
       console.log(error);
     } finally {
@@ -115,8 +109,10 @@ const Dispatch = () => {
   };
 
   useEffect(() => {
-    GetDispatch();
-  }, [pages, limit]);
+    GetDispatch(page)
+  }, [page])
+
+
 
   // const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
   //   const file = event.target.files[0];
@@ -726,11 +722,7 @@ const Dispatch = () => {
             </div>
           </div>
         )}
-
-        {/* Pagination */}
-        <div className="mt-8">
-          <Pagination page={pages} setPage={setPages} TotalPage={TotalPage} />
-        </div>
+        <Pagination page={page} setPage={setPage} hasNextPage={data.length === 2}/>
       </div>
     </div>
   );

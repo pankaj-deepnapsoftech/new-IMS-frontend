@@ -9,74 +9,134 @@ import { GiConsoleController } from "react-icons/gi";
 import { useFormik } from "formik";
 import { SalesFormValidation } from "../../../Validation/SalesformValidation";
 import { IoClose } from "react-icons/io5";
-const AddNewSale = ({ show, setShow, refresh }) => {
+const AddNewSale = ({ show, setShow, refresh, editTable }) => {
     const [cookies] = useCookies();
     const toast = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [partiesData, setpartiesData] = useState([])
     const [products, setProducts] = useState([]);
     const [imagePreview, setImagePreview] = useState(null);
-    const [imagesfile,setImageFile] = useState(null)
+    const [imagesfile, setImageFile] = useState(null)
 
-    const { values, errors, touched, handleBlur, handleChange, handleSubmit, resetForm, setFieldValue }
-        = useFormik({
-            initialValues: {
-                party: "",
-                product_id: "",
-                price: "",
-                product_qty: "",
-                product_type: "finished goods",
-                GST: "",
-                comment: "",
-            },
-            validationSchema: SalesFormValidation,
-            onSubmit: async (value) => {
-                if (isSubmitting) return;
-                setIsSubmitting(true);
-                try {
-                    const res = await fetch(process.env.REACT_APP_BACKEND_URL + "sale/create", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${cookies?.access_token}`,
-                        },
-                        body: JSON.stringify(value)
-                    });
+    // console.log(editTable)
+    const ImageUploader = async (formData) => {
+        // console.log(formData)
+        try {
+            const res = await axios.post("https://images.deepmart.shop/upload", formData);
+            console.log(res.data?.[0])
+            return res.data?.[0];
+        } catch (error) {
+            console.error("Image upload failed:", error);
+            return null;
+        }
+    };
 
-                    const data = await res.json();
 
-                    if (res.ok) {
+    const {
+        values,
+        errors,
+        touched,
+        handleBlur,
+        handleChange,
+        handleSubmit,
+        resetForm,
+        setFieldValue,
+    } = useFormik({
+        initialValues: {
+            party: editTable?.party?._id || "",
+            product_id: editTable?.product_id[0]?._id || "",
+            price: editTable?.price || "",
+            product_qty: editTable?.product_qty || "",
+            product_type: editTable?.product_type || "finished goods",
+            GST: editTable?.GST || "",
+            comment: editTable?.comment || "",
+            uom: editTable?.uom || "",
+            productFile: editTable?.productFile || "",
+        },
+        enableReinitialize: true,
+        validationSchema: SalesFormValidation,
+        onSubmit: async (value) => {
+            if (isSubmitting) return;
+            setIsSubmitting(true);
+        //    console.log("form Values",value)
+            try {
+                let designImageUrl = editTable?.productFile || "";
+
+                if (imagesfile) {
+                    const formData = new FormData();
+                    formData.append("file", imagesfile);
+                    const uploadedImage = await ImageUploader(formData);
+                    if (!uploadedImage) {
                         toast({
-                            title: "Sale Created",
-                            description: "The sale has been created successfully.",
-                            status: "success",
+                            title: "Upload failed",
+                            status: "error",
                             duration: 5000,
                             isClosable: true,
                         });
-                        resetForm({
-                            party: "",
-                            product_id: "",
-                            price: "",
-                            product_qty: "",
-                            product_type: "finished goods",
-                            GST: "",
-                            comment: "",
-                        });
-                        setShow(!show)
-                        await refresh();
-                    } else {
-                        toast.error(data?.message || "Failed to save Sale.");
+                        setIsSubmitting(false);
+                        return;
                     }
-
-                } catch (error) {
-                    console.error("Error saving sale:", error);
-                    toast.error("Something went wrong. Please try again.");
-                } finally {
-                    setIsSubmitting(false);
+                    designImageUrl = uploadedImage;
                 }
+
+                const payload = {
+                    ...value,
+                    productFile: designImageUrl,
+                };
+
+                if (editTable?._id) {
+                   
+                    await axios.put(
+                        `${process.env.REACT_APP_BACKEND_URL}sale/update/${editTable._id}`,
+                        payload,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${cookies?.access_token}`,
+                            },
+                        }
+                    );
+                    resetForm();
+                } else {
+                    // ➕ Create new sale
+                    await axios.post(
+                        `${process.env.REACT_APP_BACKEND_URL}sale/create`,
+                        payload,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${cookies?.access_token}`,
+                            },
+                        }
+                    );
+                    resetForm();
+                }
+
+                toast({
+                    title: `Sale ${editTable?._id ? "updated" : "created"} successfully`,
+                    status: "success",
+                    duration: 4000,
+                    isClosable: true,
+                });
+
+             
+                setImageFile(null);
+                setImagePreview(null);
+                setShow(false);
+                refresh();
+            } catch (error) {
+                console.error("Error saving sale:", error);
+                toast({
+                    title: "Error",
+                    description: "Something went wrong. Please try again.",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                });
+            } finally {
+                setIsSubmitting(false);
             }
-        })
-  
+        },
+    });
+
     const fetchDropdownData = async () => {
         try {
             const [partiesRes, productRes] = await Promise.all([
@@ -91,7 +151,7 @@ const AddNewSale = ({ show, setShow, refresh }) => {
             const filteredProducts = (productRes.data.products || []).filter(
                 (product: any) => product?.category == "finished goods"
             );
-            setpartiesData(partiesRes.data.data || []);
+            setpartiesData(partiesRes?.data?.data || []);
             setProducts(filteredProducts || []);
 
         } catch (error) {
@@ -104,29 +164,39 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                 isClosable: true,
             });
         }
-    } 
-    console.log(partiesData)
+    }
+    // console.log(partiesData)
 
     useEffect(() => {
         fetchDropdownData()
     }, [cookies?.access_token, toast])
 
     // console.log(products)
+    useEffect(() => {
+        if (editTable?.productFile) {
+            setImagePreview(editTable?.productFile);
+        } else {
+            setImagePreview(null);
+        }
+        setImageFile(null);
+    }, [editTable]);
+
+
 
     return (
         <div
-            className={`absolute z-50 top-0 ${show ? "right-1" : "hidden"} w-[30vw] h-full bg-[#57657F] text-white transition-opacity duration-500 flex justify-center`}
+            className={`absolute z-50 top-0 ${show ? "right-1" : "hidden"} w-[30vw]  bg-[#57657F] text-white transition-opacity duration-500 flex justify-center`}
         >
             <div className="p-6 w-full max-w-md relative">
                 <BiX size="30px" className="absolute top-4 right-4 cursor-pointer" onClick={() => setShow(!show)} />
 
                 <h2 className="text-2xl text-center font-semibold py-3 bg-white/30 rounded-md mb-6">
-                    Add a New Sale
+                    {editTable ? "Edit Sales Data" : " Add a New Sale"}
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
 
-                  
+
                     <div>
                         <label className="block text-sm font-medium mb-1">Party</label>
                         <select
@@ -149,7 +219,7 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                         )}
                     </div>
 
-                    
+
                     <div>
                         <label className="block text-sm font-medium mb-1">Product</label>
                         <select
@@ -181,21 +251,21 @@ const AddNewSale = ({ show, setShow, refresh }) => {
                         )}
                     </div>
 
-                  
+
                     <div>
                         <label className="block text-sm font-medium mb-1">Product Image</label>
                         <input
                             type="file"
-                            name="product_image"
+                            name="productFile"
                             accept="image/*"
-                            onChange={(e)=>{
+                            onChange={(e) => {
                                 const file = e.target.files[0]
-                              if(file){
-                                  const url = URL.createObjectURL(file)
-                                  setImagePreview(url)
-                                  setImageFile(file)
-                                setFieldValue("prodict_image", file)
-                              }
+                                if (file) {
+                                    const url = URL.createObjectURL(file)
+                                    setImagePreview(url)
+                                    setImageFile(file)
+                                    setFieldValue("productFile", file)
+                                }
                                 // console.log(URL.createObjectURL)
                             }}
                             className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none"
@@ -226,7 +296,7 @@ const AddNewSale = ({ show, setShow, refresh }) => {
 
                     </div>
 
-                 
+
                     <div>
                         <label className="block text-sm font-medium mb-1">Unit of Measurement (UOM)</label>
                         <input
@@ -336,4 +406,4 @@ const AddNewSale = ({ show, setShow, refresh }) => {
     )
 }
 
-export default AddNewSale
+export default AddNewSale 

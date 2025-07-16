@@ -1,62 +1,51 @@
-// @ts-nocheck
-import React from "react";
-import {  Button, HStack, Text, VStack, IconButton } from "@chakra-ui/react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import React from 'react';
 
-const Pagination = ({ page, setPage, TotalPage }) => {
-  const goToPrevious = () => setPage((prev) => Math.max(prev - 1, 1));
-  const goToNext = () => setPage((prev) => Math.min(prev + 1, TotalPage));
+interface PaginationsProps {
+    page: number;
+    setPage: (page: number) => void;
+    hasNextPage: boolean;
+}
 
-  return (
-    <VStack spacing={4} py={6}>
-      <HStack spacing={4} align="center" justify="center">
-        {/* Previous Button */}
-        <IconButton
-          aria-label="Previous Page"
-          icon={<ChevronLeftIcon />}
-          size="sm"
-          colorScheme="blue"
-          isDisabled={page === 1}
-          onClick={goToPrevious}
-          variant="solid"
-        />
+const Paginations: React.FC<PaginationsProps> = ({ page, setPage, hasNextPage }) => {
+    const handlePrev = () => {
+        if (page > 1) setPage(page - 1);
+    };
 
-        <Text fontSize="sm" fontWeight="medium" color="gray.200">
-          Page <Text as="span" fontWeight="bold" color="white">{page}</Text> of{" "}
-          <Text as="span" fontWeight="bold" color="white">{TotalPage}</Text>
-        </Text>
+    const handleNext = () => {
+        if (hasNextPage) setPage(page + 1);
+    };
 
-        {/* Next Button */}
-        <IconButton
-          aria-label="Next Page"
-          icon={<ChevronRightIcon />}
-          size="sm"
-          colorScheme="blue"
-          isDisabled={page === TotalPage}
-          onClick={goToNext}
-          variant="solid"
-        />
-      </HStack>
+    return (
+        <section className="py-4">
+            <div className="flex justify-center items-center gap-6 mx-auto max-w-md">
+                <button
+                    aria-label="Previous page"
+                    onClick={handlePrev}
+                    disabled={page === 1}
+                    className={`px-6 py-2 rounded-3xl text-white transition-colors ${page === 1
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-sky-500 hover:bg-sky-600'
+                        }`}
+                >
+                    Prev
+                </button>
 
-      {/* Jump-to Buttons (Optional enhancement) */}
-      <HStack spacing={1}>
-        {Array.from({ length: TotalPage }, (_, i) => (
-          <Button
-            key={i}
-            size="xs"
-            onClick={() => setPage(i + 1)}
-            bg={page === i + 1 ? "green.500" : "gray.700"}
-            color={page === i + 1 ? "white" : "gray.200"}
-            _hover={{ bg: "gray.600" }}
-            rounded="md"
-            fontSize="xs"
-          >
-            {i + 1}
-          </Button>
-        ))}
-      </HStack>
-    </VStack>
-  );
+                <p className="text-white text-lg font-medium">Page {page}</p>
+
+                <button
+                    aria-label="Next page"
+                    onClick={handleNext}
+                    disabled={!hasNextPage}
+                    className={`px-6 py-2 rounded-3xl text-white transition-colors ${!hasNextPage
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-sky-500 hover:bg-sky-600'
+                        }`}
+                >
+                    Next
+                </button>
+            </div>
+        </section>
+    );
 };
 
-export default Pagination;
+export default Paginations;
