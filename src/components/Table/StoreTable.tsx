@@ -1,7 +1,6 @@
 // @ts-nocheck
-
+import React, { useMemo } from "react";
 import {
-  Select,
   Table,
   TableContainer,
   Tbody,
@@ -9,35 +8,34 @@ import {
   Th,
   Thead,
   Tr,
+  Select,
+  Button,
+  useDisclosure,
 } from "@chakra-ui/react";
-import moment from "moment";
-import { useMemo, useState } from "react";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
-import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
-import { FcApproval, FcDatabase } from "react-icons/fc";
 import {
   usePagination,
   useSortBy,
   useTable,
   Column,
-  TableState,
   TableInstance,
   HeaderGroup,
-  Row,
   Cell,
 } from "react-table";
+import { FaCaretDown, FaCaretUp, FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import moment from "moment";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
+import { colors } from "../../theme/colors";
 
 interface StoreTableProps {
   stores: Array<{
+    _id: string;
     name: string;
-    gst_number: string;
-    address_line1: string;
-    address_line2?: string;
-    pincode?: string;
-    city: string;
-    state: string;
+    location: string;
+    manager: string;
+    capacity: number;
+    current_stock: number;
+    status: string;
     createdAt: string;
     updatedAt: string;
   }>;
@@ -45,7 +43,6 @@ interface StoreTableProps {
   openUpdateStoreDrawerHandler?: (id: string) => void;
   openStoreDetailsDrawerHandler?: (id: string) => void;
   deleteStoreHandler?: (id: string) => void;
-  approveStoreHandler?: (id: string) => void;
 }
 
 const StoreTable: React.FC<StoreTableProps> = ({
@@ -54,60 +51,24 @@ const StoreTable: React.FC<StoreTableProps> = ({
   openUpdateStoreDrawerHandler,
   openStoreDetailsDrawerHandler,
   deleteStoreHandler,
-  approveStoreHandler,
 }) => {
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: onDeleteModalOpen,
+    onClose: onDeleteModalClose,
+  } = useDisclosure();
+  const [storeToDelete, setStoreToDelete] = React.useState<string | null>(null);
 
-  const [showDeletePage, setshowDeletePage] = useState(false);
-  const [deleteId, setdeleteId] = useState('')
-  
-  const columns: Column<{
-    name: string;
-    gst_number: string;
-    address_line1: string;
-    address_line2?: string;
-    pincode?: string;
-    city: string;
-    state: string;
-    createdAt: string;
-    updatedAt: string;
-  }>[] = useMemo(
+  const columns: Column<any>[] = useMemo(
     () => [
-      {
-        Header: "Name",
-        accessor: "name",
-      },
-      {
-        Header: "GST No.",
-        accessor: "gst_number",
-      },
-      {
-        Header: "Address Line 1",
-        accessor: "address_line1",
-      },
-      {
-        Header: "Address Line 2",
-        accessor: "address_line2",
-      },
-      {
-        Header: "Pincode",
-        accessor: "pincode",
-      },
-      {
-        Header: "City",
-        accessor: "city",
-      },
-      {
-        Header: "State",
-        accessor: "state",
-      },
-      {
-        Header: "Created On",
-        accessor: "createdAt",
-      },
-      {
-        Header: "Last Updated",
-        accessor: "updatedAt",
-      },
+      { Header: "Name", accessor: "name" },
+      { Header: "Location", accessor: "location" },
+      { Header: "Manager", accessor: "manager" },
+      { Header: "Capacity", accessor: "capacity" },
+      { Header: "Current Stock", accessor: "current_stock" },
+      { Header: "Status", accessor: "status" },
+      { Header: "Created On", accessor: "createdAt" },
+      { Header: "Last Updated", accessor: "updatedAt" },
     ],
     []
   );
@@ -122,258 +83,323 @@ const StoreTable: React.FC<StoreTableProps> = ({
     previousPage,
     canNextPage,
     canPreviousPage,
-    state: { pageIndex, pageSize },
-    pageCount,
+    state: { pageIndex },
     setPageSize,
-  }: TableInstance<{
-    name: string;
-    gst_number: string;
-    address_line1: string;
-    address_line2?: string;
-    pincode?: string;
-    city: string;
-    state: string;
-    createdAt: string;
-    updatedAt: string;
-  }> = useTable(
+    pageCount,
+  }: TableInstance<any> = useTable(
     {
       columns,
       data: stores,
-      initialState: { pageIndex: 0 },
+      initialState: { pageIndex: 0, pageSize: 10 },
     },
     useSortBy,
     usePagination
   );
-  const dynamicBg = (index) => {
-    return index % 2 !== 0 ? "#ffffff40" : "#ffffff1f";
+
+  const handleDeleteClick = (id: string) => {
+    setStoreToDelete(id);
+    onDeleteModalOpen();
   };
+
+  const handleDeleteConfirm = () => {
+    if (storeToDelete && deleteStoreHandler) {
+      deleteStoreHandler(storeToDelete);
+    }
+    setStoreToDelete(null);
+    onDeleteModalClose();
+  };
+
+  if (isLoadingStores) {
+    return <Loading />;
+  }
+
+  if (!isLoadingStores && stores.length === 0) {
+    return <EmptyData />;
+  }
+
   return (
-    <div>
-      {isLoadingStores && <Loading />}
-      {stores.length === 0 && !isLoadingStores && <EmptyData />}
-      {!isLoadingStores && stores.length > 0 && (
-        <div>
-          <div className="flex justify-end mb-2 mt-2">
-            <Select
-              onChange={(e) => setPageSize(e.target.value)}
-              color="white"
-              width="80px"
-              size="sm"
-              borderRadius="md"
-              border="1px solid white"
-              sx={{
-                option: {
-                  backgroundColor: "#444e5b", // Default background
-                  color: "white",
-                },
+    <div className="space-y-4">
+      {/* Page Size Selector */}
+      <div className="flex justify-end">
+        <Select
+          onChange={(e) => setPageSize(Number(e.target.value))}
+          width="120px"
+          size="sm"
+          bg={colors.cardBackground}
+          color={colors.textPrimary}
+          borderColor={colors.border}
+          _hover={{ borderColor: colors.primary }}
+          _focus={{
+            borderColor: colors.primary,
+            boxShadow: `0 0 0 1px ${colors.primary}`,
+          }}
+        >
+          {[10, 20, 50, 100, 100000].map((size) => (
+            <option
+              key={size}
+              value={size}
+              style={{
+                backgroundColor: colors.cardBackground,
+                color: colors.textPrimary,
               }}
             >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-              <option value={100000}>All</option>
-            </Select>
-          </div>
-          <TableContainer maxHeight="600px" overflowY="auto" className="bg-[#14243452] rounded-md shadow-2xl ">
-            <Table variant="simple" {...getTableProps()}>
-              <Thead className="text-sm font-semibold" bg="#14243452" >
-                {headerGroups.map(
-                  (
-                    hg: HeaderGroup<{
-                      name: string;
-                      gst_number: string;
-                      address_line1: string;
-                      address_line2?: string;
-                      pincode?: string;
-                      city: string;
-                      state: string;
-                      createdAt: string;
-                      updatedAt: string;
-                    }>
-                  ) => {
-                    return (
-                      <Tr {...hg.getHeaderGroupProps()} >
-                        {hg.headers.map((column: any) => {
-                          return (
-                            <Th
-                              textTransform="capitalize"
-                              fontSize="14px"
-                              fontWeight="600"
-                              color="white"
-                            
-                              {...column.getHeaderProps(
-                                column.getSortByToggleProps()
-                              )}
-                            >
-                              <p className="flex">
-                                {column.render("Header")}
-                                {column.isSorted && (
-                                  <span>
-                                    {column.isSortedDesc ? (
-                                      <FaCaretDown />
-                                    ) : (
-                                      <FaCaretUp />
-                                    )}
-                                  </span>
-                                )}
-                              </p>
-                            </Th>
-                          );
-                        })}
-                        <Th
-                          textTransform="capitalize"
-                          fontSize="14px"
-                          fontWeight="600"
-                          color="white"
-                         
-                        >
-                          Actions
-                        </Th>
-                      </Tr>
-                    );
+              {size === 100000 ? "All" : size}
+            </option>
+          ))}
+        </Select>
+      </div>
+
+      {/* Table */}
+      <TableContainer
+        bg={colors.cardBackground}
+        borderRadius="lg"
+        border={`1px solid ${colors.border}`}
+        maxHeight="600px"
+        overflowY="auto"
+        className="shadow-lg"
+      >
+        <Table variant="simple" {...getTableProps()}>
+          <Thead bg={colors.tableHeader} position="sticky" top="0" zIndex="1">
+            {headerGroups.map((hg: HeaderGroup<any>) => (
+              <Tr {...hg.getHeaderGroupProps()}>
+                {hg.headers.map((column: any) => (
+                  <Th
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    color={colors.textPrimary}
+                    fontSize="sm"
+                    fontWeight="semibold"
+                    textTransform="none"
+                    borderColor={colors.border}
+                    py={4}
+                    px={4}
+                    cursor="pointer"
+                    _hover={{ bg: colors.hoverBackground }}
+                  >
+                    <div className="flex items-center gap-2">
+                      {column.render("Header")}
+                      {column.isSorted &&
+                        (column.isSortedDesc ? (
+                          <FaCaretDown className="text-xs" />
+                        ) : (
+                          <FaCaretUp className="text-xs" />
+                        ))}
+                    </div>
+                  </Th>
+                ))}
+                <Th
+                  color={colors.textPrimary}
+                  fontSize="sm"
+                  fontWeight="semibold"
+                  textTransform="none"
+                  borderColor={colors.border}
+                  py={4}
+                  px={4}
+                >
+                  Actions
+                </Th>
+              </Tr>
+            ))}
+          </Thead>
+
+          <Tbody {...getTableBodyProps()}>
+            {page.map((row: any, index: number) => {
+              prepareRow(row);
+              return (
+                <Tr
+                  {...row.getRowProps()}
+                  bg={
+                    index % 2 === 0
+                      ? colors.cardBackground
+                      : colors.alternateRow
                   }
-                )}
-              </Thead>
-              <Tbody {...getTableBodyProps()}>
-                {page.map((row: any, index) => {
-                  prepareRow(row);
+                  _hover={{ bg: colors.hoverBackground }}
+                >
+                  {row.cells.map((cell: Cell) => {
+                    const colId = cell.column.id;
+                    const original = row.original;
 
-                  return (
-                    <Tr
-                      className="relative text-gray-200 text-[14px] hover:cursor-pointer"
-                      {...row.getRowProps()}
-                      _hover={{
-                        bg: "#ffffff78",
-                        cursor: "pointer",
+                    let displayValue;
+                    if (colId === "name") {
+                      displayValue = original.name || "N/A";
+                    } else if (colId === "location") {
+                      displayValue = original.location || "N/A";
+                    } else if (colId === "manager") {
+                      displayValue = original.manager || "N/A";
+                    } else if (colId === "capacity") {
+                      displayValue = original.capacity || "N/A";
+                    } else if (colId === "current_stock") {
+                      displayValue = original.current_stock || "0";
+                    } else if (colId === "status") {
+                      displayValue = (
+                        <span
+                          className="px-2 py-1 rounded-full text-xs font-medium"
+                          style={{
+                            backgroundColor:
+                              original.status === "Active"
+                                ? colors.success + "20"
+                                : colors.error + "20",
+                            color:
+                              original.status === "Active"
+                                ? colors.success
+                                : colors.error,
+                          }}
+                        >
+                          {original.status || "N/A"}
+                        </span>
+                      );
+                    } else if (colId === "createdAt") {
+                      displayValue = original.createdAt
+                        ? moment(original.createdAt).format("DD/MM/YYYY")
+                        : "N/A";
+                    } else if (colId === "updatedAt") {
+                      displayValue = original.updatedAt
+                        ? moment(original.updatedAt).format("DD/MM/YYYY")
+                        : "N/A";
+                    } else {
+                      displayValue = cell.render("Cell");
+                    }
 
-                        transition: "all 0.2s",
-                      }}
-                      bg={dynamicBg(index)}
-                    >
-                      {row.cells.map((cell: Cell) => {
-                        return (
-                          <Td fontWeight="500" border="none" {...cell.getCellProps()}>
-                            {cell.column.id !== "createdAt" &&
-                              cell.column.id !== "updatedAt" &&
-                              cell.render("Cell")}
-
-                            {cell.column.id === "createdAt" &&
-                              row.original?.createdAt && (
-                                <span>
-                                  {moment(row.original?.createdAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "updatedAt" &&
-                              row.original?.updatedAt && (
-                                <span>
-                                  {moment(row.original?.updatedAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                          </Td>
-                        );
-                      })}
-                      <Td className="flex gap-x-2" border="none">
-                        {openStoreDetailsDrawerHandler && (
-                          <MdOutlineVisibility
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              openStoreDetailsDrawerHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                        {openUpdateStoreDrawerHandler && (
-                          <MdEdit
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              openUpdateStoreDrawerHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                        {deleteStoreHandler && (
-                          <MdDeleteOutline
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              
-                              {  setdeleteId(row.original._id);
-                                setshowDeletePage(true)}
-                              }
-                            
-                          />
-                        )}
-                        {approveStoreHandler && (
-                          <FcApproval
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              approveStoreHandler(row.original?._id)
-                            }
-                          />
-                        )}
+                    return (
+                      <Td
+                        {...cell.getCellProps()}
+                        color={colors.textSecondary}
+                        fontSize="sm"
+                        borderColor={colors.border}
+                        py={3}
+                        px={4}
+                        className="whitespace-nowrap truncate max-w-xs"
+                        title={
+                          typeof displayValue === "string" ? displayValue : ""
+                        }
+                      >
+                        {displayValue}
                       </Td>
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
-          </TableContainer>
+                    );
+                  })}
 
-          <div className="w-[max-content] m-auto my-7">
-            <button
-              className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canPreviousPage}
-              onClick={previousPage}
+                  {/* Actions */}
+                  <Td borderColor={colors.border} py={3} px={4}>
+                    <div className="flex items-center gap-2">
+                      {openStoreDetailsDrawerHandler && (
+                        <Button
+                          size="sm"
+                          bg={colors.primary}
+                          color="white"
+                          _hover={{ bg: colors.primary + "CC" }}
+                          onClick={() =>
+                            openStoreDetailsDrawerHandler(row.original._id)
+                          }
+                          leftIcon={<FaEye />}
+                        >
+                          View
+                        </Button>
+                      )}
+
+                      {openUpdateStoreDrawerHandler && (
+                        <Button
+                          size="sm"
+                          bg={colors.secondary}
+                          color={colors.textPrimary}
+                          _hover={{ bg: colors.secondary + "CC" }}
+                          onClick={() =>
+                            openUpdateStoreDrawerHandler(row.original._id)
+                          }
+                          leftIcon={<FaEdit />}
+                        >
+                          Edit
+                        </Button>
+                      )}
+
+                      {deleteStoreHandler && (
+                        <Button
+                          size="sm"
+                          bg={colors.error}
+                          color="white"
+                          _hover={{ bg: colors.error + "CC" }}
+                          onClick={() => handleDeleteClick(row.original._id)}
+                          leftIcon={<FaTrash />}
+                        >
+                          Delete
+                        </Button>
+                      )}
+                    </div>
+                  </Td>
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </Table>
+      </TableContainer>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-center gap-4">
+        <button
+          onClick={previousPage}
+          disabled={!canPreviousPage}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            canPreviousPage
+              ? `bg-${colors.primary} text-white hover:bg-opacity-90`
+              : "bg-gray-600 text-gray-400 cursor-not-allowed"
+          }`}
+        >
+          Previous
+        </button>
+
+        <span className="text-sm" style={{ color: colors.textSecondary }}>
+          Page {pageIndex + 1} of {pageCount}
+        </span>
+
+        <button
+          onClick={nextPage}
+          disabled={!canNextPage}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            canNextPage
+              ? `bg-${colors.primary} text-white hover:bg-opacity-90`
+              : "bg-gray-600 text-gray-400 cursor-not-allowed"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            className="rounded-lg p-6 max-w-md w-full mx-4"
+            style={{ backgroundColor: colors.cardBackground }}
+          >
+            <h3
+              className="text-lg font-semibold mb-4"
+              style={{ color: colors.textPrimary }}
             >
-              Prev
-            </button>
-            <span className="mx-3 text-gray-200 text-sm md:text-lg lg:text-xl xl:text-base">
-              {pageIndex + 1} of {pageCount}
-            </span>
-            <button
-              className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canNextPage}
-              onClick={nextPage}
-            >
-              Next
-            </button>
+              Confirm Delete
+            </h3>
+            <p style={{ color: colors.textSecondary }} className="mb-6">
+              Are you sure you want to delete this store? This action cannot be
+              undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                size="sm"
+                bg={colors.secondary}
+                color={colors.textPrimary}
+                onClick={onDeleteModalClose}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                bg={colors.error}
+                color="white"
+                onClick={handleDeleteConfirm}
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         </div>
       )}
-
-{showDeletePage && (
-                <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center">
-                    <div className="bg-[#1C3644] rounded-lg shadow-xl p-6 w-full max-w-md">
-                        <h2 className="text-lg font-semibold text-white mb-4">Confirm Deletion</h2>
-                        <p className="text-sm text-white mb-6">Are you sure you want to delete this item ?</p>
-                        <div className="mt-6 flex justify-end space-x-3">
-                            <button
-                                onClick={() => setshowDeletePage(!showDeletePage)}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() =>{ deleteStoreHandler(deleteId);
-                                setshowDeletePage(false)
-                                }}
-
-                                className={`px-4 py-2 text-sm font-medium text-white rounded transition  bg-red-600 hover:bg-red-700 `}
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-
-            )}
     </div>
   );
 };

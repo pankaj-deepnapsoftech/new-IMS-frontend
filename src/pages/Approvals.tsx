@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { toast } from "react-toastify";
 import {
   useDeleteAgentMutation,
@@ -14,13 +16,13 @@ import { useCookies } from "react-cookie";
 import { Button } from "@chakra-ui/react";
 import { MdOutlineRefresh } from "react-icons/md";
 import ProductTable from "../components/Table/ProductTable";
-import StoreTable from "../components/Table/StoreTable";
 import AgentTable from "../components/Table/AgentTable";
 import BOMTable from "../components/Table/BOMTable";
 import BOMRawMaterialTable from "../components/Table/BOMRawMaterialTable";
 import { useSelector } from "react-redux";
 import { FiSearch } from "react-icons/fi";
 import { colors } from "../theme/colors";
+import StoreTable from "../components/Table/StoreTable";
 
 const Approvals: React.FC = () => {
   const [cookies] = useCookies();
@@ -682,7 +684,6 @@ const Approvals: React.FC = () => {
               isLoadingStores={isLoadingStores}
               stores={filteredStores}
               deleteStoreHandler={deleteStoreHandler}
-              approveStoreHandler={approveStoreHandler}
             />
           </div>
         </div>

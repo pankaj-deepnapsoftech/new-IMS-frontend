@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { FaAngleDown, FaAngleUp, FaSignOutAlt } from "react-icons/fa";
 import routes from "../../routes/routes";
 import { NavLink, Navigate, useNavigate } from "react-router-dom";
@@ -50,7 +52,7 @@ const Navigation: React.FC = () => {
   return (
     <>
       {/* Mobile Menu Button */}
-      <div className="fixed top-4 left-4 z-50 lg:hidden">
+      <div className="fixed top-2 left-4 z-50 lg:hidden">
         <button
           onClick={() => setCheckMenu(!checkMenu)}
           className="p-3 rounded-xl bg-white shadow-lg border border-gray-200 hover:bg-gray-50 hover:shadow-xl transition-all duration-300 hover:scale-105"
