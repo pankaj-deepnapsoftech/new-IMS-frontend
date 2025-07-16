@@ -1,4 +1,3 @@
-import { Button } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,14 +12,16 @@ import {
   openUpdateInvoiceDrawer,
 } from "../redux/reducers/drawersSlice";
 import { useCookies } from "react-cookie";
-import { MdOutlineRefresh } from "react-icons/md";
+import { MdAdd, MdOutlineRefresh } from "react-icons/md";
+import { FiSearch } from "react-icons/fi";
 import { useDeleteInvoiceMutation } from "../redux/api/api";
 import InvoiceTable from "../components/Table/InvoiceTable";
 import AddInvoice from "../components/Drawers/Invoice/AddInvoice";
 import InvoiceDetails from "../components/Drawers/Invoice/InvoiceDetails";
 import UpdateInvoice from "../components/Drawers/Invoice/UpdateInvoice";
 import AddPayment from "../components/Drawers/Payment/AddPayment";
-import { FiSearch } from "react-icons/fi";
+import { colors } from "../theme/colors";
+import { Button } from "@chakra-ui/react";
 
 const Invoice: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -143,11 +144,29 @@ const Invoice: React.FC = () => {
   }, [searchKey]);
 
   if (!isAllowed) {
-    return <div className="text-center text-red-500">You are not allowed to access this route.</div>
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div
+            className="text-lg font-semibold mb-2"
+            style={{ color: colors.error[600] }}
+          >
+            Access Denied
+          </div>
+          <div style={{ color: colors.text.secondary }}>
+            You are not allowed to access this route.
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className=" rounded-md  px-4  pb-4 ">
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: colors.background.page }}
+    >
+      {/* Drawers */}
       {isAddInvoiceDrawerOpened && (
         <AddInvoice
           closeDrawerHandler={closeAddInvoiceDrawerHandler}
@@ -171,45 +190,96 @@ const Invoice: React.FC = () => {
         <AddPayment id={id} closeDrawerHandler={closePaymentDrawerHandler} />
       )}
 
-      <div className="w-full">
-        <h1 className="text-[28px] md:text-[35px] text-center text-white pb-6 font-bold">
-          Invoices
-        </h1>
+      <div className="p-2 lg:p-3">
+        {/* Header */}
 
-        <div className="flex flex-col md:flex-row items-center justify-center gap-3 px-4 md:px-10 w-full">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            {/* Title Section */}
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                  Invoice Management
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Manage invoices for your business.
+                </p>
+              </div>
+            </div>
 
-          {/* Search Input */}
-          <div className="relative w-full md:w-[220px]">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-200" />
-            <input
-              className="pl-10 pr-4 py-2 w-full text-sm text-gray-200 border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-              placeholder="Search roles..."
-              value={searchKey}
-              onChange={(e) => setSearchKey(e.target.value)}
-            />
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                onClick={openAddInvoiceDrawerHandler}
+                colorScheme="blue"
+                size="md"
+                leftIcon={
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                }
+                className="shadow-lg hover:shadow-xl transition-all duration-200"
+                _hover={{ transform: "translateY(-1px)" }}
+              >
+                Add New Role
+              </Button>
+              <Button
+                onClick={fetchInvoiceHandler}
+                leftIcon={<MdOutlineRefresh />}
+                variant="outline"
+                colorScheme="gray"
+                size="md"
+                className="border-gray-300 hover:border-gray-400 transition-all duration-200"
+                _hover={{ bg: "gray.50", transform: "translateY(-1px)" }}
+              >
+                Refresh
+              </Button>
+            </div>
           </div>
 
-          {/* Add Invoice Button */}
-          <button
-            onClick={openAddInvoiceDrawerHandler}
-            className="text-white bg-[#4b87a0d9] hover:bg-white hover:text-black text-sm rounded-[6px] px-4 py-2 w-full md:w-[200px] transition-all"
-          >
-            Add New Invoice
-          </button>
-
-          {/* Refresh Button */}
-          <button
-            onClick={fetchInvoiceHandler}
-            className="text-white border border-white hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[100px] transition-all flex items-center justify-center gap-1"
-          >
-            <MdOutlineRefresh className="text-base" />
-            Refresh
-          </button>
+          {/* Search Section */}
+          <div className="mt-4 flex justify-center sm:justify-end">
+            <div className="relative w-full max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiSearch className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
+                placeholder="Search roles..."
+                value={searchKey || ""}
+                onChange={(e) => setSearchKey(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
-      </div>
 
-
-      <div>
+        {/* Table Section */}
         <InvoiceTable
           isLoadingInvoices={isLoadingInvoices}
           invoices={filteredData}

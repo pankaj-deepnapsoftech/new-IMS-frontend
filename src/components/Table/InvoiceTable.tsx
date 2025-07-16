@@ -1,17 +1,4 @@
 // @ts-nocheck
-
-import { useMemo } from "react";
-import {
-  Cell,
-  Column,
-  HeaderGroup,
-  TableInstance,
-  usePagination,
-  useSortBy,
-  useTable,
-} from "react-table";
-import Loading from "../../ui/Loading";
-import { FcApproval, FcDatabase } from "react-icons/fc";
 import {
   Select,
   Table,
@@ -21,28 +8,46 @@ import {
   Th,
   Thead,
   Tr,
+  Tooltip,
 } from "@chakra-ui/react";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
-import { MdDeleteOutline, MdEdit, MdOutlinePayment, MdOutlineVisibility } from "react-icons/md";
-import { log } from "console";
+import { useMemo, useState } from "react";
+import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import {
+  MdDeleteOutline,
+  MdEdit,
+  MdOutlinePayment,
+  MdOutlineVisibility,
+} from "react-icons/md";
+import { usePagination, useSortBy, useTable } from "react-table";
+import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
+import { colors } from "../../theme/colors";
 
 interface InvoiceTableProps {
   invoices: Array<{
-    creator: string;
-    created_on: string;
-    customer?: string;
-    startdate: string;
-    subtotal: string;
-    total: string;
+    _id: string;
+    creator: {
+      first_name: string;
+      last_name: string;
+    };
+    createdAt: string;
+    updatedAt: string;
+    buyer?: {
+      name: string;
+    };
+    supplier?: {
+      name: string;
+    };
+    subtotal: number;
+    total: number;
     status: string;
   }>;
-  isLoadingInvoices: boolean,
-  openInvoiceDetailsHandler?: (id: string) => void,
-  deleteInvoiceHandler?: (id: string) => void,
-  openUpdateInvoiceDrawer?: (id: string) => void,
-  openPaymentDrawer?: (id: string) => void
+  isLoadingInvoices: boolean;
+  openInvoiceDetailsHandler?: (id: string) => void;
+  deleteInvoiceHandler?: (id: string) => void;
+  openUpdateInvoiceDrawer?: (id: string) => void;
+  openPaymentDrawer?: (id: string) => void;
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({
@@ -51,12 +56,14 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   openInvoiceDetailsHandler,
   deleteInvoiceHandler,
   openUpdateInvoiceDrawer,
-  openPaymentDrawer
+  openPaymentDrawer,
 }) => {
+  const [deleteModalId, setDeleteModalId] = useState<string | null>(null);
+
   const columns = useMemo(
     () => [
       { Header: "Created By", accessor: "creator" },
-      { Header: "Created At", accessor: "createdAt" },
+      { Header: "Created On", accessor: "createdAt" },
       { Header: "Last Updated", accessor: "updatedAt" },
       { Header: "Customer", accessor: "customer" },
       { Header: "Sub Total", accessor: "subtotal" },
@@ -78,192 +85,325 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
     state: { pageIndex, pageSize },
     pageCount,
     setPageSize,
-  }: TableInstance<{
-    createdBy: string;
-    createdOn: string;
-    customer?: string;
-    startdate: string;
-    subtotal: string;
-    total: string;
-    status: string;
-  }> = useTable(
+  } = useTable(
     {
       columns,
       data: invoices,
-      initialState: { pageIndex: 0 },
+      initialState: { pageIndex: 0, pageSize: 10 },
     },
     useSortBy,
     usePagination
   );
 
+  const handleDelete = (id: string) => {
+    setDeleteModalId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteModalId && deleteInvoiceHandler) {
+      deleteInvoiceHandler(deleteModalId);
+      setDeleteModalId(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteModalId(null);
+  };
+
   return (
-    <div>
+    <div
+      className="bg-white rounded-xl shadow-sm overflow-hidden"
+      style={{
+        backgroundColor: colors.background.card,
+        boxShadow: colors.shadow.base,
+      }}
+    >
       {isLoadingInvoices && <Loading />}
-      {invoices.length === 0 && !isLoadingInvoices && (
-        <EmptyData/>
-      )}
+
+      {invoices.length === 0 && !isLoadingInvoices && <EmptyData />}
+
       {!isLoadingInvoices && invoices.length > 0 && (
-        <div>
-          <div className="flex justify-end mb-2">
-            <Select
-              onChange={(e) => setPageSize(e.target.value)}
-              width="80px"
+        <>
+          {/* Page Size Selector */}
+          <div
+            className="flex justify-between items-center p-4"
+            style={{ borderBottom: `1px solid ${colors.border.light}` }}
+          >
+            <h2
+              className="text-lg font-semibold"
+              style={{ color: colors.text.primary }}
             >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-              <option value={100000}>All</option>
-            </Select>
+              Invoices ({invoices.length})
+            </h2>
+            <div className="flex items-center gap-2">
+              <span
+                className="text-sm"
+                style={{ color: colors.text.secondary }}
+              >
+                Show:
+              </span>
+              <Select
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                size="sm"
+                width="80px"
+                style={{
+                  borderColor: colors.border.light,
+                  fontSize: "14px",
+                }}
+              >
+                {[10, 20, 50, 100].map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </Select>
+            </div>
           </div>
-          <TableContainer maxHeight="600px" overflowY="auto">
-            <Table variant="simple" {...getTableProps()}>
-              <Thead className="text-sm font-semibold">
-                {headerGroups.map(
-                  (
-                    hg: HeaderGroup<{
-                      createdBy: string;
-                      createdOn: string;
-                      customer?: string;
-                      startdate: string;
-                      subtotal: string;
-                      total: string;
-                      status: string;
-                    }>
-                  ) => {
-                    return (
-                      <Tr {...hg.getHeaderGroupProps()}>
-                        {hg.headers.map((column: any) => {
-                          return (
-                            <Th
-                              textTransform="capitalize"
-                              fontSize="12px"
-                              fontWeight="700"
-                              color="black"
-                              backgroundColor="#fafafa"
-                              borderLeft="1px solid #d7d7d7"
-                              borderRight="1px solid #d7d7d7"
-                              {...column.getHeaderProps(
-                                column.getSortByToggleProps()
+
+          {/* Table */}
+          <TableContainer>
+            <Table {...getTableProps()} variant="simple">
+              <Thead style={{ backgroundColor: colors.table.header }}>
+                {headerGroups.map((headerGroup) => (
+                  <Tr {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map((column) => (
+                      <Th
+                        {...column.getHeaderProps(
+                          column.getSortByToggleProps()
+                        )}
+                        style={{
+                          color: colors.table.headerText,
+                          fontWeight: "600",
+                          fontSize: "12px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                          padding: "16px",
+                          borderBottom: `1px solid ${colors.table.border}`,
+                        }}
+                      >
+                        <div className="flex items-center gap-1">
+                          {column.render("Header")}
+                          {column.isSorted && (
+                            <span style={{ color: colors.primary[500] }}>
+                              {column.isSortedDesc ? (
+                                <FaCaretDown size={12} />
+                              ) : (
+                                <FaCaretUp size={12} />
                               )}
-                            >
-                              <p className="flex">
-                                {column.render("Header")}
-                                {column.isSorted && (
-                                  <span>
-                                    {column.isSortedDesc ? (
-                                      <FaCaretDown />
-                                    ) : (
-                                      <FaCaretUp />
-                                    )}
-                                  </span>
-                                )}
-                              </p>
-                            </Th>
-                          );
-                        })}
-                        <Th
-                          textTransform="capitalize"
-                          fontSize="12px"
-                          fontWeight="700"
-                          color="black"
-                          backgroundColor="#fafafa"
-                          borderLeft="1px solid #d7d7d7"
-                          borderRight="1px solid #d7d7d7"
-                        >
-                          Actions
-                        </Th>
-                      </Tr>
-                    );
-                  }
-                )}
+                            </span>
+                          )}
+                        </div>
+                      </Th>
+                    ))}
+                    <Th
+                      style={{
+                        color: colors.table.headerText,
+                        fontWeight: "600",
+                        fontSize: "12px",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        padding: "16px",
+                        borderBottom: `1px solid ${colors.table.border}`,
+                      }}
+                    >
+                      Actions
+                    </Th>
+                  </Tr>
+                ))}
               </Thead>
               <Tbody {...getTableBodyProps()}>
-                {page.map((row: any) => {
+                {page.map((row, index) => {
                   prepareRow(row);
-
                   return (
                     <Tr
-                      className="relative hover:bg-[#e4e4e4] hover:cursor-pointer text-base lg:text-sm"
                       {...row.getRowProps()}
+                      style={{
+                        backgroundColor:
+                          index % 2 === 0
+                            ? colors.background.card
+                            : colors.table.stripe,
+                        transition: "all 0.2s ease",
+                      }}
+                      _hover={{
+                        backgroundColor: colors.table.hover,
+                      }}
                     >
-                      {row.cells.map((cell: Cell) => {
-                        return (
-                          <Td fontWeight="500" {...cell.getCellProps()}>
-                            {cell.column.id !== "createdAt" &&
-                              cell.column.id !== "updatedAt" &&
-                              cell.column.id !== "customer" &&
-                              cell.column.id !== "creator" &&
-                              cell.render("Cell")}
+                      {row.cells.map((cell) => (
+                        <Td
+                          {...cell.getCellProps()}
+                          style={{
+                            padding: "16px",
+                            borderBottom: `1px solid ${colors.table.border}`,
+                            color: colors.text.primary,
+                            fontSize: "14px",
+                          }}
+                        >
+                          {/* Creator Name */}
+                          {cell.column.id === "creator" &&
+                            row.original?.creator && (
+                              <span className="font-medium">
+                                {`${row.original.creator.first_name} ${row.original.creator.last_name}`}
+                              </span>
+                            )}
 
-                            {cell.column.id === "creator" &&
-                              row.original?.creator && (
-                                <span>
-                                  {row.original?.creator?.first_name + ' ' + row.original?.creator?.last_name}
-                                </span>
-                              )}
-                            {cell.column.id === "createdAt" &&
-                              row.original?.createdAt && (
-                                <span>
-                                  {moment(row.original?.createdAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "updatedAt" &&
-                              row.original?.createdAt && (
-                                <span>
-                                  {moment(row.original?.updatedAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "customer" &&
-                              (row.original?.buyer || row.original?.supplier) && (
-                                <span>
-                                  {row.original?.buyer ? row.original.buyer.name : row.original.supplier.name}
-                                </span>
-                              )}
-                          </Td>
-                        );
-                      })}
-                      <Td className="flex gap-x-2">
-                        {openInvoiceDetailsHandler && (
-                          <MdOutlineVisibility
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              openInvoiceDetailsHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                        {openUpdateInvoiceDrawer && (
-                          <MdEdit
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              openUpdateInvoiceDrawer(row.original?._id)
-                            }
-                          />
-                        )}
-                        {deleteInvoiceHandler && (
-                          <MdDeleteOutline
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              deleteInvoiceHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                        {openPaymentDrawer && (
-                          <MdOutlinePayment
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              openPaymentDrawer(row.original?._id)
-                            }
-                          />
-                        )}
+                          {/* Created Date */}
+                          {cell.column.id === "createdAt" &&
+                            row.original?.createdAt && (
+                              <span style={{ color: colors.text.secondary }}>
+                                {moment(row.original.createdAt).format(
+                                  "DD/MM/YYYY"
+                                )}
+                              </span>
+                            )}
+
+                          {/* Updated Date */}
+                          {cell.column.id === "updatedAt" &&
+                            row.original?.updatedAt && (
+                              <span style={{ color: colors.text.secondary }}>
+                                {moment(row.original.updatedAt).format(
+                                  "DD/MM/YYYY"
+                                )}
+                              </span>
+                            )}
+
+                          {/* Customer */}
+                          {cell.column.id === "customer" &&
+                            (row.original?.buyer || row.original?.supplier) && (
+                              <span className="font-medium">
+                                {row.original?.buyer?.name ||
+                                  row.original?.supplier?.name}
+                              </span>
+                            )}
+
+                          {/* Subtotal */}
+                          {cell.column.id === "subtotal" && (
+                            <span
+                              className="font-semibold"
+                              style={{ color: colors.primary[600] }}
+                            >
+                              ₹{row.original.subtotal?.toLocaleString()}
+                            </span>
+                          )}
+
+                          {/* Total */}
+                          {cell.column.id === "total" && (
+                            <span
+                              className="font-bold"
+                              style={{ color: colors.success[600] }}
+                            >
+                              ₹{row.original.total?.toLocaleString()}
+                            </span>
+                          )}
+                        </Td>
+                      ))}
+
+                      {/* Actions */}
+                      <Td
+                        style={{
+                          padding: "16px",
+                          borderBottom: `1px solid ${colors.table.border}`,
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          {openInvoiceDetailsHandler && (
+                            <Tooltip label="View Invoice" placement="top">
+                              <button
+                                onClick={() =>
+                                  openInvoiceDetailsHandler(row.original._id)
+                                }
+                                className="p-1 rounded-md transition-all duration-200 hover:scale-110"
+                                style={{
+                                  color: colors.primary[600],
+                                  backgroundColor: colors.primary[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.primary[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.primary[50];
+                                }}
+                              >
+                                <MdOutlineVisibility size={16} />
+                              </button>
+                            </Tooltip>
+                          )}
+
+                          {openUpdateInvoiceDrawer && (
+                            <Tooltip label="Edit Invoice" placement="top">
+                              <button
+                                onClick={() =>
+                                  openUpdateInvoiceDrawer(row.original._id)
+                                }
+                                className="p-1 rounded-md transition-all duration-200 hover:scale-110"
+                                style={{
+                                  color: colors.warning[600],
+                                  backgroundColor: colors.warning[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.warning[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.warning[50];
+                                }}
+                              >
+                                <MdEdit size={16} />
+                              </button>
+                            </Tooltip>
+                          )}
+
+                          {openPaymentDrawer && (
+                            <Tooltip label="Add Payment" placement="top">
+                              <button
+                                onClick={() =>
+                                  openPaymentDrawer(row.original._id)
+                                }
+                                className="p-1 rounded-md transition-all duration-200 hover:scale-110"
+                                style={{
+                                  color: colors.success[600],
+                                  backgroundColor: colors.success[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.success[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.success[50];
+                                }}
+                              >
+                                <MdOutlinePayment size={16} />
+                              </button>
+                            </Tooltip>
+                          )}
+
+                          {deleteInvoiceHandler && (
+                            <Tooltip label="Delete Invoice" placement="top">
+                              <button
+                                onClick={() => handleDelete(row.original._id)}
+                                className="p-1 rounded-md transition-all duration-200 hover:scale-110"
+                                style={{
+                                  color: colors.error[600],
+                                  backgroundColor: colors.error[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.error[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.error[50];
+                                }}
+                              >
+                                <MdDeleteOutline size={16} />
+                              </button>
+                            </Tooltip>
+                          )}
+                        </div>
                       </Td>
                     </Tr>
                   );
@@ -272,24 +412,125 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             </Table>
           </TableContainer>
 
-          <div className="w-[max-content] m-auto my-7">
-            <button
-              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canPreviousPage}
-              onClick={previousPage}
-            >
-              Prev
-            </button>
-            <span className="mx-3 text-sm md:text-lg lg:text-xl xl:text-base">
-              {pageIndex + 1} of {pageCount}
-            </span>
-            <button
-              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canNextPage}
-              onClick={nextPage}
-            >
-              Next
-            </button>
+          {/* Pagination */}
+          <div
+            className="flex items-center justify-between px-6 py-4"
+            style={{ borderTop: `1px solid ${colors.border.light}` }}
+          >
+            <div className="flex items-center gap-2">
+              <span
+                className="text-sm"
+                style={{ color: colors.text.secondary }}
+              >
+                Showing {pageIndex * pageSize + 1} to{" "}
+                {Math.min((pageIndex + 1) * pageSize, invoices.length)} of{" "}
+                {invoices.length} results
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={previousPage}
+                disabled={!canPreviousPage}
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  color: canPreviousPage
+                    ? colors.text.primary
+                    : colors.text.muted,
+                  backgroundColor: canPreviousPage
+                    ? colors.gray[100]
+                    : colors.gray[50],
+                  border: `1px solid ${colors.border.light}`,
+                }}
+              >
+                Previous
+              </button>
+              <span
+                className="px-4 py-2 text-sm font-medium"
+                style={{ color: colors.text.primary }}
+              >
+                Page {pageIndex + 1} of {pageCount}
+              </span>
+              <button
+                onClick={nextPage}
+                disabled={!canNextPage}
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  color: canNextPage ? colors.text.primary : colors.text.muted,
+                  backgroundColor: canNextPage
+                    ? colors.gray[100]
+                    : colors.gray[50],
+                  border: `1px solid ${colors.border.light}`,
+                }}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4"
+            style={{
+              backgroundColor: colors.background.card,
+              boxShadow: colors.shadow.xl,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="p-2 rounded-full"
+                style={{ backgroundColor: colors.error[100] }}
+              >
+                <MdDeleteOutline
+                  size={24}
+                  style={{ color: colors.error[600] }}
+                />
+              </div>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.text.primary }}
+              >
+                Delete Invoice
+              </h3>
+            </div>
+            <p className="mb-6" style={{ color: colors.text.secondary }}>
+              Are you sure you want to delete this invoice? This action cannot
+              be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.gray[100],
+                  border: `1px solid ${colors.border.light}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200"
+                style={{
+                  backgroundColor: colors.error[600],
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.error[700];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.error[600];
+                }}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

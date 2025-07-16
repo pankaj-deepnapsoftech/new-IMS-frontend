@@ -1,14 +1,14 @@
-import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import { FormControl, FormLabel, Input } from "@chakra-ui/react";
 import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
+import { MdAdd } from "react-icons/md";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
-import {
-  useCreateInvoiceMutation
-} from "../../../redux/api/api";
+import { useCreateInvoiceMutation } from "../../../redux/api/api";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import AddItems from "../../Dynamic Add Components/AddItems";
+import { colors } from "../../../theme/colors";
 
 interface AddInvoiceProps {
   closeDrawerHandler: () => void;
@@ -27,9 +27,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
   const [supplier, setSupplier] = useState<
     { value: string; label: string } | undefined
   >();
-  const [invoiceNo, setInvoiceNo] = useState<
-    string | undefined
-  >();
+  const [invoiceNo, setInvoiceNo] = useState<string | undefined>();
   const [documentDate, setDocumentDate] = useState<string | undefined>();
   const [salesOrderDate, setSalesOrderDate] = useState<string | undefined>();
   const [note, setNote] = useState<string | undefined>();
@@ -239,179 +237,413 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
     fetchStoresHandler();
     fetchSuppliersHandler();
   }, []);
-  const customStyles = {
-    control: (provided: any) => ({
+
+  // Custom styles for react-select to match theme
+  const customSelectStyles = {
+    control: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: "transparent",
-      borderColor: "#a9a9a9",
-      color: "#fff",
+      backgroundColor: colors.input.background,
+      borderColor: state.isFocused
+        ? colors.input.borderFocus
+        : colors.input.border,
+      borderRadius: "8px",
+      minHeight: "44px",
+      boxShadow: state.isFocused ? `0 0 0 3px ${colors.primary[100]}` : "none",
+      "&:hover": {
+        borderColor: colors.input.borderHover,
+      },
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
-      color: "black",
-      cursor: "pointer",
-    }),
-    multiValue: (provided: any) => ({
-      ...provided,
-      backgroundColor: "#808080",
-      color: "#fff",
-    }),
-    menu: (provided: any) => ({
-      ...provided,
-      zIndex: 9999, // ensures dropdown doesn't get hidden
-    }),
-    placeholder: (provided: any) => ({
-      ...provided,
-      color: "#fff", // light gray placeholder
+      backgroundColor: state.isSelected
+        ? colors.primary[500]
+        : state.isFocused
+        ? colors.primary[50]
+        : colors.input.background,
+      color: state.isSelected ? colors.text.inverse : colors.text.primary,
+      padding: "12px",
     }),
     singleValue: (provided: any) => ({
       ...provided,
-      color: "#fff", // ensures selected value is white
+      color: colors.text.primary,
+    }),
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: colors.text.muted,
     }),
   };
+
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f] right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[500px] right-0 top-0 z-10"
         style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+          backgroundColor: colors.background.drawer,
+          boxShadow: colors.shadow.xl,
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
-          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
-        
-        </h1>
-
-        <div className="mt-8 px-5">
-        <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
-        
+        {/* Header */}
+        <div
+          className="flex items-center justify-between p-6 border-b"
+          style={{ borderColor: colors.border.light }}
+        >
+          <h1
+            className="text-xl font-semibold"
+            style={{ color: colors.text.primary }}
+          >
             Add New Invoice
-          </h2>
+          </h1>
+          <button
+            onClick={closeDrawerHandler}
+            className="p-2 rounded-lg transition-colors duration-200"
+            style={{
+              color: colors.text.secondary,
+              backgroundColor: colors.gray[100],
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[200];
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[100];
+            }}
+          >
+            <BiX size={20} />
+          </button>
+        </div>
 
-          <form onSubmit={addInvoiceHandler}>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Category</FormLabel>
+        {/* Form */}
+        <div className="p-6">
+          <form onSubmit={addInvoiceHandler} className="space-y-6">
+            {/* Category */}
+            <FormControl isRequired>
+              <FormLabel
+                className="text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Category
+              </FormLabel>
               <Select
                 value={category}
                 options={categoryOptions}
-                required={true}
                 onChange={(e: any) => setCategory(e)}
-                styles={customStyles}
+                styles={customSelectStyles}
+                placeholder="Select category"
               />
             </FormControl>
+
+            {/* Buyer (for sale) */}
             {category && category.value === "sale" && (
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">Buyer</FormLabel>
+              <FormControl isRequired>
+                <FormLabel
+                  className="text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Buyer
+                </FormLabel>
                 <Select
-                 styles={customStyles}
                   value={buyer}
                   options={buyerOptions}
-                  required={true}
                   onChange={(e: any) => setBuyer(e)}
+                  styles={customSelectStyles}
+                  placeholder="Select buyer"
                 />
               </FormControl>
             )}
+
+            {/* Supplier (for purchase) */}
             {category && category.value === "purchase" && (
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">Supplier</FormLabel>
+              <FormControl isRequired>
+                <FormLabel
+                  className="text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Supplier
+                </FormLabel>
                 <Select
-                 styles={customStyles}
                   value={supplier}
                   options={supplierOptions}
-                  required={true}
                   onChange={(e: any) => setSupplier(e)}
+                  styles={customSelectStyles}
+                  placeholder="Select supplier"
                 />
               </FormControl>
             )}
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Invoice No.</FormLabel>
+
+            {/* Invoice Number */}
+            <FormControl isRequired>
+              <FormLabel
+                className="text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Invoice Number
+              </FormLabel>
               <Input
                 value={invoiceNo}
                 onChange={(e) => setInvoiceNo(e.target.value)}
                 type="text"
-                placeholder="Invoice No."
+                placeholder="Enter invoice number"
+                className="w-full"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor: colors.input.border,
+                  color: colors.text.primary,
+                  borderRadius: "8px",
+                  height: "44px",
+                }}
+                _focus={{
+                  borderColor: colors.input.borderFocus,
+                  boxShadow: `0 0 0 3px ${colors.primary[100]}`,
+                }}
+                _hover={{
+                  borderColor: colors.input.borderHover,
+                }}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Document Date</FormLabel>
+
+            {/* Document Date */}
+            <FormControl isRequired>
+              <FormLabel
+                className="text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Document Date
+              </FormLabel>
               <Input
                 value={documentDate}
-                className="no-scrollbar text-gray-200 styled-date "
                 onChange={(e) => setDocumentDate(e.target.value)}
                 type="date"
-                placeholder="Document Date"
-                
+                className="w-full"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor: colors.input.border,
+                  color: colors.text.primary,
+                  borderRadius: "8px",
+                  height: "44px",
+                }}
+                _focus={{
+                  borderColor: colors.input.borderFocus,
+                  boxShadow: `0 0 0 3px ${colors.primary[100]}`,
+                }}
+                _hover={{
+                  borderColor: colors.input.borderHover,
+                }}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Sales Order Date</FormLabel>
+
+            {/* Sales Order Date */}
+            <FormControl isRequired>
+              <FormLabel
+                className="text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Sales Order Date
+              </FormLabel>
               <Input
                 value={salesOrderDate}
-                className="no-scrollbar text-gray-200 styled-date"
                 onChange={(e) => setSalesOrderDate(e.target.value)}
                 type="date"
-                placeholder="Sales Order Date"
+                className="w-full"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor: colors.input.border,
+                  color: colors.text.primary,
+                  borderRadius: "8px",
+                  height: "44px",
+                }}
+                _focus={{
+                  borderColor: colors.input.borderFocus,
+                  boxShadow: `0 0 0 3px ${colors.primary[100]}`,
+                }}
+                _hover={{
+                  borderColor: colors.input.borderHover,
+                }}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Store</FormLabel>
+
+            {/* Store */}
+            <FormControl isRequired>
+              <FormLabel
+                className="text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Store
+              </FormLabel>
               <Select
-               styles={customStyles}
                 value={store}
                 options={storeOptions}
-                required={true}
                 onChange={(e: any) => setStore(e)}
+                styles={customSelectStyles}
+                placeholder="Select store"
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Note</FormLabel>
+
+            {/* Note */}
+            <FormControl>
+              <FormLabel
+                className="text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Note
+              </FormLabel>
               <textarea
-                className="border w-full bg-transparent  px-3 py-3 resize-none focus:outline-none text-gray-200 border-[#a9a9a9] rounded"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="write your notes.."
+                placeholder="Enter any additional notes..."
+                rows={4}
+                className="w-full px-4 py-3 rounded-lg border resize-none focus:outline-none transition-all duration-200"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor: colors.input.border,
+                  color: colors.text.primary,
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = colors.input.borderFocus;
+                  e.target.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = colors.input.border;
+                  e.target.style.boxShadow = "none";
+                }}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Items</FormLabel>
-              <AddItems inputs={inputs} setInputs={setInputs} />
+
+            {/* Items */}
+            <FormControl isRequired>
+              <FormLabel
+                className="text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Items
+              </FormLabel>
+              <div
+                className="p-4 rounded-lg border"
+                style={{
+                  backgroundColor: colors.gray[50],
+                  borderColor: colors.border.light,
+                }}
+              >
+                <AddItems inputs={inputs} setInputs={setInputs} />
+              </div>
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Subtotal</FormLabel>
+
+            {/* Subtotal */}
+            <FormControl isRequired>
+              <FormLabel
+                className="text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Subtotal
+              </FormLabel>
               <Input
                 value={subtotal}
                 isDisabled={true}
-                className="no-scrollbar text-gray-200"
                 type="number"
-                placeholder="Subtotal"
+                placeholder="Calculated automatically"
+                className="w-full"
+                style={{
+                  backgroundColor: colors.gray[100],
+                  borderColor: colors.input.border,
+                  color: colors.text.secondary,
+                  borderRadius: "8px",
+                  height: "44px",
+                }}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Tax</FormLabel>
+
+            {/* Tax */}
+            <FormControl isRequired>
+              <FormLabel
+                className="text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Tax
+              </FormLabel>
               <Select
-               styles={customStyles}
-                required={true}
                 value={tax}
                 options={taxOptions}
                 onChange={(e: any) => setTax(e)}
+                styles={customSelectStyles}
+                placeholder="Select tax rate"
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Total</FormLabel>
-              <Input value={total} isDisabled={true} />
+
+            {/* Total */}
+            <FormControl isRequired>
+              <FormLabel
+                className="text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Total
+              </FormLabel>
+              <Input
+                value={total}
+                isDisabled={true}
+                type="number"
+                placeholder="Calculated automatically"
+                className="w-full"
+                style={{
+                  backgroundColor: colors.gray[100],
+                  borderColor: colors.input.border,
+                  color: colors.text.secondary,
+                  borderRadius: "8px",
+                  height: "44px",
+                }}
+              />
             </FormControl>
-            <Button
-              isLoading={isAdding}
-              type="submit"
-              className="mt-1"
-              color="black"
-              backgroundColor="#ffffff8a"
-              _hover={{ bg: "#d1d2d5" }}
-            >
-              Submit
-            </Button>
+
+            {/* Submit Button */}
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={closeDrawerHandler}
+                className="flex-1 px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200"
+                style={{
+                  color: colors.text.secondary,
+                  backgroundColor: colors.gray[100],
+                  border: `1px solid ${colors.border.light}`,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[200];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[100];
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isAdding}
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: isAdding
+                    ? colors.gray[400]
+                    : colors.primary[600],
+                }}
+                onMouseEnter={(e) => {
+                  if (!isAdding) {
+                    e.currentTarget.style.backgroundColor = colors.primary[700];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isAdding) {
+                    e.currentTarget.style.backgroundColor = colors.primary[600];
+                  }
+                }}
+              >
+                {isAdding ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <MdAdd size={18} />
+                    Create Invoice
+                  </>
+                )}
+              </button>
+            </div>
           </form>
         </div>
       </div>
