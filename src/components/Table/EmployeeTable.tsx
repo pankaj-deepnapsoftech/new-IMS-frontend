@@ -1,31 +1,21 @@
 // @ts-nocheck
 
-import { useMemo } from "react";
-import {
-  Cell,
-  Column,
-  HeaderGroup,
-  TableInstance,
-  usePagination,
-  useSortBy,
-  useTable,
-} from "react-table";
-import Loading from "../../ui/Loading";
-import { FcApproval, FcDatabase } from "react-icons/fc";
 import {
   Select,
   Table,
-  TableContainer,
   Tbody,
   Td,
   Th,
   Thead,
   Tr,
+  Tooltip,
 } from "@chakra-ui/react";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
-import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
-import EmptyData from "../../ui/emptyData";
+import { useMemo } from "react";
+import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { FcApproval } from "react-icons/fc";
+import { usePagination, useSortBy, useTable } from "react-table";
+import { colors } from "../../theme/colors";
 
 interface EmployeeTableProps {
   employees: Array<{
@@ -67,13 +57,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     []
   );
 
-  const verificationStyles = {
-    "not verified": {
-      text: "#fc0303",
-    },
-    verified: {
-      text: "#25d98b",
-    },
+  const dynamicBg = (index) => {
+    return index % 2 !== 0 ? colors.table.stripe : colors.background.card;
   };
 
   const {
@@ -89,16 +74,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     state: { pageIndex, pageSize },
     pageCount,
     setPageSize,
-  }: TableInstance<{
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone: string;
-    role: string;
-    isVerified: boolean;
-    createdAt: string;
-    updatedAt: string;
-  }> = useTable(
+  } = useTable(
     {
       columns,
       data: employees,
@@ -107,256 +83,553 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     useSortBy,
     usePagination
   );
-  const dynamicBg = (index) => {
-    return index % 2 !== 0 ? "#ffffff40" : "#ffffff1f";
-  };
+
   return (
-    <div>
-      {isLoadingEmployees && <Loading />}
-      {employees.length === 0 && !isLoadingEmployees && <EmptyData />}
-      {!isLoadingEmployees && employees.length > 0 && (
-        <div>
-          <div className="flex justify-end mb-2 mt-2">
-            <Select
-              onChange={(e) => setPageSize(e.target.value)}
-              color="white"
-              width="80px"
-              size="sm"
-              borderRadius="md"
-              border="1px solid white"
-              sx={{
-                option: {
-                  backgroundColor: "#444e5b", // Default background
-                  color: "white",
-                },
-              }}
+    <div className="p-6">
+      {isLoadingEmployees && (
+        <div className="flex items-center justify-center py-20">
+          <div className="flex items-center gap-3">
+            <div
+              className="animate-spin rounded-full h-8 w-8 border-b-2"
+              style={{ borderColor: colors.primary[500] }}
+            ></div>
+            <span
+              className="font-medium"
+              style={{ color: colors.text.secondary }}
             >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-              <option value={100000}>All</option>
-            </Select>
+              Loading employees...
+            </span>
+          </div>
+        </div>
+      )}
+
+      {!isLoadingEmployees && employees.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div
+            className="rounded-full p-6 mb-4"
+            style={{ backgroundColor: colors.gray[100] }}
+          >
+            <svg
+              className="w-12 h-12"
+              style={{ color: colors.gray[400] }}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+              />
+            </svg>
+          </div>
+          <h3
+            className="text-lg font-semibold mb-2"
+            style={{ color: colors.text.primary }}
+          >
+            No employees found
+          </h3>
+          <p className="max-w-md" style={{ color: colors.text.muted }}>
+            Get started by adding your first employee to manage your team.
+          </p>
+        </div>
+      )}
+
+      {!isLoadingEmployees && employees.length > 0 && (
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-6">
+              <div>
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  {employees.length} Employee{employees.length !== 1 ? "s" : ""}{" "}
+                  Found
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.text.secondary }}
+              >
+                Show:
+              </span>
+              <Select
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                value={pageSize}
+                size="sm"
+                width="auto"
+                borderRadius="lg"
+                borderColor={colors.border.light}
+                _focus={{
+                  borderColor: colors.primary[500],
+                  boxShadow: `0 0 0 1px ${colors.primary[500]}`,
+                }}
+              >
+                {[10, 20, 50, 100, 100000].map((size) => (
+                  <option key={size} value={size}>
+                    {size === 100000 ? "All" : size}
+                  </option>
+                ))}
+              </Select>
+            </div>
           </div>
 
-          <TableContainer
-            overflowY="auto"
-            borderRadius="md"
-            className="   bg-[#14243452]"
+          {/* Enhanced Table */}
+          <div
+            className="rounded-xl shadow-sm"
+            style={{
+              backgroundColor: colors.background.card,
+              border: `1px solid ${colors.border.light}`,
+            }}
           >
-            <Table variant="simple" {...getTableProps()}>
-              <Thead className="text-sm font-semibold bg-[#14243452]">
-                {headerGroups.map(
-                  (
-                    hg: HeaderGroup<{
-                      first_name: string;
-                      last_name: string;
-                      email: string;
-                      phone: string;
-                      role: string;
-                      isVerified: boolean;
-                      createdAt: string;
-                      updatedAt: string;
-                    }>
-                  ) => {
+            <div className="overflow-x-auto">
+              <Table
+                {...getTableProps()}
+                variant="simple"
+                size="md"
+                minWidth="800px"
+              >
+                <Thead bg={colors.table.header}>
+                  {headerGroups.map((hg) => (
+                    <Tr
+                      {...hg.getHeaderGroupProps()}
+                      borderBottom="1px solid"
+                      borderColor={colors.table.border}
+                    >
+                      {hg.headers.map((column) => (
+                        <Th
+                          {...column.getHeaderProps(
+                            column.getSortByToggleProps()
+                          )}
+                          fontSize="14px"
+                          color="gray.700"
+                          fontWeight="600"
+                          whiteSpace="nowrap"
+                          style={
+                            column.id === "role"
+                              ? { minWidth: "180px" }
+                              : column.id === "isVerified"
+                              ? { minWidth: "160px" }
+                              : column.id === "last_name"
+                              ? { minWidth: "160px" }
+                              : {}
+                          }
+                        >
+                          <div className="flex items-center gap-1">
+                            {column.render("Header")}
+                            {column.isSorted &&
+                              (column.isSortedDesc ? (
+                                <FaCaretDown />
+                              ) : (
+                                <FaCaretUp />
+                              ))}
+                          </div>
+                        </Th>
+                      ))}
+                      <Th
+                        fontSize="14px"
+                        fontWeight="600"
+                        color="gray.700"
+                        whiteSpace="nowrap"
+                      >
+                        Actions
+                      </Th>
+                    </Tr>
+                  ))}
+                </Thead>
+
+                <Tbody {...getTableBodyProps()}>
+                  {page.map((row, index) => {
+                    prepareRow(row);
                     return (
                       <Tr
-                        {...hg.getHeaderGroupProps()}
-                        borderBottom="1px solid #e2e8f0"
+                        {...row.getRowProps()}
+                        _hover={{
+                          bg: colors.table.hover,
+                          transform: "translateY(-1px)",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          shadow: "md",
+                        }}
+                        bgColor={dynamicBg(index)}
+                        transition="all 0.2s ease"
+                        borderBottom="1px solid"
+                        borderColor={colors.table.border}
                       >
-                        {hg.headers.map((column: any) => {
-                          return (
-                            <Th
-                              
-                              textTransform="capitalize"
-                              fontSize="14px"
-                              fontWeight="600"
-                              color="white"
-                              {...column.getHeaderProps(
-                                column.getSortByToggleProps()
-                              )}
-                            >
-                              <p className="flex font-[600] text-[14px]">
-                                {column.render("Header")}
-                                {column.isSorted && (
-                                  <span>
-                                    {column.isSortedDesc ? (
-                                      <FaCaretDown />
-                                    ) : (
-                                      <FaCaretUp />
-                                    )}
-                                  </span>
-                                )}
-                              </p>
-                            </Th>
-                          );
-                        })}
-                        <Th
-                          textTransform="capitalize"
-                          fontSize="14px"
-                          fontWeight="600"
-                          color="white"
-                          // backgroundColor="#14243452"
-                        >
-                          Actions
-                        </Th>
-                      </Tr>
-                    );
-                  }
-                )}
-              </Thead>
-              <Tbody {...getTableBodyProps()}>
-                {page.map((row: any, index) => {
-                  prepareRow(row);
-
-                  return (
-                    <Tr
-                      className="relative  hover:cursor-pointer "
-                      {...row.getRowProps()}
-                      style={{}}
-                      bgColor={dynamicBg(index)}
-                      _hover={{
-                        bg: "#ffffff78",
-                        cursor: "pointer",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      {row.cells.map((cell: Cell, index: number) => {
-                        const isFirst = index === 0;
-                        const isLast = index === row.cells.length - 1;
-
-                        return (
+                        {row.cells.map((cell) => (
                           <Td
-                            border="none"
-                            fontWeight="600"
                             {...cell.getCellProps()}
-                            fontSize="sm"
-                            color="gray.200"
+                            fontSize="14px"
+                            color={colors.text.primary}
+                            p={3}
                           >
-                            {/* Custom cell rendering (dates, role, verification) */}
-                            {cell.column.id !== "createdAt" &&
-                              cell.column.id !== "updatedAt" &&
-                              cell.column.id !== "isVerified" &&
-                              cell.column.id !== "role" &&
-                              cell.render("Cell")}
-
-                            {cell.column.id === "createdAt" &&
-                              row.original?.createdAt && (
-                                <span>
-                                  {moment(row.original?.createdAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "updatedAt" &&
-                              row.original?.updatedAt && (
-                                <span>
-                                  {moment(row.original?.updatedAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "isVerified" && (
+                            {cell.column.id === "createdAt" ||
+                            cell.column.id === "updatedAt" ? (
+                              moment(row.original[cell.column.id]).format(
+                                "DD/MM/YYYY"
+                              )
+                            ) : cell.column.id === "isVerified" ? (
                               <span
-                                className="rounded-md flex  w-[90px] items-center h-[25px]"
+                                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium shadow-sm"
                                 style={{
-                                  backgroundColor:
-                                    verificationStyles[
-                                      row.original.isVerified
-                                        ? "verified"
-                                        : "not verified"
-                                    ].bg,
-                                  color:
-                                    verificationStyles[
-                                      row.original.isVerified
-                                        ? "verified"
-                                        : "not verified"
-                                    ].text,
+                                  backgroundColor: row.original.isVerified
+                                    ? colors.success[100]
+                                    : colors.error[100],
+                                  color: row.original.isVerified
+                                    ? colors.success[800]
+                                    : colors.error[800],
                                 }}
                               >
+                                {row.original.isVerified ? (
+                                  <svg
+                                    className="w-4 h-4 mr-1.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                  </svg>
+                                ) : (
+                                  <svg
+                                    className="w-4 h-4 mr-1.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                  </svg>
+                                )}
                                 {row.original.isVerified
                                   ? "Verified"
                                   : "Not Verified"}
                               </span>
-                            )}
-                            {cell.column.id === "role" && (
-                              <span>
+                            ) : cell.column.id === "role" ? (
+                              <span
+                                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium shadow-sm"
+                                style={{
+                                  background: `linear-gradient(to right, ${colors.primary[500]}, ${colors.primary[600]})`,
+                                  color: colors.text.inverse,
+                                }}
+                              >
+                                <svg
+                                  className="w-4 h-4 mr-1.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                  />
+                                </svg>
                                 {(row.original?.role &&
                                   row.original.role.role) ||
                                   (row.original.isSuper && "Super Admin") ||
-                                  ""}
+                                  "No Role"}
                               </span>
+                            ) : (
+                              cell.render("Cell")
                             )}
                           </Td>
-                        );
-                      })}
-                      <Td border="none" className="flex gap-3 items-center">
-                        {openEmployeeDetailsDrawerHandler && (
-                          <MdOutlineVisibility
-                            className="hover:scale-110 text-gray-200 hover:text-blue-400"
-                            size={16}
-                            onClick={() =>
-                              openEmployeeDetailsDrawerHandler(
-                                row.original?._id
-                              )
-                            }
-                          />
-                        )}
-                        {openUpdateEmployeeDrawerHandler && (
-                          <MdEdit
-                            className="hover:scale-110 text-gray-200 hover:text-red-400"
-                            size={16}
-                            onClick={() =>
-                              openUpdateEmployeeDrawerHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                        {deleteEmployeeHandler && (
-                          <MdDeleteOutline
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              deleteEmployeeHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                        {approveEmployeeHandler && (
-                          <FcApproval
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              approveEmployeeHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                      </Td>
-                    </Tr>
+                        ))}
+                        <Td p={3}>
+                          <div className="flex items-center gap-2">
+                            {openEmployeeDetailsDrawerHandler && (
+                              <Tooltip label="View Details" placement="top">
+                                <button
+                                  onClick={() =>
+                                    openEmployeeDetailsDrawerHandler(
+                                      row.original._id
+                                    )
+                                  }
+                                  className="p-2 rounded-lg transition-all duration-200 group"
+                                  style={{ color: colors.text.muted }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.primary[600];
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.primary[50];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.text.muted;
+                                    e.currentTarget.style.backgroundColor =
+                                      "transparent";
+                                  }}
+                                >
+                                  <svg
+                                    className="w-4 h-4 group-hover:scale-110 transition-transform"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                    />
+                                  </svg>
+                                </button>
+                              </Tooltip>
+                            )}
+                            {openUpdateEmployeeDrawerHandler && (
+                              <Tooltip label="Edit Employee" placement="top">
+                                <button
+                                  onClick={() =>
+                                    openUpdateEmployeeDrawerHandler(
+                                      row.original._id
+                                    )
+                                  }
+                                  className="p-2 rounded-lg transition-all duration-200 group"
+                                  style={{ color: colors.text.muted }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.warning[600];
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.warning[50];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.text.muted;
+                                    e.currentTarget.style.backgroundColor =
+                                      "transparent";
+                                  }}
+                                >
+                                  <svg
+                                    className="w-4 h-4 group-hover:scale-110 transition-transform"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                    />
+                                  </svg>
+                                </button>
+                              </Tooltip>
+                            )}
+                            {deleteEmployeeHandler && (
+                              <Tooltip label="Delete Employee" placement="top">
+                                <button
+                                  onClick={() =>
+                                    deleteEmployeeHandler(row.original._id)
+                                  }
+                                  className="p-2 rounded-lg transition-all duration-200 group"
+                                  style={{ color: colors.text.muted }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.error[600];
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.error[50];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.text.muted;
+                                    e.currentTarget.style.backgroundColor =
+                                      "transparent";
+                                  }}
+                                >
+                                  <svg
+                                    className="w-4 h-4 group-hover:scale-110 transition-transform"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                </button>
+                              </Tooltip>
+                            )}
+                            {approveEmployeeHandler && (
+                              <Tooltip label="Approve Employee" placement="top">
+                                <button
+                                  onClick={() =>
+                                    approveEmployeeHandler(row.original._id)
+                                  }
+                                  className="p-2 rounded-lg transition-all duration-200 group"
+                                  style={{ color: colors.text.muted }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.success[600];
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.success[50];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.text.muted;
+                                    e.currentTarget.style.backgroundColor =
+                                      "transparent";
+                                  }}
+                                >
+                                  <FcApproval className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                </button>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </Td>
+                      </Tr>
+                    );
+                  })}
+                </Tbody>
+              </Table>
+            </div>
+          </div>
+
+          {/* Enhanced Pagination */}
+          <div
+            className="flex items-center justify-center px-6 py-4 border-t"
+            style={{
+              backgroundColor: colors.gray[50],
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <button
+                disabled={!canPreviousPage}
+                onClick={previousPage}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                  border: `1px solid ${colors.border.light}`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = colors.gray[50];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor =
+                      colors.background.card;
+                  }
+                }}
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+                Previous
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(pageCount, 5) }, (_, i) => {
+                  const pageNum = i + 1;
+                  const isActive = pageIndex + 1 === pageNum;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => {
+                        /* Add page navigation logic if needed */
+                      }}
+                      className="px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                      style={{
+                        backgroundColor: isActive
+                          ? colors.primary[500]
+                          : "transparent",
+                        color: isActive
+                          ? colors.text.inverse
+                          : colors.text.primary,
+                        boxShadow: isActive ? colors.shadow.sm : "none",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor =
+                            colors.gray[100];
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }
+                      }}
+                    >
+                      {pageNum}
+                    </button>
                   );
                 })}
-              </Tbody>
-            </Table>
-          </TableContainer>
+              </div>
 
-          <div className="w-[max-content] m-auto my-7">
-            <button
-              className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canPreviousPage}
-              onClick={previousPage}
-            >
-              Prev
-            </button>
-            <span className="mx-3 text-sm text-gray-200 md:text-lg lg:text-xl xl:text-base">
-              {pageIndex + 1} of {pageCount}
-            </span>
-            <button
-              className="text-sm mt-2 bg-[#2D3748] py-1 px-4 text-white border-[1px] border-[#2D3748] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canNextPage}
-              onClick={nextPage}
-            >
-              Next
-            </button>
+              <button
+                disabled={!canNextPage}
+                onClick={nextPage}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                  border: `1px solid ${colors.border.light}`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = colors.gray[50];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor =
+                      colors.background.card;
+                  }
+                }}
+              >
+                Next
+                <svg
+                  className="w-4 h-4 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

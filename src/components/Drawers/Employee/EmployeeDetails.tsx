@@ -33,7 +33,7 @@ const EmployeeDetails: React.FC<EmployeeDetailsProps> = ({
           method: "GET",
           headers: {
             Authorization: `Bearer ${cookies?.access_token}`,
-          }
+          },
         }
       );
       const data = await response.json();
@@ -49,7 +49,7 @@ const EmployeeDetails: React.FC<EmployeeDetailsProps> = ({
       setIsSuper(data.user.isSuper);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
-    } finally{
+    } finally {
       setIsLoadingEmployee(false);
     }
   };
@@ -61,20 +61,22 @@ const EmployeeDetails: React.FC<EmployeeDetailsProps> = ({
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[350px] bg-[#4b86a0] right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[350px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
-          <BiX onClick={closeDrawerHandler} size="26px"  color="white"/>
-        
+        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3">
+          <BiX
+            onClick={closeDrawerHandler}
+            size="26px"
+            className="text-gray-600 hover:text-gray-800 cursor-pointer"
+          />
         </h1>
 
         <div className="mt-8 px-5">
-        <h2 className="text-xl text-center  font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
-       
+          <h2 className="text-xl text-center font-semibold py-3 px-4 bg-blue-50 border border-blue-200 rounded-md text-blue-800 mb-6">
             Employee Details
           </h2>
 
@@ -82,35 +84,61 @@ const EmployeeDetails: React.FC<EmployeeDetailsProps> = ({
           {!isLoadingEmployee && (
             <div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold text-white">First Name</p>
-                <p className="text-gray-300">{firstname}</p>
+                <p className="font-bold text-gray-700 mb-2">First Name</p>
+                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                  {firstname}
+                </p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold text-white">Last Name</p>
-                <p className="text-gray-300">{lastname}</p>
+                <p className="font-bold text-gray-700 mb-2">Last Name</p>
+                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                  {lastname}
+                </p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold text-white">Email</p>
-                <p className="text-gray-300">{email}</p>
+                <p className="font-bold text-gray-700 mb-2">Email</p>
+                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                  {email}
+                </p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold text-white">Phone</p>
-                <p className="text-gray-300">{phone}</p>
+                <p className="font-bold text-gray-700 mb-2">Phone</p>
+                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                  {phone}
+                </p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold text-white">Is Verified</p>
-                <p className="text-gray-300">{isVerified ? 'Verified' : 'Not Verified'}</p>
+                <p className="font-bold text-gray-700 mb-2">Is Verified</p>
+                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                  {isVerified ? "Verified" : "Not Verified"}
+                </p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold text-white">Role</p>
-                <p className="text-gray-300 ">{(isSuper && 'Super Admin') || role?.role || 'N/A'}</p>
+                <p className="font-bold text-gray-700 mb-2">Role</p>
+                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                  {(isSuper && "Super Admin") || role?.role || "N/A"}
+                </p>
               </div>
               <div className="mt-3 mb-5">
-                <p className="font-semibold text-white">Permissions</p>
-                {!role?.permissions && <p className="text-gray-300">N/A</p>}
-                {role?.permissions && <ul className="pl-5">
-                    {role.permissions.map((permission: any) => <li>{permission}</li>)}
-                </ul>}
+                <p className="font-bold text-gray-700 mb-2">Permissions</p>
+                <div className="bg-gray-50 p-3 rounded-md border">
+                  {!role?.permissions && <p className="text-gray-600">N/A</p>}
+                  {role?.permissions && (
+                    <ul className="space-y-2">
+                      {role.permissions.map(
+                        (permission: any, index: number) => (
+                          <li
+                            key={index}
+                            className="flex items-center text-gray-600"
+                          >
+                            <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            {permission}
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  )}
+                </div>
               </div>
             </div>
           )}
