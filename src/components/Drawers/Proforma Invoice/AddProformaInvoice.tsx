@@ -3,9 +3,7 @@ import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
-import {
-  useCreateProformaInvoiceMutation,
-} from "../../../redux/api/api";
+import { useCreateProformaInvoiceMutation } from "../../../redux/api/api";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import AddItems from "../../Dynamic Add Components/AddItems";
@@ -239,183 +237,356 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
     fetchStoresHandler();
     fetchSuppliersHandler();
   }, []);
-  const customStyles = {
-    control: (provided: any) => ({
-      ...provided,
-      backgroundColor: "transparent",
-      borderColor: "#a9a9a9",
-      color: "#fff",
-    }),
-    option: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
-      color: "black",
-      cursor: "pointer",
-    }),
-    multiValue: (provided: any) => ({
-      ...provided,
-      backgroundColor: "#808080",
-      color: "#fff",
-    }),
-    menu: (provided: any) => ({
-      ...provided,
-      zIndex: 9999, // ensures dropdown doesn't get hidden
-    }),
-    placeholder: (provided: any) => ({
-      ...provided,
-      color: "#fff", // light gray placeholder
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      color: "#fff", // ensures selected value is white
-    }),
-  };
 
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-screen w-[90vw] md:w-[450px] bg-[#57657f] right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-screen w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
         <h1 className="px-4 flex gap-x-2 items-center text-xl py-3">
-          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
-
+          <BiX
+            onClick={closeDrawerHandler}
+            size="26px"
+            className="text-gray-600 hover:text-gray-800 cursor-pointer"
+          />
         </h1>
 
         <div className="mt-8 px-5">
-          <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
-          Add New Proforma Invoice
+          <h2 className="text-xl text-center font-semibold py-3 px-4 bg-blue-50 border border-blue-200 rounded-md text-blue-800 mb-6">
+            Add New Proforma Invoice
           </h2>
 
           <form onSubmit={addProformaInvoiceHandler}>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="600" color="white" >Category</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Category
+              </FormLabel>
               <Select
                 value={category}
                 options={categoryOptions}
                 required={true}
                 onChange={(e: any) => setCategory(e)}
-                styles={customStyles}
+                styles={{
+                  control: (provided: any) => ({
+                    ...provided,
+                    backgroundColor: "white",
+                    borderColor: "#d1d5db",
+                    color: "#374151",
+                    minHeight: "40px",
+                    "&:hover": {
+                      borderColor: "#9ca3af",
+                    },
+                  }),
+                  option: (provided: any, state: any) => ({
+                    ...provided,
+                    backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                    color: "#374151",
+                    "&:hover": {
+                      backgroundColor: "#f3f4f6",
+                    },
+                  }),
+                  placeholder: (provided: any) => ({
+                    ...provided,
+                    color: "#9ca3af",
+                  }),
+                  singleValue: (provided: any) => ({
+                    ...provided,
+                    color: "#374151",
+                  }),
+                  menu: (provided: any) => ({
+                    ...provided,
+                    zIndex: 9999,
+                    backgroundColor: "white",
+                    border: "1px solid #d1d5db",
+                  }),
+                }}
               />
             </FormControl>
             {category && category.value === "sales" && (
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="600" color="white">Buyer</FormLabel>
+                <FormLabel fontWeight="bold" color="gray.700">
+                  Buyer
+                </FormLabel>
                 <Select
                   value={buyer}
                   options={buyerOptions}
                   required={true}
                   onChange={(e: any) => setBuyer(e)}
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      backgroundColor: "white",
+                      borderColor: "#d1d5db",
+                      color: "#374151",
+                      minHeight: "40px",
+                      "&:hover": {
+                        borderColor: "#9ca3af",
+                      },
+                    }),
+                    option: (provided: any, state: any) => ({
+                      ...provided,
+                      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                      color: "#374151",
+                      "&:hover": {
+                        backgroundColor: "#f3f4f6",
+                      },
+                    }),
+                    placeholder: (provided: any) => ({
+                      ...provided,
+                      color: "#9ca3af",
+                    }),
+                    singleValue: (provided: any) => ({
+                      ...provided,
+                      color: "#374151",
+                    }),
+                    menu: (provided: any) => ({
+                      ...provided,
+                      zIndex: 9999,
+                      backgroundColor: "white",
+                      border: "1px solid #d1d5db",
+                    }),
+                  }}
                 />
               </FormControl>
             )}
             {category && category.value === "purchase" && (
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="600" color="white">Supplier</FormLabel>
+                <FormLabel fontWeight="bold" color="gray.700">
+                  Supplier
+                </FormLabel>
                 <Select
                   value={supplier}
                   options={supplierOptions}
                   required={true}
                   onChange={(e: any) => setSupplier(e)}
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      backgroundColor: "white",
+                      borderColor: "#d1d5db",
+                      color: "#374151",
+                      minHeight: "40px",
+                      "&:hover": {
+                        borderColor: "#9ca3af",
+                      },
+                    }),
+                    option: (provided: any, state: any) => ({
+                      ...provided,
+                      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                      color: "#374151",
+                      "&:hover": {
+                        backgroundColor: "#f3f4f6",
+                      },
+                    }),
+                    placeholder: (provided: any) => ({
+                      ...provided,
+                      color: "#9ca3af",
+                    }),
+                    singleValue: (provided: any) => ({
+                      ...provided,
+                      color: "#374151",
+                    }),
+                    menu: (provided: any) => ({
+                      ...provided,
+                      zIndex: 9999,
+                      backgroundColor: "white",
+                      border: "1px solid #d1d5db",
+                    }),
+                  }}
                 />
               </FormControl>
             )}
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="600" color="white">Proforma Invoice No.</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Proforma Invoice No.
+              </FormLabel>
               <Input
-                className="text-gray-200"
-
+                className="border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 value={proformaInvoiceNo}
                 onChange={(e) => setProformaInvoiceNo(e.target.value)}
                 type="text"
                 placeholder="Proforma Invoice No."
+                bg="white"
+                color="gray.700"
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="600" color="white">Document Date</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Document Date
+              </FormLabel>
               <Input
                 value={documentDate}
-                className="no-scrollbar styled-date text-gray-200"
+                className="border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 onChange={(e) => setDocumentDate(e.target.value)}
                 type="date"
                 placeholder="Document Date"
+                bg="white"
+                color="gray.700"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="600" color="white">Sales Order Date</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Sales Order Date
+              </FormLabel>
               <Input
-
-
                 value={salesOrderDate}
-                className="no-scrollbar styled-date text-gray-200"
+                className="border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 onChange={(e) => setSalesOrderDate(e.target.value)}
                 type="date"
                 placeholder="Sales Order Date"
+                bg="white"
+                color="gray.700"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="600" color="white">Store</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Store
+              </FormLabel>
               <Select
                 value={store}
                 options={storeOptions}
                 required={true}
                 onChange={(e: any) => setStore(e)}
-                styles={customStyles}
+                styles={{
+                  control: (provided: any) => ({
+                    ...provided,
+                    backgroundColor: "white",
+                    borderColor: "#d1d5db",
+                    color: "#374151",
+                    minHeight: "40px",
+                    "&:hover": {
+                      borderColor: "#9ca3af",
+                    },
+                  }),
+                  option: (provided: any, state: any) => ({
+                    ...provided,
+                    backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                    color: "#374151",
+                    "&:hover": {
+                      backgroundColor: "#f3f4f6",
+                    },
+                  }),
+                  placeholder: (provided: any) => ({
+                    ...provided,
+                    color: "#9ca3af",
+                  }),
+                  singleValue: (provided: any) => ({
+                    ...provided,
+                    color: "#374151",
+                  }),
+                  menu: (provided: any) => ({
+                    ...provided,
+                    zIndex: 9999,
+                    backgroundColor: "white",
+                    border: "1px solid #d1d5db",
+                  }),
+                }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="600" color="white" >Note</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Note
+              </FormLabel>
               <textarea
-                className="border w-full border-[#a9a9a9] px-2 rounded bg-transparent focus:outline-none text-gray-200 resize-none" 
+                className="border border-gray-300 w-full px-3 py-2 rounded-md bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700 resize-none"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="write your notes..."
+                placeholder="Write your notes..."
+                rows={3}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="600" color="white">Items</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Items
+              </FormLabel>
               <AddItems inputs={inputs} setInputs={setInputs} />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="600" color="white">Subtotal</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Subtotal
+              </FormLabel>
               <Input
-
-
                 value={subtotal}
                 isDisabled={true}
-                className="no-scrollbar   text-gray-300"
+                className="border border-gray-300"
                 type="number"
                 placeholder="Subtotal"
+                bg="gray.50"
+                color="gray.700"
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="600" color="white">Tax</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Tax
+              </FormLabel>
               <Select
                 required={true}
                 value={tax}
                 options={taxOptions}
                 onChange={(e: any) => setTax(e)}
-                styles={customStyles}
+                styles={{
+                  control: (provided: any) => ({
+                    ...provided,
+                    backgroundColor: "white",
+                    borderColor: "#d1d5db",
+                    color: "#374151",
+                    minHeight: "40px",
+                    "&:hover": {
+                      borderColor: "#9ca3af",
+                    },
+                  }),
+                  option: (provided: any, state: any) => ({
+                    ...provided,
+                    backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                    color: "#374151",
+                    "&:hover": {
+                      backgroundColor: "#f3f4f6",
+                    },
+                  }),
+                  placeholder: (provided: any) => ({
+                    ...provided,
+                    color: "#9ca3af",
+                  }),
+                  singleValue: (provided: any) => ({
+                    ...provided,
+                    color: "#374151",
+                  }),
+                  menu: (provided: any) => ({
+                    ...provided,
+                    zIndex: 9999,
+                    backgroundColor: "white",
+                    border: "1px solid #d1d5db",
+                  }),
+                }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="600" color="white">Total</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Total
+              </FormLabel>
               <Input
-                className="text-gray-200"
-                value={total} isDisabled={true} />
+                className="border border-gray-300"
+                value={total}
+                isDisabled={true}
+                bg="gray.50"
+                color="gray.700"
+              />
             </FormControl>
             <Button
               isLoading={isAdding}
               type="submit"
-              className="mt-1"
-              color="black"
-              backgroundColor="#ffffff8a"
-              _hover={{ bg: "#d1d2d5" }}
+              className="mt-1 w-full"
+              colorScheme="blue"
+              size="lg"
+              _hover={{ bg: "blue.600" }}
             >
-              Submit
+              Create Proforma Invoice
             </Button>
           </form>
         </div>

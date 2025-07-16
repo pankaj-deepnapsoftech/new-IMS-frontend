@@ -1,32 +1,20 @@
 // @ts-nocheck
 
-import { useMemo, useState } from "react";
-import {
-  Cell,
-  Column,
-  HeaderGroup,
-  TableInstance,
-  usePagination,
-  useSortBy,
-  useTable,
-} from "react-table";
-import Loading from "../../ui/Loading";
-import { FcApproval, FcDatabase } from "react-icons/fc";
 import {
   Select,
   Table,
-  TableContainer,
   Tbody,
   Td,
   Th,
   Thead,
   Tr,
+  Tooltip,
 } from "@chakra-ui/react";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
-import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
-import { log } from "console";
-import EmptyData from "../../ui/emptyData";
+import { useMemo, useState } from "react";
+import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { usePagination, useSortBy, useTable } from "react-table";
+import { colors } from "../../theme/colors";
 
 interface ProformaInvoiceTableProps {
   proformaInvoices: Array<{
@@ -38,22 +26,21 @@ interface ProformaInvoiceTableProps {
     total: string;
     status: string;
   }>;
-  isLoadingProformaInvoices: boolean,
-  openProformaInvoiceDetailsHandler?: (id: string) => void,
-  deleteProformaInvoiceHandler?: (id: string) => void,
-  openUpdateProformaInvoiceDrawer?: (id: string) => void
+  isLoadingProformaInvoices: boolean;
+  openProformaInvoiceDetailsHandler?: (id: string) => void;
+  deleteProformaInvoiceHandler?: (id: string) => void;
+  openUpdateProformaInvoiceDrawer?: (id: string) => void;
 }
 
-const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
+const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
   proformaInvoices,
   isLoadingProformaInvoices,
   openProformaInvoiceDetailsHandler,
   deleteProformaInvoiceHandler,
-  openUpdateProformaInvoiceDrawer
+  openUpdateProformaInvoiceDrawer,
 }) => {
-
   const [showDeletePage, setshowDeletePage] = useState(false);
-  const [deleteId, setdeleteId] = useState('')
+  const [deleteId, setdeleteId] = useState("");
 
   const columns = useMemo(
     () => [
@@ -66,6 +53,10 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
     ],
     []
   );
+
+  const dynamicBg = (index) => {
+    return index % 2 !== 0 ? colors.table.stripe : colors.background.card;
+  };
 
   const {
     getTableProps,
@@ -80,15 +71,7 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
     state: { pageIndex, pageSize },
     pageCount,
     setPageSize,
-  }: TableInstance<{
-    createdBy: string;
-    createdOn: string;
-    customer?: string;
-    startdate: string;
-    subtotal: string;
-    total: string;
-    status: string;
-  }> = useTable(
+  } = useTable(
     {
       columns,
       data: proformaInvoices,
@@ -98,248 +81,602 @@ const ProformaInvoiceTable: React.FC<AgentTableProps> = ({
     usePagination
   );
 
-  const dynamicBg = (index) => {
-    return index % 2 !== 0 ? "#ffffff40" : "#ffffff1f";
-  };
-
-
   return (
-    <div>
-      {isLoadingProformaInvoices && <Loading />}
-      {proformaInvoices.length === 0 && !isLoadingProformaInvoices && (
-        <EmptyData />
-      )}
-      {!isLoadingProformaInvoices && proformaInvoices.length > 0 && (
-        <div>
-          <div className="flex justify-end mb-2">
-            <Select
-              color="white"
-              onChange={(e) => setPageSize(e.target.value)}
-              width="80px"
-              sx={{
-                option: {
-                  backgroundColor: "#444e5b", // Default background
-                  color: "white",
-                },
-              }}
+    <div className="p-6">
+      {isLoadingProformaInvoices && (
+        <div className="flex items-center justify-center py-20">
+          <div className="flex items-center gap-3">
+            <div
+              className="animate-spin rounded-full h-8 w-8 border-b-2"
+              style={{ borderColor: colors.primary[500] }}
+            ></div>
+            <span
+              className="font-medium"
+              style={{ color: colors.text.secondary }}
             >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-              <option value={100000}>All</option>
-            </Select>
-          </div>
-          <TableContainer maxHeight="600px" overflowY="auto" borderRadius="md"
-            boxShadow="lg" bg="#14243452">
-            <Table variant="simple" {...getTableProps()}>
-              <Thead bg="#14243452" className="text-sm font-semibold">
-                {headerGroups.map(
-                  (
-                    hg: HeaderGroup<{
-                      createdBy: string;
-                      createdOn: string;
-                      customer?: string;
-                      startdate: string;
-                      subtotal: string;
-                      total: string;
-                      status: string;
-                    }>
-                  ) => {
-                    return (
-                      <Tr {...hg.getHeaderGroupProps()}>
-                        {hg.headers.map((column: any) => {
-                          return (
-                            <Th
-                              textTransform="capitalize"
-                              fontSize="14px"
-                              fontWeight="600"
-                              color="white"
-                              {...column.getHeaderProps(
-                                column.getSortByToggleProps()
-                              )}
-                            >
-                              <p className="flex">
-                                {column.render("Header")}
-                                {column.isSorted && (
-                                  <span>
-                                    {column.isSortedDesc ? (
-                                      <FaCaretDown />
-                                    ) : (
-                                      <FaCaretUp />
-                                    )}
-                                  </span>
-                                )}
-                              </p>
-                            </Th>
-                          );
-                        })}
-                        <Th
-                          textTransform="capitalize"
-                          fontSize="14px"
-                          fontWeight="600"
-                          color="white"
-
-                        >
-                          Actions
-                        </Th>
-                      </Tr>
-                    );
-                  }
-                )}
-              </Thead>
-              <Tbody {...getTableBodyProps()}>
-                {page.map((row: any, index) => {
-                  prepareRow(row);
-
-                  return (
-                    <Tr
-                      className="relative hover:bg-[#e4e4e4] hover:cursor-pointer text-base lg:text-sm"
-                      {...row.getRowProps()}
-
-                      _hover={{
-                        bg: "#ffffff78",
-                        cursor: "pointer",
-                        transition: "all 0.2s",
-                      }}
-                      bgColor={dynamicBg(index)}
-                    >
-                      {row.cells.map((cell: Cell) => {
-                        return (
-                          <Td fontWeight="500" {...cell.getCellProps()} border="none" className="text-gray-300">
-                            {cell.column.id !== "createdAt" &&
-                              cell.column.id !== "updatedAt" &&
-                              cell.column.id !== "customer" &&
-                              cell.column.id !== "creator" &&
-                              cell.column.id !== "creator" &&
-                              cell.render("Cell")}
-
-                            {cell.column.id === "creator" &&
-                              row.original?.creator && (
-                                <span>
-                                  {row.original?.creator?.first_name + ' ' + row.original?.creator?.last_name}
-                                </span>
-                              )}
-                            {cell.column.id === "createdAt" &&
-                              row.original?.createdAt && (
-                                <span>
-                                  {moment(row.original?.createdAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "updatedAt" &&
-                              row.original?.createdAt && (
-                                <span>
-                                  {moment(row.original?.updatedAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "customer" &&
-                              (row.original?.buyer || row.original?.supplier) && (
-                                <span>
-                                  {row.original?.buyer ? row.original.buyer.name : row.original.supplier.name}
-                                </span>
-                              )}
-                            {cell.column.id === "creator" &&
-                              row.original?.buyer && (
-                                <span>
-                                  PENDING
-                                </span>
-                              )}
-                          </Td>
-                        );
-                      })}
-                      <Td className="flex gap-x-2 text-gray-300" border="none">
-                        {openProformaInvoiceDetailsHandler && (
-                          <MdOutlineVisibility
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              openProformaInvoiceDetailsHandler(row.original?._id)
-                            }
-                          />
-                        )}
-                        {openUpdateProformaInvoiceDrawer && (
-                          <MdEdit
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                              openUpdateProformaInvoiceDrawer(row.original?._id)
-                            }
-                          />
-                        )}
-                        {deleteProformaInvoiceHandler && (
-                          <MdDeleteOutline
-                            className="hover:scale-110"
-                            size={16}
-                            onClick={() =>
-                            // deleteProformaInvoiceHandler(row.original?._id)
-
-                            {
-                              setdeleteId(row.original._id);
-                              setshowDeletePage(true)
-                            }
-                            }
-                          />
-                        )}
-                      </Td>
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
-          </TableContainer>
-
-          <div className="w-[max-content] m-auto my-7">
-            <button
-              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canPreviousPage}
-              onClick={previousPage}
-            >
-              Prev
-            </button>
-            <span className="mx-3 text-sm md:text-lg lg:text-xl xl:text-base">
-              {pageIndex + 1} of {pageCount}
+              Loading proforma invoices...
             </span>
-            <button
-              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canNextPage}
-              onClick={nextPage}
-            >
-              Next
-            </button>
           </div>
         </div>
       )}
 
-      {showDeletePage && (
-        <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center">
-          <div className="bg-[#1C3644] rounded-lg shadow-xl p-6 w-full max-w-md">
-            <h2 className="text-lg font-semibold text-white mb-4">Confirm Deletion</h2>
-            <p className="text-sm text-white mb-6">Are you sure you want to delete this item ?</p>
-            <div className="mt-6 flex justify-end space-x-3">
+      {!isLoadingProformaInvoices && proformaInvoices.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div
+            className="rounded-full p-6 mb-4"
+            style={{ backgroundColor: colors.gray[100] }}
+          >
+            <svg
+              className="w-12 h-12"
+              style={{ color: colors.gray[400] }}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h3
+            className="text-lg font-semibold mb-2"
+            style={{ color: colors.text.primary }}
+          >
+            No proforma invoices found
+          </h3>
+          <p className="max-w-md" style={{ color: colors.text.muted }}>
+            Get started by creating your first proforma invoice.
+          </p>
+        </div>
+      )}
+
+      {!isLoadingProformaInvoices && proformaInvoices.length > 0 && (
+        <>
+          {/* Table Header with Stats and Controls */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-6">
+              <div>
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  {proformaInvoices.length} Invoice
+                  {proformaInvoices.length !== 1 ? "s" : ""} Found
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.text.secondary }}
+              >
+                Show:
+              </span>
+              <Select
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                value={pageSize}
+                size="sm"
+                width="auto"
+                borderRadius="lg"
+                borderColor={colors.border.light}
+                _focus={{
+                  borderColor: colors.primary[500],
+                  boxShadow: `0 0 0 1px ${colors.primary[500]}`,
+                }}
+              >
+                {[10, 20, 50, 100, 100000].map((size) => (
+                  <option key={size} value={size}>
+                    {size === 100000 ? "All" : size}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+
+          {/* Enhanced Table */}
+          <div
+            className="rounded-xl shadow-sm"
+            style={{
+              backgroundColor: colors.background.card,
+              border: `1px solid ${colors.border.light}`,
+            }}
+          >
+            <div className="overflow-x-auto">
+              <Table
+                {...getTableProps()}
+                variant="simple"
+                size="md"
+                minWidth="800px"
+              >
+                <Thead bg={colors.table.header}>
+                  {headerGroups.map(
+                    (
+                      hg: HeaderGroup<{
+                        createdBy: string;
+                        createdOn: string;
+                        customer?: string;
+                        startdate: string;
+                        subtotal: string;
+                        total: string;
+                        status: string;
+                      }>
+                    ) => {
+                      return (
+                        <Tr
+                          {...hg.getHeaderGroupProps()}
+                          borderBottom="1px solid"
+                          borderColor={colors.table.border}
+                        >
+                          {hg.headers.map((column: any) => {
+                            return (
+                              <Th
+                                {...column.getHeaderProps(
+                                  column.getSortByToggleProps()
+                                )}
+                                fontSize="14px"
+                                color={colors.table.headerText}
+                                fontWeight="600"
+                                whiteSpace="nowrap"
+                              >
+                                <div className="flex items-center gap-1">
+                                  {column.render("Header")}
+                                  {column.isSorted && (
+                                    <span
+                                      style={{ color: colors.primary[500] }}
+                                    >
+                                      {column.isSortedDesc ? (
+                                        <FaCaretDown />
+                                      ) : (
+                                        <FaCaretUp />
+                                      )}
+                                    </span>
+                                  )}
+                                </div>
+                              </Th>
+                            );
+                          })}
+                          <Th
+                            fontSize="14px"
+                            fontWeight="600"
+                            color={colors.table.headerText}
+                            whiteSpace="nowrap"
+                          >
+                            Actions
+                          </Th>
+                        </Tr>
+                      );
+                    }
+                  )}
+                </Thead>
+                <Tbody {...getTableBodyProps()}>
+                  {page.map((row: any, index) => {
+                    prepareRow(row);
+
+                    return (
+                      <Tr
+                        {...row.getRowProps()}
+                        _hover={{
+                          bg: colors.table.hover,
+                          transform: "translateY(-1px)",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          shadow: "md",
+                        }}
+                        bgColor={
+                          index % 2 !== 0
+                            ? colors.table.stripe
+                            : colors.background.card
+                        }
+                        transition="all 0.2s ease"
+                        borderBottom="1px solid"
+                        borderColor={colors.table.border}
+                      >
+                        {row.cells.map((cell: Cell) => {
+                          return (
+                            <Td
+                              {...cell.getCellProps()}
+                              fontSize="14px"
+                              color={colors.text.primary}
+                              p={3}
+                            >
+                              {cell.column.id !== "createdAt" &&
+                                cell.column.id !== "updatedAt" &&
+                                cell.column.id !== "customer" &&
+                                cell.column.id !== "creator" &&
+                                cell.render("Cell")}
+
+                              {cell.column.id === "creator" &&
+                                row.original?.creator && (
+                                  <span style={{ color: colors.text.primary }}>
+                                    {row.original?.creator?.first_name +
+                                      " " +
+                                      row.original?.creator?.last_name}
+                                  </span>
+                                )}
+                              {cell.column.id === "createdAt" &&
+                                row.original?.createdAt && (
+                                  <span
+                                    style={{ color: colors.text.secondary }}
+                                  >
+                                    {moment(row.original?.createdAt).format(
+                                      "DD/MM/YYYY"
+                                    )}
+                                  </span>
+                                )}
+                              {cell.column.id === "updatedAt" &&
+                                row.original?.updatedAt && (
+                                  <span
+                                    style={{ color: colors.text.secondary }}
+                                  >
+                                    {moment(row.original?.updatedAt).format(
+                                      "DD/MM/YYYY"
+                                    )}
+                                  </span>
+                                )}
+                              {cell.column.id === "customer" &&
+                                (row.original?.buyer ||
+                                  row.original?.supplier) && (
+                                  <span style={{ color: colors.text.primary }}>
+                                    {row.original?.buyer
+                                      ? row.original.buyer.name
+                                      : row.original.supplier.name}
+                                  </span>
+                                )}
+                            </Td>
+                          );
+                        })}
+                        <Td p={3}>
+                          <div className="flex items-center gap-2">
+                            {openProformaInvoiceDetailsHandler && (
+                              <Tooltip label="View Details" placement="top">
+                                <button
+                                  onClick={() =>
+                                    openProformaInvoiceDetailsHandler(
+                                      row.original._id
+                                    )
+                                  }
+                                  className="p-2 rounded-lg transition-all duration-200 group"
+                                  style={{ color: colors.text.muted }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.primary[600];
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.primary[50];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.text.muted;
+                                    e.currentTarget.style.backgroundColor =
+                                      "transparent";
+                                  }}
+                                >
+                                  <svg
+                                    className="w-4 h-4 group-hover:scale-110 transition-transform"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                    />
+                                  </svg>
+                                </button>
+                              </Tooltip>
+                            )}
+                            {openUpdateProformaInvoiceDrawer && (
+                              <Tooltip label="Edit Invoice" placement="top">
+                                <button
+                                  onClick={() =>
+                                    openUpdateProformaInvoiceDrawer(
+                                      row.original._id
+                                    )
+                                  }
+                                  className="p-2 rounded-lg transition-all duration-200 group"
+                                  style={{ color: colors.text.muted }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.warning[600];
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.warning[50];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.text.muted;
+                                    e.currentTarget.style.backgroundColor =
+                                      "transparent";
+                                  }}
+                                >
+                                  <svg
+                                    className="w-4 h-4 group-hover:scale-110 transition-transform"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                    />
+                                  </svg>
+                                </button>
+                              </Tooltip>
+                            )}
+                            {deleteProformaInvoiceHandler && (
+                              <Tooltip label="Delete Invoice" placement="top">
+                                <button
+                                  onClick={() => {
+                                    setdeleteId(row.original._id);
+                                    setshowDeletePage(true);
+                                  }}
+                                  className="p-2 rounded-lg transition-all duration-200 group"
+                                  style={{ color: colors.text.muted }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.error[600];
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.error[50];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.text.muted;
+                                    e.currentTarget.style.backgroundColor =
+                                      "transparent";
+                                  }}
+                                >
+                                  <svg
+                                    className="w-4 h-4 group-hover:scale-110 transition-transform"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                </button>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </Td>
+                      </Tr>
+                    );
+                  })}
+                </Tbody>
+              </Table>
+            </div>
+          </div>
+
+          {/* Enhanced Pagination */}
+          <div
+            className="flex items-center justify-center px-6 py-4 border-t"
+            style={{
+              backgroundColor: colors.gray[50],
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => setshowDeletePage(!showDeletePage)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
+                disabled={!canPreviousPage}
+                onClick={previousPage}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                  border: `1px solid ${colors.border.light}`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = colors.gray[50];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor =
+                      colors.background.card;
+                  }
+                }}
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+                Previous
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(pageCount, 5) }, (_, i) => {
+                  const pageNum = i + 1;
+                  const isActive = pageIndex + 1 === pageNum;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => {
+                        /* Add page navigation logic if needed */
+                      }}
+                      className="px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                      style={{
+                        backgroundColor: isActive
+                          ? colors.primary[500]
+                          : "transparent",
+                        color: isActive
+                          ? colors.text.inverse
+                          : colors.text.primary,
+                        boxShadow: isActive ? colors.shadow.sm : "none",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor =
+                            colors.gray[100];
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }
+                      }}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                disabled={!canNextPage}
+                onClick={nextPage}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                  border: `1px solid ${colors.border.light}`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = colors.gray[50];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor =
+                      colors.background.card;
+                  }
+                }}
+              >
+                Next
+                <svg
+                  className="w-4 h-4 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {showDeletePage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        >
+          <div
+            className="rounded-2xl p-6 w-full max-w-md transform transition-all"
+            style={{
+              backgroundColor: colors.background.card,
+              boxShadow: colors.shadow.xl,
+            }}
+          >
+            <div
+              className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full"
+              style={{ backgroundColor: colors.error[100] }}
+            >
+              <svg
+                className="w-6 h-6"
+                style={{ color: colors.error[600] }}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.232 15.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <h3
+              className="text-lg font-semibold text-center mb-2"
+              style={{ color: colors.text.primary }}
+            >
+              Confirm Deletion
+            </h3>
+            <p
+              className="text-sm text-center mb-6"
+              style={{ color: colors.text.secondary }}
+            >
+              Are you sure you want to delete this proforma invoice? This action
+              cannot be undone and will permanently remove the invoice from the
+              system.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setshowDeletePage(false)}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.gray[100],
+                  focusRingColor: colors.gray[500],
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[200];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[100];
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={() => {
                   deleteProformaInvoiceHandler(deleteId);
-                  setshowDeletePage(false)
+                  setshowDeletePage(false);
                 }}
-                className={`px-4 py-2 text-sm font-medium text-white rounded transition  bg-red-600 hover:bg-red-700 `}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  color: colors.text.inverse,
+                  backgroundColor: colors.error[600],
+                  boxShadow: colors.shadow.lg,
+                  focusRingColor: colors.error[500],
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.error[700];
+                  e.currentTarget.style.boxShadow = colors.shadow.xl;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.error[600];
+                  e.currentTarget.style.boxShadow = colors.shadow.lg;
+                }}
               >
-                Delete
+                Delete Invoice
               </button>
             </div>
           </div>
         </div>
-
-
       )}
     </div>
   );
