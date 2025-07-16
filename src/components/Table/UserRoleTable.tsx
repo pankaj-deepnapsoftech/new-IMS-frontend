@@ -18,6 +18,7 @@ import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
 import { usePagination, useSortBy, useTable } from "react-table";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
+import { colors } from "../../theme/colors";
 
 interface UserRoleTableProps {
   roles: Array<{
@@ -51,7 +52,7 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
   );
 
   const dynamicBg = (index) => {
-    return index % 2 !== 0 ? "gray.50" : "white";
+    return index % 2 !== 0 ? colors.table.stripe : colors.background.card;
   };
 
   const [showDeletePage, setshowDeletePage] = useState(false);
@@ -81,17 +82,29 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
       {isLoadingRoles && (
         <div className="flex items-center justify-center py-20">
           <div className="flex items-center gap-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <span className="text-gray-600 font-medium">Loading roles...</span>
+            <div
+              className="animate-spin rounded-full h-8 w-8 border-b-2"
+              style={{ borderColor: colors.primary[500] }}
+            ></div>
+            <span
+              className="font-medium"
+              style={{ color: colors.text.secondary }}
+            >
+              Loading roles...
+            </span>
           </div>
         </div>
       )}
 
       {!isLoadingRoles && roles.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="bg-gray-100 rounded-full p-6 mb-4">
+          <div
+            className="rounded-full p-6 mb-4"
+            style={{ backgroundColor: colors.gray[100] }}
+          >
             <svg
-              className="w-12 h-12 text-gray-400"
+              className="w-12 h-12"
+              style={{ color: colors.gray[400] }}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -104,10 +117,13 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
               />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3
+            className="text-lg font-semibold mb-2"
+            style={{ color: colors.text.primary }}
+          >
             No roles found
           </h3>
-          <p className="text-gray-500 max-w-md">
+          <p className="max-w-md" style={{ color: colors.text.muted }}>
             Get started by creating your first user role to manage permissions
             and access levels.
           </p>
@@ -120,24 +136,32 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
                   {roles.length} Role{roles.length !== 1 ? "s" : ""} Found
                 </h3>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600 font-medium">Show:</span>
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.text.secondary }}
+              >
+                Show:
+              </span>
               <Select
                 onChange={(e) => setPageSize(Number(e.target.value))}
                 value={pageSize}
                 size="sm"
                 width="auto"
                 borderRadius="lg"
-                borderColor="gray.300"
+                borderColor={colors.border.light}
                 _focus={{
-                  borderColor: "blue.500",
-                  boxShadow: "0 0 0 1px #3182ce",
+                  borderColor: colors.primary[500],
+                  boxShadow: `0 0 0 1px ${colors.primary[500]}`,
                 }}
               >
                 {[10, 20, 50, 100, 100000].map((size) => (
@@ -150,7 +174,13 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
           </div>
 
           {/* Enhanced Table */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div
+            className="rounded-xl shadow-sm"
+            style={{
+              backgroundColor: colors.background.card,
+              border: `1px solid ${colors.border.light}`,
+            }}
+          >
             <div className="overflow-x-auto">
               <Table
                 {...getTableProps()}
@@ -158,12 +188,12 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                 size="md"
                 minWidth="800px"
               >
-                <Thead bg="gray.50">
+                <Thead bg={colors.table.header}>
                   {headerGroups.map((hg) => (
                     <Tr
                       {...hg.getHeaderGroupProps()}
                       borderBottom="1px solid"
-                      borderColor="gray.200"
+                      borderColor={colors.table.border}
                     >
                       {hg.headers.map((column) => (
                         <Th
@@ -205,7 +235,7 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                       <Tr
                         {...row.getRowProps()}
                         _hover={{
-                          bg: "blue.50",
+                          bg: colors.table.hover,
                           transform: "translateY(-1px)",
                           cursor: "pointer",
                           transition: "all 0.2s ease",
@@ -214,19 +244,14 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                         bgColor={dynamicBg(index)}
                         transition="all 0.2s ease"
                         borderBottom="1px solid"
-                        borderColor="gray.100"
+                        borderColor={colors.table.border}
                       >
                         {row.cells.map((cell) => (
                           <Td
                             {...cell.getCellProps()}
                             fontSize="14px"
-                            color="gray.700"
+                            color={colors.text.primary}
                             p={3}
-                            whiteSpace="nowrap"
-                            textOverflow="ellipsis"
-                            overflow="hidden"
-                            maxW="150px"
-                            textTransform="capitalize"
                           >
                             {cell.column.id === "createdAt" ||
                             cell.column.id === "updatedAt" ? (
@@ -234,7 +259,13 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                                 "DD/MM/YYYY"
                               )
                             ) : cell.column.id === "role" ? (
-                              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm">
+                              <span
+                                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium shadow-sm"
+                                style={{
+                                  background: `linear-gradient(to right, ${colors.primary[500]}, ${colors.primary[600]})`,
+                                  color: colors.text.inverse,
+                                }}
+                              >
                                 <svg
                                   className="w-4 h-4 mr-1.5"
                                   fill="none"
@@ -265,7 +296,20 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                                       row.original._id
                                     )
                                   }
-                                  className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+                                  className="p-2 rounded-lg transition-all duration-200 group"
+                                  style={{ color: colors.text.muted }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.primary[600];
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.primary[50];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.text.muted;
+                                    e.currentTarget.style.backgroundColor =
+                                      "transparent";
+                                  }}
                                 >
                                   <svg
                                     className="w-4 h-4 group-hover:scale-110 transition-transform"
@@ -297,7 +341,20 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                                       row.original._id
                                     )
                                   }
-                                  className="p-2 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all duration-200 group"
+                                  className="p-2 rounded-lg transition-all duration-200 group"
+                                  style={{ color: colors.text.muted }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.warning[600];
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.warning[50];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.text.muted;
+                                    e.currentTarget.style.backgroundColor =
+                                      "transparent";
+                                  }}
                                 >
                                   <svg
                                     className="w-4 h-4 group-hover:scale-110 transition-transform"
@@ -322,7 +379,20 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                                     setdeleteId(row.original._id);
                                     setshowDeletePage(true);
                                   }}
-                                  className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+                                  className="p-2 rounded-lg transition-all duration-200 group"
+                                  style={{ color: colors.text.muted }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.error[600];
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.error[50];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.color =
+                                      colors.text.muted;
+                                    e.currentTarget.style.backgroundColor =
+                                      "transparent";
+                                  }}
                                 >
                                   <svg
                                     className="w-4 h-4 group-hover:scale-110 transition-transform"
@@ -351,12 +421,34 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
           </div>
 
           {/* Enhanced Pagination */}
-          <div className="flex items-center justify-center px-6 py-4 bg-gray-50 border-t border-gray-200">
+          <div
+            className="flex items-center justify-center px-6 py-4 border-t"
+            style={{
+              backgroundColor: colors.gray[50],
+              borderColor: colors.border.light,
+            }}
+          >
             <div className="flex items-center gap-2">
               <button
                 disabled={!canPreviousPage}
                 onClick={previousPage}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                  border: `1px solid ${colors.border.light}`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = colors.gray[50];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor =
+                      colors.background.card;
+                  }
+                }}
               >
                 <svg
                   className="w-4 h-4 mr-2"
@@ -384,11 +476,27 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                       onClick={() => {
                         /* Add page navigation logic if needed */
                       }}
-                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                        isActive
-                          ? "bg-blue-500 text-white shadow-sm"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                      className="px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                      style={{
+                        backgroundColor: isActive
+                          ? colors.primary[500]
+                          : "transparent",
+                        color: isActive
+                          ? colors.text.inverse
+                          : colors.text.primary,
+                        boxShadow: isActive ? colors.shadow.sm : "none",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor =
+                            colors.gray[100];
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }
+                      }}
                     >
                       {pageNum}
                     </button>
@@ -399,7 +507,23 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
               <button
                 disabled={!canNextPage}
                 onClick={nextPage}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                  border: `1px solid ${colors.border.light}`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = colors.gray[50];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor =
+                      colors.background.card;
+                  }
+                }}
               >
                 Next
                 <svg
@@ -421,11 +545,24 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
         </>
       )}
       {showDeletePage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md transform transition-all">
-            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        >
+          <div
+            className="rounded-2xl p-6 w-full max-w-md transform transition-all"
+            style={{
+              backgroundColor: colors.background.card,
+              boxShadow: colors.shadow.xl,
+            }}
+          >
+            <div
+              className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full"
+              style={{ backgroundColor: colors.error[100] }}
+            >
               <svg
-                className="w-6 h-6 text-red-600"
+                className="w-6 h-6"
+                style={{ color: colors.error[600] }}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -438,17 +575,34 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+            <h3
+              className="text-lg font-semibold text-center mb-2"
+              style={{ color: colors.text.primary }}
+            >
               Confirm Deletion
             </h3>
-            <p className="text-sm text-gray-600 text-center mb-6">
+            <p
+              className="text-sm text-center mb-6"
+              style={{ color: colors.text.secondary }}
+            >
               Are you sure you want to delete this role? This action cannot be
               undone and will permanently remove the role from the system.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setshowDeletePage(false)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  color: colors.text.primary,
+                  backgroundColor: colors.gray[100],
+                  focusRingColor: colors.gray[500],
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[200];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[100];
+                }}
               >
                 Cancel
               </button>
@@ -457,7 +611,21 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                   deleteRoleHandler(deleteId);
                   setshowDeletePage(false);
                 }}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  color: colors.text.inverse,
+                  backgroundColor: colors.error[600],
+                  boxShadow: colors.shadow.lg,
+                  focusRingColor: colors.error[500],
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.error[700];
+                  e.currentTarget.style.boxShadow = colors.shadow.xl;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.error[600];
+                  e.currentTarget.style.boxShadow = colors.shadow.lg;
+                }}
               >
                 Delete Role
               </button>
