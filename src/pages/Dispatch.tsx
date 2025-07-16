@@ -23,9 +23,8 @@ const Dispatch = () => {
   const [trackingId, setTrackingId] = useState("");
   const [cookies] = useCookies();
   const [data, setData] = useState([]);
-  const [pages, setPages] = useState(1)
-  const [TotalPage, setTotalPage] = useState(0)
-  const [limit, setLimit] = useState(10)
+  const [page, setPage] = useState(1)
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showattachment, setShowAttachment] = useState(false)
   const [preview, setPreview] = useState(null);
@@ -49,7 +48,7 @@ const Dispatch = () => {
           },
         })
 
-        console.log(response)
+    
         resetForm()
         setShowModal(false)
       } catch (error) {
@@ -65,16 +64,13 @@ const Dispatch = () => {
   const GetDispatch = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch?limit=${limit}&page=${pages}`, {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch?page=${page}&&limit=2`, {
         headers: {
           Authorization: `Bearer ${cookies.access_token}`
         }
       });
 
-      setData(response?.data?.data); // This is your array of dispatch records
-      const totalData = response?.data?.totalData || 0;
-      const totalPages = Math.ceil(totalData / limit);
-      setTotalPage(totalPages);
+      setData(response?.data?.data); 
 
     } catch (error) {
       console.log(error);
@@ -84,8 +80,8 @@ const Dispatch = () => {
   };
   
   useEffect(() => {
-    GetDispatch()
-  }, [pages,limit])
+    GetDispatch(page)
+  }, [page])
 
 
 
@@ -430,7 +426,7 @@ const Dispatch = () => {
             </div>
           </div>
         )}
-        <Pagination page={pages} setPage={setPages}  TotalPage={TotalPage}/>
+        <Pagination page={page} setPage={setPage} hasNextPage={data.length === 2}/>
       </div>
     </>
   )

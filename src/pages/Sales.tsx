@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { MdOutlineRefresh } from "react-icons/md";
 import AddNewSale from "../components/Drawers/Sales/AddNewSale";
-import UpdateSale from "../components/Drawers/Sales/UpdateSale";
+// import UpdateSale from "../components/Drawers/Sales/UpdateSale";
 import { useState, useEffect } from "react";
 import SalesTable from "../components/Table/SalesTable";
 import AssignEmployee from "../components/Drawers/Sales/AssignEmployee";
@@ -11,26 +11,25 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const Sales = () => {
-    const [pages, setPages] = useState(1);
+    const [page, setPage] = useState(1);
     const [show, setShow] = useState(false);
-    const [editshow, seteditsale] = useState(false);
+    // const [editshow, seteditsale] = useState(false);
     const [cookies] = useCookies(["access_token", "role"]);
     const [purchases, setPurchases] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const role = cookies?.role;
-    const token = cookies.access_token;
+    const token = cookies?.access_token;
     const [filterText, setFilterText] = useState("");
     const [filterDate, setFilterDate] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
     const [filteredPurchases, setFilteredPurchases] = useState([]);
-    const [selectedSale, setSelectedSale] = useState([]);
+    // const [selectedSale, setSelectedSale] = useState([]);
     const [employees, setEmployees] = useState<any[]>([]);
-    const [totalPages, setTotalPages] = useState(0);
-
-    const handleDataFromChild = (data) => {
-        setSelectedSale(data);
-        seteditsale(true);
-    };
+    const [editTable,setEditTable] = useState(null)
+    // const handleDataFromChild = (data) => {
+    //     setSelectedSale(data);
+    //     seteditsale(true);
+    // };
 
     const fetchPurchases = async () => {
         try {
@@ -38,18 +37,14 @@ const Sales = () => {
             if (!token) throw new Error("Authentication token not found");
 
             const url = role === "admin"
-                ? `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=${pages}`
-                : `${process.env.REACT_APP_BACKEND_URL}sale/getOne?page=${pages}`;
+                ? `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=${page}&&limit=10`
+                : `${process.env.REACT_APP_BACKEND_URL}sale/getOne?page=${page}&&limit=10`;
 
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-
             setPurchases(response?.data?.data);
-               
-            const totalItems = response.data.totalData || 0;
-            const itemsPerPage = 10;
-            setTotalPages(Math.ceil(totalItems / itemsPerPage));
+      
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || error.message || "Failed to fetch sale data";
             toast.error(errorMessage);
@@ -70,7 +65,7 @@ const Sales = () => {
                 }
             );
 
-            const filteredEmployees = (response.data.users || []).filter(user => user.role);
+            const filteredEmployees = (response?.data?.users || []).filter(user => user.role);
             setEmployees(filteredEmployees);
         } catch (error: any) {
             toast.error(error.response?.data?.message || error.message || "Failed to fetch employees");
@@ -78,9 +73,9 @@ const Sales = () => {
     };
 
     useEffect(() => {
-        fetchPurchases();
+        fetchPurchases(page);
         fetchEmployees();
-    }, [pages]);
+    }, [page]); 
 
     useEffect(() => {
         const filtered = purchases.filter((purchase) => {
@@ -142,7 +137,7 @@ const Sales = () => {
 
                     <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-6">
                         <button
-                            onClick={() => setShow(!show)}
+                            onClick={() => { setShow(!show); setEditTable(null)}}
                             className="w-full md:w-auto px-6 text-white py-2 rounded-md shadow-md bg-[#4b87a0d9] hover:bg-[#4b86a083] transition-all duration-300"
                         >
                             Add New Sale
@@ -159,8 +154,10 @@ const Sales = () => {
        
                     <div className="overflow-x-auto">
                         <SalesTable
+                            setShow={setShow}
+                            setEditTable={setEditTable}
                             filteredPurchases={filteredPurchases}
-                            sendDataToParent={handleDataFromChild}
+                          
                             empData={employees}
                             isLoading={isLoading} 
                         />
@@ -169,9 +166,9 @@ const Sales = () => {
             </section>
 
 
-            <AddNewSale show={show} setShow={setShow} refresh={fetchPurchases} />
-            <UpdateSale editshow={editshow} sale={selectedSale} seteditsale={seteditsale} refresh={fetchPurchases} />
-            <Pagination page={pages} setPage={setPages} TotalPage={totalPages} />
+            <AddNewSale editTable={editTable} show={show} setShow={setShow} refresh={fetchPurchases} />
+            {/* <UpdateSale editshow={editshow} sale={selectedSale} seteditsale={seteditsale} refresh={fetchPurchases} /> */}
+            <Pagination page={page} setPage={setPage} hasNextPage={purchases.length === 10} />
 
         </>
     );

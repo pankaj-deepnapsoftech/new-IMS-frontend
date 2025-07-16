@@ -461,11 +461,11 @@ const Task = () => {
                     Task Done
                   </Button>
                 )}
-                {/* {role === "Production" && task?.sample_image && (
+                {role === "Production" && task?.sample_image && (
                   <Button colorScheme="teal" size="sm" onClick={() => handleSampleImage(task.sample_image)}>
                     Preview Sample Image
                   </Button>
-                )} */}
+                )}
               </HStack>
             ) : ["accountant", "acc"].includes(role?.toLowerCase()) ? (
               <HStack justify="space-between" mt={3} flexWrap="wrap" align="center" gap={4}>

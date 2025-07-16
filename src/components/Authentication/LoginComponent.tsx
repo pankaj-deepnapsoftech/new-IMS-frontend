@@ -54,14 +54,14 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       } else {
         dispatch(userExists({ ...data.user, role: "emp" }));
       }
-      setCookie("access_token", data.token, { maxAge: 86400 });
+      setCookie("access_token", data.token, { maxAge: 1000 * 60 * 60 * 24 });
       if (data?.user?.isSuper) {
-        setCookie("role", "admin", { maxAge: 86400 });
+        setCookie("role", "admin", { maxAge: 1000 * 60 * 60 * 24 });
       } else {
-        setCookie("role", data?.user?.role?.role || "emp", { maxAge: 86400 });
+        setCookie("role", data?.user?.role?.role || "emp", { maxAge: 1000 * 60 * 60 * 24 });
       }
-      setCookie("name", data.user.first_name, { maxAge: 86400 });
-      setCookie("email", data.user.email, { maxAge: 86400 });
+      setCookie("name", data.user.first_name, { maxAge: 1000 * 60 * 60 * 24 });
+      setCookie("email", data.user.email, { maxAge: 1000 * 60 * 60 * 24 });
       toast.success(data.message);
       navigate('/');
     } catch (err: any) {

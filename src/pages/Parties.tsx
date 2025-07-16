@@ -17,26 +17,22 @@ const Parties = () => {
     const [partiesData, setPartiesData] = useState([]);
     const [cookies] = useCookies();
     const [isLoading, setIsLoading] = useState(true);
-    const [pages, setPages] = useState(1)
-    const [TotalPage,setTotalPage] = useState(0)
-    const [limit,setLimit] = useState(10)
+    const [page, setPage] = useState(1)
     const [edittable, setEditTable] = useState(null)
     const fetchPartiesData = async () => {
         try {
             setIsLoading(true)
             const res = await fetch(
-                `${process.env.REACT_APP_BACKEND_URL}parties/get?limit=${limit}&page=${pages}`,
+                `${process.env.REACT_APP_BACKEND_URL}parties/get?page=${page}&&limit=10`,
                 {
                     method: "GET",
                     headers: {
-                        Authorization: `Bearer ${cookies.access_token}`,
+                        Authorization: `Bearer ${cookies?.access_token}`,
                     },
                 }
             );
             const data = await res.json();
-            setPartiesData(data.data);
-            let totalPage = Math.ceil(data.totalData / limit)
-            setTotalPage(totalPage)
+            setPartiesData(data?.data);           
         } catch (error) {
             console.log(error);
         
@@ -46,8 +42,8 @@ const Parties = () => {
     };
 
     useEffect(() => {
-        fetchPartiesData();
-    }, [counter,pages,limit]);
+        fetchPartiesData(page);
+    }, [counter,page]);
 
 
     return (
@@ -114,12 +110,12 @@ const Parties = () => {
                 setPartiesData={setPartiesData}
                 isLoading={isLoading}
                 fetchPartiesData={fetchPartiesData}
-                setLimit={setLimit}
+               
             />
 
             
             <AddParties fetchPartiesData={fetchPartiesData} setEditTable={setEditTable} edittable={edittable} showData={showData} setshowData={setshowData} setCounter={setCounter} />
-            <Pagination page={pages} setPage={setPages} TotalPage={TotalPage} />
+            <Pagination page={page} setPage={setPage} hasNextPage={partiesData?.length === 10} />
         </section>
     );
 };

@@ -8,9 +8,8 @@ import ViewDesign from "../Drawers/Sales/ViewDesign";
 import ApproveSample from "../Drawers/Sales/ApproveSample";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
-const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) => {
-    const [show, setShow] = useState(false);
-
+const SalesTable = ({ filteredPurchases, empData, isLoading, setEditTable, setShow }) => {
+    const [showassign, setShowAssign] = useState(false);
     const calculateTotalPrice = (price: number, qty: number, gst: number) => {
         const basePrice = price * qty;
         const gstVal = (basePrice * gst) / 100;
@@ -22,6 +21,15 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
     const [paymentshow, setPaymentshow] = useState(false)
     const [isOpen, setViewDesign] = useState(false)
     const [isChecked, setIsChecked] = useState(false)
+   
+
+    const handleSampleDesign = (designFile) => {
+        if (designFile) {
+            window.open(designFile, '_blank');
+        } else {
+            alert("Design file not available.");
+        }
+    };
 
     
   if (isLoading) {
@@ -37,7 +45,7 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
             {filteredPurchases?.map((purchase: any) => (
                 <section className="relative" key={purchase?._id} >
 
-                    <div className="rounded-xl shadow-lg text-white p-6 bg-[#1e1e2f4f] mb-4">
+                    <div className="rounded-xl shadow-lg text-white p-6  bg-[#1e1e2f4f] mb-4">
                         <div className="flex justify-between flex-wrap gap-4">
                             <div>
                                 <h2 className="font-semibold text-lg text-white">Created By: <span className="text-blue-400">{purchase?.user_id[0]?.first_name || "N/A"}</span></h2>
@@ -53,7 +61,7 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
                         <hr className="my-6 border-gray-600" />
 
                         <div className="space-y-2 text-sm text-gray-200">
-                            <p className="text-gray-300"><span className="font-semibold text-white">Party:</span>  {purchase?.party_id?.[0]?.full_name || "N/A"}</p>
+                            <p className="text-gray-300"><span className="font-semibold text-white">Party:</span>  {purchase?.party?.consignee_name[0] || "N/A"}</p>
                             <p className="text-gray-300"><span className="font-semibold text-white">Product Name:</span> {purchase?.product_id[0]?.name || "N/A"}</p>
                             <p className="text-gray-300"><span className="font-semibold text-white">Product Price:</span> {purchase?.price || "N/A"}</p>
                             <p className="text-gray-300"><span className="font-semibold text-white">Quantity:</span> {purchase?.product_qty}</p>
@@ -67,8 +75,8 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
 
                         </div>
 
-                        <div className="flex flex-wrap gap-3 mt-6">
-                            <button className="px-4 py-2 border border-gray-500 rounded-md text-sm hover:bg-gray-700" onClick={() => sendDataToParent(purchase)}>Edit</button>
+                        <div className="flex flex-wrap justify-between gap-3 mt-6">
+                            {/* <button className="px-4 py-2 border border-gray-500 rounded-md text-sm hover:bg-gray-700" onClick={() => sendDataToParent(purchase)}>Edit</button> */}
 
                             {/* {purchase?.token_ss &&
                                 purchase?.boms[0]?.production_processes?.every(
@@ -78,14 +86,14 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
                                         )
                                 ) ? ( */}
 
-                            { purchase?.boms[0]?.production_processes?.every(
+                            {/* { purchase?.boms[0]?.production_processes?.every(
                                     (processGroup) =>
                                         processGroup?.processes?.every(
                                             (process) => process?.done === true
                                         )
                                 ) ? (
                                 <button className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white" onClick={()=>setIsChecked(!isChecked)}>Approve Sample</button>
-                            ) : null}
+                            ) : null} */}
 
                             {/* <button className="px-4 py-2 border border-orange-500 text-orange-400 rounded-md text-sm hover:bg-orange-600 hover:text-white" onClick={()=>setViewDesign(!isOpen)}>View Design</button> */}
                             {/* <button className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white"><a href="https://images.unsplash.com/photo-1746483966639-b8dafcd05f5b?q=80&w=1288&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" target="_blank" >View Delivery Proof</a></button> */}
@@ -97,17 +105,64 @@ const SalesTable = ({ filteredPurchases, sendDataToParent, empData,isLoading }) 
                             {/* )} */}
 
                             {/* <button className="px-4 py-2 border border-white text-white rounded-md text-sm hover:bg-white hover:text-black" onClick={() => setPaymentshow(!paymentshow)}>View Payment</button> */}
-
+{/* 
                             <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onClick={() => {
                                 setShow(!show);
                                 setSelectedSale(purchase);
-                            }}>Assign</button>
+                            }}>Assign</button> */}
+
+                          
+                                <button
+                                    className="px-4 py-2 border border-gray-500 rounded-md text-sm hover:bg-gray-700"
+                                onClick={() => { setShow(true); setEditTable(purchase); }}
+                                >
+                                    Edit
+                                </button>
+
+                                {purchase?.boms[0]?.production_processes?.every(
+                                    (processGroup) =>
+                                        processGroup?.processes?.every((process) => process?.done === true)
+                                ) ? (
+                                    <button
+                                        className="px-4 py-2 border border-green-500 text-green-400 rounded-md text-sm hover:bg-green-600 hover:text-white"
+                                        onClick={() => setIsChecked(!isChecked)}
+                                    >
+                                        Approve Sample
+                                    </button>
+                                ) : null}
+
+                                <button
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                                    onClick={() => {
+                                        setShowAssign(!showassign);
+                                        setSelectedSale(purchase);
+                                    }}
+                                >
+                                    Assign
+                                </button>
+
+                              
+                            <div>
+                                <button
+                                    className="px-4 py-2 border border-purple-500 text-purple-400 rounded-md text-sm hover:bg-purple-600 hover:text-white"
+                                    onClick={() => handleSampleDesign(purchase?.productFile)}
+                                >
+                                    Sample Design
+                                </button>
+                            </div>
+                                <button
+                                    className="px-4 py-2 border border-yellow-500 text-yellow-400 rounded-md text-sm hover:bg-yellow-600 hover:text-white"
+                                    onClick={() => handleUpdatedDesign(purchase)}
+                                >
+                                    Updated Design
+                                </button>
+                          
 
                         </div>
                     </div>
                 </section>
             ))}
-            <AssignEmployee show={show} setShow={setShow} employeeData={empData}
+            <AssignEmployee show={showassign} setShow={setShowAssign} employeeData={empData}
                 saleData={selectedSale} />
             {/* <ViewPayment paymentshow={paymentshow} setPaymentshow={setPaymentshow} /> */}
             {/* <UploadInvoice showinvoice={showinvoice} setShowInvoice={setShowInvoice} /> */}

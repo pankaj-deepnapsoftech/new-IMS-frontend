@@ -135,6 +135,7 @@ const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData,
                 <table className="w-full text-sm rounded-lg whitespace-nowrap overflow-hidden">
                     <thead className="bg-[#14243452] text-white border-b">
                         <tr>
+                            <th className="px-2 py-3"> Cust Id</th>
                             <th className="px-2 py-3"> Date Added</th>
                             <th className="px-2 py-3">Consignee Name</th>
                             <th className="px-2 py-3"> Company Name</th>
@@ -157,18 +158,19 @@ const PartiesTable = ({ fetchPartiesData, searchTerm, selectedType, partiesData,
                                 className={`${index % 2 === 0 ? "bg-[#ffffff40]" : "bg-[#ffffff1f]"
                                     } hover:bg-[#ffffff78] transition-colors`}
                             >
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.cust_id || "__"}</td>
                                 <td className="py-4 pl-3 text-center text-gray-200">{new Date(party.createdAt).toLocaleDateString() || "__"}</td>
                                 <td className="py-4 pl-3 text-center text-gray-200">{party.consignee_name || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.company_name || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.email_id || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.contact_number || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.type || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.parties_type || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.gst_in || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.gst_add || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.delivery_address || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.shipped_to || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.bill_to || "__"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.company_name || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.email_id || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.contact_number || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.type || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.parties_type || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.gst_in || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.gst_add || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.delivery_address || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.shipped_to || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.bill_to || "N/A"}</td>
                                 <td className="py-4 text-center flex items-center gap-3 justify-center text-gray-200">
                                     <button
                                         onClick={() => {

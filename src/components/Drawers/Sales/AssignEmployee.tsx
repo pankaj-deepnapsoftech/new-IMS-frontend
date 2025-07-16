@@ -26,14 +26,12 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
         assined_process: "",
         assinedby_comment: "",
     });
-    console.log(employeeData)
+   
     const [isEditMode, setIsEditMode] = useState(false);
     const [editTaskId, setEditTaskId] = useState(null);
-
     const [cookies] = useCookies(["access_token"]);
     const toast = useToast();
     const token = cookies?.access_token;
-
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const { values, setValues, errors, touched, handleBlur, handleChange, handleSubmit, resetForm } = useFormik({
@@ -52,14 +50,14 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                 if (!token) throw new Error("Authentication token not found");
 
                 if (isEditMode && editTaskId) {
-                    await axios.patch(
+                  const res =  await axios.patch(
                         `${process.env.REACT_APP_BACKEND_URL}assined/update/${editTaskId}`,
                         value,
                         {
                             headers: { Authorization: `Bearer ${token}` },
                         }
                     );
-
+                    console.log(res)
                     toast({
                         title: "Task Updated",
                         description: "The task has been successfully updated.",
@@ -176,7 +174,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
             setTasks(saleData.assinedto);
         }
     }, [saleData]);
-
+    // console.log(employeeData)
     return (
         <section>
             <div className={`${show ? "block" : "hidden"} bg-[#0c0c0c79] fixed inset-0 h-full w-full flex items-center justify-center z-50`}>
@@ -242,25 +240,27 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                         >
                             <option value="" className="text-black bg-[#ffffff23]">Select an employee</option>
                             {
-                                employeeData
-                                    .filter(emp => {
-                                        const role = emp?.role?.role?.toLowerCase() || "";
-                                        return (
-                                            role.includes("production") ||
-                                            role.includes("dispatcher") ||
-                                            role.includes("inventory")
-                                        );
-                                    })
-                                    .map(emp => (
+                                // employeeData
+                                //     .filter(emp => {
+                                //         const role = emp?.role?.role?.toLowerCase() || "";
+                                //         return (
+                                //             role.includes("production") ||
+                                //             role.includes("dispatcher") ||
+                                //             role.includes("inventory")
+                                //         );
+                                //     })
+                                
+                                    employeeData.map(emp => (
                                         <option
                                             className="text-black bg-[#ffffff23]"
                                             key={emp?._id}
                                             value={emp?._id}
                                         >
-                                            {emp?.first_name} - {emp?.role?.role || ""}
+                                            {emp?.first_name} - {emp?.role?.role || "No Role"}
                                         </option>
                                     ))
-                            }
+                                }
+
 
                         </select>
                         {touched.assined_to && errors.assined_to && (
