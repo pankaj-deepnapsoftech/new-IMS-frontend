@@ -72,8 +72,8 @@ const Task = () => {
           },
         }
       );
-      console.log("testing", res)
-      const tasks = response.data.data.map((task: any) => {
+      console.log("testing", response)
+      const tasks = response?.data?.data.map((task: any) => {
         const sale = task?.sale_id?.length ? task.sale_id[0] : null;
         const product = sale?.product_id?.length ? sale.product_id[0] : null;
         const assign = task?.assined_by?.length ? task.assined_by[0] : null;
@@ -264,7 +264,7 @@ const Task = () => {
 
   }, [cookies?.access_token, page, limit]);
 
-
+  console.log(tasks)
   if (isLoading) {
     return <Loading />
   }

@@ -8,25 +8,19 @@ import ViewDesign from "../Drawers/Sales/ViewDesign";
 import ApproveSample from "../Drawers/Sales/ApproveSample";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
-const SalesTable = ({
-  filteredPurchases,
-  empData,
-  isLoading,
-  setEditTable,
-  setShow,
-}) => {
-  const [showassign, setShowAssign] = useState(false);
-  const calculateTotalPrice = (price: number, qty: number, gst: number) => {
-    const basePrice = price * qty;
-    const gstVal = (basePrice * gst) / 100;
-    const totalPrice = basePrice + gstVal;
-    return totalPrice;
-  };
-  console.log(filteredPurchases);
-  const [selectedSale, setSelectedSale] = useState([]);
-  const [paymentshow, setPaymentshow] = useState(false);
-  const [isOpen, setViewDesign] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
+const SalesTable = ({ filteredPurchases, empData, isLoading, setEditTable, setShow }) => {
+    const [showassign, setShowAssign] = useState(false);
+    const calculateTotalPrice = (price: number, qty: number, gst: number) => {
+        const basePrice = price * qty;
+        const gstVal = (basePrice * gst) / 100;
+        const totalPrice = basePrice + gstVal;
+        return totalPrice;
+    };
+    // console.log(filteredPurchases) 
+    const [selectedSale, setSelectedSale] = useState([]);
+    const [paymentshow, setPaymentshow] = useState(false)
+    const [isOpen, setViewDesign] = useState(false)
+    const [isChecked, setIsChecked] = useState(false)
 
   const handleSampleDesign = (designFile) => {
     if (designFile) {

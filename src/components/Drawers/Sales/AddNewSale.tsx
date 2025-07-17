@@ -58,7 +58,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
         onSubmit: async (value) => {
             if (isSubmitting) return;
             setIsSubmitting(true);
-        //    console.log("form Values",value)
+            //    console.log("form Values",value)
             try {
                 let designImageUrl = editTable?.productFile || "";
 
@@ -85,7 +85,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                 };
 
                 if (editTable?._id) {
-                   
+
                     await axios.put(
                         `${process.env.REACT_APP_BACKEND_URL}sale/update/${editTable._id}`,
                         payload,
@@ -117,7 +117,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                     isClosable: true,
                 });
 
-             
+
                 setImageFile(null);
                 setImagePreview(null);
                 setShow(false);

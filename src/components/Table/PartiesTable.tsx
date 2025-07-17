@@ -150,9 +150,9 @@ const PartiesTable = ({
                                 className={`${index % 2 === 0 ? "bg-[#ffffff40]" : "bg-[#ffffff1f]"
                                     } hover:bg-[#ffffff78] transition-colors`}
                             >
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.cust_id || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{new Date(party.createdAt).toLocaleDateString() || "__"}</td>
-                                <td className="py-4 pl-3 text-center text-gray-200">{party.consignee_name || "__"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.cust_id || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{new Date(party.createdAt).toLocaleDateString() || "N/A"}</td>
+                                <td className="py-4 pl-3 text-center text-gray-200">{party.consignee_name || "N/A"}</td>
                                 <td className="py-4 pl-3 text-center text-gray-200">{party.company_name || "N/A"}</td>
                                 <td className="py-4 pl-3 text-center text-gray-200">{party.email_id || "N/A"}</td>
                                 <td className="py-4 pl-3 text-center text-gray-200">{party.contact_number || "N/A"}</td>
