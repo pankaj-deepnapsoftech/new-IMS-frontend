@@ -5,11 +5,20 @@ import { useCookies } from "react-cookie";
 import { BiX } from "react-icons/bi";
 import axios from "axios";
 import { useToast } from "@chakra-ui/react";
-import { GiConsoleController } from "react-icons/gi";
 import { useFormik } from "formik";
 import { SalesFormValidation } from "../../../Validation/SalesformValidation";
 import { IoClose } from "react-icons/io5";
 import { colors } from "../../../theme/colors";
+import {
+  ShoppingCart,
+  Package,
+  DollarSign,
+  Users,
+  Hash,
+  FileImage,
+  Calculator,
+  MessageSquare,
+} from "lucide-react";
 const AddNewSale = ({ show, setShow, refresh, editTable }) => {
   const [cookies] = useCookies();
   const toast = useToast();
@@ -182,264 +191,299 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
   }, [editTable]);
 
   return (
-    <div
-      className={`absolute z-50 top-0 ${
-        show ? "right-1" : "hidden"
-      } w-[30vw] bg-white border-l border-gray-200 transition-opacity duration-500 flex justify-center`}
-      style={{
-        boxShadow:
-          "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-      }}
-    >
-      <div className="p-6 w-full max-w-md relative">
+    <>
+      {/* Backdrop Overlay */}
+      {show && (
         <div
-          className="flex items-center justify-between mb-6 pb-4 border-b"
-          style={{ borderColor: colors.border.light }}
-        >
-          <h2
-            className="text-xl font-semibold"
-            style={{ color: colors.text.primary }}
-          >
-            {editTable ? "Edit Sales Data" : "Add New Sale"}
-          </h2>
-          <button
-            onClick={() => setShow(!show)}
-            className="p-2 rounded-lg transition-colors duration-200"
-            style={{
-              color: colors.text.secondary,
-              backgroundColor: colors.gray[100],
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[200];
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[100];
-            }}
-          >
-            <BiX size={20} />
-          </button>
-        </div>
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+          onClick={() => setShow(false)}
+        />
+      )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium mb-1">Party</label>
-            <select
-              required
-              name="party"
-              value={values.party}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              className="w-full bg-white border text-white rounded px-3 py-2 focus:outline-none"
-            >
-              <option value="" className="text-black/80">
-                Select a party
-              </option>
-              {partiesData.map((party: any) => (
-                <option
-                  key={party?._id}
-                  value={party?._id}
-                  className="text-black"
-                >
-                  {party?.consignee_name}{" "}
-                  {party?.company_name ? `- (${party.company_name})` : ""}
-                </option>
-              ))}
-            </select>
-            {touched.party && errors.party && (
-              <p className="text-red-400 text-sm mt-1">{errors.party}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Product</label>
-            <select
-              required
-              name="product_id"
-              value={values.product_id}
-              onChange={(e) => {
-                const selectedProductId = e.target.value;
-                const selectedProduct = products.find(
-                  (prod) => prod._id === selectedProductId
-                );
-                setFieldValue("product_id", selectedProductId);
-                if (selectedProduct?.uom) {
-                  setFieldValue("uom", selectedProduct.uom);
-                } else {
-                  setFieldValue("uom", ""); // fallback if no UOM
-                }
-              }}
-              onBlur={handleBlur}
-              className="w-full bg-white/10 border border-white/10 text-white rounded px-3 py-2 focus:outline-none"
-            >
-              <option value="" className="text-black">
-                Select a product
-              </option>
-              {products.map((product: any) => (
-                <option
-                  key={product?._id}
-                  value={product?._id}
-                  className="text-black"
-                >
-                  {product?.name}
-                </option>
-              ))}
-            </select>
-            {touched.product_id && errors.product_id && (
-              <p className="text-red-400 text-sm mt-1">{errors.product_id}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Product Image
-            </label>
-            <input
-              type="file"
-              name="productFile"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file) {
-                  const url = URL.createObjectURL(file);
-                  setImagePreview(url);
-                  setImageFile(file);
-                  setFieldValue("productFile", file);
-                }
-                // console.log(URL.createObjectURL)
-              }}
-              className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none"
-            />
-            {imagePreview && (
-              <div className="mt-3 relative">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full max-h-40 rounded-md object-contain border border-white/20 "
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setImagePreview(null);
-                    setImageFile(null);
-                    setFieldValue("product_image", null);
-                  }}
-                  className="absolute  top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white text-xs px-1.5 rounded-full"
-                >
-                  <IoClose size={17} />
-                </button>
+      {/* Drawer */}
+      <div
+        className={`fixed inset-y-0 right-0 z-50 w-full sm:w-[500px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
+          show ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="h-full flex flex-col">
+          {/* Header */}
+          <div className=" px-6 py-4 flex items-center justify-between border ">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg border">
+                <ShoppingCart className="h-5 w-5 text-black" />
               </div>
-            )}
+              <h2 className="text-xl font-semibold text-black">
+                {editTable ? "Edit Sale" : "Add New Sale"}
+              </h2>
+            </div>
+            <button
+              onClick={() => setShow(false)}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors duration-200"
+            >
+              <BiX size={24} className="text-black" />
+            </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Unit of Measurement (UOM)
-            </label>
-            <input
-              type="text"
-              name="uom"
-              value={values.uom}
-              readOnly
-              className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none cursor-not-allowed"
-              placeholder="Auto-filled from product"
-            />
-          </div>
+          {/* Form Content */}
+          <div className="flex-1 overflow-y-auto p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Party Selection */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Users className="h-4 w-4 text-gray-500" />
+                  Party *
+                </label>
+                <select
+                  required
+                  name="party"
+                  value={values.party}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                >
+                  <option value="">Select a party</option>
+                  {partiesData.map((party: any) => (
+                    <option key={party?._id} value={party?._id}>
+                      {party?.consignee_name}{" "}
+                      {party?.company_name ? `- (${party.company_name})` : ""}
+                    </option>
+                  ))}
+                </select>
+                {touched.party && errors.party && (
+                  <p className="text-red-500 text-sm">{errors.party}</p>
+                )}
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Price</label>
-            <input
-              type="number"
-              name="price"
-              value={values.price}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none"
-              required
-            />
-            {touched.price && errors.price && (
-              <p className="text-red-400 text-sm mt-1">{errors.price}</p>
-            )}
-          </div>
+              {/* Product Selection */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Package className="h-4 w-4 text-gray-500" />
+                  Product *
+                </label>
+                <select
+                  required
+                  name="product_id"
+                  value={values.product_id}
+                  onChange={(e) => {
+                    const selectedProductId = e.target.value;
+                    const selectedProduct = products.find(
+                      (prod) => prod._id === selectedProductId
+                    );
+                    setFieldValue("product_id", selectedProductId);
+                    if (selectedProduct?.uom) {
+                      setFieldValue("uom", selectedProduct.uom);
+                    } else {
+                      setFieldValue("uom", "");
+                    }
+                  }}
+                  onBlur={handleBlur}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                >
+                  <option value="">Select a product</option>
+                  {products.map((product: any) => (
+                    <option key={product?._id} value={product?._id}>
+                      {product?.name}
+                    </option>
+                  ))}
+                </select>
+                {touched.product_id && errors.product_id && (
+                  <p className="text-red-500 text-sm">{errors.product_id}</p>
+                )}
+              </div>
 
-          {/* Product Quantity */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Product Quantity
-            </label>
-            <input
-              type="number"
-              name="product_qty"
-              value={values.product_qty}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none"
-              required
-            />
-            {touched.product_qty && errors.product_qty && (
-              <p className="text-red-400 text-sm mt-1">{errors.product_qty}</p>
-            )}
-          </div>
-
-          {/* GST */}
-          <div>
-            <label className="block text-sm font-medium mb-1">GST Type</label>
-            <div className="flex items-center gap-4 mt-2">
-              {[18, 12, 5].map((rate) => (
-                <label key={rate} className="flex items-center gap-1">
+              {/* Product Image Upload */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <FileImage className="h-4 w-4 text-gray-500" />
+                  Product Image
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-colors">
                   <input
-                    type="radio"
-                    name="GST"
-                    value={rate}
-                    checked={values.GST === String(rate)}
+                    type="file"
+                    name="productFile"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const url = URL.createObjectURL(file);
+                        setImagePreview(url);
+                        setImageFile(file);
+                        setFieldValue("productFile", file);
+                      }
+                    }}
+                    className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                  {imagePreview && (
+                    <div className="mt-4 relative">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full max-h-48 rounded-lg object-contain border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImagePreview(null);
+                          setImageFile(null);
+                          setFieldValue("productFile", null);
+                        }}
+                        className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+                      >
+                        <IoClose size={16} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* UOM Field */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Calculator className="h-4 w-4 text-gray-500" />
+                  Unit of Measurement (UOM)
+                </label>
+                <input
+                  type="text"
+                  name="uom"
+                  value={values.uom}
+                  readOnly
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                  placeholder="Auto-filled from product selection"
+                />
+              </div>
+
+              {/* Price and Quantity Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <DollarSign className="h-4 w-4 text-gray-500" />
+                    Price *
+                  </label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={values.price}
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Enter price"
+                    required
                   />
-                  <span>{rate}%</span>
+                  {touched.price && errors.price && (
+                    <p className="text-red-500 text-sm">{errors.price}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <Hash className="h-4 w-4 text-gray-500" />
+                    Quantity *
+                  </label>
+                  <input
+                    type="number"
+                    name="product_qty"
+                    value={values.product_qty}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Enter quantity"
+                    required
+                  />
+                  {touched.product_qty && errors.product_qty && (
+                    <p className="text-red-500 text-sm">{errors.product_qty}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* GST Selection */}
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Calculator className="h-4 w-4 text-gray-500" />
+                  GST Rate *
                 </label>
-              ))}
+                <div className="grid grid-cols-3 gap-3">
+                  {[18, 12, 5].map((rate) => (
+                    <label
+                      key={rate}
+                      className={`flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                        values.GST === String(rate)
+                          ? "border-blue-500 bg-blue-50 text-blue-700"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="GST"
+                        value={rate}
+                        checked={values.GST === String(rate)}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="sr-only"
+                      />
+                      <span className="font-medium">{rate}%</span>
+                    </label>
+                  ))}
+                </div>
+                {touched.GST && errors.GST && (
+                  <p className="text-red-500 text-sm">{errors.GST}</p>
+                )}
+              </div>
+
+              {/* Remarks */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <MessageSquare className="h-4 w-4 text-gray-500" />
+                  Remarks (Optional)
+                </label>
+                <textarea
+                  name="comment"
+                  value={values.comment}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                  placeholder="Add any additional notes or comments..."
+                />
+              </div>
+            </form>
+          </div>
+
+          {/* Footer Actions */}
+          <div className="border-t border-gray-200 p-6 bg-gray-50">
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShow(false)}
+                className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                onClick={handleSubmit}
+                className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                  isSubmitting
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md"
+                }`}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    {editTable ? "Updating..." : "Creating..."}
+                  </div>
+                ) : editTable ? (
+                  "Update Sale"
+                ) : (
+                  "Create Sale"
+                )}
+              </button>
             </div>
-            {touched.GST && errors.GST && (
-              <p className="text-red-400 text-sm mt-1">{errors.GST}</p>
-            )}
           </div>
-
-          {/* Remarks */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Remarks</label>
-            <input
-              type="text"
-              name="comment"
-              value={values.comment}
-              onChange={handleChange}
-              className="w-full bg-white/10 border border-white/10 text-white px-3 py-2 rounded focus:outline-none"
-              placeholder="Further details (optional)"
-            />
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-between mt-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`px-4 py-2 rounded transition text-white ${
-                isSubmitting
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-white/30 hover:bg-white/50"
-              }`}
-            >
-              Add Sale
-            </button>
-            <button
-              type="button"
-              onClick={() => setShow(!show)}
-              className="px-4 py-2 rounded bg-white/30 hover:bg-white/50 text-white"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
