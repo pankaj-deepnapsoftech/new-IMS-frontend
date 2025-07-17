@@ -86,14 +86,35 @@ const AddProduct: React.FC<AddProductProps> = ({
   ];
 
   const uomOptions = [
-    { value: "pcs", label: "pcs" },
-    { value: "kgs", label: "kgs" },
-    { value: "ltr", label: "ltr" },
-    { value: "tonne", label: "tonne" },
-    { value: "cm", label: "cm" },
+    { value: "pcs", label: "pcs" },           // pieces
+    { value: "kgs", label: "kgs" },           // kilograms
+    { value: "g", label: "g" },               // grams
+    { value: "mg", label: "mg" },             // milligrams
+    { value: "ltr", label: "ltr" },           // liters
+    { value: "ml", label: "ml" },             // milliliters
+    { value: "tonne", label: "tonne" },       // metric ton
+    { value: "cm", label: "cm" },             // centimeters
+    { value: "mm", label: "mm" },             // millimeters
     { value: "inch", label: "inch" },
-    { value: "mtr", label: "mtr" },
+    { value: "ft", label: "ft" },             // feet
+    { value: "mtr", label: "mtr" },           // meters
+    { value: "sqft", label: "sqft" },         // square feet
+    { value: "sqm", label: "sqm" },           // square meters
+    { value: "cbm", label: "cbm" },           // cubic meters
+    { value: "cft", label: "cft" },           // cubic feet
+    { value: "dozen", label: "dozen" },       // 12 pcs
+    { value: "pack", label: "pack" },
+    { value: "set", label: "set" },
+    { value: "roll", label: "roll" },
+    { value: "box", label: "box" },
+    { value: "bag", label: "bag" },
+    { value: "pair", label: "pair" },
+    { value: "sheet", label: "sheet" },
+    { value: "tube", label: "tube" },
+    { value: "bottle", label: "bottle" },
+    { value: "container", label: "container" },
   ];
+
 
   const [addProduct] = useAddProductMutation();
   const [isAddingProduct, setIsAddingProduct] = useState<boolean>(false);
@@ -120,7 +141,7 @@ const AddProduct: React.FC<AddProductProps> = ({
       const response = await addProduct({
         name,
         inventory_category: inventoryCategory?.value,
-        product_id: id,
+        // product_id: id,
         uom: uom?.value,
         category: category?.value,
         min_stock: minStock,
@@ -138,6 +159,7 @@ const AddProduct: React.FC<AddProductProps> = ({
         distributor_price: distributorPrice,
         store: store?.value || undefined,
       }).unwrap();
+      console.log(response)
       toast.success(response.message);
       fetchProductsHandler();
       closeDrawerHandler();
