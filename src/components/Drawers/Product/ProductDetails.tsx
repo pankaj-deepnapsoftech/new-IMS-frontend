@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import Loading from "../../../ui/Loading";
+import { colors } from "../../../theme/colors";
 
 interface ProductDetailsProps {
   closeDrawerHandler: () => void;
@@ -36,7 +37,9 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
     number | undefined
   >();
   const [store, setStore] = useState<string | undefined>();
-  const [inventoryCategory, setInventoryCategory] = useState<string | undefined>();
+  const [inventoryCategory, setInventoryCategory] = useState<
+    string | undefined
+  >();
 
   const [cookies] = useCookies();
 
@@ -89,105 +92,151 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f]  right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
-          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
-        
-        </h1>
+        <div
+          className="flex items-center justify-between p-6 border-b"
+          style={{ borderColor: colors.border.light }}
+        >
+          <h1
+            className="text-xl font-semibold"
+            style={{ color: colors.text.primary }}
+          >
+            Product Details
+          </h1>
+          <button
+            onClick={closeDrawerHandler}
+            className="p-2 rounded-lg transition-colors duration-200"
+            style={{
+              color: colors.text.secondary,
+              backgroundColor: colors.gray[100],
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[200];
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[100];
+            }}
+          >
+            <BiX size={20} />
+          </button>
+        </div>
 
         <div className="mt-8 px-5">
-        <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
-      
-            Product Details
-          </h2>
-
           {isLoadingProduct && <Loading />}
           {!isLoadingProduct && (
-            <div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Inventory Category</p>
-                <p className="text-gray-300">{inventoryCategory || 'N/A'}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Product ID</p>
-                <p className="text-gray-300">{id}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Product Name</p>
-                <p className="text-gray-300">{name}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Product Price (Default)</p>
-                <p className="text-gray-300">₹ {price}/-</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Regular Buying Price</p>
-                <p className="text-gray-300">
-                  {regularBuyingPrice
-                    ? `₹ ${regularBuyingPrice}/-`
-                    : "Not Available"}
-                </p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Wholesale Buying Price</p>
-                <p className="text-gray-300">
-                  {wholesaleBuyingPrice
-                    ? `₹ ${wholesaleBuyingPrice}/-`
-                    : "Not Available"}
-                </p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >MRP</p>
-                <p className="text-gray-300">{mrp || "Not Available"}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Dealer Price</p>
-                <p className="text-gray-300">{dealerPrice
-                    ? `₹ ${dealerPrice}/-`
-                    : "Not Available"}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Distributor Price</p>
-                <p className="text-gray-300">{distributorPrice
-                    ? `₹ ${distributorPrice}/-`
-                    : "Not Available"}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Product Category</p>
-                <p className="text-gray-300">{category}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Product Sub Category</p>
-                <p className="text-gray-300">{subCategory || "Not Available"}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >UOM (Unit of Measurement)</p>
-                <p className="text-gray-300">{uom}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Current Stock</p>
-                <p className="text-gray-300">{currentStock}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Min Stock</p>
-                <p className="text-gray-300">{minStock || "Not Available"}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Max Stock</p>
-                <p className="text-gray-300">{maxStock || "Not Available"}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >HSN</p>
-                <p className="text-gray-300">{hsn || "Not Available"}</p>
-              </div>
-              <div className="mt-3 mb-5 text-white">
-                <p className="font-semibold" >Store</p>
-                <p className="text-gray-300">{store || "N/A"}</p>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    Inventory Category
+                  </p>
+                  <p className="text-gray-600">{inventoryCategory || "N/A"}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">Product ID</p>
+                  <p className="text-gray-600">{id}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    Product Name
+                  </p>
+                  <p className="text-gray-600">{name}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    Product Price (Default)
+                  </p>
+                  <p className="text-gray-600">₹ {price}/-</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    Regular Buying Price
+                  </p>
+                  <p className="text-gray-600">
+                    {regularBuyingPrice
+                      ? `₹ ${regularBuyingPrice}/-`
+                      : "Not Available"}
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    Wholesale Buying Price
+                  </p>
+                  <p className="text-gray-600">
+                    {wholesaleBuyingPrice
+                      ? `₹ ${wholesaleBuyingPrice}/-`
+                      : "Not Available"}
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">MRP</p>
+                  <p className="text-gray-600">{mrp || "Not Available"}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    Dealer Price
+                  </p>
+                  <p className="text-gray-600">
+                    {dealerPrice ? `₹ ${dealerPrice}/-` : "Not Available"}
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    Distributor Price
+                  </p>
+                  <p className="text-gray-600">
+                    {distributorPrice
+                      ? `₹ ${distributorPrice}/-`
+                      : "Not Available"}
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    Product Category
+                  </p>
+                  <p className="text-gray-600">{category}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    Product Sub Category
+                  </p>
+                  <p className="text-gray-600">
+                    {subCategory || "Not Available"}
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    UOM (Unit of Measurement)
+                  </p>
+                  <p className="text-gray-600">{uom}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">
+                    Current Stock
+                  </p>
+                  <p className="text-gray-600">{currentStock}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">Min Stock</p>
+                  <p className="text-gray-600">{minStock || "Not Available"}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">Max Stock</p>
+                  <p className="text-gray-600">{maxStock || "Not Available"}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">HSN</p>
+                  <p className="text-gray-600">{hsn || "Not Available"}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-700 mb-1">Store</p>
+                  <p className="text-gray-600">{store || "N/A"}</p>
+                </div>
               </div>
             </div>
           )}

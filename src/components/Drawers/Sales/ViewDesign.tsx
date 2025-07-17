@@ -74,7 +74,7 @@ const ViewDesign = ({ isOpen, setViewDesign }) => {
                 <button
                     className="mt-4 bg-blue-600 hover:bg-blue-700 w-full py-2 rounded-lg text-white font-semibold transition shadow"
                 >
-                    Submit Response
+                    Submit Response 
                 </button>
             </div>
         </section>
