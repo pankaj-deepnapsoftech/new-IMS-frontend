@@ -57,7 +57,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                             headers: { Authorization: `Bearer ${token}` },
                         }
                     );
-                    console.log(res)
+                    // console.log(res)
                     toast({
                         title: "Task Updated",
                         description: "The task has been successfully updated.",
@@ -65,18 +65,17 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                         duration: 3000,
                         isClosable: true,
                     });
-
                     setIsEditMode(false);
                     setEditTaskId(null);
                 } else {
-                    await axios.post(
+                  const res =  await axios.post(
                         `${process.env.REACT_APP_BACKEND_URL}assined/create`,
                         value,
                         {
                             headers: { Authorization: `Bearer ${token}` },
                         }
                     );
-
+                  console.log(res)
                     toast({
                         title: "Task Created",
                         description: "The task has been successfully assigned.",
@@ -136,6 +135,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                 isClosable: true,
             });
             handleClose();
+            setTasks('')
         } catch (error) {
             toast({
                 title: "Error",
