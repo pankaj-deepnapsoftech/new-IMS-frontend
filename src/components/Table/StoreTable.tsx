@@ -125,13 +125,15 @@ const StoreTable: React.FC<StoreTableProps> = ({
           onChange={(e) => setPageSize(Number(e.target.value))}
           width="120px"
           size="sm"
-          bg={colors.cardBackground}
-          color={colors.textPrimary}
-          borderColor={colors.border}
-          _hover={{ borderColor: colors.primary }}
+          style={{
+            backgroundColor: colors.input.background,
+            borderColor: colors.input.border,
+            color: colors.text.primary,
+          }}
+          _hover={{ borderColor: colors.input.borderHover }}
           _focus={{
-            borderColor: colors.primary,
-            boxShadow: `0 0 0 1px ${colors.primary}`,
+            borderColor: colors.input.borderFocus,
+            boxShadow: `0 0 0 3px ${colors.primary[100]}`,
           }}
         >
           {[10, 20, 50, 100, 100000].map((size) => (
@@ -139,8 +141,8 @@ const StoreTable: React.FC<StoreTableProps> = ({
               key={size}
               value={size}
               style={{
-                backgroundColor: colors.cardBackground,
-                color: colors.textPrimary,
+                backgroundColor: colors.input.background,
+                color: colors.text.primary,
               }}
             >
               {size === 100000 ? "All" : size}
@@ -151,29 +153,38 @@ const StoreTable: React.FC<StoreTableProps> = ({
 
       {/* Table */}
       <TableContainer
-        bg={colors.cardBackground}
-        borderRadius="lg"
-        border={`1px solid ${colors.border}`}
+        style={{
+          backgroundColor: colors.background.card,
+          borderRadius: "12px",
+          border: `1px solid ${colors.border.light}`,
+          boxShadow: colors.shadow.sm,
+        }}
         maxHeight="600px"
         overflowY="auto"
-        className="shadow-lg"
       >
         <Table variant="simple" {...getTableProps()}>
-          <Thead bg={colors.tableHeader} position="sticky" top="0" zIndex="1">
+          <Thead
+            style={{ backgroundColor: colors.table.header }}
+            position="sticky"
+            top="0"
+            zIndex="1"
+          >
             {headerGroups.map((hg: HeaderGroup<any>) => (
               <Tr {...hg.getHeaderGroupProps()}>
                 {hg.headers.map((column: any) => (
                   <Th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                    color={colors.textPrimary}
+                    style={{
+                      color: colors.table.headerText,
+                      borderColor: colors.table.border,
+                    }}
                     fontSize="sm"
                     fontWeight="semibold"
                     textTransform="none"
-                    borderColor={colors.border}
                     py={4}
                     px={4}
                     cursor="pointer"
-                    _hover={{ bg: colors.hoverBackground }}
+                    _hover={{ bg: colors.table.hover }}
                   >
                     <div className="flex items-center gap-2">
                       {column.render("Header")}
@@ -187,11 +198,13 @@ const StoreTable: React.FC<StoreTableProps> = ({
                   </Th>
                 ))}
                 <Th
-                  color={colors.textPrimary}
+                  style={{
+                    color: colors.table.headerText,
+                    borderColor: colors.table.border,
+                  }}
                   fontSize="sm"
                   fontWeight="semibold"
                   textTransform="none"
-                  borderColor={colors.border}
                   py={4}
                   px={4}
                 >
@@ -207,12 +220,13 @@ const StoreTable: React.FC<StoreTableProps> = ({
               return (
                 <Tr
                   {...row.getRowProps()}
-                  bg={
-                    index % 2 === 0
-                      ? colors.cardBackground
-                      : colors.alternateRow
-                  }
-                  _hover={{ bg: colors.hoverBackground }}
+                  style={{
+                    backgroundColor:
+                      index % 2 === 0
+                        ? colors.background.card
+                        : colors.table.stripe,
+                  }}
+                  _hover={{ bg: colors.table.hover }}
                 >
                   {row.cells.map((cell: Cell) => {
                     const colId = cell.column.id;
@@ -236,12 +250,12 @@ const StoreTable: React.FC<StoreTableProps> = ({
                           style={{
                             backgroundColor:
                               original.status === "Active"
-                                ? colors.success + "20"
-                                : colors.error + "20",
+                                ? colors.success[100]
+                                : colors.error[100],
                             color:
                               original.status === "Active"
-                                ? colors.success
-                                : colors.error,
+                                ? colors.success[800]
+                                : colors.error[800],
                           }}
                         >
                           {original.status || "N/A"}
@@ -262,9 +276,11 @@ const StoreTable: React.FC<StoreTableProps> = ({
                     return (
                       <Td
                         {...cell.getCellProps()}
-                        color={colors.textSecondary}
+                        style={{
+                          color: colors.text.primary,
+                          borderColor: colors.table.border,
+                        }}
                         fontSize="sm"
-                        borderColor={colors.border}
                         py={3}
                         px={4}
                         className="whitespace-nowrap truncate max-w-xs"
@@ -278,14 +294,20 @@ const StoreTable: React.FC<StoreTableProps> = ({
                   })}
 
                   {/* Actions */}
-                  <Td borderColor={colors.border} py={3} px={4}>
+                  <Td
+                    style={{ borderColor: colors.table.border }}
+                    py={3}
+                    px={4}
+                  >
                     <div className="flex items-center gap-2">
                       {openStoreDetailsDrawerHandler && (
                         <Button
                           size="sm"
-                          bg={colors.primary}
-                          color="white"
-                          _hover={{ bg: colors.primary + "CC" }}
+                          style={{
+                            backgroundColor: colors.button.primary,
+                            color: colors.text.inverse,
+                          }}
+                          _hover={{ bg: colors.button.primaryHover }}
                           onClick={() =>
                             openStoreDetailsDrawerHandler(row.original._id)
                           }
@@ -298,9 +320,11 @@ const StoreTable: React.FC<StoreTableProps> = ({
                       {openUpdateStoreDrawerHandler && (
                         <Button
                           size="sm"
-                          bg={colors.secondary}
-                          color={colors.textPrimary}
-                          _hover={{ bg: colors.secondary + "CC" }}
+                          style={{
+                            backgroundColor: colors.button.secondary,
+                            color: colors.text.inverse,
+                          }}
+                          _hover={{ bg: colors.button.secondaryHover }}
                           onClick={() =>
                             openUpdateStoreDrawerHandler(row.original._id)
                           }
@@ -313,9 +337,11 @@ const StoreTable: React.FC<StoreTableProps> = ({
                       {deleteStoreHandler && (
                         <Button
                           size="sm"
-                          bg={colors.error}
-                          color="white"
-                          _hover={{ bg: colors.error + "CC" }}
+                          style={{
+                            backgroundColor: colors.button.danger,
+                            color: colors.text.inverse,
+                          }}
+                          _hover={{ bg: colors.button.dangerHover }}
                           onClick={() => handleDeleteClick(row.original._id)}
                           leftIcon={<FaTrash />}
                         >
@@ -336,27 +362,56 @@ const StoreTable: React.FC<StoreTableProps> = ({
         <button
           onClick={previousPage}
           disabled={!canPreviousPage}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            canPreviousPage
-              ? `bg-${colors.primary} text-white hover:bg-opacity-90`
-              : "bg-gray-600 text-gray-400 cursor-not-allowed"
-          }`}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            backgroundColor: canPreviousPage
+              ? colors.button.primary
+              : colors.gray[300],
+            color: canPreviousPage ? colors.text.inverse : colors.gray[500],
+          }}
+          onMouseEnter={(e) => {
+            if (canPreviousPage) {
+              e.currentTarget.style.backgroundColor =
+                colors.button.primaryHover;
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (canPreviousPage) {
+              e.currentTarget.style.backgroundColor = colors.button.primary;
+            }
+          }}
         >
           Previous
         </button>
 
-        <span className="text-sm" style={{ color: colors.textSecondary }}>
+        <span
+          className="text-sm font-medium"
+          style={{ color: colors.text.secondary }}
+        >
           Page {pageIndex + 1} of {pageCount}
         </span>
 
         <button
           onClick={nextPage}
           disabled={!canNextPage}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            canNextPage
-              ? `bg-${colors.primary} text-white hover:bg-opacity-90`
-              : "bg-gray-600 text-gray-400 cursor-not-allowed"
-          }`}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            backgroundColor: canNextPage
+              ? colors.button.primary
+              : colors.gray[300],
+            color: canNextPage ? colors.text.inverse : colors.gray[500],
+          }}
+          onMouseEnter={(e) => {
+            if (canNextPage) {
+              e.currentTarget.style.backgroundColor =
+                colors.button.primaryHover;
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (canNextPage) {
+              e.currentTarget.style.backgroundColor = colors.button.primary;
+            }
+          }}
         >
           Next
         </button>
@@ -366,32 +421,41 @@ const StoreTable: React.FC<StoreTableProps> = ({
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div
-            className="rounded-lg p-6 max-w-md w-full mx-4"
-            style={{ backgroundColor: colors.cardBackground }}
+            className="rounded-xl p-6 max-w-md w-full mx-4"
+            style={{
+              backgroundColor: colors.background.card,
+              boxShadow: colors.shadow.xl,
+            }}
           >
             <h3
               className="text-lg font-semibold mb-4"
-              style={{ color: colors.textPrimary }}
+              style={{ color: colors.text.primary }}
             >
               Confirm Delete
             </h3>
-            <p style={{ color: colors.textSecondary }} className="mb-6">
+            <p style={{ color: colors.text.secondary }} className="mb-6">
               Are you sure you want to delete this store? This action cannot be
               undone.
             </p>
             <div className="flex justify-end gap-3">
               <Button
                 size="sm"
-                bg={colors.secondary}
-                color={colors.textPrimary}
+                style={{
+                  backgroundColor: colors.gray[200],
+                  color: colors.text.primary,
+                }}
+                _hover={{ bg: colors.gray[300] }}
                 onClick={onDeleteModalClose}
               >
                 Cancel
               </Button>
               <Button
                 size="sm"
-                bg={colors.error}
-                color="white"
+                style={{
+                  backgroundColor: colors.button.danger,
+                  color: colors.text.inverse,
+                }}
+                _hover={{ bg: colors.button.dangerHover }}
                 onClick={handleDeleteConfirm}
               >
                 Delete

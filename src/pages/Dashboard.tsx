@@ -202,7 +202,7 @@ const Dashboard: React.FC = () => {
         style={{ backgroundColor: colors.background.page }}
       >
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div>
             {/* Welcome Section */}
             <div className="flex-1">
               <h1
