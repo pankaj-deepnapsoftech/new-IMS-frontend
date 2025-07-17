@@ -26,11 +26,11 @@ import { IoEyeSharp } from "react-icons/io5";
 import { NavLink, useNavigate } from "react-router-dom";
 import AddToken from "../components/Drawers/Task/AddToken";
 import AddhalfToken from "../components/Drawers/Task/AddhalfToken";
-// import UploadInvoice from "../components/Drawers/Task/UploadInvoice";
+import UploadInvoice from "../components/Drawers/Task/UploadInvoice";
 import Loading from "../ui/Loading";
 import EmptyData from "../ui/emptyData";
 import { colors } from "../theme/colors";
-import { CheckSquare } from "lucide-react";
+import { CheckSquare, Calendar, User, Package, Building } from "lucide-react";
 const Task = () => {
   const [cookies] = useCookies();
   const [tasks, setTasks] = useState([]);
@@ -53,15 +53,6 @@ const Task = () => {
   const [halfAmount, sethalfAmount] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
-  // const [showUploadInvoice, setShowUploadInvoice] = useState(false);
-
-  // Additional state variables for missing functionality
-  const [selectedData, setSelectedData] = useState(null);
-  const [sampleFile, setsampleFile] = useState("");
-  const [paymentFile, setPaymentFile] = useState("");
-  const [verifyStatus, setVerifyStatus] = useState(false);
-  const [assignId, setAssignId] = useState("");
-  const [paymentFor, setPaymentFor] = useState("");
   const fetchTasks = async () => {
     try {
       setIsLoading(true);
@@ -237,7 +228,7 @@ const Task = () => {
       half_payment_status: "Paid",
       half_payment_approve: true,
     };
-    // onViewHalfPaymentssClose()
+    onViewHalfPaymentssClose();
     try {
       const res = await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}purchase/update/${halfAmountId.sale_id}`,
@@ -253,24 +244,6 @@ const Task = () => {
       console.log(error);
     }
   };
-
-  // Additional missing functions
-  const sampleimageDisclosure = {
-    onOpen: () => {},
-    onClose: () => {},
-  };
-
-  const paymentDisclosure = {
-    onOpen: () => {},
-    onClose: () => {},
-  };
-
-  const tokenDisclosure = {
-    onOpen: () => {},
-    onClose: () => {},
-  };
-
-  const onViewHalfPaymentssClose = () => {};
 
   useEffect(() => {
     fetchTasks();
@@ -299,134 +272,201 @@ const Task = () => {
   }, [searchKey, statusFilter, processFilter, tasks]);
 
   if (isLoading) {
-    return <Loading />;
-  }
-  if (!tasks || tasks.length === 0) {
-    return <EmptyData />;
-  }
-
-  return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: colors.background.page }}
-    >
-      <div className="p-2 lg:p-3">
-        {/* Header Section */}
-        <div
-          className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
-          style={{
-            backgroundColor: colors.background.card,
-            borderColor: colors.border.light,
-          }}
-        >
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 p-3 rounded-xl shadow-lg">
-                <CheckSquare className="text-white" size={24} />
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="animate-pulse">
+            {/* Header Skeleton */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-gray-200 rounded-lg"></div>
+                <div className="h-8 bg-gray-200 rounded w-32"></div>
               </div>
-              <div>
-                <h1
-                  className="text-2xl lg:text-3xl font-bold"
-                  style={{ color: colors.text.primary }}
-                >
-                  Task Management
-                </h1>
-                <p
-                  className="text-sm mt-1"
-                  style={{ color: colors.text.secondary }}
-                >
-                  Manage and track assigned tasks and processes
-                </p>
+              <div className="h-4 bg-gray-200 rounded w-64"></div>
+            </div>
+
+            {/* Filters Skeleton */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+              <div className="flex flex-wrap gap-4">
+                <div className="w-48 h-16 bg-gray-200 rounded"></div>
+                <div className="w-48 h-16 bg-gray-200 rounded"></div>
+                <div className="flex-1 min-w-[300px] h-16 bg-gray-200 rounded"></div>
+                <div className="w-24 h-16 bg-gray-200 rounded"></div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            {/* Task Cards Skeleton */}
+            <div className="space-y-6">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+                >
+                  <div className="h-6 bg-gray-200 rounded w-64 mb-4"></div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="h-4 bg-gray-200 rounded w-full"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="h-4 bg-gray-200 rounded w-full"></div>
+                      <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                    </div>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <div className="flex gap-3">
+                      <div className="w-24 h-8 bg-gray-200 rounded"></div>
+                      <div className="w-24 h-8 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!tasks || tasks.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Header Section */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-blue-500 rounded-lg">
+                <CheckSquare className="h-6 w-6 text-white" />
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
+            </div>
+            <p className="text-gray-600">Manage and track task assignments</p>
+          </div>
+
+          {/* Empty State */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+            <div className="max-w-md mx-auto">
+              <div className="p-4 bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                <CheckSquare className="h-10 w-10 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No Tasks Found
+              </h3>
+              <p className="text-gray-600 mb-6">
+                There are currently no tasks assigned. Tasks will appear here
+                once they are created and assigned.
+              </p>
               <button
                 onClick={fetchTasks}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
-                style={{
-                  borderColor: colors.border.medium,
-                  color: colors.text.primary,
-                  backgroundColor: colors.background.card,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.gray[50];
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    colors.background.card;
-                }}
+                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 mx-auto"
               >
-                <MdOutlineRefresh size="20px" />
-                Refresh
+                <MdOutlineRefresh className="h-4 w-4" />
+                Refresh Tasks
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
 
-          {/* Search and Filters Row */}
-          <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
-            {/* Search Input */}
-            <div className="flex-1 max-w-md">
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Search Tasks
-              </label>
-              <div className="relative">
-                <FiSearch
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
-                  style={{ color: colors.text.secondary }}
-                />
-                <input
-                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor: colors.input.border,
-                    color: colors.text.primary,
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor =
-                      colors.input.borderFocus;
-                    e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = colors.input.border;
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                  placeholder="Search by product, manager, customer..."
-                  value={searchKey || ""}
-                  onChange={(e) => setSearchKey(e.target.value)}
-                />
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-blue-500 rounded-lg">
+              <CheckSquare className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
+          </div>
+          <p className="text-gray-600">Manage and track task assignments</p>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Tasks</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {tasks.length}
+                </p>
+              </div>
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <CheckSquare className="h-6 w-6 text-blue-600" />
               </div>
             </div>
+          </div>
 
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Pending</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {
+                    tasks.filter((task) => task.design_status === "Pending")
+                      .length
+                  }
+                </p>
+              </div>
+              <div className="p-3 bg-orange-100 rounded-lg">
+                <FaHourglassHalf className="h-6 w-6 text-orange-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">In Progress</p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {
+                    tasks.filter(
+                      (task) => task.design_status === "UnderProcessing"
+                    ).length
+                  }
+                </p>
+              </div>
+              <div className="p-3 bg-yellow-100 rounded-lg">
+                <User className="h-6 w-6 text-yellow-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Completed</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {
+                    tasks.filter((task) => task.design_status === "Completed")
+                      .length
+                  }
+                </p>
+              </div>
+              <div className="p-3 bg-green-100 rounded-lg">
+                <FaCheckCircle className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters and Search Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex flex-wrap items-center gap-4">
             {/* Status Filter */}
-            <div className="w-full lg:w-48">
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">
                 Status
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = colors.input.borderFocus;
-                  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = colors.input.border;
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               >
                 <option value="">All Status</option>
                 <option value="Pending">Pending</option>
@@ -436,374 +476,368 @@ const Task = () => {
             </div>
 
             {/* Process Filter */}
-            <div className="w-full lg:w-48">
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">
                 Process
               </label>
               <select
                 value={processFilter}
                 onChange={(e) => setProcessFilter(e.target.value)}
-                className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = colors.input.borderFocus;
-                  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = colors.input.border;
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               >
                 <option value="">All Processes</option>
                 <option value="Design">Design</option>
                 <option value="Production">Production</option>
                 <option value="Quality Check">Quality Check</option>
-                <option value="Packaging">Packaging</option>
+                <option value="Dispatch">Dispatch</option>
               </select>
+            </div>
+
+            {/* Search */}
+            <div className="flex flex-col flex-1 min-w-[300px]">
+              <label className="text-sm font-medium text-gray-700 mb-1">
+                Search
+              </label>
+              <div className="relative">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <input
+                  type="text"
+                  placeholder="Search by product, customer, or manager..."
+                  value={searchKey || ""}
+                  onChange={(e) => setSearchKey(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Refresh Button */}
+            <div className="flex flex-col justify-end">
+              <button
+                onClick={fetchTasks}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2"
+              >
+                <MdOutlineRefresh className="h-4 w-4" />
+                Refresh
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Tasks Section */}
-        <div className="space-y-4 mb-6">
-          {filteredTasks.map((task: any) => (
-            <div
-              key={task?._id}
-              className="rounded-xl shadow-sm border border-gray-100 p-6"
-              style={{
-                backgroundColor: colors.background.card,
-                borderColor: colors.border.light,
+        {/* Results Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-lg font-semibold text-gray-900">Task List</h2>
+            <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+              {filteredTasks.length}{" "}
+              {filteredTasks.length === 1 ? "task" : "tasks"}
+              {filteredTasks.length !== tasks.length && ` of ${tasks.length}`}
+            </span>
+          </div>
+
+          {(searchKey || statusFilter || processFilter) && (
+            <button
+              onClick={() => {
+                setSearchKey("");
+                setStatusFilter("");
+                setProcessFilter("");
               }}
+              className="px-3 py-1 text-sm text-gray-600 hover:text-gray-900 underline"
             >
-              {/* Task Header */}
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
-                <div>
-                  <h3
-                    className="text-lg font-semibold"
-                    style={{ color: colors.text.primary }}
-                  >
-                    {task?.productName}
-                  </h3>
-                  <p
-                    className="text-sm mt-1"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    {task?.date} • Assigned by {task?.assignedBy}
-                  </p>
-                </div>
+              Clear all filters
+            </button>
+          )}
+        </div>
 
-                {/* Status Badge */}
-                <div className="flex items-center gap-2">
-                  <span
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                    style={{
-                      backgroundColor:
-                        task?.design_status === "Completed"
-                          ? colors.success[100]
-                          : task?.design_status === "UnderProcessing"
-                          ? colors.warning[100]
-                          : colors.gray[100],
-                      color:
-                        task?.design_status === "Completed"
-                          ? colors.success[800]
-                          : task?.design_status === "UnderProcessing"
-                          ? colors.warning[800]
-                          : colors.gray[800],
-                    }}
-                  >
-                    {task?.design_status}
-                  </span>
+        {/* Tasks Grid */}
+        <div className="space-y-6">
+          {filteredTasks.length === 0 ? (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+              <div className="max-w-md mx-auto">
+                <div className="p-4 bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                  <FiSearch className="h-10 w-10 text-gray-400" />
                 </div>
-              </div>
-
-              {/* Task Details Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
-                <div className="space-y-3">
-                  {(role === "Accountant" ||
-                    role === "Sales" ||
-                    role === "admin") && (
-                    <div>
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        Product Price:
-                      </span>
-                      <span
-                        className="ml-2 text-sm"
-                        style={{ color: colors.text.primary }}
-                      >
-                        {task?.productPrice}
-                      </span>
-                    </div>
-                  )}
-                  <div>
-                    <span
-                      className="text-sm font-medium"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      Quantity:
-                    </span>
-                    <span
-                      className="ml-2 text-sm"
-                      style={{ color: colors.text.primary }}
-                    >
-                      {task?.productQuantity}
-                    </span>
-                  </div>
-                  {["acc", "account", "accountant", "dispatch", "dis"].includes(
-                    role?.toLowerCase()
-                  ) && (
-                    <>
-                      <div>
-                        <span
-                          className="text-sm font-medium"
-                          style={{ color: colors.text.secondary }}
-                        >
-                          Party:
-                        </span>
-                        <span
-                          className="ml-2 text-sm"
-                          style={{ color: colors.text.primary }}
-                        >
-                          {task?.customer_name}
-                        </span>
-                      </div>
-                      <div>
-                        <span
-                          className="text-sm font-medium"
-                          style={{ color: colors.text.secondary }}
-                        >
-                          Sale By:
-                        </span>
-                        <span
-                          className="ml-2 text-sm"
-                          style={{ color: colors.text.primary }}
-                        >
-                          {task?.sale_by}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <span
-                      className="text-sm font-medium"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      Assigned Process:
-                    </span>
-                    <span
-                      className="ml-2 text-sm"
-                      style={{ color: colors.text.primary }}
-                    >
-                      {task?.assined_process}
-                    </span>
-                  </div>
-                  {task?.assinedby_comment && (
-                    <div>
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        Remarks:
-                      </span>
-                      <span
-                        className="ml-2 text-sm"
-                        style={{ color: colors.text.primary }}
-                      >
-                        {task.assinedby_comment}
-                      </span>
-                    </div>
-                  )}
-                  {task?.sample_bom_name && (
-                    <div>
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        Sample BOM:
-                      </span>
-                      <span
-                        className="ml-2 text-sm"
-                        style={{ color: colors.text.primary }}
-                      >
-                        {task.sample_bom_name}
-                      </span>
-                    </div>
-                  )}
-                  {task?.bom_name && (
-                    <div>
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        BOM Name:
-                      </span>
-                      <span
-                        className="ml-2 text-sm"
-                        style={{ color: colors.text.primary }}
-                      >
-                        {task.bom_name}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div
-                className="flex flex-wrap gap-3 pt-4 border-t"
-                style={{ borderColor: colors.border.light }}
-              >
-                {role?.toLowerCase().includes("prod") ? (
-                  <>
-                    {task?.design_status === "Pending" && (
-                      <button
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
-                        style={{
-                          backgroundColor: colors.button.primary,
-                          color: colors.text.inverse,
-                        }}
-                        onClick={() => handleAccept(task.id)}
-                        disabled={isSubmitting}
-                        onMouseEnter={(e) => {
-                          if (!isSubmitting) {
-                            e.currentTarget.style.backgroundColor =
-                              colors.button.primaryHover;
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isSubmitting) {
-                            e.currentTarget.style.backgroundColor =
-                              colors.button.primary;
-                          }
-                        }}
-                      >
-                        Accept Task
-                      </button>
-                    )}
-                    {task?.bom?.length === 2 ? (
-                      <span
-                        className="inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium"
-                        style={{
-                          backgroundColor: colors.success[100],
-                          color: colors.success[800],
-                        }}
-                      >
-                        BOM: Created
-                      </span>
-                    ) : (
-                      <button
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
-                        style={{
-                          borderColor: colors.border.medium,
-                          color: colors.text.primary,
-                          backgroundColor: colors.background.card,
-                        }}
-                        onClick={() => handleBOM(task.sale_id)}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.gray[50];
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.background.card;
-                        }}
-                      >
-                        Create BOM
-                      </button>
-                    )}
-                    {task?.design_status !== "Completed" && (
-                      <button
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
-                        style={{
-                          backgroundColor: colors.button.secondary,
-                          color: colors.text.inverse,
-                        }}
-                        onClick={() => handleDone(task.id)}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.button.secondaryHover;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.button.secondary;
-                        }}
-                      >
-                        <FaCheck size="16px" />
-                        Task Done
-                      </button>
-                    )}
-                  </>
-                ) : ["accountant", "acc"].includes(role?.toLowerCase()) ? (
-                  <>
-                    {task?.design_status === "Pending" && (
-                      <button
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
-                        style={{
-                          backgroundColor: colors.button.primary,
-                          color: colors.text.inverse,
-                        }}
-                        onClick={() => handleAccept(task.id)}
-                        disabled={isSubmitting}
-                        onMouseEnter={(e) => {
-                          if (!isSubmitting) {
-                            e.currentTarget.style.backgroundColor =
-                              colors.button.primaryHover;
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isSubmitting) {
-                            e.currentTarget.style.backgroundColor =
-                              colors.button.primary;
-                          }
-                        }}
-                      >
-                        Accept Task
-                      </button>
-                    )}
-                  </>
-                ) : null}
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No Tasks Match Your Filters
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Try adjusting your search criteria or filters to find more
+                  tasks.
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchKey("");
+                    setStatusFilter("");
+                    setProcessFilter("");
+                  }}
+                  className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200"
+                >
+                  Clear Filters
+                </button>
               </div>
             </div>
-          ))}
+          ) : (
+            filteredTasks.map((task: any) => (
+              <div
+                key={task?._id}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
+              >
+                {/* Task Header */}
+                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Package className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          {task?.productName}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Process: {task?.assined_process}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Status Badge */}
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          task?.design_status === "Completed"
+                            ? "bg-green-100 text-green-800"
+                            : task?.design_status === "UnderProcessing"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {task?.design_status === "Completed" && (
+                          <CheckSquare className="h-3 w-3 mr-1" />
+                        )}
+                        {task?.design_status || "Pending"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Task Content */}
+                <div className="p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Left Column */}
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex items-center gap-2">
+                          <Package className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm text-gray-600">
+                            Quantity:
+                          </span>
+                          <span className="text-sm font-medium text-gray-900">
+                            {task?.productQuantity}
+                          </span>
+                        </div>
+
+                        {(role === "Accountant" ||
+                          role === "Sales" ||
+                          role === "admin") && (
+                          <div className="flex items-center gap-2">
+                            <FaDollarSign className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm text-gray-600">
+                              Price:
+                            </span>
+                            <span className="text-sm font-medium text-gray-900">
+                              {task?.productPrice}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {[
+                        "acc",
+                        "account",
+                        "accountant",
+                        "dispatch",
+                        "dis",
+                      ].includes(role?.toLowerCase()) && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="flex items-center gap-2">
+                            <Building className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm text-gray-600">
+                              Customer:
+                            </span>
+                            <span className="text-sm font-medium text-gray-900">
+                              {task?.customer_name}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm text-gray-600">
+                              Sale By:
+                            </span>
+                            <span className="text-sm font-medium text-gray-900">
+                              {task?.sale_by}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-600">
+                          Assigned By:
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {task?.assignedBy}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-600">Date:</span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {task.date}
+                        </span>
+                      </div>
+
+                      {task?.assinedby_comment && (
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Remarks:
+                          </span>
+                          <p className="text-sm text-gray-900 mt-1 p-2 bg-gray-50 rounded-lg">
+                            {task.assinedby_comment}
+                          </p>
+                        </div>
+                      )}
+
+                      {task?.sample_bom_name && (
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Sample BOM:
+                          </span>
+                          <span className="text-sm font-medium text-gray-900 ml-2">
+                            {task.sample_bom_name}
+                          </span>
+                        </div>
+                      )}
+
+                      {task?.bom_name && (
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            BOM Name:
+                          </span>
+                          <span className="text-sm font-medium text-gray-900 ml-2">
+                            {task.bom_name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    {role?.toLowerCase().includes("prod") ? (
+                      <div className="flex flex-wrap items-center gap-3">
+                        {task?.design_status === "Pending" && (
+                          <button
+                            onClick={() => handleAccept(task.id)}
+                            disabled={isSubmitting}
+                            className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${
+                              isSubmitting
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                          >
+                            <FaCheck className="h-4 w-4" />
+                            Accept Task
+                          </button>
+                        )}
+
+                        {task?.bom?.length === 2 ? (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <CheckSquare className="h-3 w-3 mr-1" />
+                            BOM Created
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleBOM(task.sale_id)}
+                            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200"
+                          >
+                            Create BOM
+                          </button>
+                        )}
+
+                        {task?.design_status !== "Completed" && (
+                          <button
+                            onClick={() => handleDone(task.id)}
+                            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2"
+                          >
+                            <FaCheck className="h-4 w-4" />
+                            Mark Done
+                          </button>
+                        )}
+                      </div>
+                    ) : ["accountant", "acc"].includes(role?.toLowerCase()) ? (
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
+                          {task?.design_status === "Pending" && (
+                            <button
+                              onClick={() => handleAccept(task.id)}
+                              disabled={isSubmitting}
+                              className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${
+                                isSubmitting
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
+                            >
+                              <FaCheck className="h-4 w-4" />
+                              Accept Task
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          {task?.design_status === "Pending" && (
+                            <button
+                              onClick={() => handleAccept(task.id)}
+                              disabled={isSubmitting}
+                              className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${
+                                isSubmitting
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
+                            >
+                              <FaCheck className="h-4 w-4" />
+                              Accept Task
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Pagination */}
-        <Pagination page={page} setPage={setPage} TotalPage={TotalPage} />
+        {filteredTasks.length > 0 && TotalPage > 1 && (
+          <div className="mt-8 flex justify-center">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <Pagination page={page} setPage={setPage} TotalPage={TotalPage} />
+            </div>
+          </div>
+        )}
+      </div>  
 
-        {/* Modals */}
-        <AddToken
-          showToken={showToken}
-          setShowToken={setShowToken}
-          tokenAmount={tokenAmount}
-          sale={saleId}
-          refresh={fetchTasks}
-        />
-        {/* <UploadInvoice
-          showUploadInvoice={showUploadInvoice}
-          setShowUploadInvoice={setShowUploadInvoice}
-          sale={saleId}
-          invoicefile={invoicefile}
-        /> */}
-        <AddhalfToken
-          showhalfToken={showhalfToken}
-          setShowhalfToken={setShowhalfToken}
-          tokenAmount={tokenAmount}
-          sale={saleId}
-          refresh={fetchTasks}
-        />
-      </div>
+      {/* Drawer Components - Commented out for now */}
+      {/* <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
+      <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice} sale={saleId} invoicefile={invoicefile} />
+      <AddhalfToken showhalfToken={showhalfToken} setShowhalfToken={setShowhalfToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} /> */}
     </div>
   );
 };

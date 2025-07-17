@@ -6,6 +6,7 @@ import Select from "react-select";
 import { useAddProductMutation } from "../../../redux/api/api";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
+import { colors } from "../../../theme/colors";
 
 interface AddProductProps {
   closeDrawerHandler: () => void;
@@ -90,9 +91,9 @@ const AddProduct: React.FC<AddProductProps> = ({
   ]);
 
   const inventoryCategoryOptions = [
-    {value: 'direct', label: 'Direct'},
-    {value: 'indirect', label: 'Indirect'}
-  ]
+    { value: "direct", label: "Direct" },
+    { value: "indirect", label: "Indirect" },
+  ];
 
   const categoryOptions = [
     { value: "finished goods", label: "Finished Goods" },
@@ -215,57 +216,99 @@ const AddProduct: React.FC<AddProductProps> = ({
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
-      backgroundColor: "transparent",
-      borderColor: "#a9a9a9",
-      color: "#fff",
+      backgroundColor: "white",
+      borderColor: "#d1d5db",
+      color: "#374151",
+      minHeight: "40px",
+      "&:hover": {
+        borderColor: "#9ca3af",
+      },
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
-      color: "black",
-      cursor: "pointer",
+      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+      color: "#374151",
+      "&:hover": {
+        backgroundColor: "#f3f4f6",
+      },
     }),
     multiValue: (provided: any) => ({
       ...provided,
-      backgroundColor: "#808080",
-      color: "#fff",
+      backgroundColor: "#e5e7eb",
+      color: "#374151",
+    }),
+    multiValueLabel: (provided: any) => ({
+      ...provided,
+      color: "#374151",
+    }),
+    multiValueRemove: (provided: any) => ({
+      ...provided,
+      color: "#6b7280",
+      "&:hover": {
+        backgroundColor: "#ef4444",
+        color: "white",
+      },
     }),
     menu: (provided: any) => ({
       ...provided,
-      zIndex: 9999, // ensures dropdown doesn't get hidden
+      zIndex: 9999,
+      backgroundColor: "white",
+      border: "1px solid #d1d5db",
     }),
     placeholder: (provided: any) => ({
       ...provided,
-      color: "#fff", // light gray placeholder
+      color: "#9ca3af",
     }),
     singleValue: (provided: any) => ({
       ...provided,
-      color: "#fff", // ensures selected value is white
+      color: "#374151",
     }),
   };
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f] right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
-          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
-         
-        </h1>
+        <div
+          className="flex items-center justify-between p-6 border-b"
+          style={{ borderColor: colors.border.light }}
+        >
+          <h1
+            className="text-xl font-semibold"
+            style={{ color: colors.text.primary }}
+          >
+            Add New Product
+          </h1>
+          <button
+            onClick={closeDrawerHandler}
+            className="p-2 rounded-lg transition-colors duration-200"
+            style={{
+              color: colors.text.secondary,
+              backgroundColor: colors.gray[100],
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[200];
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[100];
+            }}
+          >
+            <BiX size={20} />
+          </button>
+        </div>
 
         <div className="mt-8 px-5">
-        <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
-                Add New Product
-          </h2>
-
-          <form onSubmit={addProductHandler}><FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Inventory Category</FormLabel>
+          <form onSubmit={addProductHandler}>
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Inventory Category
+              </FormLabel>
               <Select
-              styles={customStyles}
+                styles={customStyles}
                 value={inventoryCategory}
                 options={inventoryCategoryOptions}
                 onChange={(e: any) => setInventoryCategory(e)}
@@ -274,78 +317,141 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
          
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Product Name</FormLabel>
-              <Input color="white"
+              <FormLabel fontWeight="bold" color="gray.700">
+                Product Name
+              </FormLabel>
+              <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 type="text"
                 placeholder="Product Name"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Product Price (Default)</FormLabel>
-              <Input color="white"
+              <FormLabel fontWeight="bold" color="gray.700">
+                Product Price (Default)
+              </FormLabel>
+              <Input
                 value={price}
                 className="no-scrollbar"
                 onChange={(e) => setPrice(e.target.value)}
                 type="number"
                 placeholder="Product Price"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Regular Buying Price</FormLabel>
-              <Input 
+              <FormLabel fontWeight="bold" color="gray.700">
+                Regular Buying Price
+              </FormLabel>
+              <Input
                 value={regularBuyingPrice}
-                className="no-scrollbar text-white"
+                className="no-scrollbar"
                 onChange={(e) => setRegularBuyingPrice(+e.target.value)}
                 type="number"
                 placeholder="Regular Buying Price"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Wholesale Buying Price</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Wholesale Buying Price
+              </FormLabel>
               <Input
                 value={wholesaleBuyingPrice}
-                className="no-scrollbar text-white"
+                className="no-scrollbar"
                 onChange={(e) => setWholeSaleBuyingPrice(+e.target.value)}
                 type="number"
-                placeholder="Regular Buying Price"
+                placeholder="Wholesale Buying Price"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">MRP</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                MRP
+              </FormLabel>
               <Input
                 value={mrp}
-                className="no-scrollbar text-white"
+                className="no-scrollbar"
                 onChange={(e) => setMrp(+e.target.value)}
                 type="number"
                 placeholder="MRP"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Dealer Price</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Dealer Price
+              </FormLabel>
               <Input
                 value={dealerPrice}
-                className="no-scrollbar text-white"
+                className="no-scrollbar"
                 onChange={(e) => setDealerPrice(+e.target.value)}
                 type="number"
                 placeholder="Dealer Price"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Distributor Price</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Distributor Price
+              </FormLabel>
               <Input
                 value={distributorPrice}
-                className="no-scrollbar text-white"
+                className="no-scrollbar"
                 onChange={(e) => setDistributorPrice(+e.target.value)}
                 type="number"
                 placeholder="Distributor Price"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="white">Inventory Type</FormLabel>
               <Select
-              styles={customStyles}
+                styles={customStyles}
                 value={category}
                 options={categoryOptions}
                 onChange={(e: any) => setCategory(e)}
@@ -404,84 +510,135 @@ const AddProduct: React.FC<AddProductProps> = ({
 
 
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Product Subcategory</FormLabel>
-              <Input color="white"
+              <FormLabel fontWeight="bold" color="gray.700">
+                Product Subcategory
+              </FormLabel>
+              <Input
                 value={subCategory}
                 onChange={(e) => setSubCategory(e.target.value)}
                 type="text"
                 placeholder="Product Subcategory"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Product Type</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Product Type
+              </FormLabel>
               <Select
-              styles={customStyles}
+                styles={customStyles}
                 value={itemType}
                 options={itemTypeOptions}
                 onChange={(e: any) => setItemType(e)}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Product/Service</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Product/Service
+              </FormLabel>
               <Select
-              styles={customStyles}
+                styles={customStyles}
                 value={productOrService}
                 options={productOrServiceOptions}
                 onChange={(e: any) => setProductOrService(e)}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Current Stock</FormLabel>
-              <Input color="white"
+              <FormLabel fontWeight="bold" color="gray.700">
+                Current Stock
+              </FormLabel>
+              <Input
                 value={currentStock}
                 onChange={(e) => setCurrentStock(e.target.value)}
                 type="number"
                 placeholder="Current Stock"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Min Stock</FormLabel>
-              <Input color="white"
+              <FormLabel fontWeight="bold" color="gray.700">
+                Min Stock
+              </FormLabel>
+              <Input
                 value={minStock}
                 onChange={(e) => setMinStock(e.target.value)}
                 type="number"
                 placeholder="Min Stock"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Max Stock</FormLabel>
-              <Input color="white"
+              <FormLabel fontWeight="bold" color="gray.700">
+                Max Stock
+              </FormLabel>
+              <Input
                 value={maxStock}
                 onChange={(e) => setMaxStock(e.target.value)}
                 type="number"
                 placeholder="Max Stock"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">HSN</FormLabel>
-              <Input color="white"
+              <FormLabel fontWeight="bold" color="gray.700">
+                HSN
+              </FormLabel>
+              <Input
                 value={hsn}
                 onChange={(e) => setHsn(e.target.value)}
                 type="text"
                 placeholder="HSN"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Store</FormLabel>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Store
+              </FormLabel>
               <Select
-              styles={customStyles}
-                className="w-full rounded mt-2 border border-[#a9a9a9]"
-                options={storeOptions}
+                styles={customStyles}
                 value={store}
-                onChange={(d: any) => setStore(d)}
+                options={storeOptions}
+                onChange={(e: any) => setStore(e)}
               />
             </FormControl>
             <Button
+              isLoading={isAddingProduct}
               type="submit"
-              className="mt-1"
-              color="black"
-              backgroundColor="#ffffff8a"
-              _hover={{ bg: "#d1d2d5" }}
+              className="mt-5"
+              colorScheme="blue"
+              size="md"
+              width="full"
             >
               Submit
             </Button>

@@ -212,7 +212,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="p-4 space-y-4">
       {!isLoadingProducts && products.length > 0 && (
         <>
           {/* Page Size Selector */}

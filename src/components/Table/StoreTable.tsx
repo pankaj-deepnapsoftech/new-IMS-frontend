@@ -26,6 +26,7 @@ import moment from "moment";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
+import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
 
 interface StoreTableProps {
   stores: Array<{
@@ -118,7 +119,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="p-4 space-y-4">
       {/* Page Size Selector */}
       <div className="flex justify-end">
         <Select
@@ -304,16 +305,15 @@ const StoreTable: React.FC<StoreTableProps> = ({
                         <Button
                           size="sm"
                           style={{
-                            backgroundColor: colors.button.primary,
-                            color: colors.text.inverse,
+                            backgroundColor: colors.secondary[50],
+                            color: colors.secondary[600],
                           }}
                           _hover={{ bg: colors.button.primaryHover }}
                           onClick={() =>
                             openStoreDetailsDrawerHandler(row.original._id)
                           }
-                          leftIcon={<FaEye />}
                         >
-                          View
+                          <MdOutlineVisibility size={16} />
                         </Button>
                       )}
 
@@ -321,16 +321,15 @@ const StoreTable: React.FC<StoreTableProps> = ({
                         <Button
                           size="sm"
                           style={{
-                            backgroundColor: colors.button.secondary,
-                            color: colors.text.inverse,
+                            color: colors.primary[600],
+                            backgroundColor: colors.primary[50],
                           }}
                           _hover={{ bg: colors.button.secondaryHover }}
                           onClick={() =>
                             openUpdateStoreDrawerHandler(row.original._id)
                           }
-                          leftIcon={<FaEdit />}
                         >
-                          Edit
+                          <MdEdit size={16} />
                         </Button>
                       )}
 
@@ -338,14 +337,13 @@ const StoreTable: React.FC<StoreTableProps> = ({
                         <Button
                           size="sm"
                           style={{
-                            backgroundColor: colors.button.danger,
-                            color: colors.text.inverse,
+                            color: colors.error[600],
+                            backgroundColor: colors.error[50],
                           }}
                           _hover={{ bg: colors.button.dangerHover }}
                           onClick={() => handleDeleteClick(row.original._id)}
-                          leftIcon={<FaTrash />}
                         >
-                          Delete
+                         <MdDeleteOutline size={16} />
                         </Button>
                       )}
                     </div>
