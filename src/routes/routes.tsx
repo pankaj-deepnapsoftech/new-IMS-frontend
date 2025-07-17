@@ -31,11 +31,11 @@ import WIPProducts from "../pages/WIPProducts";
 import InventoryApprovals from "../pages/InventoryApprovals";
 import Userprofile from "../pages/Userprofile";
 import Sales from "../pages/Sales";
-import { FaSalesforce } from "react-icons/fa6";
 import Dispatch from "../pages/Dispatch";
 import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
 import Task from "../pages/Task";
+import { HandCoins } from "lucide-react";
 
 const routes = [
   {
@@ -69,7 +69,7 @@ const routes = [
   },
   {
     name: "Sales Order",
-    icon: <FaSalesforce />,
+    icon: <HandCoins/>,
     path: "sales",
     element: <Sales />,
     isSublink: false
