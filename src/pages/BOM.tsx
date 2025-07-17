@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { MdOutlineRefresh } from "react-icons/md";
+import { MdOutlineRefresh, MdAdd } from "react-icons/md";
 import BOMTable from "../components/Table/BOMTable";
 import { useDeleteBomMutation, useLazyFetchBomsQuery } from "../redux/api/api";
 import { toast } from "react-toastify";
@@ -18,10 +18,12 @@ import AddBom from "../components/Drawers/BOM/AddBom";
 import BomDetails from "../components/Drawers/BOM/BomDetails";
 import UpdateBom from "../components/Drawers/BOM/UpdateBom";
 import { FiSearch } from "react-icons/fi";
+import { colors } from "../theme/colors";
+import { FileText } from "lucide-react";
 
 const BOM: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
-  console.log('allowedroutes =', allowedroutes)
+  console.log("allowedroutes =", allowedroutes);
   const isAllowed = isSuper || allowedroutes.includes("production");
   const [cookies] = useCookies();
   const [bomId, setBomId] = useState<string | undefined>();
@@ -106,7 +108,10 @@ const BOM: React.FC = () => {
         bom.bom_name?.toLowerCase()?.includes(searchTxt) ||
         bom.parts_count?.toString()?.toLowerCase()?.includes(searchTxt) ||
         bom.total_cost?.toString()?.toLowerCase()?.includes(searchTxt) ||
-        (bom?.approved_by?.first_name + ' ' + bom?.approved_by?.last_name)?.toString()?.toLowerCase()?.includes(searchTxt || '') ||
+        (bom?.approved_by?.first_name + " " + bom?.approved_by?.last_name)
+          ?.toString()
+          ?.toLowerCase()
+          ?.includes(searchTxt || "") ||
         (bom?.createdAt &&
           new Date(bom?.createdAt)
             ?.toISOString()
@@ -128,92 +133,170 @@ const BOM: React.FC = () => {
   }, [searchKey]);
 
   if (!isAllowed) {
-    return <div className="text-center text-red-500">You are not allowed to access this route.</div>
+    return (
+      <div className="text-center text-red-500">
+        You are not allowed to access this route.
+      </div>
+    );
   }
 
   return (
-    <div className="rounded-md ">
-      {/* Add BOM */}
-      {isAddBomDrawerOpened && (
-        <AddBom
-          closeDrawerHandler={closeAddBomDrawerHandler}
-          fetchBomsHandler={fetchBomsHandler}
-        />
-      )}
-      {/* BOM Details */}
-      {isBomDetailsDrawerOpened && (
-        <BomDetails
-          bomId={bomId}
-          closeDrawerHandler={closeBomDetailsDrawerHandler}
-        />
-      )}
-      {/* Update BOM */}
-      {isUpdateBomDrawerOpened && (
-        <UpdateBom
-          bomId={bomId}
-          closeDrawerHandler={closeUpdateBomDrawerHandler}
-          fetchBomsHandler={fetchBomsHandler}
-        />
-      )}
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: colors.background.page }}
+    >
+      <div className="p-2 lg:p-3">
+        {/* Add BOM */}
+        {isAddBomDrawerOpened && (
+          <AddBom
+            closeDrawerHandler={closeAddBomDrawerHandler}
+            fetchBomsHandler={fetchBomsHandler}
+          />
+        )}
+        {/* BOM Details */}
+        {isBomDetailsDrawerOpened && (
+          <BomDetails
+            bomId={bomId}
+            closeDrawerHandler={closeBomDetailsDrawerHandler}
+          />
+        )}
+        {/* Update BOM */}
+        {isUpdateBomDrawerOpened && (
+          <UpdateBom
+            bomId={bomId}
+            closeDrawerHandler={closeUpdateBomDrawerHandler}
+            fetchBomsHandler={fetchBomsHandler}
+          />
+        )}
 
-      <div>
-        <h1 className="text-center text-white font-[700] text-[30px] pb-6">
-          Bill Of Materials (BOM)
-        </h1>
+        {/* Header Section */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 p-3 rounded-xl shadow-lg">
+                <FileText className="text-white" size={24} />
+              </div>
+              <div>
+                <h1
+                  className="text-2xl lg:text-3xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Bill Of Materials (BOM)
+                </h1>
+                <p
+                  className="text-sm mt-1"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Manage bill of materials and production specifications
+                </p>
+              </div>
+            </div>
 
-        <div className="mt-2 flex flex-wrap justify-center md:justify-center w-full gap-4">
-          {/* Search Input */}
-          <div className="relative w-full md:w-[200px]">
-            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-200" />
-            <input
-              className="pl-10 pr-4 py-2 w-full text-sm text-gray-200 border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-              placeholder="Search roles..."
-              value={searchKey}
-              onChange={(e) => setSearchKey(e.target.value)}
-            />
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={openAddBomDrawerHandler}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: colors.button.primary,
+                  color: colors.text.inverse,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.primaryHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.button.primary;
+                }}
+              >
+                <MdAdd size="20px" />
+                Add BOM
+              </button>
+
+              <button
+                onClick={fetchBomsHandler}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                style={{
+                  borderColor: colors.border.medium,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[50];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.background.card;
+                }}
+              >
+                <MdOutlineRefresh size="20px" />
+                Refresh
+              </button>
+            </div>
           </div>
 
-          {/* Add New BOM Button */}
-          <Button
-            fontSize={{ base: "14px", md: "14px" }}
-            paddingX={{ base: "10px", md: "12px" }}
-            paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "100%", md: 200 }}
-            onClick={openAddBomDrawerHandler}
-            color="white"
-            backgroundColor="#4b87a0d9"
-            _hover={{ bg: "#fff", textColor: "#000" }}
-          >
-            Add New BOM
-          </Button>
-
-          {/* Refresh Button */}
-          <Button
-            fontSize={{ base: "14px", md: "14px" }}
-            paddingX={{ base: "10px", md: "12px" }}
-            paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "100%", md: 100 }}
-            onClick={fetchBomsHandler}
-            leftIcon={<MdOutlineRefresh />}
-            color="white"
-            borderColor="white"
-            variant="outline"
-            _hover={{ bg: "white", color: "#2D3748" }}
-          >
-            Refresh
-          </Button>
+          {/* Search and Filters Row */}
+          <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
+            {/* Search Input */}
+            <div className="flex-1 max-w-md">
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Search BOMs
+              </label>
+              <div className="relative">
+                <FiSearch
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                  style={{ color: colors.text.secondary }}
+                />
+                <input
+                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor =
+                      colors.input.borderFocus;
+                    e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = colors.input.border;
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                  placeholder="Search by BOM name, parts, cost..."
+                  value={searchKey || ""}
+                  onChange={(e) => setSearchKey(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-
-      <div>
-        <BOMTable
-          isLoadingBoms={isLoadingBoms}
-          boms={filteredBoms}
-          openBomDetailsDrawerHandler={openBomDetailsDrawerHandler}
-          openUpdateBomDrawerHandler={openUpdateBomDrawerHandler}
-          deleteBomHandler={deleteBomHandler}
-        />
+        {/* BOM Table */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <BOMTable
+            isLoadingBoms={isLoadingBoms}
+            boms={filteredBoms}
+            openBomDetailsDrawerHandler={openBomDetailsDrawerHandler}
+            openUpdateBomDrawerHandler={openUpdateBomDrawerHandler}
+            deleteBomHandler={deleteBomHandler}
+          />
+        </div>
       </div>
     </div>
   );

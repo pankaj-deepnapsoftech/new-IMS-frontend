@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
-import { MdOutlineRefresh } from "react-icons/md";
+import { MdOutlineRefresh, MdAdd } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import SampleCSV from "../assets/csv/store-sample.csv";
 import { colors } from "../theme/colors";
@@ -26,6 +26,7 @@ import {
 import { AiFillFileExcel } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
 import { FiSearch } from "react-icons/fi";
+import { Store } from "lucide-react";
 
 const Stores: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -208,31 +209,7 @@ const Stores: React.FC = () => {
           />
         )}
 
-        {/* Main Header */}
-        <div
-          className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
-          style={{
-            backgroundColor: colors.background.card,
-            borderColor: colors.border.light,
-          }}
-        >
-          <div className="text-center">
-            <h1
-              className="text-2xl lg:text-3xl font-bold"
-              style={{ color: colors.text.primary }}
-            >
-              Store Management
-            </h1>
-            <p
-              className="text-sm mt-1"
-              style={{ color: colors.text.secondary }}
-            >
-              Manage store locations and warehouse details
-            </p>
-          </div>
-        </div>
-
-        {/* Actions and Search */}
+        {/* Header Section */}
         <div
           className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
           style={{
@@ -241,27 +218,47 @@ const Stores: React.FC = () => {
           }}
         >
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex flex-col sm:flex-row gap-3 flex-1">
-              <div className="relative">
-                <FiSearch
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl shadow-lg">
+                <Store className="text-white" size={24} />
+              </div>
+              <div>
+                <h1
+                  className="text-2xl lg:text-3xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Store Management
+                </h1>
+                <p
+                  className="text-sm mt-1"
                   style={{ color: colors.text.secondary }}
-                />
-                <input
-                  className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor: colors.input.border,
-                    color: colors.text.primary,
-                  }}
-                  placeholder="Search stores..."
-                  value={searchKey || ""}
-                  onChange={(e) => setSearchKey(e.target.value)}
-                />
+                >
+                  Manage store locations and warehouse details
+                </p>
               </div>
             </div>
 
+            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={openAddStoreDrawerHandler}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: colors.button.primary,
+                  color: colors.text.inverse,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.primaryHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.button.primary;
+                }}
+              >
+                <MdAdd size="20px" />
+                Add Store
+              </button>
+
               <button
                 onClick={fetchStoresHandler}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
@@ -270,107 +267,163 @@ const Stores: React.FC = () => {
                   color: colors.text.primary,
                   backgroundColor: colors.background.card,
                 }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[50];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.background.card;
+                }}
               >
-                <MdOutlineRefresh size="16px" />
+                <MdOutlineRefresh size="20px" />
                 Refresh
               </button>
 
               <button
-                onClick={openAddStoreDrawerHandler}
+                onClick={() => setShowBulkUploadMenu(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
                 style={{
-                  backgroundColor: colors.primary[500],
+                  backgroundColor: colors.button.secondary,
                   color: colors.text.inverse,
                 }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.secondaryHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.secondary;
+                }}
               >
-                Add New Store
+                <AiFillFileExcel size="20px" />
+                Bulk Upload
               </button>
+            </div>
+          </div>
 
+          {/* Search and Filters Row */}
+          <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
+            {/* Search Input */}
+            <div className="flex-1 max-w-md">
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Search Stores
+              </label>
               <div className="relative">
-                <button
-                  onClick={() => setShowBulkUploadMenu((prev) => !prev)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                <FiSearch
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                  style={{ color: colors.text.secondary }}
+                />
+                <input
+                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
                   style={{
-                    backgroundColor: colors.secondary[500],
-                    color: colors.text.inverse,
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
                   }}
-                >
-                  <AiFillFileExcel size="16px" />
-                  Bulk Upload
-                </button>
-
-                {/* Bulk Upload Dropdown */}
-                {showBulkUploadMenu && (
-                  <div
-                    className="absolute z-50 mt-2 w-80 shadow-lg rounded-xl p-4"
-                    style={{
-                      backgroundColor: colors.background.card,
-                      borderColor: colors.border.light,
-                    }}
-                  >
-                    <form>
-                      <div className="mb-4">
-                        <label
-                          className="block text-sm font-medium mb-2"
-                          style={{ color: colors.text.primary }}
-                        >
-                          Choose File (.csv)
-                        </label>
-                        <input
-                          ref={fileRef}
-                          type="file"
-                          accept=".csv, .xlsx"
-                          className="w-full text-sm p-2 border rounded-lg"
-                          style={{
-                            backgroundColor: colors.input.background,
-                            borderColor: colors.input.border,
-                            color: colors.text.primary,
-                          }}
-                        />
-                      </div>
-
-                      <div className="flex gap-3 mb-3">
-                        <button
-                          type="button"
-                          onClick={bulkUploadHandler}
-                          disabled={bulkUploading}
-                          className="flex-1 px-4 py-2 rounded-lg font-medium transition-colors"
-                          style={{
-                            backgroundColor: colors.success[500],
-                            color: colors.text.inverse,
-                          }}
-                        >
-                          {bulkUploading ? "Uploading..." : "Upload"}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => setShowBulkUploadMenu(false)}
-                          className="flex-1 px-4 py-2 rounded-lg font-medium border transition-colors"
-                          style={{
-                            borderColor: colors.border.medium,
-                            color: colors.text.primary,
-                            backgroundColor: colors.background.card,
-                          }}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-
-                      <a
-                        href={SampleCSV}
-                        className="text-sm underline"
-                        style={{ color: colors.primary[500] }}
-                      >
-                        Download Sample CSV
-                      </a>
-                    </form>
-                  </div>
-                )}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor =
+                      colors.input.borderFocus;
+                    e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = colors.input.border;
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                  placeholder="Search by name, GST, address..."
+                  value={searchKey || ""}
+                  onChange={(e) => setSearchKey(e.target.value)}
+                />
               </div>
             </div>
           </div>
         </div>
+
+        {/* Bulk Upload Modal */}
+        {showBulkUploadMenu && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div
+              className="rounded-xl shadow-xl max-w-md w-full p-6"
+              style={{ backgroundColor: colors.background.card }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Bulk Upload Stores
+                </h3>
+                <button
+                  onClick={() => setShowBulkUploadMenu(false)}
+                  className="p-1 rounded-lg transition-colors"
+                  style={{ color: colors.text.secondary }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = colors.gray[100];
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  <RxCross2 size="20px" />
+                </button>
+              </div>
+
+              <form onSubmit={bulkUploadHandler}>
+                <div className="mb-4">
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.text.primary }}
+                  >
+                    Choose File (.csv or .xlsx)
+                  </label>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept=".csv, .xlsx"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                    style={{
+                      backgroundColor: colors.input.background,
+                      borderColor: colors.input.border,
+                      color: colors.text.primary,
+                    }}
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={bulkUploading}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                    style={{
+                      backgroundColor: colors.button.primary,
+                      color: colors.text.inverse,
+                    }}
+                  >
+                    {bulkUploading ? "Uploading..." : "Upload"}
+                    <AiFillFileExcel size="16px" />
+                  </button>
+
+                  <a href={SampleCSV} className="flex-1">
+                    <button
+                      type="button"
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                      style={{
+                        borderColor: colors.border.medium,
+                        color: colors.text.primary,
+                        backgroundColor: colors.background.card,
+                      }}
+                    >
+                      Sample CSV
+                      <AiFillFileExcel size="16px" />
+                    </button>
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* Store Table */}
         <div

@@ -14,6 +14,7 @@ import Loading from "../ui/Loading";
 import EmptyData from "../ui/emptyData";
 import Pagination from "./Pagination";
 import { colors } from "../theme/colors";
+
 const Dispatch = () => {
   const [paymentFilter, setPaymentFilter] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +24,7 @@ const Dispatch = () => {
   const [trackingId, setTrackingId] = useState("");
   const [cookies] = useCookies();
   const [data, setData] = useState([]);
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(1);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showattachment, setShowAttachment] = useState(false);
@@ -50,6 +51,7 @@ const Dispatch = () => {
       }
     }
   };
+
   const {
     handleBlur,
     handleChange,
@@ -79,9 +81,8 @@ const Dispatch = () => {
           }
         );
 
-    
-        resetForm()
-        setShowModal(false)
+        resetForm();
+        setShowModal(false);
       } catch (error) {
         console.log(error);
       } finally {
@@ -93,14 +94,16 @@ const Dispatch = () => {
   const GetDispatch = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch?page=${page}&&limit=2`, {
-        headers: {
-          Authorization: `Bearer ${cookies.access_token}`
-        }}
-      )
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch?page=${page}&&limit=2`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies.access_token}`,
+          },
+        }
+      );
 
-      setData(response?.data?.data); 
-
+      setData(response?.data?.data);
     } catch (error) {
       console.log(error);
     } finally {
@@ -109,17 +112,8 @@ const Dispatch = () => {
   };
 
   useEffect(() => {
-    GetDispatch(page)
-  }, [page])
-
-
-
-  // const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = event.target.files[0];
-  //   if (file) {
-
-  //   }
-  // };
+    GetDispatch(page);
+  }, [page]);
 
   const calculateTotal = (price: number, qty: number, gst: number) => {
     const basePrice = price * qty;
@@ -131,10 +125,12 @@ const Dispatch = () => {
   if (isLoading) {
     return (
       <div
-        className="min-h-screen p-6"
+        className="min-h-screen"
         style={{ backgroundColor: colors.background.page }}
       >
-        <Loading />
+        <div className="p-2 lg:p-3">
+          <Loading />
+        </div>
       </div>
     );
   }
@@ -142,34 +138,49 @@ const Dispatch = () => {
   if (!data || data.length === 0) {
     return (
       <div
-        className="min-h-screen p-6"
+        className="min-h-screen"
         style={{ backgroundColor: colors.background.page }}
       >
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <div
-                className="p-2 rounded-lg"
-                style={{ backgroundColor: colors.primary[100] }}
-              >
-                <TbTruckDelivery
-                  className="w-6 h-6"
-                  style={{ color: colors.primary[600] }}
-                />
+        <div className="p-2 lg:p-3">
+          {/* Header Section */}
+          <div
+            className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl shadow-lg">
+                <TbTruckDelivery className="text-white" size={24} />
               </div>
-              <h1
-                className="text-3xl font-bold"
-                style={{ color: colors.text.primary }}
-              >
-                Dispatch Management
-              </h1>
+              <div>
+                <h1
+                  className="text-2xl md:text-3xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Dispatch Management
+                </h1>
+                <p
+                  className="text-sm mt-1"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Manage dispatch operations and track deliveries
+                </p>
+              </div>
             </div>
-            <p className="text-lg" style={{ color: colors.text.secondary }}>
-              Manage dispatch operations and track deliveries
-            </p>
           </div>
-          <EmptyData />
+
+          {/* Empty State */}
+          <div
+            className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <EmptyData />
+          </div>
         </div>
       </div>
     );
@@ -177,94 +188,160 @@ const Dispatch = () => {
 
   return (
     <div
-      className="min-h-screen p-6"
+      className="min-h-screen"
       style={{ backgroundColor: colors.background.page }}
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="p-2 lg:p-3">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div
-              className="p-2 rounded-lg"
-              style={{ backgroundColor: colors.primary[100] }}
-            >
-              <TbTruckDelivery
-                className="w-6 h-6"
-                style={{ color: colors.primary[600] }}
-              />
-            </div>
-            <h1
-              className="text-3xl font-bold"
-              style={{ color: colors.text.primary }}
-            >
-              Dispatch Management
-            </h1>
-          </div>
-          <p className="text-lg" style={{ color: colors.text.secondary }}>
-            Manage dispatch operations and track deliveries
-          </p>
-        </div>
-
-        {/* Filters and Actions */}
         <div
-          className="mb-6 p-6 rounded-xl"
+          className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
           style={{
             backgroundColor: colors.background.card,
-            boxShadow: colors.shadow.md,
+            borderColor: colors.border.light,
           }}
         >
-          <div className="flex flex-wrap items-center gap-4 justify-between">
-            {/* Search Bar */}
-            <div className="flex-1 min-w-[300px]">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl shadow-lg">
+                <TbTruckDelivery className="text-white" size={24} />
+              </div>
+              <div>
+                <h1
+                  className="text-2xl lg:text-3xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Dispatch Management
+                </h1>
+                <p
+                  className="text-sm mt-1"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Manage dispatch operations and track deliveries
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => {
+                  setPaymentFilter("All");
+                  setProductFilter("All");
+                  setSearchTerm("");
+                  GetDispatch();
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                style={{
+                  borderColor: colors.border.medium,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[50];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.background.card;
+                }}
+              >
+                <RefreshCw size="20px" />
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          {/* Search and Filters Row */}
+          <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
+            {/* Search Input */}
+            <div className="flex-1 max-w-md">
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Search Dispatch
+              </label>
               <div className="relative">
                 <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
-                  style={{ color: colors.text.muted }}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                  style={{ color: colors.text.secondary }}
                 />
                 <input
-                  type="text"
+                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor =
+                      colors.input.borderFocus;
+                    e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = colors.input.border;
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
                   placeholder="Search by party name, product..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border transition-colors"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor: colors.input.border,
-                    color: colors.text.primary,
-                  }}
                 />
               </div>
             </div>
 
-            {/* Filters */}
-            <div className="flex gap-4 items-center">
-              <div className="flex items-center gap-2">
-                <Filter
-                  className="w-4 h-4"
-                  style={{ color: colors.text.secondary }}
-                />
-                <select
-                  className="px-3 py-2 rounded-lg border transition-colors"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor: colors.input.border,
-                    color: colors.text.primary,
-                  }}
-                  value={paymentFilter}
-                  onChange={(e) => setPaymentFilter(e.target.value)}
-                >
-                  <option value="All">All Payment Status</option>
-                  <option value="Paid">Paid</option>
-                  <option value="Unpaid">Unpaid</option>
-                </select>
-              </div>
-
+            {/* Payment Filter */}
+            <div className="w-full lg:w-48">
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Payment Status
+              </label>
               <select
-                className="px-3 py-2 rounded-lg border transition-colors"
+                className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
                 style={{
                   backgroundColor: colors.input.background,
                   borderColor: colors.input.border,
                   color: colors.text.primary,
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = colors.input.borderFocus;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = colors.input.border;
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+                value={paymentFilter}
+                onChange={(e) => setPaymentFilter(e.target.value)}
+              >
+                <option value="All">All Payment Status</option>
+                <option value="Paid">Paid</option>
+                <option value="Unpaid">Unpaid</option>
+              </select>
+            </div>
+
+            {/* Product Filter */}
+            <div className="w-full lg:w-48">
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Product Status
+              </label>
+              <select
+                className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor: colors.input.border,
+                  color: colors.text.primary,
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = colors.input.borderFocus;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = colors.input.border;
+                  e.currentTarget.style.boxShadow = "none";
                 }}
                 value={productFilter}
                 onChange={(e) => setProductFilter(e.target.value)}
@@ -273,117 +350,65 @@ const Dispatch = () => {
                 <option value="Dispatch">Dispatch</option>
                 <option value="Delivered">Delivered</option>
               </select>
-
-              <button
-                onClick={() => {
-                  setPaymentFilter("All");
-                  setProductFilter("All");
-                  setSearchTerm("");
-                  GetDispatch();
-                }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 hover:shadow-md"
-                style={{
-                  borderColor: colors.border.medium,
-                  color: colors.text.secondary,
-                  backgroundColor: colors.background.card,
-                }}
-              >
-                <RefreshCw className="w-4 h-4" />
-                Reset
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Dispatch Cards */}
-        <div className="space-y-6">
-          {data?.map((acc: any) => (
-            <div
-              key={acc?._id}
-              className="rounded-xl border-l-4 transition-all duration-200 hover:shadow-lg"
-              style={{
-                backgroundColor: colors.background.card,
-                borderLeftColor: colors.success[500],
-                boxShadow: colors.shadow.sm,
-              }}
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="space-y-3 flex-1">
-                    <div className="flex items-center gap-4">
-                      <span
-                        className="px-3 py-1 rounded-full text-xs font-medium"
-                        style={{
-                          backgroundColor: colors.primary[100],
-                          color: colors.primary[800],
-                        }}
-                      >
-                        Order #{acc?._id?.slice(-6).toUpperCase()}
-                      </span>
-                      <span
-                        className="text-sm"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        {new Date(
-                          acc?.Sale_id[0]?.createdAt
-                        ).toLocaleDateString()}
-                      </span>
-                    </div>
+        {/* Dispatch Cards Section */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <div className="p-6">
+            <div className="space-y-6">
+              {data?.map((acc: any) => (
+                <div
+                  key={acc?._id}
+                  className="border rounded-xl border-l-4 transition-all duration-200 hover:shadow-md"
+                  style={{
+                    backgroundColor: colors.background.card,
+                    borderLeftColor: colors.success[500],
+                    borderColor: colors.border.light,
+                  }}
+                >
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="space-y-3 flex-1">
+                        <div className="flex items-center gap-4">
+                          <span
+                            className="px-3 py-1 rounded-full text-xs font-medium"
+                            style={{
+                              backgroundColor: colors.primary[100],
+                              color: colors.primary[800],
+                            }}
+                          >
+                            Order #{acc?._id?.slice(-6).toUpperCase()}
+                          </span>
+                          <span
+                            className="text-sm"
+                            style={{ color: colors.text.secondary }}
+                          >
+                            {new Date(
+                              acc?.Sale_id[0]?.createdAt
+                            ).toLocaleDateString()}
+                          </span>
+                        </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="font-medium"
-                            style={{ color: colors.text.primary }}
-                          >
-                            Party:
-                          </span>
-                          <span style={{ color: colors.text.secondary }}>
-                            {acc?.Sale_id[0]?.customer_id[0]?.full_name ||
-                              "N/A"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="font-medium"
-                            style={{ color: colors.text.primary }}
-                          >
-                            Product:
-                          </span>
-                          <span style={{ color: colors.text.secondary }}>
-                            {acc?.Sale_id[0]?.product_id[0]?.name || "N/A"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="font-medium"
-                            style={{ color: colors.text.primary }}
-                          >
-                            Quantity:
-                          </span>
-                          <span style={{ color: colors.text.secondary }}>
-                            {acc?.Sale_id[0]?.product_qty || "N/A"}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        {(role === "Accountant" ||
-                          role === "Sales" ||
-                          role === "admin") && (
-                          <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
                             <div className="flex items-center gap-2">
                               <span
                                 className="font-medium"
                                 style={{ color: colors.text.primary }}
                               >
-                                Price:
+                                Party:
                               </span>
                               <span style={{ color: colors.text.secondary }}>
-                                ₹
-                                {acc?.Sale_id[0]?.price *
-                                  acc?.Sale_id[0]?.product_qty || "N/A"}
+                                {acc?.Sale_id[0]?.customer_id[0]?.full_name ||
+                                  "N/A"}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -391,339 +416,304 @@ const Dispatch = () => {
                                 className="font-medium"
                                 style={{ color: colors.text.primary }}
                               >
-                                Total (incl. GST):
+                                Product:
                               </span>
-                              <span
-                                className="font-semibold"
-                                style={{ color: colors.success[600] }}
-                              >
-                                ₹
-                                {calculateTotal(
-                                  acc?.Sale_id[0]?.price,
-                                  acc?.Sale_id[0]?.product_qty,
-                                  acc?.Sale_id[0]?.GST
-                                )}
+                              <span style={{ color: colors.text.secondary }}>
+                                {acc?.Sale_id[0]?.product_id[0]?.name || "N/A"}
                               </span>
                             </div>
-                          </>
-                        )}
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="font-medium"
-                            style={{ color: colors.text.primary }}
-                          >
-                            GST:
-                          </span>
-                          <span style={{ color: colors.text.secondary }}>
-                            {acc?.Sale_id[0]?.GST}%
-                          </span>
-                        </div>
-                        {acc?.Sale_id[0]?.delivery_status_by_customer && (
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="font-medium"
-                              style={{ color: colors.text.primary }}
-                            >
-                              Delivery Status:
-                            </span>
-                            <span style={{ color: colors.text.secondary }}>
-                              {
-                                acc?.Sale_id[0]
-                                  ?.delivery_status_comment_by_customer
-                              }
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="font-medium"
+                                style={{ color: colors.text.primary }}
+                              >
+                                Quantity:
+                              </span>
+                              <span style={{ color: colors.text.secondary }}>
+                                {acc?.Sale_id[0]?.product_qty || "N/A"}
+                              </span>
+                            </div>
                           </div>
-                        )}
+
+                          <div className="space-y-2">
+                            {(role === "Accountant" ||
+                              role === "Sales" ||
+                              role === "admin") && (
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className="font-medium"
+                                  style={{ color: colors.text.primary }}
+                                >
+                                  Total:
+                                </span>
+                                <span style={{ color: colors.text.secondary }}>
+                                  ₹
+                                  {calculateTotal(
+                                    acc?.Sale_id[0]?.selling_price || 0,
+                                    acc?.Sale_id[0]?.quantity || 0,
+                                    acc?.Sale_id[0]?.gst || 0
+                                  )}
+                                </span>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="font-medium"
+                                style={{ color: colors.text.primary }}
+                              >
+                                Status:
+                              </span>
+                              <span
+                                className="px-2 py-1 rounded-full text-xs font-medium"
+                                style={{
+                                  backgroundColor: acc?.Sale_id[0]
+                                    ?.payment_verify
+                                    ? colors.success[100]
+                                    : colors.warning[100],
+                                  color: acc?.Sale_id[0]?.payment_verify
+                                    ? colors.success[800]
+                                    : colors.warning[800],
+                                }}
+                              >
+                                {acc?.Sale_id[0]?.payment_verify
+                                  ? "Paid"
+                                  : "Unpaid"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* Action Buttons */}
-                <div
-                  className="flex gap-3 justify-end pt-4 border-t"
-                  style={{ borderColor: colors.border.light }}
-                >
-                  {acc?.Sale_id[0]?.payment_verify === true && (
-                    <button
-                      onClick={() => setShowModal(true)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 hover:shadow-md"
-                      style={{
-                        borderColor: colors.success[500],
-                        color: colors.success[600],
-                        backgroundColor: colors.success[50],
-                      }}
+                    {/* Action Buttons */}
+                    <div
+                      className="flex gap-3 justify-end pt-4 border-t"
+                      style={{ borderColor: colors.border.light }}
                     >
-                      <TbTruckDelivery className="w-4 h-4" />
-                      Dispatch
-                    </button>
-                  )}
-
-                  {(acc?.Sale_id[0]?.customer_order_ss ||
-                    acc?.Sale_id[0]?.dispatcher_order_ss) && (
-                    <button
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 hover:shadow-md"
-                      style={{
-                        borderColor: colors.warning[500],
-                        color: colors.warning[600],
-                        backgroundColor: colors.warning[50],
-                      }}
-                    >
-                      <a
-                        href="https://rtpasbackend.deepmart.shop/images/delivery-74712863-4179-4830-bdc0-9c60f8b31fbd.jpg"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2"
-                      >
-                        <FiEye className="w-4 h-4" />
-                        View Delivery Proof
-                      </a>
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Dispatch Modal */}
-        {showModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div
-              className="w-full max-w-md mx-4 rounded-xl shadow-xl"
-              style={{ backgroundColor: colors.background.card }}
-            >
-              <form onSubmit={handleSubmit}>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2
-                      className="text-xl font-semibold"
-                      style={{ color: colors.text.primary }}
-                    >
-                      Dispatch Details
-                    </h2>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowModal(false);
-                        resetForm();
-                      }}
-                      className="p-1 rounded-lg transition-colors"
-                      style={{ color: colors.text.muted }}
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label
-                        className="block text-sm font-medium mb-2"
-                        style={{ color: colors.text.primary }}
-                      >
-                        Delivery Site Link
-                      </label>
-                      <input
-                        type="text"
-                        name="tracking_web"
-                        value={values.tracking_web}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full px-3 py-2 rounded-lg border transition-colors"
-                        style={{
-                          backgroundColor: colors.input.background,
-                          borderColor:
-                            touched.tracking_web && errors.tracking_web
-                              ? colors.error[500]
-                              : colors.input.border,
-                          color: colors.text.primary,
-                        }}
-                        placeholder="Enter tracking website URL"
-                      />
-                      {touched.tracking_web && errors.tracking_web && (
-                        <p
-                          className="mt-1 text-sm"
-                          style={{ color: colors.error[500] }}
+                      {acc?.Sale_id[0]?.payment_verify === true && (
+                        <button
+                          onClick={() => setShowModal(true)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                          style={{
+                            backgroundColor: colors.primary[600],
+                            color: colors.text.inverse,
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              colors.primary[700];
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              colors.primary[600];
+                          }}
                         >
-                          {errors.tracking_web}
-                        </p>
+                          <TbTruckDelivery size={16} />
+                          Dispatch
+                        </button>
                       )}
-                    </div>
 
-                    <div>
-                      <label
-                        className="block text-sm font-medium mb-2"
-                        style={{ color: colors.text.primary }}
-                      >
-                        Tracking ID
-                      </label>
-                      <input
-                        type="text"
-                        name="tracking_id"
-                        value={values.tracking_id}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full px-3 py-2 rounded-lg border transition-colors"
+                      <button
+                        onClick={() => setShowAttachment(true)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
                         style={{
-                          backgroundColor: colors.input.background,
-                          borderColor:
-                            touched.tracking_id && errors.tracking_id
-                              ? colors.error[500]
-                              : colors.input.border,
-                          color: colors.text.primary,
+                          backgroundColor: colors.background.card,
+                          borderColor: colors.border.medium,
+                          color: colors.text.secondary,
                         }}
-                        placeholder="Enter tracking ID"
-                      />
-                      {touched.tracking_id && errors.tracking_id && (
-                        <p
-                          className="mt-1 text-sm"
-                          style={{ color: colors.error[500] }}
-                        >
-                          {errors.tracking_id}
-                        </p>
-                      )}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            colors.gray[50];
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            colors.background.card;
+                        }}
+                      >
+                        <HiOutlinePaperClip size={16} />
+                        Attachment
+                      </button>
                     </div>
                   </div>
-
-                  <div className="flex gap-3 mt-6">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowModal(false);
-                        resetForm();
-                      }}
-                      className="flex-1 px-4 py-2 rounded-lg border transition-all duration-200"
-                      style={{
-                        borderColor: colors.error[500],
-                        color: colors.error[600],
-                        backgroundColor: colors.error[50],
-                      }}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="flex-1 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50"
-                      style={{
-                        backgroundColor: colors.success[500],
-                        color: colors.text.inverse,
-                      }}
-                    >
-                      {isSubmitting ? "Submitting..." : "Submit & Save"}
-                    </button>
-                  </div>
                 </div>
-              </form>
+              ))}
             </div>
           </div>
-        )}
+        </div>
 
-        {/* File Upload Modal */}
-        {showattachment && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div
-              className="w-full max-w-md mx-4 rounded-xl shadow-xl"
-              style={{ backgroundColor: colors.background.card }}
-            >
+        {/* Pagination */}
+        <div className="mt-6">
+          <Pagination
+            page={page}
+            setPage={setPage}
+            hasNextPage={data.length === 2}
+          />
+        </div>
+      </div>
+
+      {/* Dispatch Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-md mx-4 rounded-xl shadow-xl"
+            style={{ backgroundColor: colors.background.card }}
+          >
+            <form onSubmit={handleSubmit}>
               <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2
-                    className="text-xl font-semibold"
-                    style={{ color: colors.text.primary }}
-                  >
-                    Upload Attachment
-                  </h2>
-                  <button
-                    onClick={() => {
-                      setShowAttachment(false);
-                      setPreview(null);
-                      setFileName("");
-                    }}
-                    className="p-1 rounded-lg transition-colors"
-                    style={{ color: colors.text.muted }}
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+                <h3
+                  className="text-lg font-semibold mb-4"
+                  style={{ color: colors.text.primary }}
+                >
+                  Dispatch Details
+                </h3>
 
-                <div className="mb-6">
-                  <div
-                    className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all hover:shadow-md relative"
-                    style={{ borderColor: colors.border.medium }}
-                  >
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: colors.text.primary }}
+                    >
+                      Tracking ID
+                    </label>
                     <input
-                      type="file"
-                      accept=".pdf,.docx,.png,.jpg,.jpeg"
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      onChange={handleFileChange}
+                      type="text"
+                      name="tracking_id"
+                      value={values.tracking_id}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        backgroundColor: colors.input.background,
+                        borderColor: colors.input.border,
+                        color: colors.text.primary,
+                      }}
                     />
+                  </div>
 
-                    <div className="flex flex-col items-center gap-3">
-                      {preview ? (
-                        <img
-                          src={preview}
-                          alt="Preview"
-                          className="w-32 h-32 object-cover rounded-lg"
-                        />
-                      ) : (
-                        <HiOutlinePaperClip
-                          className="w-12 h-12"
-                          style={{ color: colors.text.muted }}
-                        />
-                      )}
-                      <div className="text-center">
-                        <p
-                          className="text-sm"
-                          style={{ color: colors.text.primary }}
-                        >
-                          {fileName
-                            ? `Selected: ${fileName}`
-                            : "Drag and drop your file here, or click to browse"}
-                        </p>
-                        <p
-                          className="text-xs mt-1"
-                          style={{ color: colors.text.muted }}
-                        >
-                          Supported formats: PDF, DOCX, PNG, JPG
-                        </p>
-                      </div>
-                    </div>
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: colors.text.primary }}
+                    >
+                      Tracking Website
+                    </label>
+                    <input
+                      type="text"
+                      name="tracking_web"
+                      value={values.tracking_web}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        backgroundColor: colors.input.background,
+                        borderColor: colors.input.border,
+                        color: colors.text.primary,
+                      }}
+                    />
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 mt-6">
                   <button
-                    onClick={() => {
-                      setPreview(null);
-                      setFileName("");
-                      setShowAttachment(false);
-                    }}
-                    className="flex-1 px-4 py-2 rounded-lg border transition-all duration-200"
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
                     style={{
-                      borderColor: colors.error[500],
-                      color: colors.error[600],
-                      backgroundColor: colors.error[50],
+                      backgroundColor: colors.primary[600],
+                      color: colors.text.inverse,
+                    }}
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="flex-1 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200"
+                    style={{
+                      backgroundColor: colors.background.card,
+                      borderColor: colors.border.medium,
+                      color: colors.text.secondary,
                     }}
                   >
                     Cancel
                   </button>
-                  <button
-                    className="flex-1 px-4 py-2 rounded-lg transition-all duration-200"
-                    style={{
-                      backgroundColor: colors.primary[500],
-                      color: colors.text.inverse,
-                    }}
-                  >
-                    Upload
-                  </button>
                 </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* File Upload Modal */}
+      {showattachment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-md mx-4 rounded-xl shadow-xl"
+            style={{ backgroundColor: colors.background.card }}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Upload Attachment
+                </h3>
+                <button
+                  onClick={() => setShowAttachment(false)}
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ color: colors.text.secondary }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                />
+                {fileName && (
+                  <p
+                    className="mt-2 text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Selected: {fileName}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                  style={{
+                    backgroundColor: colors.primary[600],
+                    color: colors.text.inverse,
+                  }}
+                >
+                  Upload
+                </button>
+                <button
+                  onClick={() => setShowAttachment(false)}
+                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200"
+                  style={{
+                    backgroundColor: colors.background.card,
+                    borderColor: colors.border.medium,
+                    color: colors.text.secondary,
+                  }}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
-        )}
-        <Pagination page={page} setPage={setPage} hasNextPage={data.length === 2}/>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

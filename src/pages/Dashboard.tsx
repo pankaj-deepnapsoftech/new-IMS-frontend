@@ -5,11 +5,12 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Card from "../components/Dashboard/Card";
 import Loading from "../ui/Loading";
+import { colors } from "../theme/colors";
 import { IoIosDocument, IoMdCart } from "react-icons/io";
 import { FaRupeeSign, FaStoreAlt, FaUser } from "react-icons/fa";
 import { AiFillProduct } from "react-icons/ai";
 import { IoPeople } from "react-icons/io5";
-import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import { Button, Input } from "@chakra-ui/react";
 
 const Dashboard: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -21,78 +22,78 @@ const Dashboard: React.FC = () => {
   const { firstname } = useSelector((state: any) => state.auth);
   const [approvalsPending, setApprovalsPending] = useState<
     | {
-      unapproved_product_count: number;
-      unapproved_store_count: number;
-      unapproved_merchant_count: number;
-      unapproved_bom_count: number;
-    }
+        unapproved_product_count: number;
+        unapproved_store_count: number;
+        unapproved_merchant_count: number;
+        unapproved_bom_count: number;
+      }
     | undefined
   >();
   const [scrap, setScrap] = useState<
     | {
-      total_product_count: number;
-      total_stock_price: number;
-    }
+        total_product_count: number;
+        total_stock_price: number;
+      }
     | undefined
   >();
   const [inventory, setInventory] = useState<
     | {
-      total_product_count: number;
-      total_stock_price: number;
-    }
+        total_product_count: number;
+        total_stock_price: number;
+      }
     | undefined
   >();
   const [directInventory, setDirectInventory] = useState<
     | {
-      total_low_stock: number;
-      total_excess_stock: number;
-      total_product_count: number;
-      total_stock_price: number;
-    }
+        total_low_stock: number;
+        total_excess_stock: number;
+        total_product_count: number;
+        total_stock_price: number;
+      }
     | undefined
   >();
   const [indirectInventory, setIndirectInventory] = useState<
     | {
-      total_low_stock: number;
-      total_excess_stock: number;
-      total_product_count: number;
-      total_stock_price: number;
-    }
+        total_low_stock: number;
+        total_excess_stock: number;
+        total_product_count: number;
+        total_stock_price: number;
+      }
     | undefined
   >();
   const [stores, setStores] = useState<
     | {
-      total_store_count: number;
-    }
+        total_store_count: number;
+      }
     | undefined
   >();
   const [boms, setBoms] = useState<
     | {
-      total_bom_count: number;
-    }
+        total_bom_count: number;
+      }
     | undefined
   >();
   const [merchants, setMerchants] = useState<
     | {
-      total_supplier_count: number;
-      total_buyer_count: number;
-    }
+        total_supplier_count: number;
+        total_buyer_count: number;
+      }
     | undefined
   >();
   const [employees, setEmployees] = useState<
     | {
-      _id: string;
-      total_employee_count: number;
-    }[]
+        _id: string;
+        total_employee_count: number;
+      }[]
     | undefined
   >();
   const [processes, setProcesses] = useState<
     | {
-      ["raw material approval pending"]?: number;
-      ["raw materials approved"]?: number;
-      completed?: number;
-      "work in progress"?: number;
-    }
+        ["raw material approval pending"]?: number;
+        ["raw materials approved"]?: number;
+        completed?: number;
+        "work in progress"?: number;
+      }
     | undefined
   >();
   const [totalProformaInvoices, setTotalProformaInvoices] = useState<number>(0);
@@ -164,23 +165,22 @@ const Dashboard: React.FC = () => {
 
     fetchSummaryHandler();
   };
-const dynamicColor = (index: number) => {
-  switch (index) {
-    case 0:
-      return "bg-gradient-to-tl from-purple-400 to-pink-500";
-    case 1:
-      return "bg-gradient-to-tl from-green-300 to-blue-500";
-    case 2:
-      return "bg-gradient-to-tl from-sky-400 to-blue-600";
-    case 3:
-      return "bg-gradient-to-tl from-indigo-400 to-purple-600";
-    case 4:
-      return "bg-gradient-to-tl from-teal-400 to-cyan-500";
-    default:
-      return "bg-gradient-to-tl from-gray-300 to-gray-500"; // fallback
-  }
-};
-
+  const dynamicColor = (index: number) => {
+    switch (index) {
+      case 0:
+        return "bg-gradient-to-tl from-purple-400 to-pink-500";
+      case 1:
+        return "bg-gradient-to-tl from-green-300 to-blue-500";
+      case 2:
+        return "bg-gradient-to-tl from-sky-400 to-blue-600";
+      case 3:
+        return "bg-gradient-to-tl from-indigo-400 to-purple-600";
+      case 4:
+        return "bg-gradient-to-tl from-teal-400 to-cyan-500";
+      default:
+        return "bg-gradient-to-tl from-gray-300 to-gray-500"; // fallback
+    }
+  };
 
   useEffect(() => {
     fetchSummaryHandler();
@@ -195,415 +195,576 @@ const dynamicColor = (index: number) => {
   }
 
   return (
-    <div>
-      <div className="flex flex-col  md:items-center md:justify-between gap-6 p-8 backdrop-blur-lg bg-gradient-to-r from-[#4f5f79] to-[#6987b1] rounded-xl shadow-sm">
-        <div className="text-2xl md:text-3xl text-[#faf9f9] font-[700]   ">
-          Welcome {firstname || ""}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Section */}
+      <div
+        className="bg-white border-b border-gray-200 p-6 md:p-8 shadow-sm"
+        style={{ backgroundColor: colors.background.page }}
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            {/* Welcome Section */}
+            <div className="flex-1">
+              <h1
+                className="text-3xl md:text-4xl font-bold mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Welcome back, {firstname || "User"}!
+              </h1>
+              <p className="text-lg" style={{ color: colors.text.secondary }}>
+                Here's what's happening with your business today.
+              </p>
+            </div>
+
+            {/* Filter Form */}
+            <div
+              className="bg-white rounded-xl p-6 shadow-sm border"
+              style={{
+                backgroundColor: colors.background.card,
+                borderColor: colors.border.light,
+                boxShadow: colors.shadow.md,
+              }}
+            >
+              <form
+                onSubmit={applyFilterHandler}
+                className="flex flex-col sm:flex-row items-start sm:items-end gap-4"
+              >
+                <div className="min-w-0 flex-1">
+                  <label
+                    htmlFor="from-date"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.text.primary }}
+                  >
+                    From Date
+                  </label>
+                  <Input
+                    value={from}
+                    onChange={(e) => setFrom(e.target.value)}
+                    id="from-date"
+                    type="date"
+                    className="w-full rounded-lg px-4 py-2.5 text-sm border transition-colors focus:outline-none focus:ring-2"
+                    style={{
+                      backgroundColor: colors.input.background,
+                      borderColor: colors.input.border,
+                      color: colors.text.primary,
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = colors.input.borderFocus;
+                      e.target.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = colors.input.border;
+                      e.target.style.boxShadow = "none";
+                    }}
+                  />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <label
+                    htmlFor="to-date"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.text.primary }}
+                  >
+                    To Date
+                  </label>
+                  <Input
+                    value={to}
+                    onChange={(e) => setTo(e.target.value)}
+                    id="to-date"
+                    type="date"
+                    className="w-full rounded-lg px-4 py-2.5 text-sm border transition-colors focus:outline-none focus:ring-2"
+                    style={{
+                      backgroundColor: colors.input.background,
+                      borderColor: colors.input.border,
+                      color: colors.text.primary,
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = colors.input.borderFocus;
+                      e.target.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = colors.input.border;
+                      e.target.style.boxShadow = "none";
+                    }}
+                  />
+                </div>
+
+                <div className="flex gap-3 sm:gap-2">
+                  <Button
+                    type="submit"
+                    className="px-6 py-2.5 text-sm font-medium text-white rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    style={{
+                      backgroundColor: colors.primary[600],
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        colors.primary[700];
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        colors.primary[600];
+                    }}
+                  >
+                    <p className="text-white"> Apply Filter</p>
+                  </Button>
+                  <Button
+                    onClick={resetFilterHandler}
+                    type="button"
+                    className="px-6 py-2.5 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    style={{
+                      backgroundColor: colors.background.card,
+                      borderColor: colors.border.medium,
+                      color: colors.text.secondary,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = colors.gray[50];
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        colors.background.card;
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
-
-        <form
-          onSubmit={applyFilterHandler}
-          className="flex flex-col md:flex-row items-start md:items-end gap-4 w-full md:w-auto"
-        >
-          <div className="w-full max-w-md">
-            <label htmlFor="dob" className="block text-sm font-medium text-[#dcdddd] mb-1">
-              FROM:
-            </label>
-            <input 
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-              id="dob"
-              type="text"
-              
-              placeholder="DD/MM/YYYY"
-              className="w-full  rounded-md px-4 py-2 text-sm  text-gray-200 placeholder-gray-300   bg-[#918f8f57]  focus:outline-none transition"
-            />
-
-          </div>
-          <div className="w-full max-w-md">
-            <label htmlFor="dob" className="block text-sm font-medium text-[#dcdddd]  mb-1">
-              TO:
-            </label>
-            <input
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-              id="dob"
-              type="text"
-              placeholder="DD/MM/YYYY"
-              className="w-full  rounded-md px-4 py-2 text-sm text-gray-200 placeholder-gray-300   bg-[#918f8f57]  focus:outline-none  transition"
-            />
-          </div>
-          <div className="flex w-full md:w-auto gap-2">
-            <button
-              onClick={resetFilterHandler}
-              type="submit"
-              className="w-full md:w-40 h-11 px-4 text-sm font-medium tracking-wide rounded-md bg-gradient-to-r from-[#5b7eb5] to-[#4f79b5] text-white shadow-md border-none hover:from-[#4f79b5]  hover:to-[#5c7aa3] focus:outline-none  transition-all duration-300 ease-in-out"
-            >
-              Apply Now
-            </button>
-            <button
-              onClick={resetFilterHandler}
-              type="submit"
-              className="w-full md:w-40  h-11 text-sm font-medium tracking-wide rounded-md  bg-gradient-to-r from-[#5b7eb5] to-[#4f79b5] text-white shadow-md border-none hover:from-[#4f79b5] hover:to-[#6280aa] focus:outline-none  transition-all duration-300 ease-in-out"
-            >
-              Reset
-            </button>
-          </div>
-        </form>
       </div>
 
-      {isLoading && <Loading />}
-      {!isLoading && (
-        <div>
-          <div className="mb-2 text-white  mt-6 font-[700] text-[25px]">
-            Employee Insights
-          </div>
-          {employees && employees.length === 0 && (
-            <div className="text-center mb-2 text-white">No data found.</div>
-          )}
-          {employees && (
-            <div className=" flex flex-wrap max-[700px]:justify-center px-5 py-5 bg-[#34739777] shadow-3xl rounded-md  gap-4  ">
-              {employees.map((emp, ind) => {
-                return (
-                  <Card
-                    primaryColor="white"
-                    secondaryColor="#A82298"
-                    bgColor={dynamicColor(ind)}
-                    textColor="#A82298"
-                    title={emp?._id}
-                    content={emp?.total_employee_count}
-                    link="employee"
-                    icon={<IoPeople color="#ffffff" size={28} />}
-                  />
-                );
-              })}
-            </div>
-          )}
-          <div className="mb-2 text-white mt-6 font-bold text-2xl">
-            Sales & Purchase Insights
-          </div>
-          {approvalsPending && (
-            <div className=" flex flex-wrap max-[700px]:justify-center px-5 py-5 bg-[#34739777] shadow-3xl rounded-md  gap-4 ">
-              <Card
-                primaryColor="white"
-                secondaryColor="white"
-                bgColor="bg-gradient-to-tl from-green-300 to-blue-500"
-                textColor="black"
-                title="Proforma Invoices"
-                content={totalProformaInvoices}
-                link="approval"
-                icon={<IoMdCart color="#fff" size={28} />}
-              />
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 md:px-8 py-8">
+        {isLoading && <Loading />}
 
-              <Card
-                primaryColor="white"
-                secondaryColor="#900C3F"
-                bgColor="bg-gradient-to-tl from-purple-300 to-pink-500"
-                textColor="#00FFFF"
-                title="Invoices"
-                content={totalInvoices}
-                link="approval"
-                icon={<FaStoreAlt color="#fff" size={28} />}
-              />
-
-              <Card
-                primaryColor="white"
-                secondaryColor="#155724"  
-                bgColor="bg-gradient-to-tl from-gray-300 to-green-500"
-                textColor="#FF69B4"
-                title="Payments"
-                content={totalPayments}
-                link="approval"
-                icon={<FaUser color="#fff" size={28} />}
-              />
-
-            </div>
-          )}
-          <div className="mb-2 text-white mt-6 font-bold text-2xl ">
-            Approvals Pending
-          </div>
-          {approvalsPending && (
-            <div className=" flex flex-wrap max-[700px]:justify-center px-5 py-5 bg-[#34739777] shadow-3xl rounded-md  gap-4  ">
-              <Card
-                primaryColor="white"
-                secondaryColor="#1E387B"
-                textColor="white"
-                bgColor="bg-gradient-to-tl from-sky-400 to-blue-600"
-
-
-                title="Inventory"
-                content={approvalsPending?.unapproved_product_count}
-                link="approval"
-                icon={<IoMdCart color="#ffffff" size={28} />}
-              />
-              <Card
-                primaryColor="white"
-                secondaryColor="#1E387B"
-                textColor="white"
-                bgColor= "bg-gradient-to-tl from-indigo-400 to-purple-600"
-                title="Stores"
-                content={approvalsPending?.unapproved_store_count}
-                link="approval"
-                icon={<FaStoreAlt color="#ffffff" size={28} />}
-              />
-              <Card
-                primaryColor="white"
-                secondaryColor="#1E387B"
-                textColor="white"
-                bgColor= "bg-gradient-to-tl from-blue-400 to-sky-600"
-                title="Merchants"
-                content={approvalsPending?.unapproved_merchant_count}
-                link="approval"
-                icon={<FaUser color="#ffffff" size={28} />}
-              />
-              <Card
-                primaryColor="white"
-                secondaryColor="#1E387B"
-                textColor="white"
-                bgColor= "bg-gradient-to-tl from-gray-400 to-cyan-600"
-                title="BOMs"
-                content={approvalsPending?.unapproved_bom_count}
-                link="approval"
-                icon={<IoIosDocument color="#ffffff" size={28} />}
-              />
-            </div>
-          )}
-          <div className="mb-2 text-white mt-5 font-bold text-2xl">
-            Inventory Insights
-          </div>
-          {directInventory && (
-            <div className="  flex flex-wrap max-[700px]:justify-center px-5 py-5 bg-[#34739777] shadow-3xl rounded-md  gap-4 mb-4 ">
-              <Card
-                primaryColor="white"
-                secondaryColor="#32A1E7"
-                textColor="white"
-                bgColor= "bg-gradient-to-tl from-blue-400 to-purple-600"
-                title="Direct Inventory"
-                content={directInventory?.total_product_count}
-                link="product"
-                icon={<IoMdCart color="#ffffff" size={28} />}
-              />
-              <Card
-                primaryColor="white"
-                secondaryColor="#32A1E7"
-                textColor="white"
-                bgColor= "bg-gradient-to-tl from-purple-400 to-blue-600"
-                title="Stock Value"
-                content={"₹ " + directInventory?.total_stock_price + "/-"}
-                icon={<FaRupeeSign color="#ffffff" size={24} />}
-                link="product"
-              />
-              <Card
-                primaryColor="white"
-                secondaryColor="#32A1E7"
-                textColor="white"
-                bgColor= "bg-gradient-to-tl from-gray-400 to-green-600"
-                title="Excess Stock"
-                content={directInventory?.total_excess_stock}
-                link="product"
-                icon={<AiFillProduct color="#ffffff" size={28} />}
-              />
-              <Card
-                primaryColor="white"
-                secondaryColor="#32A1E7"
-                textColor="white"
-                bgColor= "bg-gradient-to-tl from-gray-400 to-purple-600"
-                title="Low Stock"
-                content={directInventory?.total_low_stock}
-                link="product"
-                icon={<AiFillProduct color="#ffffff" size={28} />}
-              />
-            </div>
-          )}
-          {indirectInventory && (
-            <div className="  flex flex-wrap max-[700px]:justify-center  px-5 py-5 bg-[#34739777] shadow-3xl rounded-md  gap-4 mb-4 ">
-              <Card
-                primaryColor="white"
-                secondaryColor="#32A1E7"
-                textColor="white"
-                bgColor= "bg-gradient-to-tl from-gray-400 to-blue-600"
-                title="Indirect Inventory"
-                content={indirectInventory?.total_product_count}
-                link="product"
-                icon={<IoMdCart color="#ffffff" size={28} />}
-              />
-              <Card
-                primaryColor="white"
-                secondaryColor="#32A1E7"
-                textColor="white"
-                bgColor= "bg-gradient-to-tl from-gray-400 to-teal-600"
-                title="Stock Value"
-                content={"₹ " + indirectInventory?.total_stock_price + "/-"}
-                icon={<FaRupeeSign color="#ffffff" size={28} />}
-                link="product"
-              />
-              <Card
-                primaryColor="white"
-                secondaryColor="#32A1E7"
-                textColor="white"
-                bgColor="bg-gradient-to-tl from-gray-400 to-sky-600"
-                title="Excess Stock"
-                content={indirectInventory?.total_excess_stock}
-                link="product"
-                icon={<AiFillProduct color="#ffffff" size={28} />}
-              />
-              <Card
-                primaryColor="white"
-                secondaryColor="#32A1E7"
-                textColor="white"
-                bgColor="bg-gradient-to-tl from-gray-400 to-pink-600"
-                title="Low Stock"
-                content={indirectInventory?.total_low_stock}
-                link="product"
-                icon={<AiFillProduct color="#ffffff" size={28} />}
-              />
-            </div>
-          )}
-          <div className=" flex flex-wrap max-[700px]:justify-center px-5 py-5 bg-[#34739777] shadow-3xl rounded-md  gap-4 mb-4 ">
-            <Card
-              primaryColor="white"
-              secondaryColor="#32A1E7"
-              textColor="white"
-              bgColor="bg-gradient-to-tl from-gray-400 to-green-600"
-              title="Scrap Materials"
-              content={scrap?.total_product_count?.toString() || ""}
-              link="product"
-              icon={<IoMdCart color="#ffffff" size={28} />}
-            />
-            <Card
-              primaryColor="white"
-              secondaryColor="#32A1E7"
-              textColor="white"
-              bgColor="bg-gradient-to-tl from-gray-400 to-purple-600"
-              title="Scrap Value"
-              content={"₹ " + scrap?.total_stock_price + "/-"}
-              icon={<FaRupeeSign color="#ffffff" size={24} />}
-              link="product"
-            />
-            <Card
-              primaryColor="white"
-              secondaryColor="#32A1E7"
-              textColor="white"
-              bgColor="bg-gradient-to-tl from-gray-400 to-teal-600"
-              title="WIP Inventory"
-              content={inventory?.total_product_count?.toString() || ""}
-              link="product"
-              icon={<IoMdCart color="#ffffff" size={28} />}
-            />
-            <Card
-              primaryColor="white"
-              secondaryColor="#32A1E7"
-              textColor="White"
-              bgColor="bg-gradient-to-tl from-gray-400 to-cyan-600"
-              title="WIP Inventory Value"
-              content={"₹ " + inventory?.total_stock_price + "/-"}
-              icon={<FaRupeeSign color="#ffffff" size={24} />}
-              link="product"
-            />
-          </div>
-          <div className="mb-2 text-white mt-5 font-bold text-2xl">
-            Store & Merchant Insights
-          </div>
-          <div className=" flex flex-wrap max-[700px]:justify-center px-5 py-5 bg-[#34739777] shadow-3xl rounded-md  gap-4  ">
-            {stores && (
-              <div>
-                <Card
-                  primaryColor="white"
-                  secondaryColor="#E56F27"
-                  textColor="white"
-                  bgColor="bg-gradient-to-tl from-gray-400 to-blue-600"
-                  title="Stores"
-                  content={stores?.total_store_count}
-                  link="store"
-                  icon={<FaStoreAlt color="#ffffff" size={24} />}
+        {!isLoading && (
+          <div className="space-y-12">
+            {/* Employee Insights Section */}
+            <section className="animate-fade-in">
+              <div className="flex items-center gap-3 mb-6">
+                <div
+                  className="w-1 h-8 rounded-full transition-all duration-300 hover:w-2"
+                  style={{ backgroundColor: colors.primary[500] }}
                 />
+                <h2
+                  className="text-2xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Employee Insights
+                </h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent ml-4" />
               </div>
-            )}
-            {merchants && (
-              <Card
-                primaryColor="white"
-                secondaryColor="#A231E8"
-                textColor="white"
-                bgColor="bg-gradient-to-tl from-slate-400 to-teal-600"
-                title="Buyers"
-                content={merchants?.total_buyer_count}
-                link="merchant/buyer"
-                icon={<FaUser color="#ffffff" size={24} />}
-              />
-            )}
-            {merchants && (
-              <Card
-                primaryColor="white"
-                secondaryColor="#A231E8"
-                textColor="white"
-                bgColor="bg-gradient-to-tl from-gray-400 to-sky-600"
-                title="Suppliers"
-                content={merchants?.total_supplier_count}
-                link="merchant/supplier"
-                icon={<FaUser color="#ffffff" size={24} />}
-              />
-            )}
-          </div>
 
-          <div className="mb-2 text-white mt-5 font-bold text-2xl">
-            Production Insights
+              {employees && employees.length === 0 && (
+                <div
+                  className="text-center py-12 rounded-xl border border-dashed"
+                  style={{
+                    borderColor: colors.border.light,
+                    color: colors.text.muted,
+                  }}
+                >
+                  <p className="text-lg">No employee data found.</p>
+                </div>
+              )}
+
+              {employees && employees.length > 0 && (
+                <div
+                  className="p-6 rounded-xl border shadow-sm"
+                  style={{
+                    backgroundColor: colors.background.card,
+                    borderColor: colors.border.light,
+                    boxShadow: colors.shadow.sm,
+                  }}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {employees.map((emp, ind) => (
+                      <Card
+                        key={emp._id}
+                        type="employees"
+                        title={emp?._id}
+                        content={emp?.total_employee_count}
+                        icon={<IoPeople size={28} />}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* Sales & Purchase Insights Section */}
+            <section className="animate-fade-in">
+              <div className="flex items-center gap-3 mb-6">
+                <div
+                  className="w-1 h-8 rounded-full transition-all duration-300 hover:w-2"
+                  style={{ backgroundColor: colors.success[500] }}
+                />
+                <h2
+                  className="text-2xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Sales & Purchase Insights
+                </h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent ml-4" />
+              </div>
+
+              {approvalsPending && (
+                <div
+                  className="p-6 rounded-xl border shadow-sm"
+                  style={{
+                    backgroundColor: colors.background.card,
+                    borderColor: colors.border.light,
+                    boxShadow: colors.shadow.sm,
+                  }}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Card
+                      type="sales"
+                      title="Proforma Invoices"
+                      content={totalProformaInvoices}
+                      icon={<IoMdCart size={28} />}
+                    />
+                    <Card
+                      type="dispatcher"
+                      title="Invoices"
+                      content={totalInvoices}
+                      icon={<FaStoreAlt size={28} />}
+                    />
+                    <Card
+                      type="employees"
+                      title="Payments"
+                      content={totalPayments}
+                      icon={<FaUser size={28} />}
+                    />
+                  </div>
+                </div>
+              )}
+            </section>
+            {/* Approvals Pending Section */}
+            <section className="animate-fade-in">
+              <div className="flex items-center gap-3 mb-6">
+                <div
+                  className="w-1 h-8 rounded-full transition-all duration-300 hover:w-2"
+                  style={{ backgroundColor: colors.warning[500] }}
+                />
+                <h2
+                  className="text-2xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Approvals Pending
+                </h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent ml-4" />
+              </div>
+
+              {approvalsPending && (
+                <div
+                  className="p-6 rounded-xl border shadow-sm"
+                  style={{
+                    backgroundColor: colors.background.card,
+                    borderColor: colors.border.light,
+                    boxShadow: colors.shadow.sm,
+                  }}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Card
+                      type="inventory"
+                      title="Inventory"
+                      content={approvalsPending?.unapproved_product_count}
+                      icon={<IoMdCart size={28} />}
+                    />
+                    <Card
+                      type="employees"
+                      title="Stores"
+                      content={approvalsPending?.unapproved_store_count}
+                      icon={<FaStoreAlt size={28} />}
+                    />
+                    <Card
+                      type="sales"
+                      title="Merchants"
+                      content={approvalsPending?.unapproved_merchant_count}
+                      icon={<FaUser size={28} />}
+                    />
+                    <Card
+                      type="products"
+                      title="BOMs"
+                      content={approvalsPending?.unapproved_bom_count}
+                      icon={<IoIosDocument size={28} />}
+                    />
+                  </div>
+                </div>
+              )}
+            </section>
+            {/* Inventory Insights Section */}
+            <section className="animate-fade-in">
+              <div className="flex items-center gap-3 mb-6">
+                <div
+                  className="w-1 h-8 rounded-full transition-all duration-300 hover:w-2"
+                  style={{ backgroundColor: colors.secondary[500] }}
+                />
+                <h2
+                  className="text-2xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Inventory Insights
+                </h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent ml-4" />
+              </div>
+
+              <div className="space-y-6">
+                {/* Direct Inventory */}
+                {directInventory && (
+                  <div
+                    className="p-6 rounded-xl border shadow-sm"
+                    style={{
+                      backgroundColor: colors.background.card,
+                      borderColor: colors.border.light,
+                      boxShadow: colors.shadow.sm,
+                    }}
+                  >
+                    <h3
+                      className="text-lg font-semibold mb-4"
+                      style={{ color: colors.text.primary }}
+                    >
+                      Direct Inventory
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <Card
+                        type="products"
+                        title="Total Products"
+                        content={directInventory?.total_product_count}
+                        icon={<IoMdCart size={28} />}
+                      />
+                      <Card
+                        type="sales"
+                        title="Stock Value"
+                        content={
+                          "₹ " + directInventory?.total_stock_price + "/-"
+                        }
+                        icon={<FaRupeeSign size={24} />}
+                      />
+                      <Card
+                        type="dispatcher"
+                        title="Excess Stock"
+                        content={directInventory?.total_excess_stock}
+                        icon={<AiFillProduct size={28} />}
+                      />
+                      <Card
+                        type="inventory"
+                        title="Low Stock"
+                        content={directInventory?.total_low_stock}
+                        icon={<AiFillProduct size={28} />}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Indirect Inventory */}
+                {indirectInventory && (
+                  <div
+                    className="p-6 rounded-xl border shadow-sm"
+                    style={{
+                      backgroundColor: colors.background.card,
+                      borderColor: colors.border.light,
+                      boxShadow: colors.shadow.sm,
+                    }}
+                  >
+                    <h3
+                      className="text-lg font-semibold mb-4"
+                      style={{ color: colors.text.primary }}
+                    >
+                      Indirect Inventory
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <Card
+                        type="products"
+                        title="Total Products"
+                        content={indirectInventory?.total_product_count}
+                        icon={<IoMdCart size={28} />}
+                      />
+                      <Card
+                        type="sales"
+                        title="Stock Value"
+                        content={
+                          "₹ " + indirectInventory?.total_stock_price + "/-"
+                        }
+                        icon={<FaRupeeSign size={28} />}
+                      />
+                      <Card
+                        type="dispatcher"
+                        title="Excess Stock"
+                        content={indirectInventory?.total_excess_stock}
+                        icon={<AiFillProduct size={28} />}
+                      />
+                      <Card
+                        type="inventory"
+                        title="Low Stock"
+                        content={indirectInventory?.total_low_stock}
+                        icon={<AiFillProduct size={28} />}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Other Inventory */}
+                <div
+                  className="p-6 rounded-xl border shadow-sm"
+                  style={{
+                    backgroundColor: colors.background.card,
+                    borderColor: colors.border.light,
+                    boxShadow: colors.shadow.sm,
+                  }}
+                >
+                  <h3
+                    className="text-lg font-semibold mb-4"
+                    style={{ color: colors.text.primary }}
+                  >
+                    Scrap & WIP Inventory
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Card
+                      type="dispatcher"
+                      title="Scrap Materials"
+                      content={scrap?.total_product_count?.toString() || ""}
+                      icon={<IoMdCart size={28} />}
+                    />
+                    <Card
+                      type="inventory"
+                      title="Scrap Value"
+                      content={"₹ " + scrap?.total_stock_price + "/-"}
+                      icon={<FaRupeeSign size={24} />}
+                    />
+                    <Card
+                      type="employees"
+                      title="WIP Inventory"
+                      content={inventory?.total_product_count?.toString() || ""}
+                      icon={<IoMdCart size={28} />}
+                    />
+                    <Card
+                      type="sales"
+                      title="WIP Inventory Value"
+                      content={"₹ " + inventory?.total_stock_price + "/-"}
+                      icon={<FaRupeeSign size={24} />}
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Store & Merchant Insights Section */}
+            <section className="animate-fade-in">
+              <div className="flex items-center gap-3 mb-6">
+                <div
+                  className="w-1 h-8 rounded-full transition-all duration-300 hover:w-2"
+                  style={{ backgroundColor: colors.primary[500] }}
+                />
+                <h2
+                  className="text-2xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Store & Merchant Insights
+                </h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent ml-4" />
+              </div>
+
+              <div
+                className="p-6 rounded-xl border shadow-sm"
+                style={{
+                  backgroundColor: colors.background.card,
+                  borderColor: colors.border.light,
+                  boxShadow: colors.shadow.sm,
+                }}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {stores && (
+                    <Card
+                      type="employees"
+                      title="Stores"
+                      content={stores?.total_store_count}
+                      icon={<FaStoreAlt size={24} />}
+                    />
+                  )}
+                  {merchants && (
+                    <Card
+                      type="sales"
+                      title="Buyers"
+                      content={merchants?.total_buyer_count}
+                      icon={<FaUser size={24} />}
+                    />
+                  )}
+                  {merchants && (
+                    <Card
+                      type="dispatcher"
+                      title="Suppliers"
+                      content={merchants?.total_supplier_count}
+                      icon={<FaUser size={24} />}
+                    />
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Production Insights Section */}
+            <section className="animate-fade-in">
+              <div className="flex items-center gap-3 mb-6">
+                <div
+                  className="w-1 h-8 rounded-full transition-all duration-300 hover:w-2"
+                  style={{ backgroundColor: colors.warning[500] }}
+                />
+                <h2
+                  className="text-2xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Production Insights
+                </h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent ml-4" />
+              </div>
+
+              <div
+                className="p-6 rounded-xl border shadow-sm"
+                style={{
+                  backgroundColor: colors.background.card,
+                  borderColor: colors.border.light,
+                  boxShadow: colors.shadow.sm,
+                }}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {boms && (
+                    <Card
+                      type="products"
+                      title="BOMs"
+                      content={boms?.total_bom_count}
+                      icon={<IoIosDocument size={28} />}
+                    />
+                  )}
+                  <Card
+                    type="inventory"
+                    title="Inventory Approval Pending"
+                    content={processes?.["raw material approval pending"] || 0}
+                    icon={<FaStoreAlt size={28} />}
+                  />
+                  <Card
+                    type="dispatcher"
+                    title="Inventory Approved"
+                    content={processes?.["raw materials approved"] || 0}
+                    icon={<FaStoreAlt size={28} />}
+                  />
+                  <Card
+                    type="employees"
+                    title="Work In Progress"
+                    content={processes?.["work in progress"] || 0}
+                    icon={<FaStoreAlt size={28} />}
+                  />
+                  <Card
+                    type="sales"
+                    title="Completed"
+                    content={processes?.completed || 0}
+                    icon={<FaStoreAlt size={28} />}
+                  />
+                </div>
+              </div>
+            </section>
           </div>
-          <div className=" flex flex-wrap max-[700px]:justify-center px-5 py-5 bg-[#34739777] shadow-3xl rounded-md  gap-4  ">
-            {boms && (
-              <Card
-                primaryColor="white"
-                secondaryColor="#21A86C"
-                textColor="white"
-                bgColor="bg-gradient-to-tl from-gray-400 to-rose-600"
-                title="BOMs"
-                content={boms?.total_bom_count}
-                link="bom"
-                icon={<IoIosDocument color="#ffffff" size={28} />}
-              />
-            )}
-            <Card
-              primaryColor="white"
-              secondaryColor="#E56F27"
-              textColor="white"
-              bgColor="bg-gradient-to-tl from-gray-400 to-lime-600"
-              title="Inventory Approval Pending"
-              content={processes?.["raw material approval pending"] || 0}
-              link="production/production-process"
-              icon={<FaStoreAlt color="#ffffff" size={28} />}
-            />
-            <Card
-              primaryColor="white"
-              secondaryColor="#E56F27"
-              bgColor="bg-gradient-to-tl from-gray-400 to-teal-600"
-              textColor="white"
-              title="Inventory Approved"
-              content={processes?.["raw materials approved"] || 0}
-              link="production/production-process"
-              icon={<FaStoreAlt color="#ffffff" size={28} />}
-            />
-            <Card
-              primaryColor="white"
-              secondaryColor="#E56F27"
-              textColor="white"
-              bgColor="bg-gradient-to-tl from-gray-400 to-purple-600"
-              title="Work In Progress"
-              content={processes?.["work in progress"] || 0}
-              link="production/production-process"
-              icon={<FaStoreAlt color="#ffffff" size={28} />}
-            />
-            <Card
-              primaryColor="white"
-              secondaryColor="#E56F27"
-              textColor="white"
-              bgColor="bg-gradient-to-tl from-gray-400 to-blue-600"
-              title="Completed"
-              content={processes?.completed || 0}
-              link="production/production-process"
-              icon={<FaStoreAlt color="#ffffff" size={28} />}
-            />
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

@@ -22,6 +22,7 @@ import ProductDetails from "../components/Drawers/Product/ProductDetails";
 import WIPProductTable from "../components/Table/WIPProductTable";
 import { FiSearch } from "react-icons/fi";
 import { colors } from "../theme/colors";
+import { PackageSearch } from "lucide-react";
 
 const WIPProducts: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -252,19 +253,24 @@ const WIPProducts: React.FC = () => {
           }}
         >
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h1
-                className="text-2xl lg:text-3xl font-bold"
-                style={{ color: colors.text.primary }}
-              >
-                WIP Products
-              </h1>
-              <p
-                className="text-sm mt-1"
-                style={{ color: colors.text.secondary }}
-              >
-                Work In Progress inventory management
-              </p>
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
+                <PackageSearch className="text-white" />
+              </div>
+              <div>
+                <h1
+                  className="text-2xl lg:text-3xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  WIP Products
+                </h1>
+                <p
+                  className="text-sm mt-1"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Work In Progress inventory management
+                </p>
+              </div>
             </div>
 
             {/* Action Buttons */}

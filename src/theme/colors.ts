@@ -146,6 +146,67 @@ export const colors = {
     lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
     xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
   },
+
+  // Dashboard specific colors
+  dashboard: {
+    card: {
+      background: "#ffffff",
+      border: "#e5e7eb",
+      shadow:
+        "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+      shadowHover:
+        "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+      iconBackground: "#f9fafb",
+      contentBackground: "#f3f4f6",
+    },
+    metrics: {
+      designer: {
+        primary: "#8b5cf6",
+        secondary: "#a78bfa",
+        background: "#faf5ff",
+      },
+      dispatcher: {
+        primary: "#10b981",
+        secondary: "#34d399",
+        background: "#f0fdf4",
+      },
+      sales: {
+        primary: "#3b82f6",
+        secondary: "#60a5fa",
+        background: "#eff6ff",
+      },
+      products: {
+        primary: "#f59e0b",
+        secondary: "#fbbf24",
+        background: "#fffbeb",
+      },
+      inventory: {
+        primary: "#ef4444",
+        secondary: "#f87171",
+        background: "#fef2f2",
+      },
+      employees: {
+        primary: "#06b6d4",
+        secondary: "#22d3ee",
+        background: "#f0fdff",
+      },
+      stores: {
+        primary: "#8b5cf6",
+        secondary: "#a78bfa",
+        background: "#faf5ff",
+      },
+      payments: {
+        primary: "#22c55e",
+        secondary: "#4ade80",
+        background: "#f0fdf4",
+      },
+      bom: {
+        primary: "#f59e0b",
+        secondary: "#fbbf24",
+        background: "#fffbeb",
+      },
+    },
+  },
 } as const;
 
 // Type for accessing nested color values

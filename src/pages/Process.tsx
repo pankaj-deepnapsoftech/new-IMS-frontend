@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { MdOutlineRefresh } from "react-icons/md";
+import { MdOutlineRefresh, MdAdd } from "react-icons/md";
 import ProcessTable from "../components/Table/ProcessTable";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
@@ -18,6 +18,8 @@ import ProcessDetails from "../components/Drawers/Process/ProcessDetails";
 import UpdateProcess from "../components/Drawers/Process/UpdateProcess";
 import { useDeleteProcessMutation } from "../redux/api/api";
 import { FiSearch } from "react-icons/fi";
+import { colors } from "../theme/colors";
+import { Settings } from "lucide-react";
 
 const Process: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -138,83 +140,160 @@ const Process: React.FC = () => {
   }
 
   return (
-    <div className="rounded-md ">
-      {isAddProcessDrawerOpened && (
-        <AddProcess
-          fetchProcessHandler={fetchProcessHandler}
-          closeDrawerHandler={closeAddProcessDrawerHandler}
-        />
-      )}
-      {isProcessDetailsDrawerOpened && (
-        <ProcessDetails
-          id={id}
-          closeDrawerHandler={closeProcessDetailsDrawerHandler}
-        />
-      )}
-      {isUpdateProcessDrawerOpened && (
-        <UpdateProcess
-          id={id}
-          closeDrawerHandler={closeUpdateProcessDrawerHandler}
-          fetchProcessHandler={fetchProcessHandler}
-        />
-      )}
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: colors.background.page }}
+    >
+      <div className="p-2 lg:p-3">
+        {/* Add Process Drawer */}
+        {isAddProcessDrawerOpened && (
+          <AddProcess
+            fetchProcessHandler={fetchProcessHandler}
+            closeDrawerHandler={closeAddProcessDrawerHandler}
+          />
+        )}
+        {/* Process Details Drawer */}
+        {isProcessDetailsDrawerOpened && (
+          <ProcessDetails
+            id={id}
+            closeDrawerHandler={closeProcessDetailsDrawerHandler}
+          />
+        )}
+        {/* Update Process Drawer */}
+        {isUpdateProcessDrawerOpened && (
+          <UpdateProcess
+            id={id}
+            closeDrawerHandler={closeUpdateProcessDrawerHandler}
+            fetchProcessHandler={fetchProcessHandler}
+          />
+        )}
 
-      <div>
-        <h1 className="text-center font-[700] text-white text-[30px] pb-4">
-          Production Process
-        </h1>
+        {/* Header Section */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl shadow-lg">
+                <Settings className="text-white" size={24} />
+              </div>
+              <div>
+                <h1
+                  className="text-2xl lg:text-3xl font-bold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Production Process
+                </h1>
+                <p
+                  className="text-sm mt-1"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Manage your production processes and workflows
+                </p>
+              </div>
+            </div>
 
-        <div className="mt-2 flex flex-wrap justify-center md:justify-center w-full gap-4">
-          {/* Search Input */}
-          <div className="relative w-full md:w-[200px]">
-            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-200" />
-            <input
-              className="pl-10 pr-4 py-2 w-full text-sm text-gray-200 border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
-              placeholder="Search roles..."
-              value={searchKey}
-              onChange={(e) => setSearchKey(e.target.value)}
-            />
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={openAddProcessDrawerHandler}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: colors.button.primary,
+                  color: colors.text.inverse,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.primaryHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.button.primary;
+                }}
+              >
+                <MdAdd size="20px" />
+                Add New Process
+              </button>
+
+              <button
+                onClick={fetchProcessHandler}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                style={{
+                  borderColor: colors.border.medium,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[50];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.background.card;
+                }}
+              >
+                <MdOutlineRefresh size="20px" />
+                Refresh
+              </button>
+            </div>
           </div>
 
-          {/* Add New Production Process Button */}
-          <Button
-            fontSize={{ base: "14px", md: "14px" }}
-            paddingX={{ base: "10px", md: "12px" }}
-            paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "100%", md: 230 }}
-            onClick={openAddProcessDrawerHandler}
-            color="white"
-            backgroundColor="#4b87a0d9"
-            _hover={{ bg: "white", color: "black" }}
-          >
-            Add New Production Process
-          </Button>
-
-
-          <Button
-            fontSize={{ base: "14px", md: "14px" }}
-            paddingX={{ base: "10px", md: "12px" }}
-            paddingY={{ base: "0", md: "3px" }}
-            width={{ base: "100%", md: 100 }}
-            onClick={fetchProcessHandler}
-            leftIcon={<MdOutlineRefresh />}
-            color="white"
-            borderColor="white"
-            variant="outline"
-            _hover={{ bg: "white", color: "#2D3748" }}
-          >
-            Refresh
-          </Button>
+          {/* Search Row */}
+          <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
+            <div className="flex-1 max-w-md">
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Search Processes
+              </label>
+              <div className="relative">
+                <FiSearch
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                  style={{ color: colors.text.secondary }}
+                />
+                <input
+                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor =
+                      colors.input.borderFocus;
+                    e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = colors.input.border;
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                  placeholder="Search by creator, item, status, store..."
+                  value={searchKey || ""}
+                  onChange={(e) => setSearchKey(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <ProcessTable
-          isLoadingProcess={isLoading}
-          process={filteredData}
-          deleteProcessHandler={deleteProcessHandler}
-          openUpdateProcessDrawerHandler={openUpdateProcessDrawerHandler}
-        />
+        {/* Process Table */}
+        <div
+          className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          style={{
+            backgroundColor: colors.background.card,
+            borderColor: colors.border.light,
+          }}
+        >
+          <ProcessTable
+            isLoadingProcess={isLoading}
+            process={filteredData}
+            deleteProcessHandler={deleteProcessHandler}
+            openUpdateProcessDrawerHandler={openUpdateProcessDrawerHandler}
+          />
+        </div>
       </div>
     </div>
   );
