@@ -18,7 +18,7 @@ import { MdDelete } from "react-icons/md";
 import { useFormik } from "formik";
 import { AssignFormValidation } from "../../../Validation/SalesformValidation";
 
-const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
+const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurchases }) => {
     const [tasks, setTasks] = useState([]);
     const [formData, setFormData] = useState({
         sale_id: saleData?._id,
@@ -26,7 +26,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
         assined_process: "",
         assinedby_comment: "",
     });
-   
+    console.log(saleData)
     const [isEditMode, setIsEditMode] = useState(false);
     const [editTaskId, setEditTaskId] = useState(null);
     const [cookies] = useCookies(["access_token"]);
@@ -67,6 +67,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                     });
                     setIsEditMode(false);
                     setEditTaskId(null);
+
                 } else {
                   const res =  await axios.post(
                         `${process.env.REACT_APP_BACKEND_URL}assined/create`,
@@ -84,7 +85,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
                         isClosable: true,
                     });
                 }
-
+                fetchPurchases()
                 resetForm({
                     sale_id: saleData?._id,
                     assined_to: "",
@@ -174,7 +175,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
             setTasks(saleData.assinedto);
         }
     }, [saleData]);
-    // console.log(employeeData)
+ 
     return (
         <section>
             <div className={`${show ? "block" : "hidden"} bg-[#0c0c0c79] fixed inset-0 h-full w-full flex items-center justify-center z-50`}>
