@@ -96,14 +96,13 @@ const ScrapMaterial: React.FC<ScrapMaterialProps> = ({
   return (
     <div>
       <FormControl>
-        <FormLabel fontWeight="bold" color="white" fontSize="18px">Scrap Materials</FormLabel>
         {inputs && inputs.map((input, ind) => (
           <div
            
             key={ind}
           >
             <FormControl className="mb-5">
-              <FormLabel fontWeight="bold" color="white">Product Name</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Product Name</FormLabel>
               <Select
                 required
                 styles={customStyles}
@@ -118,7 +117,7 @@ const ScrapMaterial: React.FC<ScrapMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Description</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Description</FormLabel>
               <Input className="text-gray-200"
                 border="1px"
                 borderColor="#a9a9a9"
@@ -131,7 +130,7 @@ const ScrapMaterial: React.FC<ScrapMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Quantity</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Quantity</FormLabel>
               <Input className="text-gray-200"
                 border="1px"
                 borderColor="#a9a9a9"
@@ -144,7 +143,7 @@ const ScrapMaterial: React.FC<ScrapMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">UOM</FormLabel>
+              <FormLabel fontWeight="bold" color="black">UOM</FormLabel>
               <Input className="text-gray-200"
                 isDisabled={true}
                 border="1px"
@@ -155,7 +154,7 @@ const ScrapMaterial: React.FC<ScrapMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Unit Cost</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Unit Cost</FormLabel>
               <Input className="text-gray-200"
                 isDisabled={true}
                 border="1px"
@@ -169,7 +168,7 @@ const ScrapMaterial: React.FC<ScrapMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Total Part Cost</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Total Part Cost</FormLabel>
               <input 
                 disabled={true} 
                 onChange={(e) => {

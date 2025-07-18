@@ -103,13 +103,9 @@ const AddStore: React.FC<AddStoreProps> = ({
         </div>
 
         <div className="mt-8 px-5">
-          <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
-            Add New Store
-          </h2>
-
           <form onSubmit={addStoreHandler}>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Store Name
               </FormLabel>
               <Input
@@ -121,7 +117,7 @@ const AddStore: React.FC<AddStoreProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 GST Number
               </FormLabel>
               <Input
@@ -133,7 +129,7 @@ const AddStore: React.FC<AddStoreProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Address Line 1
               </FormLabel>
               <Input
@@ -145,7 +141,7 @@ const AddStore: React.FC<AddStoreProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Address Line 2
               </FormLabel>
               <Input
@@ -157,7 +153,7 @@ const AddStore: React.FC<AddStoreProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Pincode
               </FormLabel>
               <Input
@@ -169,7 +165,7 @@ const AddStore: React.FC<AddStoreProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 City
               </FormLabel>
               <Input
@@ -181,7 +177,7 @@ const AddStore: React.FC<AddStoreProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 State
               </FormLabel>
               <Input
@@ -196,9 +192,9 @@ const AddStore: React.FC<AddStoreProps> = ({
               isLoading={isAddingStore}
               type="submit"
               className="mt-1"
-              color="black"
-              backgroundColor="#ffffff8a"
-              _hover={{ bg: "#d1d2d5" }}
+              color="white"
+              backgroundColor="#3b82f6"
+              _hover={{ bg: "#3b82f6" }}
             >
               Submit
             </Button>

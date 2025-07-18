@@ -1,5 +1,5 @@
 // Centralized color definitions for the entire application
-export const colors = {
+export const  colors = {
   // Primary colors
   primary: {
     50: "#eff6ff",

@@ -144,14 +144,13 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
   return (
     <div>
       <FormControl isRequired>
-        <FormLabel fontWeight="bold" color="white" fontSize="18px">Raw Materials</FormLabel>
         {inputs.map((input, ind) => (
           <div
            
             key={ind}
           >
             <FormControl className="mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Product Name</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Product Name</FormLabel>
               <Select
               styles={customStyles}
                 required
@@ -166,7 +165,7 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Description</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Description</FormLabel>
               <Input 
               className="mb-2 text-gray-200"
                 border="1px"
@@ -180,7 +179,7 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">Quantity</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Quantity</FormLabel>
               <Input
               className="mb-2 text-gray-200"
                 border="1px"
@@ -194,7 +193,7 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">UOM</FormLabel>
+              <FormLabel fontWeight="bold" color="black">UOM</FormLabel>
               <Input
               className="mb-2 text-gray-200"
                 isDisabled={true}
@@ -206,7 +205,7 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">Category</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Category</FormLabel>
               <Input
               className="mb-2 text-gray-200"
                 isDisabled={true}
@@ -218,7 +217,7 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Assembly Phase</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Assembly Phase</FormLabel>
               <Select
               styles={customStyles}
                 className="rounded mt-2 border mb-4 border-[#a9a9a9]"
@@ -232,7 +231,7 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Supplier</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Supplier</FormLabel>
               <Select
               styles={customStyles}
                 className="rounded mt-2 border   mb-4 border-[#a9a9a9]"
@@ -246,7 +245,7 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Comments</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Comments</FormLabel>
               <Input
               className="text-gray-200"
                 border="1px"
@@ -260,7 +259,7 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">Unit Cost</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Unit Cost</FormLabel>
               <Input className="text-gray-200"
                 isDisabled={true}
                 border="1px"
@@ -274,7 +273,7 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Total Part Cost</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Total Part Cost</FormLabel>
               <input
               
                 disabled={true}

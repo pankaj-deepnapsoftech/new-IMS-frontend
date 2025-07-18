@@ -316,18 +316,18 @@ const AddBom: React.FC<AddBomProps> = ({
       <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between border-b">
+          <div className="px-6 py-4 flex items-center justify-between border-b">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <Package className="h-5 w-5 text-white" />
+              <div className="p-2 bg-white/20 border rounded-lg">
+                <Package className="h-5 w-5 text-black  " />
               </div>
-              <h2 className="text-xl font-semibold text-white">Add New BOM</h2>
+              <h2 className="text-xl font-semibold text-black">Add New BOM</h2>
             </div>
             <button
               onClick={closeDrawerHandler}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors duration-200"
+              className="p-2 hover:bg-white/20 border rounded-lg transition-colors duration-200"
             >
-              <BiX size={24} className="text-white" />
+              <BiX size={24} className="text-black" />
             </button>
           </div>
 
@@ -638,7 +638,7 @@ const AddBom: React.FC<AddBomProps> = ({
               <div className="bg-white border-t p-6 -mx-6 -mb-6">
                 <button
                   type="submit"
-                  className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-black font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   Create BOM
                 </button>

@@ -29,11 +29,10 @@ const Process: React.FC<ProcessProps> = ({inputs, setInputs}) => {
 
   return (
     <div>
-      <FormLabel fontWeight="bold" color="white">Processes</FormLabel>
       <div>
         {inputs.map((input, ind) => (
           <FormControl key={ind} isRequired>
-            <FormLabel color="white">Process</FormLabel>
+            <FormLabel color="black">Process</FormLabel>
             <Input
             className="text-gray-200"
               border="1px"
