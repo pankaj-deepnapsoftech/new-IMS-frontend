@@ -5,13 +5,7 @@ import { toast } from "react-toastify";
 import Loading from "../../../ui/Loading";
 import Drawer from "../../../ui/Drawer";
 import { colors } from "../../../theme/colors";
-import {
-  Store,
-  MapPin,
-  FileText,
-  Hash,
-  Eye,
-} from "lucide-react";
+import { Store, MapPin, FileText, Hash, Eye } from "lucide-react";
 
 interface StoreDetailsProps {
   closeDrawerHandler: () => void;
@@ -57,7 +51,7 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
       setState(data.store.state);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
-    } finally{
+    } finally {
       setIsLoadingStore(false);
     }
   };
@@ -75,18 +69,20 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
       <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[500px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between border-b">
+          <div className="px-6 py-4 flex items-center justify-between border-b">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <Eye className="h-5 w-5 text-white" />
+              <div className="p-2 bg-white/20 border rounded-lg">
+                <Eye className="h-5 w-5 text-black" />
               </div>
-              <h2 className="text-xl font-semibold text-white">Store Details</h2>
+              <h2 className="text-xl font-semibold text-black">
+                Store Details
+              </h2>
             </div>
             <button
               onClick={closeDrawerHandler}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors duration-200"
+              className="p-2 hover:bg-white/20 border rounded-lg transition-colors duration-200"
             >
-              <BiX size={24} className="text-white" />
+              <BiX size={24} className="text-black" />
             </button>
           </div>
 
@@ -112,8 +108,12 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                         <Store className="h-5 w-5 text-blue-600" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-sm font-medium text-gray-700 mb-1">Store Name</h4>
-                        <p className="text-gray-900 font-medium">{name || "N/A"}</p>
+                        <h4 className="text-sm font-medium text-gray-700 mb-1">
+                          Store Name
+                        </h4>
+                        <p className="text-gray-900 font-medium">
+                          {name || "N/A"}
+                        </p>
                       </div>
                     </div>
 
@@ -123,8 +123,12 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                         <FileText className="h-5 w-5 text-green-600" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-sm font-medium text-gray-700 mb-1">GST Number</h4>
-                        <p className="text-gray-900 font-medium">{gst || "N/A"}</p>
+                        <h4 className="text-sm font-medium text-gray-700 mb-1">
+                          GST Number
+                        </h4>
+                        <p className="text-gray-900 font-medium">
+                          {gst || "N/A"}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -144,7 +148,9 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                         <MapPin className="h-5 w-5 text-purple-600" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-sm font-medium text-gray-700 mb-1">Address Line 1</h4>
+                        <h4 className="text-sm font-medium text-gray-700 mb-1">
+                          Address Line 1
+                        </h4>
                         <p className="text-gray-900">{addressLine1 || "N/A"}</p>
                       </div>
                     </div>
@@ -155,7 +161,9 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                         <MapPin className="h-5 w-5 text-purple-600" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-sm font-medium text-gray-700 mb-1">Address Line 2</h4>
+                        <h4 className="text-sm font-medium text-gray-700 mb-1">
+                          Address Line 2
+                        </h4>
                         <p className="text-gray-900">{addressLine2 || "N/A"}</p>
                       </div>
                     </div>
@@ -168,8 +176,12 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                           <Hash className="h-4 w-4 text-orange-600" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-sm font-medium text-gray-700 mb-1">Pincode</h4>
-                          <p className="text-gray-900 font-medium">{pincode || "N/A"}</p>
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">
+                            Pincode
+                          </h4>
+                          <p className="text-gray-900 font-medium">
+                            {pincode || "N/A"}
+                          </p>
                         </div>
                       </div>
 
@@ -179,8 +191,12 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                           <MapPin className="h-4 w-4 text-indigo-600" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-sm font-medium text-gray-700 mb-1">City</h4>
-                          <p className="text-gray-900 font-medium">{city || "N/A"}</p>
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">
+                            City
+                          </h4>
+                          <p className="text-gray-900 font-medium">
+                            {city || "N/A"}
+                          </p>
                         </div>
                       </div>
 
@@ -190,8 +206,12 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                           <MapPin className="h-4 w-4 text-teal-600" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-sm font-medium text-gray-700 mb-1">State</h4>
-                          <p className="text-gray-900 font-medium">{state || "N/A"}</p>
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">
+                            State
+                          </h4>
+                          <p className="text-gray-900 font-medium">
+                            {state || "N/A"}
+                          </p>
                         </div>
                       </div>
                     </div>

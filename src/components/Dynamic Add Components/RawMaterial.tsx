@@ -157,7 +157,7 @@ const RawMaterial: React.FC<RawMaterialProps> = ({
                 className="rounded mt-2 border border-[#a9a9a9]"
                 options={productOptions}
                 placeholder="Select"
-                value={selectedProducts[ind]?.label}
+                value={selectedProducts[ind] || null}
                 name="item_name"
                 onChange={(d) => {
                   onChangeHandler("item_name", d, ind);

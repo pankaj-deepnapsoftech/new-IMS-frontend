@@ -42,8 +42,7 @@ const ScrapMaterial: React.FC<ScrapMaterialProps> = ({
       if (unit_cost) {
         inputsArr[ind]["total_part_cost"] = +unit_cost * +value;
       }
-    }
-     else if (name === "item_name") {
+    } else if (name === "item_name") {
       const item_id = inputsArr[ind]["item_name"].value;
       const product = products.filter((prd: any) => prd._id === item_id)[0];
       inputsArr[ind]["uom"] = product.uom;
@@ -127,128 +126,132 @@ const ScrapMaterial: React.FC<ScrapMaterialProps> = ({
   };
   return (
     <div className="space-y-6">
-      {inputs && inputs.map((input, ind) => (
-        <div key={ind} className="bg-gray-50 rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h4 className="text-lg font-medium text-gray-900 flex items-center gap-2">
-              <Package className="h-5 w-5 text-red-600" />
-              Scrap Material #{ind + 1}
-            </h4>
-            {inputs.length > 1 && (
-              <button
-                type="button"
-                onClick={() => deleteInputHandler(ind)}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            )}
+      {inputs &&
+        inputs.map((input, ind) => (
+          <div
+            key={ind}
+            className="bg-gray-50 rounded-lg border border-gray-200 p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+                <Package className="h-5 w-5 text-red-600" />
+                Scrap Material #{ind + 1}
+              </h4>
+              {inputs.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => deleteInputHandler(ind)}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Product Name */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Package className="h-4 w-4 text-gray-500" />
+                  Product Name *
+                </label>
+                <Select
+                  styles={customStyles}
+                  className="text-sm"
+                  options={productOptions}
+                  placeholder="Select product"
+                  value={selectedProducts[ind] || null}
+                  name="item_name"
+                  onChange={(d) => {
+                    onChangeHandler("item_name", d, ind);
+                  }}
+                  required
+                />
+              </div>
+
+              {/* Description */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <FileText className="h-4 w-4 text-gray-500" />
+                  Description
+                </label>
+                <input
+                  type="text"
+                  name="description"
+                  value={input.description || ""}
+                  onChange={(e) => {
+                    onChangeHandler(e.target.name, e.target.value, ind);
+                  }}
+                  placeholder="Enter description"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                />
+              </div>
+
+              {/* Quantity */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Hash className="h-4 w-4 text-gray-500" />
+                  Quantity
+                </label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={input.quantity || ""}
+                  onChange={(e) => {
+                    onChangeHandler(e.target.name, e.target.value, ind);
+                  }}
+                  placeholder="Enter quantity"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                />
+              </div>
+
+              {/* UOM */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Calculator className="h-4 w-4 text-gray-500" />
+                  Unit of Measurement
+                </label>
+                <input
+                  type="text"
+                  name="uom"
+                  value={input.uom || ""}
+                  disabled
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                />
+              </div>
+
+              {/* Unit Cost */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <DollarSign className="h-4 w-4 text-gray-500" />
+                  Unit Cost
+                </label>
+                <input
+                  type="number"
+                  name="unit_cost"
+                  value={input.unit_cost || ""}
+                  disabled
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                />
+              </div>
+
+              {/* Total Part Cost */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <DollarSign className="h-4 w-4 text-gray-500" />
+                  Total Cost
+                </label>
+                <input
+                  type="number"
+                  name="total_part_cost"
+                  value={input.total_part_cost || ""}
+                  disabled
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                />
+              </div>
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Product Name */}
-            <div className="space-y-2 md:col-span-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <Package className="h-4 w-4 text-gray-500" />
-                Product Name *
-              </label>
-              <Select
-                styles={customStyles}
-                className="text-sm"
-                options={productOptions}
-                placeholder="Select product"
-                value={selectedProducts[ind]}
-                name="item_name"
-                onChange={(d) => {
-                  onChangeHandler("item_name", d, ind);
-                }}
-                required
-              />
-            </div>
-
-            {/* Description */}
-            <div className="space-y-2 md:col-span-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <FileText className="h-4 w-4 text-gray-500" />
-                Description
-              </label>
-              <input
-                type="text"
-                name="description"
-                value={input.description || ""}
-                onChange={(e) => {
-                  onChangeHandler(e.target.name, e.target.value, ind);
-                }}
-                placeholder="Enter description"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-              />
-            </div>
-
-            {/* Quantity */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <Hash className="h-4 w-4 text-gray-500" />
-                Quantity
-              </label>
-              <input
-                type="number"
-                name="quantity"
-                value={input.quantity || ""}
-                onChange={(e) => {
-                  onChangeHandler(e.target.name, e.target.value, ind);
-                }}
-                placeholder="Enter quantity"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-              />
-            </div>
-
-            {/* UOM */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <Calculator className="h-4 w-4 text-gray-500" />
-                Unit of Measurement
-              </label>
-              <input
-                type="text"
-                name="uom"
-                value={input.uom || ""}
-                disabled
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-              />
-            </div>
-
-            {/* Unit Cost */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <DollarSign className="h-4 w-4 text-gray-500" />
-                Unit Cost
-              </label>
-              <input
-                type="number"
-                name="unit_cost"
-                value={input.unit_cost || ""}
-                disabled
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-              />
-            </div>
-
-            {/* Total Part Cost */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <DollarSign className="h-4 w-4 text-gray-500" />
-                Total Cost
-              </label>
-              <input
-                type="number"
-                name="total_part_cost"
-                value={input.total_part_cost || ""}
-                disabled
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-              />
-            </div>
-          </div>
-        </div>
-      ))}
+        ))}
 
       {/* Add/Remove Buttons */}
       <div className="flex items-center justify-end gap-3">
