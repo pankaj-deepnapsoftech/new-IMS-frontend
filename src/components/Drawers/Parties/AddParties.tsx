@@ -170,7 +170,7 @@ const AddParties = ({ showData, setshowData, setCounter, edittable, setEditTable
                         className="text-xl font-semibold"
                         style={{ color: colors.text.primary }}
                     >
-                        {edittable ? "Edit Party" : "Add New Party"}
+                        {edittable ? "Edit Merchant" : "Add New Merchant"}
                     </h1>
                     <button
                         onClick={() => setshowData(false)}
@@ -246,7 +246,7 @@ const AddParties = ({ showData, setshowData, setCounter, edittable, setEditTable
                                     className="block text-sm font-medium mb-2"
                                     style={{ color: colors.text.secondary }}
                                 >
-                                    Party Type *
+                                    Merchant Type *
                                 </label>
                                 <select
                                     name="parties_type"
@@ -260,7 +260,7 @@ const AddParties = ({ showData, setshowData, setCounter, edittable, setEditTable
                                         color: colors.text.primary,
                                     }}
                                 >
-                                    <option value="">Select party type</option>
+                                    <option value="">Select Merchant type</option>
                                     <option value="Buyer">Buyer</option>
                                     <option value="Seller">Seller</option>
                                 </select>
