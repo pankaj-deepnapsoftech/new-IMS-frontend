@@ -191,7 +191,7 @@ const AddParties = ({
                 )}
               </div>
               <h2 className="text-xl font-semibold text-black">
-                {edittable ? "Update Party" : "Add New Party"}
+                {edittable ? "Update Merchant" : "Add New Merchant"}
               </h2>
             </div>
             <button
@@ -241,7 +241,7 @@ const AddParties = ({
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <Users className="h-4 w-4 text-gray-500" />
-                      Party Type *
+                      Merchant Type *
                     </label>
                     <select
                       name="parties_type"
@@ -250,7 +250,7 @@ const AddParties = ({
                       onBlur={formik.handleBlur}
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                     >
-                      <option value="">Select party type</option>
+                      <option value="">Select merchant type</option>
                       <option value="Buyer">Buyer</option>
                       <option value="Seller">Seller</option>
                     </select>

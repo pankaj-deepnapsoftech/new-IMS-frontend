@@ -75,7 +75,7 @@ const Paginations: React.FC<PaginationsProps> = ({
             boxShadow: colors.shadow.sm,
           }}
         >
-          Page {page}
+           {page}
         </div>
 
         {/* Next Button */}

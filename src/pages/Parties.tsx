@@ -20,11 +20,13 @@ const Parties = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [edittable, setEditTable] = useState(null);
+  const [limit, setLimit] = useState(10);
+
   const fetchPartiesData = async () => {
     try {
       setIsLoading(true);
       const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}parties/get?page=${page}&&limit=10`,
+        `${process.env.REACT_APP_BACKEND_URL}parties/get?page=${page}&&limit={limit}`,
         {
           method: "GET",
           headers: {
@@ -133,7 +135,7 @@ const Parties = () => {
                 className="block text-sm font-medium mb-2"
                 style={{ color: colors.text.primary }}
               >
-                Search Parties
+                Search Merchant
               </label>
               <div className="relative">
                 <FiSearch
@@ -249,6 +251,7 @@ const Parties = () => {
             setPartiesData={setPartiesData}
             isLoading={isLoading}
             fetchPartiesData={fetchPartiesData}
+            setLimit={setLimit}
           />
         </div>
 
@@ -257,7 +260,7 @@ const Parties = () => {
           <Pagination
             page={page}
             setPage={setPage}
-            hasNextPage={partiesData?.length === 10}
+            hasNextPage={partiesData?.length === limit}
           />
         </div>
       </div>
