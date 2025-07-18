@@ -303,15 +303,12 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
         </div>
 
         <div className="mt-8 px-5">
-          <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
-            Update Product
-          </h2>
 
           {isLoadingProduct && <Loading />}
           {!isLoadingProduct && (
             <form onSubmit={updateProductHandler}>
               <FormControl isRequired>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Inventory Category
                 </FormLabel>
                 <Select
@@ -323,7 +320,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Product ID
                 </FormLabel>
                 <Input
@@ -335,7 +332,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Product Name
                 </FormLabel>
                 <Input
@@ -347,7 +344,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Product Price
                 </FormLabel>
                 <Input
@@ -359,7 +356,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Regular Buying Price
                 </FormLabel>
                 <Input
@@ -371,7 +368,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Wholesale Buying Price
                 </FormLabel>
                 <Input
@@ -383,7 +380,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   MRP
                 </FormLabel>
                 <Input
@@ -395,7 +392,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Dealer Price
                 </FormLabel>
                 <Input
@@ -407,7 +404,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Distributor Price
                 </FormLabel>
                 <Input
@@ -419,7 +416,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Product Category
                 </FormLabel>
                 <Select
@@ -430,7 +427,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Product Subcategory
                 </FormLabel>
                 <Input
@@ -442,7 +439,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   UOM (Unit of Measurement)
                 </FormLabel>
                 <Select
@@ -453,7 +450,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Current Stock
                 </FormLabel>
                 <Input
@@ -465,7 +462,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Min Stock
                 </FormLabel>
                 <Input
@@ -477,7 +474,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Max Stock
                 </FormLabel>
                 <Input
@@ -489,7 +486,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   HSN
                 </FormLabel>
                 <Input
@@ -501,7 +498,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
               <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Store
                 </FormLabel>
                 <Select
@@ -516,9 +513,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 isLoading={isUpdatingProduct}
                 type="submit"
                 className="mt-1"
-                color="black"
-                backgroundColor="#ffffff8a"
-                _hover={{ bg: "#d1d2d5" }}
+                color="white"
+                backgroundColor="#000000"
+                _hover={{ bg: "#000000" }}
               >
                 Submit
               </Button>

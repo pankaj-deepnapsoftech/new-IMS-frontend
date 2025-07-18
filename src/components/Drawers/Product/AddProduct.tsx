@@ -449,7 +449,7 @@ const AddProduct: React.FC<AddProductProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Inventory Type</FormLabel>
+              <FormLabel fontWeight="bold" color="black">Inventory Type</FormLabel>
               <Select
                 styles={customStyles}
                 value={category}
@@ -458,7 +458,7 @@ const AddProduct: React.FC<AddProductProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">UOM (Unit of Measurement)</FormLabel>
+              <FormLabel fontWeight="bold" color="black">UOM (Unit of Measurement)</FormLabel>
               {/* Existing dropdown */}
               <Select
                 styles={customStyles}
@@ -471,7 +471,7 @@ const AddProduct: React.FC<AddProductProps> = ({
               <Input
                 mt={2}
                 placeholder="Add new UOM (e.g. bundle)"
-                color="white"
+                color="black"
                 value={newUOM}
                 onChange={(e) => setNewUOM(e.target.value)}
               />
