@@ -21,21 +21,21 @@ import {
 } from "lucide-react";
 import { BiX } from "react-icons/bi";
 
-const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
-  const [tasks, setTasks] = useState([]);
-  const [formData, setFormData] = useState({
-    sale_id: saleData?._id,
-    assined_to: "",
-    assined_process: "",
-    assinedby_comment: "",
-  });
-
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editTaskId, setEditTaskId] = useState(null);
-  const [cookies] = useCookies(["access_token"]);
-  const toast = useToast();
-  const token = cookies?.access_token;
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurchases }) => {
+    const [tasks, setTasks] = useState([]);
+    const [formData, setFormData] = useState({
+        sale_id: saleData?._id,
+        assined_to: "",
+        assined_process: "",
+        assinedby_comment: "",
+    });
+    console.log(saleData)
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editTaskId, setEditTaskId] = useState(null);
+    const [cookies] = useCookies(["access_token"]);
+    const toast = useToast();
+    const token = cookies?.access_token;
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     values,
@@ -62,59 +62,60 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData }) => {
         if (!token) throw new Error("Authentication token not found");
 
         if (isEditMode && editTaskId) {
-          const res = await axios.patch(
-            `${process.env.REACT_APP_BACKEND_URL}assined/update/${editTaskId}`,
-            value,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          // console.log(res)
-          toast({
-            title: "Task Updated",
-            description: "The task has been successfully updated.",
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });
-          setIsEditMode(false);
-          setEditTaskId(null);
-        } else {
-          const res = await axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}assined/create`,
-            value,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          console.log(res);
-          toast({
-            title: "Task Created",
-            description: "The task has been successfully assigned.",
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });
-        }
+                  const res =  await axios.patch(
+                        `${process.env.REACT_APP_BACKEND_URL}assined/update/${editTaskId}`,
+                        value,
+                        {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }
+                    );
+                    // console.log(res)
+                    toast({
+                        title: "Task Updated",
+                        description: "The task has been successfully updated.",
+                        status: "success",
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                    setIsEditMode(false);
+                    setEditTaskId(null);
 
-        resetForm({
-          sale_id: saleData?._id,
-          assined_to: "",
-          assined_process: "",
-          assinedby_comment: "",
-        });
+                } else {
+                  const res =  await axios.post(
+                        `${process.env.REACT_APP_BACKEND_URL}assined/create`,
+                        value,
+                        {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }
+                    );
+                  console.log(res)
+                    toast({
+                        title: "Task Created",
+                        description: "The task has been successfully assigned.",
+                        status: "success",
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                }
+                fetchPurchases()
+                resetForm({
+                    sale_id: saleData?._id,
+                    assined_to: "",
+                    assined_process: "",
+                    assinedby_comment: "",
+                });
 
-        handleClose();
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Something went wrong. Please try again.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      } finally {
-        setIsSubmitting(false);
+                handleClose();
+            } catch (error) {
+                toast({
+                    title: "Error",
+                    description: "Something went wrong. Please try again.",
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                });
+            } finally {
+                setIsSubmitting(false);
       }
     },
   });

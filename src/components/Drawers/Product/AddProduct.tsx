@@ -58,6 +58,37 @@ const AddProduct: React.FC<AddProductProps> = ({
   const [inventoryCategory, setInventoryCategory] = useState<
     { value: string; label: string } | undefined
   >();
+  const [showNewUOMInput, setShowNewUOMInput] = useState(false);
+  const [newUOM, setNewUOM] = useState("");
+  const [uomOptions, setUomOptions] = useState([
+    { value: "pcs", label: "pcs" },
+    { value: "kgs", label: "kgs" },
+    { value: "g", label: "g" },
+    { value: "mg", label: "mg" },
+    { value: "ltr", label: "ltr" },
+    { value: "ml", label: "ml" },
+    { value: "tonne", label: "tonne" },
+    { value: "cm", label: "cm" },
+    { value: "mm", label: "mm" },
+    { value: "inch", label: "inch" },
+    { value: "ft", label: "ft" },
+    { value: "mtr", label: "mtr" },
+    { value: "sqft", label: "sqft" },
+    { value: "sqm", label: "sqm" },
+    { value: "cbm", label: "cbm" },
+    { value: "cft", label: "cft" },
+    { value: "dozen", label: "dozen" },
+    { value: "pack", label: "pack" },
+    { value: "set", label: "set" },
+    { value: "roll", label: "roll" },
+    { value: "box", label: "box" },
+    { value: "bag", label: "bag" },
+    { value: "pair", label: "pair" },
+    { value: "sheet", label: "sheet" },
+    { value: "tube", label: "tube" },
+    { value: "bottle", label: "bottle" },
+    { value: "container", label: "container" },
+  ]);
 
   const inventoryCategoryOptions = [
     { value: "direct", label: "Direct" },
@@ -85,35 +116,35 @@ const AddProduct: React.FC<AddProductProps> = ({
     { value: "service", label: "Service" },
   ];
 
-  const uomOptions = [
-    { value: "pcs", label: "pcs" },           // pieces
-    { value: "kgs", label: "kgs" },           // kilograms
-    { value: "g", label: "g" },               // grams
-    { value: "mg", label: "mg" },             // milligrams
-    { value: "ltr", label: "ltr" },           // liters
-    { value: "ml", label: "ml" },             // milliliters
-    { value: "tonne", label: "tonne" },       // metric ton
-    { value: "cm", label: "cm" },             // centimeters
-    { value: "mm", label: "mm" },             // millimeters
-    { value: "inch", label: "inch" },
-    { value: "ft", label: "ft" },             // feet
-    { value: "mtr", label: "mtr" },           // meters
-    { value: "sqft", label: "sqft" },         // square feet
-    { value: "sqm", label: "sqm" },           // square meters
-    { value: "cbm", label: "cbm" },           // cubic meters
-    { value: "cft", label: "cft" },           // cubic feet
-    { value: "dozen", label: "dozen" },       // 12 pcs
-    { value: "pack", label: "pack" },
-    { value: "set", label: "set" },
-    { value: "roll", label: "roll" },
-    { value: "box", label: "box" },
-    { value: "bag", label: "bag" },
-    { value: "pair", label: "pair" },
-    { value: "sheet", label: "sheet" },
-    { value: "tube", label: "tube" },
-    { value: "bottle", label: "bottle" },
-    { value: "container", label: "container" },
-  ];
+  // const uomOptions = [
+  //   { value: "pcs", label: "pcs" },           // pieces
+  //   { value: "kgs", label: "kgs" },           // kilograms
+  //   { value: "g", label: "g" },               // grams
+  //   { value: "mg", label: "mg" },             // milligrams
+  //   { value: "ltr", label: "ltr" },           // liters
+  //   { value: "ml", label: "ml" },             // milliliters
+  //   { value: "tonne", label: "tonne" },       // metric ton
+  //   { value: "cm", label: "cm" },             // centimeters
+  //   { value: "mm", label: "mm" },             // millimeters
+  //   { value: "inch", label: "inch" },
+  //   { value: "ft", label: "ft" },             // feet
+  //   { value: "mtr", label: "mtr" },           // meters
+  //   { value: "sqft", label: "sqft" },         // square feet
+  //   { value: "sqm", label: "sqm" },           // square meters
+  //   { value: "cbm", label: "cbm" },           // cubic meters
+  //   { value: "cft", label: "cft" },           // cubic feet
+  //   { value: "dozen", label: "dozen" },       // 12 pcs
+  //   { value: "pack", label: "pack" },
+  //   { value: "set", label: "set" },
+  //   { value: "roll", label: "roll" },
+  //   { value: "box", label: "box" },
+  //   { value: "bag", label: "bag" },
+  //   { value: "pair", label: "pair" },
+  //   { value: "sheet", label: "sheet" },
+  //   { value: "tube", label: "tube" },
+  //   { value: "bottle", label: "bottle" },
+  //   { value: "container", label: "container" },
+  // ];
 
 
   const [addProduct] = useAddProductMutation();
@@ -122,21 +153,7 @@ const AddProduct: React.FC<AddProductProps> = ({
   const addProductHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (
-        !name ||
-        !id ||
-        !uom ||
-        !category ||
-        !currentStock ||
-        !price ||
-        !itemType ||
-        !productOrService ||
-        name.trim().length === 0 ||
-        id.trim().length === 0 ||
-        !uom
-      ) {
-        throw new Error("Please fill all the fileds");
-      }
+   
 
       const response = await addProduct({
         name,
@@ -159,7 +176,7 @@ const AddProduct: React.FC<AddProductProps> = ({
         distributor_price: distributorPrice,
         store: store?.value || undefined,
       }).unwrap();
-      console.log(response)
+    
       toast.success(response.message);
       fetchProductsHandler();
       closeDrawerHandler();
@@ -298,24 +315,7 @@ const AddProduct: React.FC<AddProductProps> = ({
                 required={true}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Product ID
-              </FormLabel>
-              <Input
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                type="text"
-                placeholder="Product ID"
-                bg="white"
-                borderColor="gray.300"
-                _focus={{
-                  borderColor: "blue.500",
-                  boxShadow: "0 0 0 1px #3182ce",
-                }}
-                _placeholder={{ color: "gray.500" }}
-              />
-            </FormControl>
+         
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Product Name
@@ -449,9 +449,7 @@ const AddProduct: React.FC<AddProductProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Product Category
-              </FormLabel>
+              <FormLabel fontWeight="bold" color="white">Inventory Type</FormLabel>
               <Select
                 styles={customStyles}
                 value={category}
@@ -460,16 +458,57 @@ const AddProduct: React.FC<AddProductProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                UOM (Unit of Measurement)
-              </FormLabel>
+              <FormLabel fontWeight="bold" color="white">UOM (Unit of Measurement)</FormLabel>
+              {/* Existing dropdown */}
               <Select
                 styles={customStyles}
                 value={uom}
                 options={uomOptions}
                 onChange={(e: any) => setUom(e)}
               />
+
+              {/* Input to add new UOM */}
+              <Input
+                mt={2}
+                placeholder="Add new UOM (e.g. bundle)"
+                color="white"
+                value={newUOM}
+                onChange={(e) => setNewUOM(e.target.value)}
+              />
+
+              <Button
+                mt={2}
+                size="sm"
+                colorScheme="teal"
+                onClick={() => {
+                  const trimmed = newUOM.trim().toLowerCase();
+                  if (!trimmed) {
+                    toast.warning("Please enter a UOM.");
+                    return;
+                  }
+
+                  const exists = uomOptions.some(opt => opt.value === trimmed);
+                  if (exists) {
+                    toast.warning("UOM already exists.");
+                    return;
+                  }
+
+                  const confirmed = window.confirm(`Are you sure you want to add "${trimmed}" as a new UOM?`);
+                  if (!confirmed) return;
+
+                  const newOption = { value: trimmed, label: trimmed };
+                  setUomOptions(prev => [...prev, newOption]);
+                  setUom(newOption);
+                  setNewUOM("");
+                  toast.success(`UOM "${trimmed}" added.`);
+                }}
+              >
+                Add UOM
+              </Button>
             </FormControl>
+
+
+
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="gray.700">
                 Product Subcategory

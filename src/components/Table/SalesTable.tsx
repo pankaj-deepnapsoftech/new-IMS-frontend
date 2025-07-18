@@ -23,6 +23,7 @@ const SalesTable = ({
   isLoading,
   setEditTable,
   setShow,
+    fetchPurchases
 }) => {
   const [showassign, setShowAssign] = useState(false);
   const calculateTotalPrice = (price: number, qty: number, gst: number) => {
@@ -57,6 +58,8 @@ const SalesTable = ({
   if (!filteredPurchases || filteredPurchases.length === 0) {
     return <EmptyData />;
   }
+  
+    console.log(filteredPurchases)
 
   return (
     <div className="space-y-4 bg-[#f8f9fa]">
@@ -76,7 +79,7 @@ const SalesTable = ({
                 className="text-lg font-semibold"
                 style={{ color: colors.text.primary }}
               >
-                Sale #{purchase?._id?.slice(-6)}
+                          Order Id : {purchase.order_id}
               </h3>
               <p
                 className="text-sm mt-1"
@@ -90,18 +93,7 @@ const SalesTable = ({
               </p>
             </div>
 
-            {/* Status Badge */}
-            <div className="flex items-center gap-2">
-              <span
-                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                style={{
-                  backgroundColor: colors.success[100],
-                  color: colors.success[800],
-                }}
-              >
-                Active
-              </span>
-            </div>
+        
           </div>
 
           {/* Sale Details Grid */}
@@ -335,6 +327,7 @@ const SalesTable = ({
         setShow={setShowAssign}
         employeeData={empData}
         saleData={selectedSale}
+              fetchPurchases={fetchPurchases}
       />
       <ApproveSample isChecked={isChecked} setIsChecked={setIsChecked} />
     </div>
