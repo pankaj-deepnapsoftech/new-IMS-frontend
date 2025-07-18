@@ -4,6 +4,14 @@ import { BiX } from "react-icons/bi";
 import { toast } from "react-toastify";
 import Loading from "../../../ui/Loading";
 import Drawer from "../../../ui/Drawer";
+import { colors } from "../../../theme/colors";
+import {
+  Store,
+  MapPin,
+  FileText,
+  Hash,
+  Eye,
+} from "lucide-react";
 
 interface StoreDetailsProps {
   closeDrawerHandler: () => void;
@@ -59,60 +67,142 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
   }, []);
 
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
-      <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f] right-0 top-0 z-10 py-3"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
-      >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
-          <BiX onClick={closeDrawerHandler} size="26px"  color="white"/>
-         
-        </h1>
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
 
-        <div className="mt-8 px-5">
-        <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
-        Store Details
-          </h2>
-
-          {isLoadingStore && <Loading />}
-          {!isLoadingStore && (
-            <div className="text-white">
-              <div className="mt-3 mb-5">
-                <p className="font-semibold">Store Name</p>
-                <p className="text-gray-200">{name}</p>
+      {/* Drawer */}
+      <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[500px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
+        <div className="h-full flex flex-col">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between border-b">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Eye className="h-5 w-5 text-white" />
               </div>
-              <div className="mt-3 mb-5">
-                <p className="font-semibold">GST Number</p>
-                <p className="text-gray-200">{gst}</p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-semibold">Address Line 1</p>
-                <p className="text-gray-200">{addressLine1}</p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-semibold">Address Line 2</p>
-                <p className="text-gray-200">{addressLine2}</p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-semibold">Pincode</p>
-                <p className="text-gray-200">{pincode}</p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-semibold">City</p>
-                <p className="text-gray-200">{city}</p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-semibold">State</p>
-                <p className="text-gray-200">{state}</p>
-              </div>
+              <h2 className="text-xl font-semibold text-white">Store Details</h2>
             </div>
-          )}
+            <button
+              onClick={closeDrawerHandler}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors duration-200"
+            >
+              <BiX size={24} className="text-white" />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+            {isLoadingStore ? (
+              <div className="flex items-center justify-center h-64">
+                <Loading />
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Store Information Card */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                    <Store className="h-5 w-5 text-blue-600" />
+                    Store Information
+                  </h3>
+
+                  <div className="space-y-6">
+                    {/* Store Name */}
+                    <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Store className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-gray-700 mb-1">Store Name</h4>
+                        <p className="text-gray-900 font-medium">{name || "N/A"}</p>
+                      </div>
+                    </div>
+
+                    {/* GST Number */}
+                    <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <FileText className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-gray-700 mb-1">GST Number</h4>
+                        <p className="text-gray-900 font-medium">{gst || "N/A"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Address Information Card */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-blue-600" />
+                    Address Information
+                  </h3>
+
+                  <div className="space-y-6">
+                    {/* Address Line 1 */}
+                    <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="p-2 bg-purple-100 rounded-lg">
+                        <MapPin className="h-5 w-5 text-purple-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-gray-700 mb-1">Address Line 1</h4>
+                        <p className="text-gray-900">{addressLine1 || "N/A"}</p>
+                      </div>
+                    </div>
+
+                    {/* Address Line 2 */}
+                    <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="p-2 bg-purple-100 rounded-lg">
+                        <MapPin className="h-5 w-5 text-purple-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-gray-700 mb-1">Address Line 2</h4>
+                        <p className="text-gray-900">{addressLine2 || "N/A"}</p>
+                      </div>
+                    </div>
+
+                    {/* Location Details */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Pincode */}
+                      <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="p-2 bg-orange-100 rounded-lg">
+                          <Hash className="h-4 w-4 text-orange-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">Pincode</h4>
+                          <p className="text-gray-900 font-medium">{pincode || "N/A"}</p>
+                        </div>
+                      </div>
+
+                      {/* City */}
+                      <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="p-2 bg-indigo-100 rounded-lg">
+                          <MapPin className="h-4 w-4 text-indigo-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">City</h4>
+                          <p className="text-gray-900 font-medium">{city || "N/A"}</p>
+                        </div>
+                      </div>
+
+                      {/* State */}
+                      <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="p-2 bg-teal-100 rounded-lg">
+                          <MapPin className="h-4 w-4 text-teal-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">State</h4>
+                          <p className="text-gray-900 font-medium">{state || "N/A"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </Drawer>
+    </>
   );
 };
 
