@@ -8,6 +8,7 @@ import {
 } from "../../redux/api/api";
 import { toast } from "react-toastify";
 import { TbPasswordMobilePhone } from "react-icons/tb";
+import { colors } from "../../theme/colors";
 
 interface OTPVerificationComponentProps {
   email: string | undefined;
@@ -48,7 +49,7 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
 
   const resendOTPHandler = async () => {
     try {
-      const data = await resendOTP({email}).unwrap();
+      const data = await resendOTP({ email }).unwrap();
       toast.success(data.message);
       setCanResend(false);
       setSecondsLeft(30);
@@ -84,53 +85,110 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
   }, [canResend]);
 
   return (
-    <div className="w-[80%] md:w-[60%]">
-      <h1 className="flex gap-x-1 text-4xl text-black font-bold border-b pb-5">
-        <IoMdArrowBack onClick={() => navigate(0)} />
-        OTP Verification
-      </h1>
-
-      <form onSubmit={verifyHandler} className="mt-4 w-[100%]">
-        <div className="flex flex-col items-start">
-          <label className="flex gap-x-1 items-center font-bold text-sm text-white">
-            <span>
-              <FaStarOfLife size="6px" color="red" />
-            </span>
-            OTP
-          </label>
-          <div className="relative w-[100%]">
-            <div className="absolute top-[18px] left-[7px] text-base">
-              <TbPasswordMobilePhone/>
-            </div>
-            <input
-              value={otp}
-              required
-              onChange={(e) => setOtp(e.target.value)}
-              className="w-[100%] outline-none text-base pl-7 pr-2 py-2 border mt-2 border-[#d9d9d9] rounded-[10px] hover:border-[#1640d6] cursor-pointer"
-              type="text"
-              placeholder="OTP"
-            />
+    <div className="w-full max-w-md mx-auto">
+      {/* OTP Verification Card */}
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <div className="flex items-center justify-center mb-4">
+            <button
+              onClick={() => navigate(0)}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors mr-3"
+            >
+              <IoMdArrowBack size={24} className="text-gray-600" />
+            </button>
+            <h1 className="text-2xl font-bold text-gray-800">
+              Verify Your Email
+            </h1>
           </div>
+          <p className="text-gray-600">
+            Enter the 6-digit verification code sent to <br />
+            <span className="font-semibold text-gray-800">{email}</span>
+          </p>
         </div>
-        <div className="flex items-center gap-x-1">
-          <button
-            type="button"
-            onClick={resendOTPHandler}
-            disabled={!canResend}
-            style={{ boxShadow: "0 2px 0 rgba(5, 95, 255, 0.1)" }}
-            className="mt-4 w-[100%] rounded-lg bg-[#1c77ac] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
-          >
-            {canResend ? "Resend OTP" : `Resend (${secondsLeft}s)`}
-          </button>
-          <button
-            disabled={isVerifyingOTP}
-            style={{ boxShadow: "0 2px 0 rgba(5, 95, 255, 0.1)" }}
-            className="mt-4 w-[100%] rounded-lg bg-[#1c77ac] text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
-          >
-            {isVerifyingOTP ? "Verifying OTP..." : "Verify OTP"}
-          </button>
+
+        {/* Verification Form */}
+        <form onSubmit={verifyHandler} className="space-y-6">
+          {/* OTP Field */}
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+              <FaStarOfLife size={6} className="text-red-500" />
+              Verification Code
+            </label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <TbPasswordMobilePhone size={20} />
+              </div>
+              <input
+                value={otp || ""}
+                required
+                onChange={(e) => setOtp(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 text-center text-lg tracking-widest
+                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
+                type="text"
+                placeholder="000000"
+                maxLength={6}
+                pattern="[0-9]{6}"
+              />
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            {/* Verify Button */}
+            <button
+              type="submit"
+              disabled={isVerifyingOTP}
+              className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 
+                ${
+                  isVerifyingOTP
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 transform hover:scale-[1.02] active:scale-[0.98]"
+                } shadow-lg hover:shadow-xl`}
+            >
+              {isVerifyingOTP ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Verifying...
+                </div>
+              ) : (
+                "Verify Email"
+              )}
+            </button>
+
+            {/* Resend Button */}
+            <button
+              type="button"
+              onClick={resendOTPHandler}
+              disabled={!canResend || isResendingOTP}
+              className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 border-2
+                ${
+                  !canResend || isResendingOTP
+                    ? "bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed"
+                    : "bg-white border-blue-600 text-blue-600 hover:bg-blue-50 active:bg-blue-100"
+                }`}
+            >
+              {isResendingOTP ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
+                  Sending...
+                </div>
+              ) : canResend ? (
+                "Resend Code"
+              ) : (
+                `Resend in ${secondsLeft}s`
+              )}
+            </button>
+          </div>
+        </form>
+
+        {/* Help Text */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">
+            Didn't receive the code? Check your spam folder or try resending.
+          </p>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
