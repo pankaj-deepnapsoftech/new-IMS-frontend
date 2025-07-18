@@ -69,7 +69,7 @@ const Parties = () => {
                   className="text-2xl md:text-3xl font-bold"
                   style={{ color: colors.text.primary }}
                 >
-                  Parties Management
+                  Merchant Management
                 </h1>
                 <p
                   className="text-sm mt-1"
@@ -100,7 +100,7 @@ const Parties = () => {
                 }}
               >
                 <FiPlus size={16} />
-                Add New Party
+                Add New Merchant
               </button>
 
               <button

@@ -45,7 +45,6 @@ const routes = [
     element: <Dashboard />,
     isSublink: false
   },
-
   {
     name: "Employees",
     icon: <FaPeopleGroup />,
@@ -61,9 +60,9 @@ const routes = [
     isSublink: false
   },
   {
-    name: "Parties",
+    name: "Merchant",
     icon: <IoIosPeople />,
-    path: "parties",
+    path: "merchant",
     element: <Parties />
 
   },
@@ -75,8 +74,8 @@ const routes = [
     isSublink: false
   },
   {
-    name: "Sales & Purchase",
-    path: "sales-purchase",
+    name: "Invioces",
+    path: "invoices",
     icon: <BiPurchaseTagAlt />,
     sublink: [
       {
@@ -168,26 +167,26 @@ const routes = [
     element: <Approvals />,
     isSublink: false
   },
-  {
-    name: "Merchant",
-    path: "merchant",
-    icon: <TbUsersGroup />,
-    sublink: [
-      {
-        name: "Buyer",
-        icon: <MdOutlineAttachMoney />,
-        path: "buyer",
-        element: <Buyers />,
-      },
-      {
-        name: "Supplier",
-        icon: <MdOutlineSell />,
-        path: "supplier",
-        element: <Sellers />,
-      },
-    ],
-    isSublink: true
-  },
+  // {
+  //   name: "Merchant",
+  //   path: "merchant",
+  //   icon: <TbUsersGroup />,
+  //   sublink: [
+  //     {
+  //       name: "Buyer",
+  //       icon: <MdOutlineAttachMoney />,
+  //       path: "buyer",
+  //       element: <Buyers />,
+  //     },
+  //     {
+  //       name: "Supplier",
+  //       icon: <MdOutlineSell />,
+  //       path: "supplier",
+  //       element: <Sellers />,
+  //     },
+  //   ],
+  //   isSublink: true
+  // },
   {
     name: "Production",
     path: "production",
