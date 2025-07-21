@@ -69,7 +69,7 @@ const Dashboard: React.FC = () => {
   const [from, setFrom] = useState<string | undefined>();
   const [to, setTo] = useState<string | undefined>();
   const [cookies] = useCookies();
-  const { firstname } = useSelector((state: any) => state.auth);
+
   const [approvalsPending, setApprovalsPending] = useState<
     | {
         unapproved_product_count: number;
@@ -366,17 +366,7 @@ const Dashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div>
             {/* Welcome Section */}
-            <div className="flex flex-col justify-center items-center mb-5">
-              <h1
-                className="text-3xl md:text-4xl font-bold mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Welcome back, {firstname || "User"}!
-              </h1>
-              <p className="text-lg" style={{ color: colors.text.secondary }}>
-                Here's what's happening with your business today.
-              </p>
-            </div>
+           
 
             {/* Filter Form */}
             <div
