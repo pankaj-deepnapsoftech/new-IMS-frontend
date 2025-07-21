@@ -188,6 +188,7 @@ const AddBom: React.FC<AddBomProps> = ({
       toast.success(response?.message);
       fetchBomsHandler();
       closeDrawerHandler();
+      console.log(response)
     } catch (error: any) {
       if (error?.data?.message?.includes("Insufficient stock")) {
         fetchBomsHandler();
