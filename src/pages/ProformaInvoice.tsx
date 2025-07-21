@@ -3,14 +3,7 @@ import { useEffect, useState } from "react";
 import ProformaInvoiceTable from "../components/Table/ProformaInvoiceTable";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  closeAddProformaInvoiceDrawer,
-  closeProformaInvoiceDetailsDrawer,
-  closeUpdateProformaInvoiceDrawer,
-  openAddProformaInvoiceDrawer,
-  openProformaInvoiceDetailsDrawer,
-  openUpdateProformaInvoiceDrawer,
-} from "../redux/reducers/drawersSlice";
+import { closeAddProformaInvoiceDrawer, closeProformaInvoiceDetailsDrawer, closeUpdateProformaInvoiceDrawer, openAddProformaInvoiceDrawer, openProformaInvoiceDetailsDrawer, openUpdateProformaInvoiceDrawer } from "../redux/reducers/drawersSlice";
 import AddProformaInvoice from "../components/Drawers/Proforma Invoice/AddProformaInvoice";
 import { useCookies } from "react-cookie";
 import { MdOutlineRefresh } from "react-icons/md";
@@ -27,11 +20,7 @@ const ProformaInvoice: React.FC = () => {
   const [data, setData] = useState<any[] | []>([]);
   const [filteredData, setFilteredData] = useState<any[] | []>([]);
   const [isLoadingProformaInvoices] = useState<boolean>(false);
-  const {
-    isAddProformaInvoiceDrawerOpened,
-    isUpdateProformaInvoiceDrawerOpened,
-    isProformaInvoiceDetailsDrawerOpened,
-  } = useSelector((state: any) => state.drawers);
+  const { isAddProformaInvoiceDrawerOpened, isUpdateProformaInvoiceDrawerOpened, isProformaInvoiceDetailsDrawerOpened } = useSelector((state: any) => state.drawers);
   const dispatch = useDispatch();
   const [id, setId] = useState<string | undefined>();
 
@@ -39,38 +28,35 @@ const ProformaInvoice: React.FC = () => {
 
   const openAddProformaInvoiceDrawerHandler = () => {
     dispatch(openAddProformaInvoiceDrawer());
-  };
+  }
   const closeAddProformaInvoiceDrawerHandler = () => {
     dispatch(closeAddProformaInvoiceDrawer());
-  };
+  }
 
   const openProformaInvoiceDetailsDrawerHandler = (id: string) => {
     setId(id);
     dispatch(openProformaInvoiceDetailsDrawer());
-  };
+  }
   const closeProformaInvoiceDetailsDrawerHandler = () => {
     dispatch(closeProformaInvoiceDetailsDrawer());
-  };
+  }
 
   const openProformaInvoiceUpdateDrawerHandler = (id: string) => {
     setId(id);
     dispatch(openUpdateProformaInvoiceDrawer());
-  };
+  }
   const closeProformaInvoiceUpdateDrawerHandler = () => {
     dispatch(closeUpdateProformaInvoiceDrawer());
-  };
+  }
 
   const fetchProformaInvoiceHandler = async () => {
     try {
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "proforma-invoice/all",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
+      const response = await fetch(process.env.REACT_APP_BACKEND_URL + 'proforma-invoice/all', {
+        method: "GET",
+        headers: {
+          'Authorization': `Bearer ${cookies?.access_token}`
         }
-      );
+      });
       const data = await response.json();
       if (!data.success) {
         throw new Error(data.message);
@@ -79,9 +65,9 @@ const ProformaInvoice: React.FC = () => {
       setData(data.proforma_invoices);
       setFilteredData(data.proforma_invoices);
     } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
+      toast.error(error?.message || 'Something went wrong');
     }
-  };
+  }
 
   const deleteProformaInvoiceHandler = async (id: string) => {
     try {
@@ -92,13 +78,13 @@ const ProformaInvoice: React.FC = () => {
       toast.success(response.message);
       fetchProformaInvoiceHandler();
     } catch (error: any) {
-      toast.error(error.message || "Something went wrong");
+      toast.error(error.message || 'Something went wrong');
     }
-  };
+  }
 
   useEffect(() => {
     fetchProformaInvoiceHandler();
-  }, []);
+  }, [])
 
   useEffect(() => {
     const searchText = searchKey?.toLowerCase();
@@ -128,129 +114,59 @@ const ProformaInvoice: React.FC = () => {
             ?.includes(searchText?.replaceAll("/", "") || ""))
     );
     setFilteredData(results);
-  }, [searchKey]);
+  }, [searchKey])
 
   if (!isAllowed) {
-    return (
-      <div className="text-center text-red-500">
-        You are not allowed to access this route.
-      </div>
-    );
+    return <div className="text-center text-red-500">You are not allowed to access this route.</div>
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2 lg:p-3">
-      {isAddProformaInvoiceDrawerOpened && (
-        <AddProformaInvoice
-          closeDrawerHandler={closeAddProformaInvoiceDrawerHandler}
-          fetchProformaInvoicesHandler={fetchProformaInvoiceHandler}
-        />
-      )}
-      {isProformaInvoiceDetailsDrawerOpened && (
-        <ProformaInvoiceDetails
-          closeDrawerHandler={closeProformaInvoiceDetailsDrawerHandler}
-          id={id}
-        />
-      )}
-      {isUpdateProformaInvoiceDrawerOpened && (
-        <UpdateProformaInvoice
-          closeDrawerHandler={closeProformaInvoiceUpdateDrawerHandler}
-          id={id}
-          fetchProformaInvoicesHandler={fetchProformaInvoiceHandler}
-        />
-      )}
+    <div className="  pb-4  rounded-md h-full">
 
-      {/* Header Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          {/* Title Section */}
-          <div className="flex items-center gap-4">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Proforma Invoices
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Manage proforma invoices and quotations
-              </p>
-            </div>
-          </div>
+      {isAddProformaInvoiceDrawerOpened && <AddProformaInvoice closeDrawerHandler={closeAddProformaInvoiceDrawerHandler} fetchProformaInvoicesHandler={fetchProformaInvoiceHandler} />}
+      {isProformaInvoiceDetailsDrawerOpened && <ProformaInvoiceDetails closeDrawerHandler={closeProformaInvoiceDetailsDrawerHandler} id={id} />}
+      {isUpdateProformaInvoiceDrawerOpened && <UpdateProformaInvoice closeDrawerHandler={closeProformaInvoiceUpdateDrawerHandler} id={id} fetchProformaInvoicesHandler={fetchProformaInvoiceHandler} />}
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
-              onClick={openAddProformaInvoiceDrawerHandler}
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              Add New Invoice
-            </button>
-            <button
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-lg border border-gray-300 transition-all duration-200 hover:shadow-md flex items-center justify-center gap-2"
-              onClick={fetchProformaInvoiceHandler}
-            >
-              <MdOutlineRefresh className="text-base" />
-              Refresh
-            </button>
-          </div>
-        </div>
+      <div>
+        <h1 className="text-center font-bold text-white text-2xl md:text-3xl pt-4 pb-6">
+          Proforma Invoices
+        </h1>
 
-        {/* Search Section */}
-        <div className="mt-6 flex justify-center sm:justify-end">
-          <div className="relative w-full max-w-md">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FiSearch className="h-5 w-5 text-gray-400" />
-            </div>
+        <div className="w-full flex flex-col md:flex-row md:items-center md:justify-center gap-3 px-4 md:px-10">
+
+          {/* Search Input */}
+          <div className="relative w-full md:w-[220px]">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-200" />
             <input
-              type="text"
-              className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-              placeholder="Search invoices..."
-              value={searchKey || ""}
+              className="pl-10 pr-4 py-2 w-full text-sm text-gray-200 border-b bg-[#475569] shadow-sm focus:outline-none placeholder:text-gray-200"
+              placeholder="Search roles..."
+              value={searchKey}
               onChange={(e) => setSearchKey(e.target.value)}
             />
           </div>
+
+          {/* Add New Proforma Invoice Button */}
+          <button
+            className="text-white bg-[#4b87a0d9] hover:bg-white hover:text-black text-sm rounded-[6px] px-4 py-2 w-full md:w-[240px] transition-all"
+            onClick={openAddProformaInvoiceDrawerHandler}
+          >
+            Add New Proforma Invoice
+          </button>
+
+          {/* Refresh Button */}
+          <button
+            className="text-white border border-white hover:bg-[#2D3748] hover:text-white text-sm rounded-[6px] px-4 py-2 w-full md:w-[110px] transition-all flex items-center justify-center gap-1"
+            onClick={fetchProformaInvoiceHandler}
+          >
+            <MdOutlineRefresh className="text-base" />
+            Refresh
+          </button>
         </div>
       </div>
 
-      {/* Table Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <ProformaInvoiceTable
-          isLoadingProformaInvoices={isLoadingProformaInvoices}
-          proformaInvoices={filteredData}
-          deleteProformaInvoiceHandler={deleteProformaInvoiceHandler}
-          openProformaInvoiceDetailsHandler={
-            openProformaInvoiceDetailsDrawerHandler
-          }
-          openUpdateProformaInvoiceDrawer={
-            openProformaInvoiceUpdateDrawerHandler
-          }
-        />
+
+      <div>
+        <ProformaInvoiceTable isLoadingProformaInvoices={isLoadingProformaInvoices} proformaInvoices={filteredData} deleteProformaInvoiceHandler={deleteProformaInvoiceHandler} openProformaInvoiceDetailsHandler={openProformaInvoiceDetailsDrawerHandler} openUpdateProformaInvoiceDrawer={openProformaInvoiceUpdateDrawerHandler} />
       </div>
     </div>
   );

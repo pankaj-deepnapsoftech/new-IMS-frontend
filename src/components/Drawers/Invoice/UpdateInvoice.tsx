@@ -1,7 +1,8 @@
 import { FormControl, FormLabel, Input, Button } from "@chakra-ui/react";
 import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
-import { MdEdit } from "react-icons/md";
+import { MdEdit, MdReceipt } from "react-icons/md";
+import { FaFileInvoice, FaCalendarAlt, FaStore, FaUser, FaTags } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { useUpdateInvoiceMutation } from "../../../redux/api/api";
@@ -81,19 +82,17 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
 
   const [updateInvoice] = useUpdateInvoiceMutation();
 
-  // Custom styles for react-select to match theme
+  // Custom styles for react-select to match modern theme
   const customSelectStyles = {
     control: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: colors.input.background,
-      borderColor: state.isFocused
-        ? colors.input.borderFocus
-        : colors.input.border,
+      backgroundColor: "white",
+      borderColor: state.isFocused ? colors.primary[500] : colors.gray[300],
       borderRadius: "8px",
       minHeight: "44px",
       boxShadow: state.isFocused ? `0 0 0 3px ${colors.primary[100]}` : "none",
       "&:hover": {
-        borderColor: colors.input.borderHover,
+        borderColor: colors.primary[400],
       },
     }),
     option: (provided: any, state: any) => ({
@@ -102,24 +101,26 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
         ? colors.primary[500]
         : state.isFocused
         ? colors.primary[50]
-        : colors.input.background,
-      color: state.isSelected ? colors.text.inverse : colors.text.primary,
+        : "white",
+      color: state.isSelected ? "white" : colors.gray[900],
       padding: "12px",
+      cursor: "pointer",
     }),
     singleValue: (provided: any) => ({
       ...provided,
-      color: colors.text.primary,
+      color: colors.gray[900],
     }),
     placeholder: (provided: any) => ({
       ...provided,
-      color: colors.text.secondary,
+      color: colors.gray[500],
     }),
     menu: (provided: any) => ({
       ...provided,
-      backgroundColor: colors.input.background,
-      border: `1px solid ${colors.input.border}`,
+      backgroundColor: "white",
+      border: `1px solid ${colors.gray[200]}`,
       borderRadius: "8px",
-      boxShadow: colors.shadow.lg,
+      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      zIndex: 9999,
     }),
   };
 
@@ -352,177 +353,264 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
   }, [id]);
 
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
-      <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#4b86a0]  right-0 top-0 z-10 py-3"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
-      >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
-          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
-        </h1>
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
 
-        <div className="mt-8 px-5">
-          <h2 className="text-xl text-center  font-semibold py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
-            Update Invoice
-          </h2>
+      {/* Drawer */}
+      <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
+        <div className="h-full flex flex-col">
+          {/* Header */}
+          <div className="px-6 py-4 flex items-center justify-between border-b">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <MdEdit className="h-5 w-5 text-blue-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">Update Invoice</h2>
+            </div>
+            <button
+              onClick={closeDrawerHandler}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            >
+              <BiX size={24} className="text-gray-600" />
+            </button>
+          </div>
 
-          {isLoading && <Loading />}
-          {!isLoading && (
-            <form onSubmit={updateInvoiceHandler}>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
-                  Category
-                </FormLabel>
-                <Select
-                  styles={customSelectStyles}
-                  isDisabled
-                  value={category}
-                  options={categoryOptions}
-                  required={true}
-                  onChange={(e: any) => setCategory(e)}
-                />
-              </FormControl>
-              {category && category.value === "sale" && (
-                <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold" color="white">
-                    Buyer
-                  </FormLabel>
-                  <Select
-                    styles={customSelectStyles}
-                    isDisabled
-                    value={buyer}
-                    options={buyerOptions}
-                    required={true}
-                    onChange={(e: any) => setBuyer(e)}
-                  />
-                </FormControl>
-              )}
-              {category && category.value === "purchase" && (
-                <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold" color="white">
-                    Supplier
-                  </FormLabel>
-                  <Select
-                    styles={customSelectStyles}
-                    isDisabled
-                    value={supplier}
-                    options={supplierOptions}
-                    required={true}
-                    onChange={(e: any) => setSupplier(e)}
-                  />
-                </FormControl>
-              )}
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
-                  Invoice No.
-                </FormLabel>
-                <Input
-                  className="text-gray-200"
-                  value={invoiceNo}
-                  onChange={(e) => setInvoiceNo(e.target.value)}
-                  type="text"
-                  placeholder="Invoice No."
-                />
-              </FormControl>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
-                  Document Date
-                </FormLabel>
-                <Input
-                  value={documentDate}
-                  className="no-scrollbar text-gray-200"
-                  onChange={(e) => setDocumentDate(e.target.value)}
-                  type="date"
-                  placeholder="Document Date"
-                />
-              </FormControl>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
-                  Sales Order Date
-                </FormLabel>
-                <Input
-                  value={salesOrderDate}
-                  className="no-scrollbar text-gray-200"
-                  onChange={(e) => setSalesOrderDate(e.target.value)}
-                  type="date"
-                  placeholder="Sales Order Date"
-                />
-              </FormControl>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
-                  Store
-                </FormLabel>
-                <Select
-                  styles={customSelectStyles}
-                  value={store}
-                  options={storeOptions}
-                  required={true}
-                  onChange={(e: any) => setStore(e)}
-                />
-              </FormControl>
-              <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="bold" color="white">
-                  Note
-                </FormLabel>
-                <textarea
-                  className="border w-full border-[#a9a9a9] bg-transparent text-gray-200 rounded"
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                />
-              </FormControl>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
-                  Items
-                </FormLabel>
-                <AddItems inputs={inputs} setInputs={setInputs} />
-              </FormControl>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
-                  Subtotal
-                </FormLabel>
-                <Input
-                  value={subtotal}
-                  isDisabled={true}
-                  className="no-scrollbar text-gray-200"
-                  type="number"
-                  placeholder="Subtotal"
-                />
-              </FormControl>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
-                  Tax
-                </FormLabel>
-                <Select
-                  styles={customSelectStyles}
-                  required={true}
-                  value={tax}
-                  options={taxOptions}
-                  onChange={(e: any) => setTax(e)}
-                />
-              </FormControl>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">
-                  Total
-                </FormLabel>
-                <Input value={total} isDisabled={true} />
-              </FormControl>
-              <Button
-                isLoading={isUpdating}
-                type="submit"
-                className="mt-1"
-                color="white"
-                backgroundColor="#1640d6"
-              >
-                Submit
-              </Button>
-            </form>
-          )}
+          {/* Form Content */}
+          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+            {isLoading && <Loading />}
+            {!isLoading && (
+              <form onSubmit={updateInvoiceHandler} className="space-y-6">
+                {/* Invoice Type Section */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <FaTags className="h-5 w-5 text-blue-600" />
+                    Invoice Type
+                  </h3>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <MdReceipt className="h-4 w-4 text-gray-500" />
+                      Category *
+                    </label>
+                    <Select
+                      styles={customSelectStyles}
+                      isDisabled
+                      value={category}
+                      options={categoryOptions}
+                      placeholder="Select category"
+                      className="text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* Customer/Supplier Section */}
+                {(category?.value === "sale" || category?.value === "purchase") && (
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <FaUser className="h-5 w-5 text-green-600" />
+                      {category?.value === "sale" ? "Customer Details" : "Supplier Details"}
+                    </h3>
+
+                    {category.value === "sale" && (
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                          <FaUser className="h-4 w-4 text-gray-500" />
+                          Buyer *
+                        </label>
+                        <Select
+                          styles={customSelectStyles}
+                          isDisabled
+                          value={buyer}
+                          options={buyerOptions}
+                          placeholder="Select buyer"
+                          className="text-sm"
+                        />
+                      </div>
+                    )}
+
+                    {category.value === "purchase" && (
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                          <FaUser className="h-4 w-4 text-gray-500" />
+                          Supplier *
+                        </label>
+                        <Select
+                          styles={customSelectStyles}
+                          isDisabled
+                          value={supplier}
+                          options={supplierOptions}
+                          placeholder="Select supplier"
+                          className="text-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Invoice Details Section */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                    <FaFileInvoice className="h-5 w-5 text-purple-600" />
+                    Invoice Details
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <FaFileInvoice className="h-4 w-4 text-gray-500" />
+                        Invoice No. *
+                      </label>
+                      <input
+                        type="text"
+                        value={invoiceNo || ""}
+                        onChange={(e) => setInvoiceNo(e.target.value)}
+                        placeholder="Enter invoice number"
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <FaStore className="h-4 w-4 text-gray-500" />
+                        Store *
+                      </label>
+                      <Select
+                        styles={customSelectStyles}
+                        value={store}
+                        options={storeOptions}
+                        placeholder="Select store"
+                        onChange={(e: any) => setStore(e)}
+                        className="text-sm"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <FaCalendarAlt className="h-4 w-4 text-gray-500" />
+                        Document Date *
+                      </label>
+                      <input
+                        type="date"
+                        value={documentDate || ""}
+                        onChange={(e) => setDocumentDate(e.target.value)}
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <FaCalendarAlt className="h-4 w-4 text-gray-500" />
+                        Sales Order Date *
+                      </label>
+                      <input
+                        type="date"
+                        value={salesOrderDate || ""}
+                        onChange={(e) => setSalesOrderDate(e.target.value)}
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Note
+                      </label>
+                      <textarea
+                        value={note || ""}
+                        onChange={(e) => setNote(e.target.value)}
+                        placeholder="Enter any additional notes..."
+                        rows={3}
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900 resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Items Section */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <FaTags className="h-5 w-5 text-orange-600" />
+                    Items *
+                  </h3>
+                  <AddItems inputs={inputs} setInputs={setInputs} />
+                </div>
+
+                {/* Pricing Section */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                    <FaFileInvoice className="h-5 w-5 text-green-600" />
+                    Pricing & Tax
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Subtotal
+                      </label>
+                      <input
+                        type="number"
+                        value={subtotal || ""}
+                        readOnly
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Tax *
+                      </label>
+                      <Select
+                        styles={customSelectStyles}
+                        value={tax}
+                        options={taxOptions}
+                        placeholder="Select tax"
+                        onChange={(e: any) => setTax(e)}
+                        className="text-sm"
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Total Amount
+                      </label>
+                      <input
+                        type="number"
+                        value={total || ""}
+                        readOnly
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed font-semibold text-lg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="bg-white border-t p-6 -mx-6 -mb-6">
+                  <button
+                    type="submit"
+                    disabled={isUpdating}
+                    className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
+                  >
+                    {isUpdating ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Updating...
+                      </>
+                    ) : (
+                      <>
+                        <MdEdit className="h-4 w-4" />
+                        Update Invoice
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
       </div>
-    </Drawer>
+    </>
   );
 };
 
