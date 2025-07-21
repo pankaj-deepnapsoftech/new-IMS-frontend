@@ -448,12 +448,12 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[700px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between border-b">
+          <div className="px-6 py-4 flex items-center justify-between border-b">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white/20 rounded-lg">
-                <Edit3 className="h-5 w-5 text-white" />
+                <Edit3 className="h-5 w-5 text-black" />
               </div>
-              <h2 className="text-xl font-semibold text-white">
+              <h2 className="text-xl font-semibold text-black">
                 Update Production Process
               </h2>
             </div>
@@ -461,7 +461,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
               onClick={closeDrawerHandler}
               className="p-2 hover:bg-white/20 rounded-lg transition-colors duration-200"
             >
-              <BiX size={24} className="text-white" />
+              <BiX size={24} className="text-black" />
             </button>
           </div>
 

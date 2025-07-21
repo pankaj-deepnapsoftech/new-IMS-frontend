@@ -81,17 +81,17 @@ const AddItems: React.FC<AddItemsProps> = ({inputs, setInputs}) => {
       ...provided,
       backgroundColor: "transparent",
       borderColor: "#a9a9a9",
-      color: "#fff",
+      color: "#000",
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#FFF" : "#d3d3d3", // dark gray on focus, light gray default
+      backgroundColor: state.isFocused ? "#d3d3d3" : "#FFF", // dark gray on focus, light gray default
       color: "#000", // text color
     }),
     multiValue: (provided: any) => ({
       ...provided,
       backgroundColor: "#808080",
-      color: "#fff",
+      color: "#000",
     }),
     menu: (provided: any) => ({
       ...provided,
@@ -99,11 +99,11 @@ const AddItems: React.FC<AddItemsProps> = ({inputs, setInputs}) => {
     }),
     placeholder: (provided: any) => ({
       ...provided,
-      color: "#fff", // light gray placeholder
+      color: "#000", // light gray placeholder
     }),
     singleValue: (provided: any) => ({
       ...provided,
-      color: "#fff", // ensures selected value is white
+      color: "#000", // ensures selected value is white
     }),
   };
   return (

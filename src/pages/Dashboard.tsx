@@ -258,68 +258,115 @@ const Dashboard: React.FC = () => {
   ];
 
   // Generate current week data dynamically
-  const getCurrentWeekData = () => {
+  const getProductionPlanForCurrentWeek = () => {
     const today = new Date();
-    const currentDayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - currentDayOfWeek); // Get Sunday of current week
+    const currentDayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday...
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - currentDayOfWeek);
 
     const weekDays = [];
-    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const dayNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
 
     for (let i = 0; i < 7; i++) {
-      const date = new Date(weekStart);
-      date.setDate(weekStart.getDate() + i);
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
 
       const dayName = dayNames[i];
-      const dayNumber = date.getDate().toString().padStart(2, "0");
+      const formattedDate = `${date.getDate()}/${
+        date.getMonth() + 1
+      }/${date.getFullYear()}`; // dd/m/yyyy
 
-      // Sample task distribution based on day of week
-      let tasks: string[] = [];
-      switch (i) {
-        case 0: // Sunday
-          tasks = [];
-          break;
-        case 1: // Monday
-          tasks = [
-            "Raw Material Processing",
-            "Quality Check",
-            "Inventory Update",
-          ];
-          break;
-        case 2: // Tuesday
-          tasks = [
-            "Batch Processing",
-            "Machine Operation",
-            "Packaging",
-            "Dispatch Preparation",
-          ];
-          break;
-        case 3: // Wednesday
-          tasks = ["Maintenance Check"];
-          break;
-        case 4: // Thursday
-          tasks = ["Order Fulfillment", "Final Quality Inspection"];
-          break;
-        case 5: // Friday
-          tasks = ["Weekly Report Generation", "Equipment Cleaning"];
-          break;
-        case 6: // Saturday
-          tasks = [];
-          break;
-        default:
-          tasks = [];
-      }
+      // Find matching tasks from backend
+      const dayTasks =
+        backendProductionPlan?.[dayName]?.filter(
+          (task: any) => task.date === formattedDate
+        ) || [];
 
       weekDays.push({
-        day: `${dayName} ${dayNumber}`,
-        tasks: tasks,
-        date: date,
+        day: `${dayName.slice(0, 3)} ${String(date.getDate()).padStart(
+          2,
+          "0"
+        )}`,
+        tasks: dayTasks.map((t: any) => t.name),
+        date,
         isToday: date.toDateString() === today.toDateString(),
       });
     }
 
     return weekDays;
+  };
+
+  const [backendProductionPlan, setBackendProductionPlan] = useState<any>({});
+  const fetchProductionPlan = async () => {
+    try {
+      const res = await fetch("http://localhost:8085/api/bom/weekly");
+      const data = await res.json();
+      if (data.success) {
+        setBackendProductionPlan(data.weekMap);
+      }
+    } catch (err) {
+      console.error("Failed to fetch production plan", err);
+    }
+  };
+
+  fetchProductionPlan();
+  const getBackendWeekData = () => {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    const result: {
+      day: string;
+      tasks: string[];
+      date: Date;
+      isToday: boolean;
+    }[] = [];
+
+    
+ 
+    const dayNamesMap: Record<string, number> = {
+      Sunday: 0,
+      Monday: 1,
+      Tuesday: 2,
+      Wednesday: 3,
+      Thursday: 4,
+      Friday: 5,
+      Saturday: 6,
+    };
+
+    Object.entries(backendProductionPlan).forEach(([day, tasks]) => {
+      const filteredTasks = (tasks as any[]).filter((task) => {
+        const [d, m, y] = task.date.split("/").map(Number);
+        const taskDate = new Date(y, m - 1, d);
+        return taskDate >= startOfWeek && taskDate <= endOfWeek;
+      });
+
+      if (filteredTasks.length > 0) {
+        const sampleDate = filteredTasks[0].date;
+        const [d, m, y] = sampleDate.split("/").map(Number);
+        const date = new Date(y, m - 1, d);
+
+        result.push({
+          day: `${day.slice(0, 3)} ${String(d).padStart(2, "0")}`,
+          tasks: filteredTasks.map((t) => t.name),
+          date,
+          isToday: date.toDateString() === today.toDateString(),
+        });
+      }
+    });
+
+    return result;
   };
 
   // Get current week date range for header
@@ -358,7 +405,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const productionPlanData = getCurrentWeekData();
+  const productionPlanData = getProductionPlanForCurrentWeek();
 
   const fetchSummaryHandler = async () => {
     try {
@@ -452,7 +499,8 @@ const Dashboard: React.FC = () => {
     fetchSummaryHandler();
 
     // Set default selected day to today
-    const weekData = getCurrentWeekData();
+    const weekData = getProductionPlanForCurrentWeek();
+
     const today = weekData.find((day) => day.isToday);
     if (today) {
       setSelectedProductionDay(today);
@@ -688,7 +736,8 @@ const Dashboard: React.FC = () => {
                       size="sm"
                       variant="ghost"
                       onClick={() => {
-                        const weekData = getCurrentWeekData();
+                        const weekData = getProductionPlanForCurrentWeek();
+
                         const today = weekData.find((day) => day.isToday);
                         if (today) {
                           setSelectedProductionDay(today);
@@ -773,7 +822,7 @@ const Dashboard: React.FC = () => {
                       <HStack spacing={3} mb={3}>
                         <Text fontSize="sm" fontWeight="bold" color="gray.700">
                           {selectedProductionDay.day}
-                          {getCurrentWeekData().find(
+                          {getProductionPlanForCurrentWeek().find(
                             (day) => day.day === selectedProductionDay.day
                           )?.isToday && (
                             <Text
