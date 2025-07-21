@@ -1,70 +1,71 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// @ts-nocheck
+// @ts-nocheck 
 
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
+import axios from "axios"
+import { useEffect, useState } from "react"
+import { useCookies } from "react-cookie"
 import Pagination from "./Pagination";
 import { toast } from "react-toastify";
+
+import { FaCheck, FaCheckCircle, FaCloudUploadAlt, FaDollarSign, FaHourglassHalf, FaMoneyBillWave, FaMoneyCheckAlt, FaShieldAlt, FaTimesCircle, FaUpload } from "react-icons/fa";
 import {
-  FaCheck,
-  FaCheckCircle,
-  FaCloudUploadAlt,
-  FaDollarSign,
-  FaHourglassHalf,
-  FaMoneyBillWave,
-  FaMoneyCheckAlt,
-  FaShieldAlt,
-  FaTimesCircle,
-  FaUpload,
-} from "react-icons/fa";
-import { MdOutlineRefresh, MdAdd } from "react-icons/md";
-import { FiSearch } from "react-icons/fi";
-import { VStack, HStack, Text, Button, Badge, Icon } from "@chakra-ui/react";
+  // Box,
+  VStack,
+  HStack,
+  Text,
+  Button,
+  Badge,
+  Icon,
+  // Input,
+  // Modal,
+  // ModalOverlay,
+  // ModalContent,
+  // ModalHeader,
+  // ModalCloseButton,
+  // ModalBody,
+  // ModalFooter,
+  // FormControl,
+  // FormLabel,
+  // useDisclosure,
+  // useColorModeValue,
+  // Select,
+  // Spinner,
+  // Img,
+} from "@chakra-ui/react";
 import { IoEyeSharp } from "react-icons/io5";
 import { NavLink, useNavigate } from "react-router-dom";
 import AddToken from "../components/Drawers/Task/AddToken";
 import AddhalfToken from "../components/Drawers/Task/AddhalfToken";
-// import UploadInvoice from "../components/Drawers/Task/UploadInvoice";
+
+import UploadInvoice from "../components/Drawers/Task/UploadInvoice";
 import Loading from "../ui/Loading";
 import EmptyData from "../ui/emptyData";
-import { colors } from "../theme/colors";
-import { CheckSquare } from "lucide-react";
+import UploadDesignFile from "../components/Drawers/UploadDesignFile";
 const Task = () => {
   const [cookies] = useCookies();
   const [tasks, setTasks] = useState([]);
-  const [filteredTasks, setFilteredTasks] = useState([]);
   const [page, setPage] = useState(1);
-  const [showToken, setShowToken] = useState(false);
-  const [showhalfToken, setShowhalfToken] = useState(false);
+  const [showToken, setShowToken] = useState(false)
+  const [showhalfToken, setShowhalfToken] = useState(false)
   const [saleId, setSaleId] = useState("");
   const [tokenAmount, setTokenAmount] = useState();
-  const [invoicefile, setInvoiceFile] = useState("");
-  const [limit, setlimit] = useState(10);
-  const [TotalPage, setTotalPage] = useState(0);
-  const [searchKey, setSearchKey] = useState<string | undefined>();
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [processFilter, setProcessFilter] = useState<string>("");
+  const [invoicefile, setInvoiceFile] = useState("")
+  const [limit, setlimit] = useState(10)
+  const [TotalPage, setTotalPage] = useState(0)
+  const [showDesignUpload, setShowDesignUpload] = useState(false);
 
   const role = cookies?.role;
 
-  const [halfAmountId, sethalfAmountId] = useState("");
+
+
+  const [halfAmountId, sethalfAmountId] = useState("")
   const [halfAmount, sethalfAmount] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
-  // const [showUploadInvoice, setShowUploadInvoice] = useState(false);
-
-  // Additional state variables for missing functionality
-  const [selectedData, setSelectedData] = useState(null);
-  const [sampleFile, setsampleFile] = useState("");
-  const [paymentFile, setPaymentFile] = useState("");
-  const [verifyStatus, setVerifyStatus] = useState(false);
-  const [assignId, setAssignId] = useState("");
-  const [paymentFor, setPaymentFor] = useState("");
   const fetchTasks = async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(true)
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}assined/get-assined?limit=${limit}&page=${page}`,
         {
@@ -73,7 +74,6 @@ const Task = () => {
           },
         }
       );
-      // console.log("testing", response);
       const tasks = response.data.data.map((task: any) => {
         const sale = task?.sale_id?.length ? task.sale_id[0] : null;
         const product = sale?.product_id?.length ? sale.product_id[0] : null;
@@ -84,6 +84,9 @@ const Task = () => {
         const user = task?.sale_id[0]?.user_id
           ? task?.sale_id[0]?.user_id[0]
           : null;
+
+
+
 
         return {
           id: task?._id,
@@ -120,18 +123,19 @@ const Task = () => {
         };
       });
       setTasks(tasks);
-      setFilteredTasks(tasks);
       let totalData = response?.data?.totalData || 0;
       let totalPages = Math.ceil(totalData / limit);
       setTotalPage(totalPages);
 
-      // console.log(totalPage)
+      console.log(totalPage)
     } catch (error) {
       console.log(error);
+
     } finally {
       setIsLoading(false);
     }
-  };
+  }
+
 
   const navigate = useNavigate();
 
@@ -171,6 +175,7 @@ const Task = () => {
     }
   };
 
+
   const handleDone = async (id) => {
     try {
       const response = await axios.patch(
@@ -182,6 +187,7 @@ const Task = () => {
           },
         }
       );
+
 
       toast.success(response.data.message);
       fetchTasks();
@@ -232,580 +238,371 @@ const Task = () => {
   //   onAccountpreviewOpen();
   // };
 
+
   const handleVerifyImage = async () => {
     const data = {
       half_payment_status: "Paid",
-      half_payment_approve: true,
-    };
-    // onViewHalfPaymentssClose()
-    try {
-      const res = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}purchase/update/${halfAmountId.sale_id}`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
-        }
-      );
-      toast.success("Half amount Verify");
-    } catch (error) {
-      console.log(error);
+      half_payment_approve: true
     }
-  };
+    onViewHalfPaymentssClose()
+    try {
+      const res = await axios.put(`${process.env.REACT_APP_BACKEND_URL}purchase/update/${halfAmountId.sale_id}`, data, {
+        headers: {
+          Authorization: `Bearer ${cookies?.access_token}`,
+        },
+      })
+      toast.success("Half amount Verify")
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-  // Additional missing functions
-  const sampleimageDisclosure = {
-    onOpen: () => {},
-    onClose: () => {},
-  };
-
-  const paymentDisclosure = {
-    onOpen: () => {},
-    onClose: () => {},
-  };
-
-  const tokenDisclosure = {
-    onOpen: () => {},
-    onClose: () => {},
-  };
-
-  const onViewHalfPaymentssClose = () => {};
 
   useEffect(() => {
     fetchTasks();
+
   }, [cookies?.access_token, page, limit]);
 
-  // Filter tasks based on search and filters
-  useEffect(() => {
-    const searchTxt = searchKey?.toLowerCase();
-    const results = tasks.filter((task: any) => {
-      const matchesSearch =
-        !searchTxt ||
-        task.productName?.toLowerCase()?.includes(searchTxt) ||
-        task.assignedBy?.toLowerCase()?.includes(searchTxt) ||
-        task.customer_name?.toLowerCase()?.includes(searchTxt) ||
-        task.company_name?.toLowerCase()?.includes(searchTxt) ||
-        task.assined_process?.toLowerCase()?.includes(searchTxt);
-
-      const matchesStatus =
-        !statusFilter || task.design_status === statusFilter;
-      const matchesProcess =
-        !processFilter || task.assined_process === processFilter;
-
-      return matchesSearch && matchesStatus && matchesProcess;
-    });
-    setFilteredTasks(results);
-  }, [searchKey, statusFilter, processFilter, tasks]);
 
   if (isLoading) {
-    return <Loading />;
+    return <Loading />
   }
   if (!tasks || tasks.length === 0) {
-    return <EmptyData />;
+    return <EmptyData />
   }
 
+
   return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: colors.background.page }}
-    >
-      <div className="p-2 lg:p-3">
-        {/* Header Section */}
-        <div
-          className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
-          style={{
-            backgroundColor: colors.background.card,
-            borderColor: colors.border.light,
-          }}
-        >
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 p-3 rounded-xl shadow-lg">
-                <CheckSquare className="text-white" size={24} />
-              </div>
-              <div>
-                <h1
-                  className="text-2xl lg:text-3xl font-bold"
-                  style={{ color: colors.text.primary }}
-                >
-                  Task Management
-                </h1>
-                <p
-                  className="text-sm mt-1"
-                  style={{ color: colors.text.secondary }}
-                >
-                  Manage and track assigned tasks and processes
-                </p>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={fetchTasks}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
-                style={{
-                  borderColor: colors.border.medium,
-                  color: colors.text.primary,
-                  backgroundColor: colors.background.card,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.gray[50];
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    colors.background.card;
-                }}
-              >
-                <MdOutlineRefresh size="20px" />
-                Refresh
-              </button>
-            </div>
-          </div>
-
-          {/* Search and Filters Row */}
-          <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
-            {/* Search Input */}
-            <div className="flex-1 max-w-md">
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Search Tasks
-              </label>
-              <div className="relative">
-                <FiSearch
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
-                  style={{ color: colors.text.secondary }}
-                />
-                <input
-                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor: colors.input.border,
-                    color: colors.text.primary,
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor =
-                      colors.input.borderFocus;
-                    e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = colors.input.border;
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                  placeholder="Search by product, manager, customer..."
-                  value={searchKey || ""}
-                  onChange={(e) => setSearchKey(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Status Filter */}
-            <div className="w-full lg:w-48">
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Status
-              </label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = colors.input.borderFocus;
-                  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = colors.input.border;
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                <option value="">All Status</option>
-                <option value="Pending">Pending</option>
-                <option value="UnderProcessing">Under Processing</option>
-                <option value="Completed">Completed</option>
-              </select>
-            </div>
-
-            {/* Process Filter */}
-            <div className="w-full lg:w-48">
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Process
-              </label>
-              <select
-                value={processFilter}
-                onChange={(e) => setProcessFilter(e.target.value)}
-                className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = colors.input.borderFocus;
-                  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = colors.input.border;
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                <option value="">All Processes</option>
-                <option value="Design">Design</option>
-                <option value="Production">Production</option>
-                <option value="Quality Check">Quality Check</option>
-                <option value="Packaging">Packaging</option>
-              </select>
-            </div>
-          </div>
+    <section>
+      <div className="min-h-screen p-6 text-gray-100">
+        <h1 className="text-3xl font-bold mb-6">Tasks</h1>
+        <div className="flex flex-wrap items-center gap-4 mb-8">
+          <select className=" rounded px-4 py-2 bg-[#646b75] focus:outline-none text-gray-100">
+            <option className="text-white">Select Status</option>
+            <option className="text-white">Under Processing</option>
+            <option className="text-white">Completed</option>
+          </select>
+          <input type="date" className=" styled-date rounded focus:outline-none px-4 py-2 bg-[#ffffff2a] text-gray-100 placeholder:text-gray-100" />
+          <input
+            type="text"
+            placeholder="Search by Product or Manager"
+            className=" focus:outline-none rounded px-4 py-2 flex-grow bg-[#ffffff2a] text-gray-100"
+          />
+          <button onClick={fetchTasks} className="border border-blue-400 text-blue-400 px-4 py-1.5 rounded hover:bg-blue-400 hover:text-white transition-all duration-300">
+            ⟳ Refresh
+          </button>
         </div>
 
-        {/* Tasks Section */}
-        <div className="space-y-4 mb-6">
-          {filteredTasks.map((task: any) => (
-            <div
-              key={task?._id}
-              className="rounded-xl shadow-sm border border-gray-100 p-6"
-              style={{
-                backgroundColor: colors.background.card,
-                borderColor: colors.border.light,
-              }}
-            >
-              {/* Task Header */}
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
-                <div>
-                  <h3
-                    className="text-lg font-semibold"
-                    style={{ color: colors.text.primary }}
-                  >
-                    {task?.productName}
-                  </h3>
-                  <p
-                    className="text-sm mt-1"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    {task?.date} • Assigned by {task?.assignedBy}
-                  </p>
-                </div>
+        {tasks.map((task: any) => (
+          <div key={task?._id} className="rounded-md shadow-md p-6 bg-[#ffffff2a] mb-4">
 
-                {/* Status Badge */}
-                <div className="flex items-center gap-2">
-                  <span
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                    style={{
-                      backgroundColor:
-                        task?.design_status === "Completed"
-                          ? colors.success[100]
-                          : task?.design_status === "UnderProcessing"
-                          ? colors.warning[100]
-                          : colors.gray[100],
-                      color:
-                        task?.design_status === "Completed"
-                          ? colors.success[800]
-                          : task?.design_status === "UnderProcessing"
-                          ? colors.warning[800]
-                          : colors.gray[800],
-                    }}
-                  >
-                    {task?.design_status}
-                  </span>
-                </div>
-              </div>
+            <div className="flex flex-wrap gap-2 mt-6">
+              {["acc", "account", "accountant", "dispatch", "dis"].includes(role?.toLowerCase()) && (
+                <HStack wrap="wrap" spacing={2}>
+                  {/* {task?.token_amt && !task?.token_status && (
+                    <Badge
+                      colorScheme="orange"
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Icon as={FaHourglassHalf} />
+                      Token: Pending
+                    </Badge>
+                  )} */}
 
-              {/* Task Details Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
-                <div className="space-y-3">
-                  {(role === "Accountant" ||
-                    role === "Sales" ||
-                    role === "admin") && (
-                    <div>
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        Product Price:
-                      </span>
-                      <span
-                        className="ml-2 text-sm"
-                        style={{ color: colors.text.primary }}
-                      >
-                        {task?.productPrice}
-                      </span>
-                    </div>
-                  )}
-                  <div>
-                    <span
-                      className="text-sm font-medium"
-                      style={{ color: colors.text.secondary }}
+                  {/* {task?.token_amt && task?.token_status && (
+                    <Badge
+                      colorScheme="green"
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
                     >
-                      Quantity:
-                    </span>
-                    <span
-                      className="ml-2 text-sm"
-                      style={{ color: colors.text.primary }}
-                    >
-                      {task?.productQuantity}
-                    </span>
-                  </div>
-                  {["acc", "account", "accountant", "dispatch", "dis"].includes(
-                    role?.toLowerCase()
-                  ) && (
-                    <>
-                      <div>
-                        <span
-                          className="text-sm font-medium"
-                          style={{ color: colors.text.secondary }}
-                        >
-                          Party:
-                        </span>
-                        <span
-                          className="ml-2 text-sm"
-                          style={{ color: colors.text.primary }}
-                        >
-                          {task?.customer_name}
-                        </span>
-                      </div>
-                      <div>
-                        <span
-                          className="text-sm font-medium"
-                          style={{ color: colors.text.secondary }}
-                        >
-                          Sale By:
-                        </span>
-                        <span
-                          className="ml-2 text-sm"
-                          style={{ color: colors.text.primary }}
-                        >
-                          {task?.sale_by}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
+                      <Icon as={FaCheckCircle} />
+                      Token: Paid
+                    </Badge>
+                  )} */}
 
-                <div className="space-y-3">
-                  <div>
-                    <span
-                      className="text-sm font-medium"
-                      style={{ color: colors.text.secondary }}
+                  {/* {typeof task?.isTokenVerify === "boolean" && (
+                    <Badge
+                      colorScheme={task.isTokenVerify ? "green" : "orange"}
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
                     >
-                      Assigned Process:
-                    </span>
-                    <span
-                      className="ml-2 text-sm"
-                      style={{ color: colors.text.primary }}
-                    >
-                      {task?.assined_process}
-                    </span>
-                  </div>
-                  {task?.assinedby_comment && (
-                    <div>
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        Remarks:
-                      </span>
-                      <span
-                        className="ml-2 text-sm"
-                        style={{ color: colors.text.primary }}
-                      >
-                        {task.assinedby_comment}
-                      </span>
-                    </div>
-                  )}
-                  {task?.sample_bom_name && (
-                    <div>
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        Sample BOM:
-                      </span>
-                      <span
-                        className="ml-2 text-sm"
-                        style={{ color: colors.text.primary }}
-                      >
-                        {task.sample_bom_name}
-                      </span>
-                    </div>
-                  )}
-                  {task?.bom_name && (
-                    <div>
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        BOM Name:
-                      </span>
-                      <span
-                        className="ml-2 text-sm"
-                        style={{ color: colors.text.primary }}
-                      >
-                        {task.bom_name}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
+                      <Icon as={task.isTokenVerify ? FaShieldAlt : FaHourglassHalf} />
+                      Token Verification: {task.isTokenVerify ? "Verified" : "Pending"}
+                    </Badge>
+                  )} */}
 
-              {/* Action Buttons */}
-              <div
-                className="flex flex-wrap gap-3 pt-4 border-t"
-                style={{ borderColor: colors.border.light }}
-              >
-                {role?.toLowerCase().includes("prod") ? (
-                  <>
-                    {task?.design_status === "Pending" && (
-                      <button
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
-                        style={{
-                          backgroundColor: colors.button.primary,
-                          color: colors.text.inverse,
-                        }}
-                        onClick={() => handleAccept(task.id)}
-                        disabled={isSubmitting}
-                        onMouseEnter={(e) => {
-                          if (!isSubmitting) {
-                            e.currentTarget.style.backgroundColor =
-                              colors.button.primaryHover;
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isSubmitting) {
-                            e.currentTarget.style.backgroundColor =
-                              colors.button.primary;
-                          }
-                        }}
-                      >
-                        Accept Task
-                      </button>
-                    )}
-                    {task?.bom?.length === 2 ? (
-                      <span
-                        className="inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium"
-                        style={{
-                          backgroundColor: colors.success[100],
-                          color: colors.success[800],
-                        }}
-                      >
-                        BOM: Created
-                      </span>
-                    ) : (
-                      <button
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
-                        style={{
-                          borderColor: colors.border.medium,
-                          color: colors.text.primary,
-                          backgroundColor: colors.background.card,
-                        }}
-                        onClick={() => handleBOM(task.sale_id)}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.gray[50];
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.background.card;
-                        }}
-                      >
-                        Create BOM
-                      </button>
-                    )}
-                    {task?.design_status !== "Completed" && (
-                      <button
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
-                        style={{
-                          backgroundColor: colors.button.secondary,
-                          color: colors.text.inverse,
-                        }}
-                        onClick={() => handleDone(task.id)}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.button.secondaryHover;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.button.secondary;
-                        }}
-                      >
-                        <FaCheck size="16px" />
-                        Task Done
-                      </button>
-                    )}
-                  </>
-                ) : ["accountant", "acc"].includes(role?.toLowerCase()) ? (
-                  <>
-                    {task?.design_status === "Pending" && (
-                      <button
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
-                        style={{
-                          backgroundColor: colors.button.primary,
-                          color: colors.text.inverse,
-                        }}
-                        onClick={() => handleAccept(task.id)}
-                        disabled={isSubmitting}
-                        onMouseEnter={(e) => {
-                          if (!isSubmitting) {
-                            e.currentTarget.style.backgroundColor =
-                              colors.button.primaryHover;
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isSubmitting) {
-                            e.currentTarget.style.backgroundColor =
-                              colors.button.primary;
-                          }
-                        }}
-                      >
-                        Accept Task
-                      </button>
-                    )}
-                  </>
-                ) : null}
-              </div>
+                  {/* {task?.allsale?.half_payment_status && (
+                    <Badge
+                      colorScheme="green"
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Icon as={FaMoneyCheckAlt} />
+                      Half Payment: {task.allsale.half_payment_status}
+                    </Badge>
+                  )} */}
+
+                  {/* {task?.payment_status && (
+                    <Badge
+                      colorScheme={colorChange(task.payment_status)}
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Icon as={FaDollarSign} />
+                      Payment: {task.payment_status}
+                    </Badge>
+                  )} */}
+
+                  {/* {typeof task?.payment_verify === "boolean" && (
+                    <Badge
+                      colorScheme={colorChange(task.payment_verify)}
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Icon as={task.payment_verify ? FaCheckCircle : FaTimesCircle} />
+                      Payment Verification: {task.payment_verify ? "Verified" : "Not Verified"}
+                    </Badge>
+                  )} */}
+                </HStack>
+              )}
             </div>
-          ))}
-        </div>
 
-        {/* Pagination */}
-        <Pagination page={page} setPage={setPage} TotalPage={TotalPage} />
 
-        {/* Modals */}
-        <AddToken
-          showToken={showToken}
-          setShowToken={setShowToken}
-          tokenAmount={tokenAmount}
-          sale={saleId}
-          refresh={fetchTasks}
-        />
-        {/* <UploadInvoice
-          showUploadInvoice={showUploadInvoice}
-          setShowUploadInvoice={setShowUploadInvoice}
-          sale={saleId}
-          invoicefile={invoicefile}
-        /> */}
-        <AddhalfToken
-          showhalfToken={showhalfToken}
-          setShowhalfToken={setShowhalfToken}
-          tokenAmount={tokenAmount}
-          sale={saleId}
-          refresh={fetchTasks}
-        />
+            <HStack justify="space-between" spacing={3} mt={3} flexWrap="wrap" align="start" gap={4}>
+              <VStack align="start" w={{ base: "100%", md: "48%" }}>
+                {(role === "Accountant" || role === "Sales" || role === "admin") && (
+                  <Text fontSize="sm" ><strong>Product Price:</strong> {task?.productPrice}</Text>
+                )}
+                <Text fontSize="sm" ><strong>Quantity:</strong> {task?.productQuantity}</Text>
+                {["acc", "account", "accountant", "dispatch", "dis"].includes(role?.toLowerCase()) && (
+                  <>
+                    <Text fontSize="sm" ><strong>Party:</strong> {task?.customer_name}</Text>
+                    <Text fontSize="sm" ><strong>Sale By:</strong> {task?.sale_by}</Text>
+                    <Text fontSize="sm" ><strong>Assigned By:</strong> {task?.assignedBy}</Text>
+                  </>
+                )}
+              </VStack>
+
+              <VStack align={{ base: "start", md: "end" }} w={{ base: "100%", md: "48%" }}>
+                <Text fontSize="sm"><strong>Assigned Process:</strong> {task?.assined_process}</Text>
+                {task?.assinedby_comment && (
+                  <Text fontSize="sm"><strong>Remarks:</strong> {task.assinedby_comment}</Text>
+                )}
+                {task?.sample_bom_name && (
+                  <Text fontSize="sm" color="gray.200"><strong className="text-white">Sample BOM Name:</strong> {task.sample_bom_name}</Text>
+                )}
+                {task?.bom_name && (
+                  <Text fontSize="sm" color="gray.200"><strong className="text-white">BOM Name:</strong> {task.bom_name}</Text>
+                )}
+                {/* {task?.token_ss && (
+                  <Text
+                    className="text-green-500 font-[600]  text-sm underline underline-offset-4 cursor-pointer"
+                    onClick={() => handlePayment(task.sale_id, task.token_ss, task.isTokenVerify, task.id, "token")}
+                  >
+                    View Token Proof
+                  </Text>
+                )} */}
+                {/* {task?.allsale?.half_payment_image && (
+                  <Text
+                    className="text-blue-500 underline text-sm cursor-pointer"
+                    onClick={() => { onViewHalfPaymentssOpen(); sethalfAmountId(task) }}
+                  >
+                    View Half Payment
+                  </Text>
+                )} */}
+              </VStack>
+            </HStack>
+
+            {role?.toLowerCase().includes("prod") ? (
+              <HStack className="space-x-3" mt={4}>
+                {task?.design_status === "Pending" && (
+                  <Button className={`${isSubmitting ? "cursor-not-allowed" : ""}`} colorScheme="teal" size="sm" onClick={() => handleAccept(task.id)} disabled={isSubmitting}>
+                    Accept Task
+                  </Button>
+                )}
+                {task?.bom?.length === 2 ? (
+                  <Badge colorScheme="green" fontSize="sm"><strong>BOM:</strong> Created</Badge>
+                ) : (
+                  <Button colorScheme="teal" size="sm" onClick={() => handleBOM(task.sale_id)}>
+                    Create BOM
+                  </Button>
+                )}
+                {task?.design_status !== "Completed" && (
+                  <Button colorScheme="orange" leftIcon={<FaCheck />} size="sm" onClick={() => handleDone(task.id)}>
+                    Task Done
+                  </Button>
+                )}
+                {/* {role === "Production" && task?.sample_image && (
+                  <Button colorScheme="teal" size="sm" onClick={() => handleSampleImage(task.sample_image)}>
+                    Preview Sample Image
+                  </Button>
+                )} */}
+
+
+              </HStack>
+            ) : ["accountant", "acc"].includes(role?.toLowerCase()) ? (
+              <HStack justify="space-between" mt={3} flexWrap="wrap" align="center" gap={4}>
+                {task?.design_status === "Pending" && (
+                  <Button colorScheme="teal" size="sm" onClick={() => handleAccept(task.id)} disabled={isSubmitting}>
+                    Accept Task
+                  </Button>
+                )}
+                <Button
+                  colorScheme="blue"
+                  size="sm"
+                  leftIcon={<FaUpload />}
+                  onClick={() => {
+                    setSaleId(task.sale_id);       // set sale ID for upload
+                    setShowDesignUpload(true);     // show modal
+                  }}
+                >
+                  Upload Design
+                </Button>
+                {/* <Button
+                  bgGradient="linear(to-r, purple.400, purple.600)"
+                  color="white"
+                  fontWeight="bold"
+                  px="6"
+                  py="3"
+                  borderRadius="md"
+                  boxShadow="lg"
+                  _hover={{
+                    bgGradient: "linear(to-r, purple.600, purple.800)",
+                    boxShadow: "xl",
+                    transform: "scale(1.02)",
+                  }}
+                  transition="all 0.3s ease-in-out"
+                  onClick={() => {
+                    setShowToken(!showToken);
+                    setTokenAmount(task.token_amt);
+                    setSaleId(task.sale_id);
+                  }}
+                // onClick={() => handleTokenClick(task.sale_id, task.token_amt)}
+                >
+                  Add Token Amount
+                </Button> */}
+
+
+                {/* {task?.isTokenVerify && ( */}
+                {/* <Button
+                  leftIcon={<FaCloudUploadAlt />}
+                  bgGradient="linear(to-r, blue.400, blue.600)"
+                  color="white"
+                  fontWeight="semibold"
+                  px="6"
+                  py="3"
+                  borderRadius="md"
+                  boxShadow="md"
+                  _hover={{
+                    bgGradient: "linear(to-r, blue.500, blue.700)",
+                    boxShadow: "lg",
+                    transform: "translateY(-2px)",
+                  }}
+                  transition="all 0.2s ease-in-out"
+                  // onClick={() => handleInvoiceUpload(task.sale_id, task.invoice)}
+                  onClick={() => {
+                    setShowUploadInvoice(!showUploadInvoice);
+                    setSaleId(task?.sale_id);
+                    setInvoiceFile(task?.invoice);
+                  }
+                  }
+                >
+                  Upload Invoice
+                </Button> */}
+
+                {/* )} */}
+                {/* {task?.isSampleApprove && ( */}
+                {/* <Button
+                  onClick={() => {
+                      setShowhalfToken(!showhalfToken);
+                    setTokenAmount(task?.allsale?.half_payment);
+                    setSaleId(task.sale_id);
+                  }}
+                  leftIcon={<FaMoneyBillWave />}
+                  bgGradient="linear(to-r, teal.400, teal.600)"
+                  color="white"
+                  fontWeight="semibold"
+                  px="6"
+                  py="3"
+                  borderRadius="md"
+                  boxShadow="md"
+                  _hover={{
+                    bgGradient: "linear(to-r, teal.500, teal.700)",
+                    transform: "translateY(-2px)",
+                    boxShadow: "lg",
+                  }}
+                  transition="all 0.2s ease-in-out"
+                >
+                  Add Half Payment
+                </Button> */}
+
+                <Text fontSize="sm"><strong>Date:</strong> {task.date}</Text>
+              </HStack>
+            ) : (
+              <HStack justify="space-between" mt={3} flexWrap="wrap" align="center" gap={4}>
+                <VStack align="start">
+                  {task?.design_status === "Pending" && (
+                    <Button leftIcon={<FaCheck />} colorScheme="teal" size="sm" onClick={() => handleAccept(task.id)} disabled={isSubmitting}>
+                      Accept Task
+                    </Button>
+                  )}
+
+                </VStack>
+
+                <VStack align="end">
+                  <Text fontSize="sm"><strong>Date:</strong> {task.date}</Text>
+                </VStack>
+              </HStack>
+            )}
+          </div>
+        ))}
+
       </div>
-    </div>
-  );
-};
+      <Pagination page={page} setPage={setPage} TotalPage={TotalPage} />
+      {/* <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />
+      <UploadInvoice showUploadInvoice={showUploadInvoice} setShowUploadInvoice={setShowUploadInvoice} sale={saleId} invoicefile={invoicefile} />
+      <AddhalfToken showhalfToken={showhalfToken} setShowhalfToken={setShowhalfToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} /> */}
+      <UploadDesignFile
+        show={showDesignUpload}
+        setShow={setShowDesignUpload}
+        saleId={saleId}
+        refresh={fetchTasks}
+      />
 
-export default Task;
+    </section>
+
+  )
+}
+
+export default Task
