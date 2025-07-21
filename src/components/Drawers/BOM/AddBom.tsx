@@ -638,7 +638,7 @@ const AddBom: React.FC<AddBomProps> = ({
               <div className="bg-white border-t p-6 -mx-6 -mb-6">
                 <button
                   type="submit"
-                  className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-black font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   Create BOM
                 </button>

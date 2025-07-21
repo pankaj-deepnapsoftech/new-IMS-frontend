@@ -208,10 +208,13 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                                 {...column.getHeaderProps(
                                   column.getSortByToggleProps()
                                 )}
-                                fontSize="14px"
-                                color={colors.table.headerText}
-                                fontWeight="600"
-                                whiteSpace="nowrap"
+                                style={{
+                                  position: "sticky",
+                                  top: 0,
+                                  left: column.id === "creator" ? 0 : undefined,
+                                  zIndex: column.id === "creator" ? 11 : 10,
+                                  backgroundColor: colors.table.header,
+                                }}
                                 px={4}
                                 py={3}
                               >
@@ -274,8 +277,20 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                           return (
                             <Td
                               {...cell.getCellProps()}
-                              fontSize="14px"
-                              color={colors.text.primary}
+                              style={{
+                                position:
+                                  cell.column.id === "creator"
+                                    ? "sticky"
+                                    : undefined,
+                                left:
+                                  cell.column.id === "creator" ? 0 : undefined,
+                                backgroundColor:
+                                  cell.column.id === "creator"
+                                    ? dynamicBg(index)
+                                    : undefined,
+                                zIndex:
+                                  cell.column.id === "creator" ? 1 : undefined,
+                              }}
                               px={4}
                               py={3}
                             >

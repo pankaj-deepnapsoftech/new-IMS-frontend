@@ -112,16 +112,16 @@ const AddItems: React.FC<AddItemsProps> = ({inputs, setInputs}) => {
         {inputs.map((input, ind) => (
           <div key={ind} className="grid grid-cols-3 gap-x-1 gap-y-2">
             <FormControl>
-              <FormLabel color="white">Product</FormLabel>
+              <FormLabel color="black">Product</FormLabel>
               <Select  styles={customStyles} onChange={(d: any)=>onChangeHandler(ind, "item", d)} value={input.item} options={productOptions} />
             </FormControl>
             <FormControl>
-              <FormLabel color="white">Quantity</FormLabel>
-              <Input className="text-gray-200" value={input.quantity} onChange={(e)=>onChangeHandler(ind, "quantity", e.target.value)} type="number" />
+              <FormLabel color="black">Quantity</FormLabel>
+              <Input className="text-gray-400" value={input.quantity} onChange={(e)=>onChangeHandler(ind, "quantity", e.target.value)} type="number" />
             </FormControl>
             <FormControl>
-              <FormLabel color="white">Price</FormLabel>
-              <Input className="text-gray-200" value={input.price} onChange={(e)=>onChangeHandler(ind, "price", e.target.value)} type="number" />
+              <FormLabel color="black">Price</FormLabel>
+              <Input className="text-gray-400" value={input.price} onChange={(e)=>onChangeHandler(ind, "price", e.target.value)} type="number" />
             </FormControl>
           </div>
         ))}
@@ -141,7 +141,7 @@ const AddItems: React.FC<AddItemsProps> = ({inputs, setInputs}) => {
           onClick={addInputHandler}
           leftIcon={<IoIosAdd className=" hover:text-black" />}
           variant="outline"
-          color="gray.300"
+          color="gray.400"
           _hover={{color:"black" ,bg:"white"}}
         >
           Add

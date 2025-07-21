@@ -7,10 +7,52 @@ import Card from "../components/Dashboard/Card";
 import Loading from "../ui/Loading";
 import { colors } from "../theme/colors";
 import { IoIosDocument, IoMdCart } from "react-icons/io";
-import { FaRupeeSign, FaStoreAlt, FaUser } from "react-icons/fa";
+import {
+  FaRupeeSign,
+  FaStoreAlt,
+  FaUser,
+  FaArrowUp,
+  FaArrowDown,
+} from "react-icons/fa";
 import { AiFillProduct } from "react-icons/ai";
 import { IoPeople } from "react-icons/io5";
-import { Button, Input } from "@chakra-ui/react";
+import {
+  Button,
+  Input,
+  Box,
+  SimpleGrid,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  StatArrow,
+  Text,
+  Progress,
+  CircularProgress,
+  CircularProgressLabel,
+  Flex,
+  Icon,
+  VStack,
+  HStack,
+} from "@chakra-ui/react";
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { IndianRupee } from "lucide-react";
 
 const Dashboard: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -99,6 +141,91 @@ const Dashboard: React.FC = () => {
   const [totalProformaInvoices, setTotalProformaInvoices] = useState<number>(0);
   const [totalInvoices, setTotalInvoices] = useState<number>(0);
   const [totalPayments, setTotalPayments] = useState<number>(0);
+  
+  const [verifiedEmployeesCount, setVerifiedEmployeesCount] = useState<number>(0);
+  const [totalProductionAmount, setTotalProductionAmount] = useState<number>(0);
+  const [totalSalesAmount, setTotalSalesAmount] = useState<number>(0);
+  const [totalProductBuyPrice, setTotalProductBuyPrice] = useState<number>(0);
+
+  const dashboardCards = [
+    {
+      title: "Verified Employees",
+      value: verifiedEmployeesCount.toLocaleString(),
+      icon: <IoPeople />,
+      color: "blue",
+      prefix: "",
+      suffix: "",
+    },
+    {
+      title: "Total Production",
+      value: totalProductionAmount.toLocaleString(),
+      icon: <AiFillProduct />,
+      color: "green",
+      prefix: "₹",
+      suffix: "",
+    },
+    {
+      title: "Total Sales",
+      value: totalSalesAmount.toLocaleString(),
+      icon: <IoMdCart />,
+      color: "orange",
+      prefix: "₹",
+      suffix: "",
+    },
+    {
+      title: "Product Buy Price",
+      value: totalProductBuyPrice.toLocaleString(),
+      change: -3.2,
+      icon: <IndianRupee />,
+      color: "purple",
+      prefix: "₹",
+      suffix: "",
+    },
+  ];
+
+  // Dummy chart data
+  const actualVsTargetData = [
+    { time: "4:00", actual: 50, target: 45 },
+    { time: "6:00", actual: 80, target: 70 },
+    { time: "8:00", actual: 120, target: 110 },
+    { time: "10:00", actual: 180, target: 170 },
+    { time: "12:00", actual: 220, target: 200 },
+    { time: "14:00", actual: 250, target: 240 },
+    { time: "16:00", actual: 280, target: 270 },
+    { time: "18:00", actual: 300, target: 290 },
+    { time: "20:00", actual: 280, target: 270 },
+    { time: "22:00", actual: 250, target: 240 },
+    { time: "0:00", actual: 200, target: 190 },
+    { time: "2:00", actual: 150, target: 140 },
+    { time: "4:00", actual: 100, target: 90 },
+  ];
+
+  const inspectionData = [
+    { name: "Dke", target: 1.2, inspection: 1.0 },
+    { name: "Dmax", target: 1.8, inspection: 1.5 },
+    { name: "Dmin", target: 0.8, inspection: 1.2 },
+    { name: "P1 Dmax", target: 2.0, inspection: 1.8 },
+    { name: "P1 Dmin", target: 1.0, inspection: 0.8 },
+    { name: "P2 Dmax", target: 1.5, inspection: 1.3 },
+    { name: "P2 Dmin", target: 0.5, inspection: 0.7 },
+  ];
+
+  const statusHistoryData = [
+    { name: "Total Run Time", value: 72, color: "#8884d8" },
+    { name: "Not Run Time", value: 14, color: "#ff7c7c" },
+    { name: "Maintenance", value: 9, color: "#ffc658" },
+    { name: "Break", value: 5, color: "#8dd1e1" },
+  ];
+
+  const productionPlanData = [
+    { day: "Sun 01", tasks: [] },
+    { day: "Mon 02", tasks: ["Raw Material Processing"] },
+    { day: "Tue 03", tasks: ["Batch Processing", "Machine Operation"] },
+    { day: "Wed 04", tasks: [] },
+    { day: "Thu 05", tasks: ["Order Fulfillment"] },
+    { day: "Fri 06", tasks: [] },
+    { day: "Sat 07", tasks: [] },
+  ];
 
   const fetchSummaryHandler = async () => {
     try {
@@ -142,6 +269,12 @@ const Dashboard: React.FC = () => {
       setTotalProformaInvoices(data.proforma_invoices);
       setTotalInvoices(data.invoices);
       setTotalPayments(data.payments);
+      
+      // Set dashboard card data
+      setVerifiedEmployeesCount(data.verified_employees_count || 0);
+      setTotalProductionAmount(data.total_production_amount || 0);
+      setTotalSalesAmount(data.total_sales_amount || 0);
+      setTotalProductBuyPrice(data.total_product_buy_price || 0);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
@@ -204,7 +337,7 @@ const Dashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div>
             {/* Welcome Section */}
-            <div className="flex-1">
+            <div className="flex flex-col justify-center items-center mb-5">
               <h1
                 className="text-3xl md:text-4xl font-bold mb-2"
                 style={{ color: colors.text.primary }}
@@ -339,6 +472,251 @@ const Dashboard: React.FC = () => {
 
         {!isLoading && (
           <div className="space-y-12">
+            {/* Dashboard Overview Section */}
+            <section className="animate-fade-in">
+              {/* Small Stats Cards */}
+              <SimpleGrid
+                columns={{ base: 1, md: 2, lg: 4 }}
+                spacing={6}
+                mb={8}
+              >
+                {dashboardCards.map((card, index) => (
+                  <Box
+                    key={index}
+                    bg="white"
+                    p={6}
+                    rounded="xl"
+                    shadow="md"
+                    border="1px"
+                    borderColor="gray.200"
+                    transition="all 0.3s"
+                    _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
+                  >
+                    <Flex justify="space-between" align="center" mb={4}>
+                      <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                        {card.title}
+                      </Text>
+                      <Text fontSize="2xl" color={`${card.color}.500`}>
+                        {card.icon}
+                      </Text>
+                    </Flex>
+                    <VStack align="start" spacing={2}>
+                      <Text fontSize="2xl" fontWeight="bold" color="gray.800">
+                        {card.prefix}
+                        {card.value}
+                        {card.suffix}
+                      </Text>
+                      {/* <HStack spacing={1}>
+                        <Icon
+                          as={card.change > 0 ? FaArrowUp : FaArrowDown}
+                          color={card.change > 0 ? "green.500" : "red.500"}
+                          boxSize={3}
+                        />
+                        <Text
+                          fontSize="sm"
+                          color={card.change > 0 ? "green.500" : "red.500"}
+                          fontWeight="medium"
+                        >
+                          {Math.abs(card.change)}%
+                        </Text>
+                      </HStack> */}
+                    </VStack>
+                  </Box>
+                ))}
+              </SimpleGrid>
+
+              {/* Charts Section */}
+              <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={8} mb={8}>
+                {/* Production Plan Schedule */}
+                <Box
+                  bg="white"
+                  p={6}
+                  rounded="xl"
+                  shadow="md"
+                  border="1px"
+                  borderColor="gray.200"
+                >
+                  <Text fontSize="lg" fontWeight="bold" mb={4} color="gray.800">
+                    Production Plan - December 2024
+                  </Text>
+                  <Box>
+                    <SimpleGrid columns={7} spacing={2} mb={4}>
+                      {productionPlanData.map((day, index) => (
+                        <Box key={index} textAlign="center">
+                          <Text fontSize="xs" color="gray.600" mb={2}>
+                            {day.day.split(" ")[0]}
+                          </Text>
+                          <Text fontSize="xs" fontWeight="bold" mb={2}>
+                            {day.day.split(" ")[1]}
+                          </Text>
+                          <Box minH="120px" position="relative">
+                            {day.tasks.map((task, taskIndex) => (
+                              <Box
+                                key={taskIndex}
+                                bg={
+                                  taskIndex === 0
+                                    ? "purple.100"
+                                    : taskIndex === 1
+                                    ? "blue.100"
+                                    : "green.100"
+                                }
+                                color={
+                                  taskIndex === 0
+                                    ? "purple.700"
+                                    : taskIndex === 1
+                                    ? "blue.700"
+                                    : "green.700"
+                                }
+                                p={1}
+                                rounded="md"
+                                fontSize="xs"
+                                mb={1}
+                                textAlign="center"
+                              >
+                                {task}
+                              </Box>
+                            ))}
+                          </Box>
+                        </Box>
+                      ))}
+                    </SimpleGrid>
+                  </Box>
+                </Box>
+
+                {/* Actual vs Target Chart */}
+                <Box
+                  bg="white"
+                  p={6}
+                  rounded="xl"
+                  shadow="md"
+                  border="1px"
+                  borderColor="gray.200"
+                >
+                  <Text fontSize="lg" fontWeight="bold" mb={4} color="gray.800">
+                    Actual vs Target (pcs)
+                  </Text>
+                  <Box height="250px">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={actualVsTargetData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="time" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Area
+                          type="monotone"
+                          dataKey="target"
+                          stackId="1"
+                          stroke="#8884d8"
+                          fill="#8884d8"
+                          fillOpacity={0.3}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="actual"
+                          stackId="1"
+                          stroke="#82ca9d"
+                          fill="#82ca9d"
+                          fillOpacity={0.3}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </Box>
+                </Box>
+
+                {/* Inspection Values Chart */}
+                <Box
+                  bg="white"
+                  p={6}
+                  rounded="xl"
+                  shadow="md"
+                  border="1px"
+                  borderColor="gray.200"
+                >
+                  <Text fontSize="lg" fontWeight="bold" mb={4} color="gray.800">
+                    Inspection Values
+                  </Text>
+                  <Box height="250px">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={inspectionData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="name"
+                          angle={-45}
+                          textAnchor="end"
+                          height={80}
+                        />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="target" fill="#3182ce" name="Target" />
+                        <Bar
+                          dataKey="inspection"
+                          fill="#38a169"
+                          name="Inspection"
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </Box>
+                </Box>
+
+                {/* Status History Pie Chart */}
+                <Box
+                  bg="white"
+                  p={6}
+                  rounded="xl"
+                  shadow="md"
+                  border="1px"
+                  borderColor="gray.200"
+                >
+                  <Text fontSize="lg" fontWeight="bold" mb={4} color="gray.800">
+                    Status History
+                  </Text>
+                  <Flex align="center" justify="space-between">
+                    <Box height="200px" width="200px">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={statusHistoryData}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                            label={({ value }) => `${value}%`}
+                          >
+                            {statusHistoryData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </Box>
+                    <VStack align="start" spacing={3} ml={6}>
+                      {statusHistoryData.map((item, index) => (
+                        <HStack key={index} spacing={3}>
+                          <Box w={3} h={3} bg={item.color} rounded="full" />
+                          <VStack align="start" spacing={0}>
+                            <Text
+                              fontSize="sm"
+                              fontWeight="bold"
+                              color="gray.800"
+                            >
+                              {item.name}
+                            </Text>
+                            <Text fontSize="xs" color="gray.600">
+                              {item.value}%
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      ))}
+                    </VStack>
+                  </Flex>
+                </Box>
+              </SimpleGrid>
+            </section>
+
             {/* Employee Insights Section */}
             <section className="animate-fade-in">
               <div className="flex items-center gap-3 mb-6">
