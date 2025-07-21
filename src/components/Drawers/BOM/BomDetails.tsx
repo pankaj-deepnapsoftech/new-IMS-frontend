@@ -4,6 +4,17 @@ import { toast } from "react-toastify";
 import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import Loading from "../../../ui/Loading";
+import { colors } from "../../../theme/colors";
+import {
+  Package,
+  FileText,
+  Hash,
+  Layers,
+  DollarSign,
+  Settings,
+  Eye,
+  List,
+} from "lucide-react";
 
 interface BomDetailsProps {
   bomId: string | undefined;
@@ -60,188 +71,376 @@ const BomDetails: React.FC<BomDetailsProps> = ({
     fetchBomDetails();
   }, []);
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
-      <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f] right-0 top-0 z-10 py-3"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
-      >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3">
-          <BiX onClick={closeDrawerHandler} size="26px"  color="white"/>
-         
-        </h1>
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
 
-        <div className="mt-8 px-5">
-        <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
-         BOM Details
-          </h2>
-
-          {isLoadingBom && <Loading />}
-          {!isLoadingBom && (
-            <div className="text-white">
-              <div className="mt-3 mb-5">
-                <p className="font-semibold">BOM Name</p>
-                <p className="text-gray-200">{bomName}</p>
+      {/* Drawer */}
+      <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
+        <div className="h-full flex flex-col">
+          {/* Header */}
+          <div className="px-6 py-4 flex items-center justify-between border-b">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg border">
+                <Eye className="h-5 w-5 text-black" />
               </div>
-              <div className="mt-3 mb-5">
-                <p className="font-semibold">Parts Count</p>
-                <p className="text-gray-200">{partsCount}</p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-semibold">Total Cost</p>
-                <p className="text-gray-200">₹ {totalBomCost}/-</p>
-              </div>
-              <div>
-                <p className="font-semibold">Raw Materials</p>
-                {rawMaterials && (
-                  <ul className="mt-3 mb-5 pl-5 list-decimal">
-                    {rawMaterials.map((material) => (
-                      <li>
-                        <p>
-                          <span className="font-semibold text-gray-200">Item ID</span>:{" "}
-                          {material?.item?.product_id}
-                        </p>
-                        <p>
-                          <span className="font-semibold text-gray-200">Item Name</span>:{" "}
-                          {material?.item?.name}
-                        </p>
-                        <p>
-                          <span className="font-semibold text-gray-200">Quantity</span>:{" "}
-                          {material?.quantity}
-                        </p>
-                        <p>
-                          <span className="font-semibold text-gray-200">UOM</span>:{" "}
-                          {material?.item?.uom}
-                        </p>
-                        <p>
-                          <span className="font-semibold text-gray-200">Total Part Cost</span>
-                          : ₹ {material?.total_part_cost}/-
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <div>
-                <p className="font-semibold">Processes</p>
-                {processes && (
-                  <ul className="mt-3 mb-5 pl-5 list-decimal">
-                    {processes.map((process: string) => (
-                      <li className="text-gray-200">{process}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              {finishedGood && (
-                <div className="mt-3 mb-5">
-                  <p className="font-semibold">Finished Good</p>
-                  <ul className="pl-5">
-                    <li>
-                      <span className="font-semibold text-gray-200">Item Id</span>:{" "}
-                      {finishedGood?.item?.product_id}
-                    </li>
-                    <li>
-                      <span className="font-semibold text-gray-200">Item Name</span>:{" "}
-                      {finishedGood?.item?.name}
-                    </li>
-                    <li>
-                      <span className="font-semibold text-gray-200">Quantity</span>:{" "}
-                      {finishedGood.quantity}
-                    </li>
-                    <li>
-                      <span className="font-semibold text-gray-200">UOM</span>:{" "}
-                      {finishedGood?.item?.uom}
-                    </li>
-                    <li>
-                      <span className="font-semibold text-gray-200">Category</span>:{" "}
-                      {finishedGood?.item?.category}
-                    </li>
-                    <li>
-                      <span className="font-semibold text-gray-200">Category</span>:{" "}
-                      {finishedGood.category}
-                    </li>
-                    <li>
-                      <span className="font-semibold text-gray-200">Cost</span>: ₹{" "}
-                      {finishedGood.cost}/-
-                    </li>
-                    <li>
-                      <span className="font-semibold text-gray-200">Supporting Document</span>
-                      :{" "}
-                      {finishedGood.supporting_doc ? (
-                        <a href={finishedGood.supporting_doc} target="_blank">
-                          <button className="underline">Open</button>
-                        </a>
-                      ) : (
-                        "N/A"
-                      )}
-                    </li>
-                  </ul>
-                </div>
-              )}
-
-              {scrapMaterials && (
-                <div>
-                  <p className="font-semibold">Scrap Materials</p>
-
-                  <ul className="mt-3 mb-5 pl-5 list-decimal">
-                    {scrapMaterials.map((material) => (
-                      <li>
-                        <p>
-                          <span className="font-semibold">Item ID</span>:{" "}
-                          {material?.item?.product_id}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Item Name</span>:{" "}
-                          {material?.item?.name}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Quantity</span>:{" "}
-                          {material?.quantity}
-                        </p>
-                        <p>
-                          <span className="font-semibold">UOM</span>:{" "}
-                          {material?.item?.uom}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Total Part Cost</span>
-                          : ₹ {material?.total_part_cost}/-
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {otherCharges && (
-                <div>
-                  <p className="font-semibold">Other Charges</p>
-
-                  <p>
-                    <span className="font-semibold">Labour Charges</span>: ₹{" "}
-                    {otherCharges?.labour_charges}/-
-                  </p>
-                  <p>
-                    <span className="font-semibold">Machinery Charges</span>: ₹{" "}
-                    {otherCharges?.machinery_charges}/-
-                  </p>
-                  <p>
-                    <span className="font-semibold">Electricity Charges</span>: ₹{" "}
-                    {otherCharges?.electricity_charges}/-
-                  </p>
-                  <p>
-                    <span className="font-semibold">Other Charges</span>: ₹{" "}
-                    {otherCharges?.other_charges}/-
-                  </p>
-                </div>
-              )}
+              <h2 className="text-xl font-semibold text-black">BOM Details</h2>
             </div>
-          )}
+            <button
+              onClick={closeDrawerHandler}
+              className="p-2 hover:bg-white/20 border rounded-lg transition-colors duration-200"
+            >
+              <BiX size={24} className="text-black" />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+            {isLoadingBom && (
+              <div className="flex items-center justify-center h-64">
+                <Loading />
+              </div>
+            )}
+
+            {!isLoadingBom && (
+              <div className="space-y-6">
+                {/* BOM Summary */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                    <Package className="h-5 w-5 text-blue-600" />
+                    BOM Summary
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileText className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-medium text-gray-700">
+                          BOM Name
+                        </span>
+                      </div>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {bomName}
+                      </p>
+                    </div>
+
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Hash className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-gray-700">
+                          Parts Count
+                        </span>
+                      </div>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {partsCount}
+                      </p>
+                    </div>
+
+                    <div className="bg-purple-50 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <DollarSign className="h-4 w-4 text-purple-600" />
+                        <span className="text-sm font-medium text-gray-700">
+                          Total Cost
+                        </span>
+                      </div>
+                      <p className="text-lg font-semibold text-gray-900">
+                        ₹ {totalBomCost}/-
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Raw Materials */}
+                {rawMaterials && rawMaterials.length > 0 && (
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                      <Layers className="h-5 w-5 text-orange-600" />
+                      Raw Materials
+                    </h3>
+
+                    <div className="space-y-4">
+                      {rawMaterials.map((material, index) => (
+                        <div
+                          key={index}
+                          className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                        >
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div>
+                              <span className="text-sm font-medium text-gray-600">
+                                Item ID:
+                              </span>
+                              <p className="text-gray-900">
+                                {material?.item?.product_id || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-600">
+                                Item Name:
+                              </span>
+                              <p className="text-gray-900">
+                                {material?.item?.name || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-600">
+                                Quantity:
+                              </span>
+                              <p className="text-gray-900">
+                                {material?.quantity || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-600">
+                                UOM:
+                              </span>
+                              <p className="text-gray-900">
+                                {material?.item?.uom || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-600">
+                                Unit Cost:
+                              </span>
+                              <p className="text-gray-900">
+                                ₹ {material?.unit_cost || 0}/-
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-600">
+                                Total Cost:
+                              </span>
+                              <p className="text-gray-900 font-semibold">
+                                ₹ {material?.total_part_cost || 0}/-
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Processes */}
+                {processes && processes.length > 0 && (
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                      <Settings className="h-5 w-5 text-blue-600" />
+                      Processes
+                    </h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {processes.map((process: string, index: number) => (
+                        <div
+                          key={index}
+                          className="bg-blue-50 rounded-lg p-4 border border-blue-200"
+                        >
+                          <div className="flex items-center gap-2">
+                            <List className="h-4 w-4 text-blue-600" />
+                            <span className="font-medium text-gray-900">
+                              Process {index + 1}
+                            </span>
+                          </div>
+                          <p className="text-gray-700 mt-2">{process}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Finished Good */}
+                {finishedGood && (
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                      <Package className="h-5 w-5 text-green-600" />
+                      Finished Good
+                    </h3>
+
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div>
+                          <span className="text-sm font-medium text-gray-600">
+                            Item ID:
+                          </span>
+                          <p className="text-gray-900">
+                            {finishedGood?.item?.product_id || "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-600">
+                            Item Name:
+                          </span>
+                          <p className="text-gray-900">
+                            {finishedGood?.item?.name || "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-600">
+                            Quantity:
+                          </span>
+                          <p className="text-gray-900">
+                            {finishedGood?.quantity || "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-600">
+                            UOM:
+                          </span>
+                          <p className="text-gray-900">
+                            {finishedGood?.item?.uom || "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-600">
+                            Category:
+                          </span>
+                          <p className="text-gray-900">
+                            {finishedGood?.item?.category ||
+                              finishedGood?.category ||
+                              "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-600">
+                            Cost:
+                          </span>
+                          <p className="text-gray-900 font-semibold">
+                            ₹ {finishedGood?.cost || 0}/-
+                          </p>
+                        </div>
+                      </div>
+
+                      {finishedGood?.supporting_doc && (
+                        <div className="mt-4 pt-4 border-t border-green-200">
+                          <span className="text-sm font-medium text-gray-600">
+                            Supporting Document:
+                          </span>
+                          <a
+                            href={finishedGood.supporting_doc}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-2 inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors"
+                          >
+                            <Eye className="h-4 w-4" />
+                            View Document
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Scrap Materials */}
+                {scrapMaterials && scrapMaterials.length > 0 && (
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                      <Package className="h-5 w-5 text-red-600" />
+                      Scrap Materials
+                    </h3>
+
+                    <div className="space-y-4">
+                      {scrapMaterials.map((material, index) => (
+                        <div
+                          key={index}
+                          className="bg-red-50 rounded-lg p-4 border border-red-200"
+                        >
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div>
+                              <span className="text-sm font-medium text-gray-600">
+                                Item ID:
+                              </span>
+                              <p className="text-gray-900">
+                                {material?.item?.product_id || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-600">
+                                Item Name:
+                              </span>
+                              <p className="text-gray-900">
+                                {material?.item?.name || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-600">
+                                Quantity:
+                              </span>
+                              <p className="text-gray-900">
+                                {material?.quantity || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-600">
+                                UOM:
+                              </span>
+                              <p className="text-gray-900">
+                                {material?.item?.uom || "N/A"}
+                              </p>
+                            </div>
+                            <div className="md:col-span-2">
+                              <span className="text-sm font-medium text-gray-600">
+                                Total Part Cost:
+                              </span>
+                              <p className="text-gray-900 font-semibold">
+                                ₹ {material?.total_part_cost || 0}/-
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Other Charges */}
+                {otherCharges && (
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                      <DollarSign className="h-5 w-5 text-purple-600" />
+                      Other Charges
+                    </h3>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                        <span className="text-sm font-medium text-gray-600">
+                          Labour Charges:
+                        </span>
+                        <p className="text-lg font-semibold text-gray-900">
+                          ₹ {otherCharges?.labour_charges || 0}/-
+                        </p>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                        <span className="text-sm font-medium text-gray-600">
+                          Machinery Charges:
+                        </span>
+                        <p className="text-lg font-semibold text-gray-900">
+                          ₹ {otherCharges?.machinery_charges || 0}/-
+                        </p>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                        <span className="text-sm font-medium text-gray-600">
+                          Electricity Charges:
+                        </span>
+                        <p className="text-lg font-semibold text-gray-900">
+                          ₹ {otherCharges?.electricity_charges || 0}/-
+                        </p>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                        <span className="text-sm font-medium text-gray-600">
+                          Other Charges:
+                        </span>
+                        <p className="text-lg font-semibold text-gray-900">
+                          ₹ {otherCharges?.other_charges || 0}/-
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </Drawer>
+    </>
   );
 };
 

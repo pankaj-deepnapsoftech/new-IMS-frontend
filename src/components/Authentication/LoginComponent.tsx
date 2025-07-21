@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { userExists } from "../../redux/reducers/authSlice";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
+import { colors } from "../../theme/colors";
 
 interface LoginComponentProps {
   email: string | undefined;
@@ -35,7 +36,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
 
   const [login] = useLoginMutation();
   const [isLoginLoading, setIsLoginLoading] = useState<boolean>(false);
-  
+
   const loginHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -46,7 +47,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       }).unwrap();
       // dispatch(userExists(data.user));
 
-      console.log('data.user =', data.user)
+      console.log("data.user =", data.user);
       if (data.user.role) {
         dispatch(userExists(data.user));
       } else if (data?.user?.isSuper) {
@@ -58,102 +59,134 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       if (data?.user?.isSuper) {
         setCookie("role", "admin", { maxAge: 1000 * 60 * 60 * 24 });
       } else {
-        setCookie("role", data?.user?.role?.role || "emp", { maxAge: 1000 * 60 * 60 * 24 });
+        setCookie("role", data?.user?.role?.role || "emp", {
+          maxAge: 1000 * 60 * 60 * 24,
+        });
       }
       setCookie("name", data.user.first_name, { maxAge: 1000 * 60 * 60 * 24 });
       setCookie("email", data.user.email, { maxAge: 1000 * 60 * 60 * 24 });
       toast.success(data.message);
-      navigate('/');
+      navigate("/");
     } catch (err: any) {
       toast.error(err?.message || err?.data?.message || "Something went wrong");
-    } finally{
+    } finally {
       setIsLoginLoading(false);
     }
   };
 
   return (
-    <div className="w-[80%] md:w-[80%] shadow-2xl rounded-xl p-10  bg-[#ffffff2c] backdrop-blur-md ">
-      <h1 className="text-4xl text-gray-100 font-bold text-center  pb-5">Sign In</h1>
-      <form onSubmit={loginHandler} className="mt-4 w-[100%]">
-        <div className="flex flex-col items-start">
-          <label className="flex text-gray-100 gap-x-1 items-center font-bold text-sm text-[rgba(0, 0, 0, 0.88)]">
-            <span>
-              <FaStarOfLife size="6px" color="red" />
-            </span>
-            Email
-          </label>
-          <div className="relative w-[100%]">
-            <div className="absolute top-[20px] left-[7px] text-base">
-              <BiUser color="gray" />
-            </div>
-            <input
-              value={email}
-              required
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-[100%] outline-none text-base pl-7 pr-2  py-2 border mt-2   rounded-[10px] hover:border-[#1640d6] cursor-pointer"
-              type="email"
-              placeholder="Email"
-            />
-          </div>
-        </div>
-        <div className="mt-4 flex flex-col items-start text-sm">
-          <label className="flex gap-x-1 text-gray-100 items-center font-bold text-sm ">
-            <span>
-              <FaStarOfLife size="6px" color="red" />
-            </span>
-            Password
-          </label>
-          <div className="relative w-[100%]">
-            <div className="absolute top-[20px] left-[7px] text-base">
-              <BiLockAlt color="gray" />
-            </div>
-            <input
-              value={password}
-              required
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-[100%] outline-none text-base pl-7 pr-2 py-2 border mt-2 rounded-[10px] hover:border-[#1640d6] cursor-pointer"
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-            />
-            {!showPassword ? (
-              <IoEyeOffOutline
-                onClick={() => setShowPassword(true)}
-                size={20}
-                className="absolute top-[20px] right-3"
-              />
-            ) : (
-              <IoEyeOutline
-                onClick={() => setShowPassword(false)}
-                size={20}
-                className="absolute top-[20px] right-3"
-              />
-            )}
-          </div>
-        </div>
-        <div className="my-6 flex items-center justify-between font-bold text-sm">
-          <div className="text-[#2db2ff]">
-            <Link to="/register">Don't have an account?</Link>
-          </div>
-          <div 
-            className="text-[#2db2ff] cursor-pointer"
-            onClick={() => {
-              setShowForgetPasswordComponent(true);
-              setShowLoginComponent(false);
-              setShowOTPVerificationComponent(false);
-            }}
-          >
-            Forgot Password
-          </div>
+    <div className="w-full max-w-md mx-auto">
+      {/* Login Card */}
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-gray-600">Sign in to your account to continue</p>
         </div>
 
-        <button
-          disabled={isLoginLoading}
-          style={{ boxShadow: "0 2px 0 rgba(5, 95, 255, 0.1)" }}
-          className="w-[100%] rounded-lg bg-[#1c77ac]  text-white py-2 font-bold disabled:cursor-not-allowed disabled:bg-[#b7b6b6]"
-        >
-          {isLoginLoading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+        {/* Login Form */}
+        <form onSubmit={loginHandler} className="space-y-6">
+          {/* Email Field */}
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+              <FaStarOfLife size={6} className="text-red-500" />
+              Email Address
+            </label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <BiUser size={20} />
+              </div>
+              <input
+                value={email || ""}
+                required
+                onChange={(e) => setEmail(e.target.value)}
+                className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 
+                  focus:ring-2 focus:ring-${colors.primary[500]} focus:border-${colors.primary[500]} 
+                  transition-all duration-200 hover:border-gray-400`}
+                type="email"
+                placeholder="Enter your email"
+              />
+            </div>
+          </div>
+
+          {/* Password Field */}
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+              <FaStarOfLife size={6} className="text-red-500" />
+              Password
+            </label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <BiLockAlt size={20} />
+              </div>
+              <input
+                value={password || ""}
+                required
+                onChange={(e) => setPassword(e.target.value)}
+                className={`w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 
+                  focus:ring-2 focus:ring-${colors.primary[500]} focus:border-${colors.primary[500]} 
+                  transition-all duration-200 hover:border-gray-400`}
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPassword ? (
+                  <IoEyeOutline size={20} />
+                ) : (
+                  <IoEyeOffOutline size={20} />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Links */}
+          <div className="flex items-center justify-between text-sm">
+            <Link
+              to="/register"
+              className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              Login account
+            </Link>
+            <button
+              type="button"
+              className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              onClick={() => {
+                setShowForgetPasswordComponent(true);
+                setShowLoginComponent(false);
+                setShowOTPVerificationComponent(false);
+              }}
+            >
+              Forgot password?
+            </button>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            disabled={isLoginLoading}
+            className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 
+              ${
+                isLoginLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 transform hover:scale-[1.02] active:scale-[0.98]"
+              } shadow-lg hover:shadow-xl`}
+          >
+            {isLoginLoading ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Signing in...
+              </div>
+            ) : (
+              "Sign In"
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

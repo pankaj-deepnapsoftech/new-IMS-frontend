@@ -12,7 +12,6 @@ import { FaPeopleGroup } from "react-icons/fa6";
 import { BiPurchaseTagAlt } from "react-icons/bi";
 import { VscServerProcess } from "react-icons/vsc";
 import { GiProgression } from "react-icons/gi";
-import Dashboard from "../pages/Dashboard";
 import Products from "../pages/Products";
 import Approvals from "../pages/Approvals";
 import Stores from "../pages/Stores";
@@ -31,11 +30,12 @@ import WIPProducts from "../pages/WIPProducts";
 import InventoryApprovals from "../pages/InventoryApprovals";
 import Userprofile from "../pages/Userprofile";
 import Sales from "../pages/Sales";
-import { FaSalesforce } from "react-icons/fa6";
 import Dispatch from "../pages/Dispatch";
 import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
 import Task from "../pages/Task";
+import { HandCoins } from "lucide-react";
+import Dashboard from "../pages/Dashboard";
 
 const routes = [
   {
@@ -45,7 +45,6 @@ const routes = [
     element: <Dashboard />,
     isSublink: false
   },
-
   {
     name: "Employees",
     icon: <FaPeopleGroup />,
@@ -61,22 +60,22 @@ const routes = [
     isSublink: false
   },
   {
-    name: "Parties",
+    name: "Merchant",
     icon: <IoIosPeople />,
-    path: "parties",
+    path: "merchant",
     element: <Parties />
 
   },
   {
     name: "Sales Order",
-    icon: <FaSalesforce />,
+    icon: <HandCoins/>,
     path: "sales",
     element: <Sales />,
     isSublink: false
   },
   {
-    name: "Sales & Purchase",
-    path: "sales-purchase",
+    name: "Invioces",
+    path: "invoices",
     icon: <BiPurchaseTagAlt />,
     sublink: [
       {
@@ -168,26 +167,26 @@ const routes = [
     element: <Approvals />,
     isSublink: false
   },
-  {
-    name: "Merchant",
-    path: "merchant",
-    icon: <TbUsersGroup />,
-    sublink: [
-      {
-        name: "Buyer",
-        icon: <MdOutlineAttachMoney />,
-        path: "buyer",
-        element: <Buyers />,
-      },
-      {
-        name: "Supplier",
-        icon: <MdOutlineSell />,
-        path: "supplier",
-        element: <Sellers />,
-      },
-    ],
-    isSublink: true
-  },
+  // {
+  //   name: "Merchant",
+  //   path: "merchant",
+  //   icon: <TbUsersGroup />,
+  //   sublink: [
+  //     {
+  //       name: "Buyer",
+  //       icon: <MdOutlineAttachMoney />,
+  //       path: "buyer",
+  //       element: <Buyers />,
+  //     },
+  //     {
+  //       name: "Supplier",
+  //       icon: <MdOutlineSell />,
+  //       path: "supplier",
+  //       element: <Sellers />,
+  //     },
+  //   ],
+  //   isSublink: true
+  // },
   {
     name: "Production",
     path: "production",

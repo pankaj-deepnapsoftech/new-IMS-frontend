@@ -25,7 +25,7 @@ const Login: React.FC = () => {
     <div className="w-full h-[100vh] flex ">
       <Intro />
 
-      <div className="h-[100%] w-full xl:w-[50%] bg-gray-600 flex flex-col items-center justify-center">
+      <div className="h-[100%] w-full xl:w-[50%] bg-white/95 flex flex-col items-center justify-center">
      
         {showLoginComponent && (
           <LoginComponent

@@ -35,6 +35,6 @@ export const PartiesFromValidation = object({
 
   type: string().required('Type is a required field'),
 
-  parties_type: string().required('Parties Type is a required field'),
+  parties_type: string().required('Merchant Type is a required field'),
 
 });

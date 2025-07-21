@@ -16,6 +16,19 @@ import Process from "../../Dynamic Add Components/ProductionProcess";
 import RawMaterial from "../../Dynamic Add Components/ProcessRawMaterial";
 import ScrapMaterial from "../../Dynamic Add Components/ScrapMaterial";
 import ProcessScrapMaterial from "../../Dynamic Add Components/ProcessScrapMaterial";
+import { colors } from "../../../theme/colors";
+import {
+  Settings,
+  FileText,
+  Hash,
+  Layers,
+  DollarSign,
+  Package,
+  Upload,
+  MessageSquare,
+  Calculator,
+  Edit3,
+} from "lucide-react";
 
 interface UpdateProcess {
   closeDrawerHandler: () => void;
@@ -89,7 +102,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   >();
   const [submitBtnText, setSubmitBtnText] = useState<string>("Update");
   const [processStatus, setProcessStatus] = useState<string | undefined>();
-  const [rawMaterialApprovalPending, setRawMaterialApprovalPending] = useState<boolean>(false);
+  const [rawMaterialApprovalPending, setRawMaterialApprovalPending] =
+    useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
   const [scrapMaterials, setScrapMaterials] = useState<any[]>([
@@ -313,15 +327,17 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
         data.production_process.finished_good.produced_quantity
       );
 
-     if (data.production_process.status === "raw materials approved") {
+      if (data.production_process.status === "raw materials approved") {
         setSubmitBtnText("Start Production");
         setProcessStatus("work in progress");
       } else if (data.production_process.status === "work in progress") {
         setSubmitBtnText("Update");
         setProcessStatus("work in progress");
-      } else if(data.production_process.status === "completed"){
+      } else if (data.production_process.status === "completed") {
         setIsCompleted(true);
-      } else if(data.production_process.status === "raw material approval pending"){
+      } else if (
+        data.production_process.status === "raw material approval pending"
+      ) {
         setRawMaterialApprovalPending(true);
       }
     } catch (error: any) {
@@ -383,262 +399,366 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
-      backgroundColor: "transparent",
-      borderColor: "#a9a9a9",
-      color: "#fff",
+      backgroundColor: "white",
+      borderColor: colors.gray[300],
+      color: colors.gray[900],
+      minHeight: "42px",
+      borderRadius: "8px",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: colors.primary[500],
+      },
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
-      color: "black",
+      backgroundColor: state.isFocused ? colors.primary[50] : "white",
+      color: colors.gray[900],
       cursor: "pointer",
+      "&:hover": {
+        backgroundColor: colors.primary[100],
+      },
     }),
     multiValue: (provided: any) => ({
       ...provided,
-      backgroundColor: "#808080",
-      color: "#fff",
+      backgroundColor: colors.primary[100],
+      color: colors.primary[800],
     }),
     menu: (provided: any) => ({
       ...provided,
-      zIndex: 9999, // ensures dropdown doesn't get hidden
+      zIndex: 9999,
+      borderRadius: "8px",
+      boxShadow:
+        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
     }),
     placeholder: (provided: any) => ({
       ...provided,
-      color: "#fff", // light gray placeholder
+      color: colors.gray[500],
     }),
     singleValue: (provided: any) => ({
       ...provided,
-      color: "#fff", // ensures selected value is white
+      color: colors.gray[900],
     }),
   };
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
-      <div
-          className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-[#57657f] right-0 top-0 z-10 py-3"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
-      >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 ">
-          <BiX onClick={closeDrawerHandler} size="26px"  color="white"/>
-         
-        </h1>
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
 
-        <div className="mt-8 px-5">
-        <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">     
-        
-            Update Production Process
-          </h2>
-
-          <form onSubmit={updateProcessHandler}>
-            <div>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">BOM Name</FormLabel>
-                <Input className="text-gray-200"
-                  isDisabled
-                  value={bomName}
-                  onChange={(e) => setBomName(e.target.value)}
-                  type="text"
-                  placeholder="BOM Name"
-                />
-              </FormControl>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">Total Cost</FormLabel>
-                <Input className="text-gray-200"
-                  isDisabled
-                  value={totalCost}
-                  onChange={(e) => setTotalCost(e.target.value)}
-                  type="number"
-                  placeholder="Total Cost"
-                />
-              </FormControl>
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="white">Created By</FormLabel>
-                <Input 
-                  isDisabled
-                  value={createdBy}
-                  className="no-scrollbar text-gray-200"
-                  onChange={(e) => setCreatedBy(e.target.value)}
-                  type="text"
-                  placeholder="Created By"
-                />
-              </FormControl>
-            </div>
-            <div>
-              <RawMaterial
-                inputs={selectedProducts}
-                setInputs={setSelectedProducts}
-                products={products}
-                productOptions={productOptions}
-              />
-            </div>
-            <div>
-              <Process inputs={processes} setInputs={setProcesses} />
-            </div>
-            <div className="mt-4">
-              <FormLabel fontWeight="bold" color="white">Finished Good</FormLabel>
-              <div className="">
-                <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold" color="white">Finished Good</FormLabel>
-                  <Select
-                    isDisabled
-                    styles={customStyles}
-                    className="rounded mt-2 border border-[#a9a9a9]"
-                    options={productOptions}
-                    placeholder="Select"
-                    value={finishedGood}
-                    name="assembly_phase"
-                    onChange={onFinishedGoodChangeHandler}
-                  />
-                </FormControl>
-                <FormControl className="mt-3 mb-5">
-                  <FormLabel fontWeight="bold" color="white">Description</FormLabel>
-                  <Input className="text-gray-200"
-                    isDisabled
-                    border="1px"
-                    borderColor="#a9a9a9"
-                    value={finishedGoodDescription}
-                    onChange={(e) => setFinishedGoodDescription(e.target.value)}
-                    type="text"
-                    placeholder="Description"
-                  />
-                </FormControl>
-                <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold" color="white">Estimated Quantity</FormLabel>
-                  <Input  className="text-gray-200"
-                    disabled  
-                    border="1px"
-                    borderColor="#a9a9a9"
-                    value={finishedGoodQuantity}
-                    onChange={(e) =>
-                      onFinishedGoodQntyChangeHandler(+e.target.value)
-                    }
-                    type="number"
-                    placeholder="Quantity"
-                  />
-                </FormControl>
-                <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold" color="white">Produced Quantity</FormLabel>
-                  <Input  className="text-gray-200"
-                    border="1px" 
-                    borderColor="#a9a9a9"
-                    value={finishedGoodProducedQuantity}
-                    onChange={(e) =>
-                      setFinishedGoodProducedQuantity(+e.target.value)
-                    }
-                    type="number"
-                    placeholder="Produced Quantity"
-                  />
-                </FormControl>
-                <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold" color="white">
-                    Unit Of Measurement (UOM)
-                  </FormLabel>
-                  <Input  className="text-gray-200"
-                    isDisabled={true}
-                    border="1px"
-                    borderColor="#a9a9a9"
-                    value={finishedGoodUom}
-                    type="text"
-                  />
-                </FormControl>
-                <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold" color="white">Category</FormLabel>
-                  <Input  className="text-gray-200"
-                    isDisabled={true}
-                    border="1px"
-                    borderColor="#a9a9a9"
-                    value={finishedGoodCategory}
-                    type="text"
-                  />
-                </FormControl>
-                <FormControl className="mt-3 mb-5">
-                  <FormLabel fontWeight="bold" color="white">Supporting Doc</FormLabel>
-                  <input  
-                    disabled
-                    type="file"
-                    placeholder="Choose a file"
-                    accept=".pdf"
-                    color="#000"
-                    className="p-1 border text-gray-200 border-[#a9a9a9] w-[267px] rounded"
-                  />
-                </FormControl>
-                <FormControl className="mt-3 mb-5">
-                  <FormLabel fontWeight="bold" color="white">Comments</FormLabel>
-                  <Input
-                    isDisabled
-                    border="1px"
-                    borderColor="#a9a9a9"
-                    value={finishedGoodComments}
-                    onChange={(e) => setFinishedGoodComments(e.target.value)}
-                    type="text"
-                    placeholder="Comments"
-                  />
-                </FormControl>
-                <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold" color="white">Unit Cost</FormLabel>
-                  <Input   className="text-gray-200"
-                    isDisabled={true}
-                    border="1px"
-                    borderColor="#a9a9a9"
-                    value={finishedGoodUnitCost}
-                    type="number"
-                  />
-                </FormControl>
-                <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold" color="white">Cost</FormLabel>
-                  <Input  className="text-gray-200" 
-                    isDisabled={true}
-                    border="1px"
-                    borderColor="#a9a9a9"
-                    value={finishedGoodCost}
-                    type="number"
-                    placeholder="Cost"
-                  />
-                </FormControl>
+      {/* Drawer */}
+      <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[700px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
+        <div className="h-full flex flex-col">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between border-b">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Edit3 className="h-5 w-5 text-white" />
               </div>
+              <h2 className="text-xl font-semibold text-white">
+                Update Production Process
+              </h2>
             </div>
-            <div>
-              <ProcessScrapMaterial
-                products={products}
-                productOptions={productOptions}
-                inputs={scrapMaterials}
-                setInputs={setScrapMaterials}
-              />
-            </div>
-            <div className="mt-2">
-              <Button
-                disabled={isCompleted || rawMaterialApprovalPending}
-                marginRight={2}
-                isLoading={isUpdating}
-                type="submit"
-                className="mt-1"
-                color="black"
-              backgroundColor="#ffffff8a"
-              _hover={{ bg: "#d1d2d5" }}
-              >
-                {submitBtnText}
-              </Button>
-              {submitBtnText === "Update" && (
-                <Button
-                  disabled={isCompleted || rawMaterialApprovalPending}
-                  isLoading={isUpdating}
-                  type="button"
-                  className="mt-1"
-                  color="black"
-                  backgroundColor="#ffffff8a"
-                  _hover={{ bg: "#d1d2d5" }}
-                  onClick={markProcessDoneHandler}
+            <button
+              onClick={closeDrawerHandler}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors duration-200"
+            >
+              <BiX size={24} className="text-white" />
+            </button>
+          </div>
+
+          {/* Form Content */}
+          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+            <form onSubmit={updateProcessHandler} className="space-y-6">
+              {/* BOM Details Section */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  BOM Details
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Package className="h-4 w-4 text-gray-500" />
+                      BOM Name
+                    </label>
+                    <input
+                      type="text"
+                      value={bomName || ""}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <DollarSign className="h-4 w-4 text-gray-500" />
+                      Total Cost
+                    </label>
+                    <input
+                      type="number"
+                      value={totalCost || ""}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Hash className="h-4 w-4 text-gray-500" />
+                      Created By
+                    </label>
+                    <input
+                      type="text"
+                      value={createdBy || ""}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Raw Materials Section */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Layers className="h-5 w-5 text-blue-600" />
+                  Raw Materials
+                </h3>
+                <RawMaterial
+                  inputs={selectedProducts}
+                  setInputs={setSelectedProducts}
+                  products={products}
+                  productOptions={productOptions}
+                />
+              </div>
+
+              {/* Process Section */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-blue-600" />
+                  Process
+                </h3>
+                <Process inputs={processes} setInputs={setProcesses} />
+              </div>
+
+              {/* Finished Good Section */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                  <Package className="h-5 w-5 text-blue-600" />
+                  Finished Good
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Finished Good Selection */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Package className="h-4 w-4 text-gray-500" />
+                      Finished Good *
+                    </label>
+                    <Select
+                      styles={customStyles}
+                      className="text-sm"
+                      options={productOptions}
+                      placeholder="Select Finished Good"
+                      value={finishedGood}
+                      name="assembly_phase"
+                      onChange={onFinishedGoodChangeHandler}
+                      isDisabled
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <FileText className="h-4 w-4 text-gray-500" />
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      value={finishedGoodDescription || ""}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+
+                  {/* Estimated Quantity */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Hash className="h-4 w-4 text-gray-500" />
+                      Estimated Quantity *
+                    </label>
+                    <input
+                      type="number"
+                      value={finishedGoodQuantity || ""}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+
+                  {/* Produced Quantity */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Hash className="h-4 w-4 text-gray-500" />
+                      Produced Quantity *
+                    </label>
+                    <input
+                      type="number"
+                      value={finishedGoodProducedQuantity || ""}
+                      onChange={(e) =>
+                        setFinishedGoodProducedQuantity(+e.target.value)
+                      }
+                      placeholder="Enter produced quantity"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                    />
+                  </div>
+
+                  {/* UOM */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Calculator className="h-4 w-4 text-gray-500" />
+                      Unit of Measurement
+                    </label>
+                    <input
+                      type="text"
+                      value={finishedGoodUom || ""}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+
+                  {/* Category */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Layers className="h-4 w-4 text-gray-500" />
+                      Category
+                    </label>
+                    <input
+                      type="text"
+                      value={finishedGoodCategory || ""}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+
+                  {/* Supporting Doc */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Upload className="h-4 w-4 text-gray-500" />
+                      Supporting Document
+                    </label>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-600"
+                    />
+                  </div>
+
+                  {/* Comments */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <MessageSquare className="h-4 w-4 text-gray-500" />
+                      Comments
+                    </label>
+                    <input
+                      type="text"
+                      value={finishedGoodComments || ""}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+
+                  {/* Unit Cost */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <DollarSign className="h-4 w-4 text-gray-500" />
+                      Unit Cost
+                    </label>
+                    <input
+                      type="number"
+                      value={finishedGoodUnitCost || ""}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+
+                  {/* Total Cost */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <DollarSign className="h-4 w-4 text-gray-500" />
+                      Cost
+                    </label>
+                    <input
+                      type="number"
+                      value={finishedGoodCost || ""}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Scrap Material Section */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Package className="h-5 w-5 text-red-600" />
+                  Scrap Materials
+                </h3>
+                <ProcessScrapMaterial
+                  products={products}
+                  productOptions={productOptions}
+                  inputs={scrapMaterials}
+                  setInputs={setScrapMaterials}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+                <button
+                  type="submit"
+                  disabled={
+                    isCompleted || rawMaterialApprovalPending || isUpdating
+                  }
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
                 >
-                  Mark as Done
-                </Button>
+                  {isUpdating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Updating...
+                    </>
+                  ) : (
+                    submitBtnText
+                  )}
+                </button>
+
+                {submitBtnText === "Update" && (
+                  <button
+                    type="button"
+                    disabled={
+                      isCompleted || rawMaterialApprovalPending || isUpdating
+                    }
+                    onClick={markProcessDoneHandler}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-lg hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    Mark as Completed
+                  </button>
+                )}
+              </div>
+
+              {(isCompleted || rawMaterialApprovalPending) && (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-800 flex items-center gap-2">
+                    <Hash className="h-4 w-4" />
+                    {isCompleted
+                      ? "This process has been completed."
+                      : "Raw material approval is pending."}
+                  </p>
+                </div>
               )}
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
-    </Drawer>
+    </>
   );
 };
 

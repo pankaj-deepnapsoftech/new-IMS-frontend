@@ -4,6 +4,7 @@ import { BiX } from "react-icons/bi";
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { toast } from "react-toastify";
 import { useAddAgentMutation } from "../../../redux/api/api";
+import { colors } from "../../../theme/colors";
 
 interface AddBuyerProps {
   closeDrawerHandler: () => void;
@@ -87,44 +88,74 @@ const AddBuyer: React.FC<AddBuyerProps> = ({
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px]  bg-[#57657f] right-0 top-0 z-10 py-3"
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
         }}
       >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3">
-          <BiX onClick={closeDrawerHandler} size="26px" color="white" />
-
-        </h1>
+        <div
+          className="flex items-center justify-between p-6 border-b"
+          style={{ borderColor: colors.border.light }}
+        >
+          <h1
+            className="text-xl font-semibold"
+            style={{ color: colors.text.primary }}
+          >
+            Add New Buyer
+          </h1>
+          <button
+            onClick={closeDrawerHandler}
+            className="p-2 rounded-lg transition-colors duration-200"
+            style={{
+              color: colors.text.secondary,
+              backgroundColor: colors.gray[100],
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[200];
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[100];
+            }}
+          >
+            <BiX size={20} />
+          </button>
+        </div>
 
         <div className="mt-8 px-5">
           <h2 className="text-xl text-center  font-semi600 py-3 px-4 bg-[#ffffff4f]  rounded-md text-white  mb-6  ">
-
             Add New Buyer
           </h2>
 
           <form onSubmit={addBuyerHandler}>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Name</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                Name
+              </FormLabel>
               <Input
-                className="text-gray-200" value={name}
+                className="text-gray-200"
+                value={name}
                 onChange={(e) => setName(e.target.value)}
                 type="text"
                 placeholder="Name"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Email</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                Email
+              </FormLabel>
               <Input
-                className="text-gray-200" value={email}
+                className="text-gray-200"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 placeholder="Email"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Phone</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                Phone
+              </FormLabel>
               <Input
                 value={phone}
                 className="no-scrollbar text-gray-200"
@@ -134,7 +165,9 @@ const AddBuyer: React.FC<AddBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">GST Number</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                GST Number
+              </FormLabel>
               <Input
                 value={gst}
                 className="no-scrollbar text-gray-200"
@@ -144,7 +177,9 @@ const AddBuyer: React.FC<AddBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Company Name</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                Company Name
+              </FormLabel>
               <Input
                 className="no-scrollbar text-gray-200"
                 value={companyName}
@@ -154,63 +189,84 @@ const AddBuyer: React.FC<AddBuyerProps> = ({
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Current Email</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                Current Email
+              </FormLabel>
               <Input
-                className="text-gray-200" value={companyEmail}
+                className="text-gray-200"
+                value={companyEmail}
                 onChange={(e) => setCompanyEmail(e.target.value)}
                 type="email"
                 placeholder="Company Email"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Company Phone</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                Company Phone
+              </FormLabel>
               <Input
-                className="text-gray-200" value={companyPhone}
+                className="text-gray-200"
+                value={companyPhone}
                 onChange={(e) => setCompanyPhone(e.target.value)}
                 type="number"
                 placeholder="Company Phone"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Address Line 1</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                Address Line 1
+              </FormLabel>
               <Input
-                className="text-gray-200" value={addressLine1}
+                className="text-gray-200"
+                value={addressLine1}
                 onChange={(e) => setAddressLine1(e.target.value)}
                 type="text"
                 placeholder="Address Line 1"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Address Line 2</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                Address Line 2
+              </FormLabel>
               <Input
-                className="text-gray-200" value={addressLine2}
+                className="text-gray-200"
+                value={addressLine2}
                 onChange={(e) => setAddressLine2(e.target.value)}
                 type="text"
                 placeholder="Address Line 2"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="white">Pincode</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                Pincode
+              </FormLabel>
               <Input
-                className="text-gray-200" value={pincode}
+                className="text-gray-200"
+                value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
                 type="text"
                 placeholder="Pincode"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">City</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                City
+              </FormLabel>
               <Input
-                className="text-gray-200" value={city}
+                className="text-gray-200"
+                value={city}
                 onChange={(e) => setCity(e.target.value)}
                 type="text"
                 placeholder="City"
               />
             </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">State</FormLabel>
+              <FormLabel fontWeight="bold" color="white">
+                State
+              </FormLabel>
               <Input
-                className="text-gray-200" value={state}
+                className="text-gray-200"
+                value={state}
                 onChange={(e) => setState(e.target.value)}
                 type="text"
                 placeholder="State"
