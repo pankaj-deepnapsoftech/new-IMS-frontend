@@ -176,7 +176,7 @@ const AddParties = ({
       {/* Drawer */}
       <div
         className={`fixed inset-y-0 right-0 z-50 w-full sm:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
-          showData ? "translate-x-0" : "translate-x-full"
+          showData ? "translate-x-0" : "translate-x-full" 
         }`}
       >
         <div className="h-full flex flex-col">
