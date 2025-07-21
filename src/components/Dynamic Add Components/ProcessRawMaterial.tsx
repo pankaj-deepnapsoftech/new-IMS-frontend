@@ -88,20 +88,23 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
   useEffect(() => {
     let prods = [];
     prods = inputs.map((material: any) => ({
-      value: material.item_id,
-      label: material.item_name,
+      value: material.item_id || material.item_name?.value || "",
+      label:
+        typeof material.item_name === "object"
+          ? material.item_name.label
+          : material.item_name,
     }));
     setSelectedProducts(prods);
   }, [inputs]);
   const customStyles = {
     control: (base: any) => ({
       ...base,
-      backgroundColor: 'transparent', // Light gray background for the placeholder
-      color : "#fff"
+      backgroundColor: "transparent", // Light gray background for the placeholder
+      color: "#fff",
     }),
     placeholder: (base: any) => ({
       ...base,
-      color: '#fff', // Gray text for placeholder
+      color: "#fff", // Gray text for placeholder
     }),
     option: (provided: any, state: any) => ({
       ...provided,
@@ -111,21 +114,23 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
     }),
     singleValue: (base: any) => ({
       ...base,
-      color: '#fff',
+      color: "#fff",
     }),
   };
   return (
     <div>
       <FormControl isRequired>
-        <FormLabel fontWeight="bold" color="white" paddingBottom="10px">Raw Materials</FormLabel>
+        <FormLabel fontWeight="bold" color="white" paddingBottom="10px">
+          Raw Materials
+        </FormLabel>
         {inputs.map((input, ind) => (
-          <div
-            className=" border-b-[#a9a9a9] pb-2 mb-2"
-            key={ind}
-          >
+          <div className=" border-b-[#a9a9a9] pb-2 mb-2" key={ind}>
             <FormControl className="mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">Product Name</FormLabel>
-              <Select styles={customStyles}
+              <FormLabel fontWeight="bold" color="white">
+                Product Name
+              </FormLabel>
+              <Select
+                styles={customStyles}
                 isDisabled
                 required
                 className="rounded mt-2 border border-[#a9a9a9]"
@@ -139,8 +144,11 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Description</FormLabel>
-              <Input className="text-gray-200"
+              <FormLabel fontWeight="bold" color="white">
+                Description
+              </FormLabel>
+              <Input
+                className="text-gray-200"
                 isDisabled
                 border="1px"
                 borderColor="#a9a9a9"
@@ -153,8 +161,11 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">Estimated Quantity</FormLabel>
-              <Input className="text-gray-200"
+              <FormLabel fontWeight="bold" color="white">
+                Estimated Quantity
+              </FormLabel>
+              <Input
+                className="text-gray-200"
                 disabled={true}
                 border="1px"
                 borderColor="#a9a9a9"
@@ -167,9 +178,12 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">Used Quantity</FormLabel>
-              <Input className="text-gray-200"
-                border="1px" 
+              <FormLabel fontWeight="bold" color="white">
+                Used Quantity
+              </FormLabel>
+              <Input
+                className="text-gray-200"
+                border="1px"
                 borderColor="#a9a9a9"
                 onChange={(e) => {
                   onChangeHandler(e.target.name, e.target.value, ind);
@@ -180,8 +194,11 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">UOM</FormLabel>
-              <Input className="text-gray-200"
+              <FormLabel fontWeight="bold" color="white">
+                UOM
+              </FormLabel>
+              <Input
+                className="text-gray-200"
                 isDisabled={true}
                 border="1px"
                 borderColor="#a9a9a9"
@@ -191,8 +208,11 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">Category</FormLabel>
-              <Input className="text-gray-200"
+              <FormLabel fontWeight="bold" color="white">
+                Category
+              </FormLabel>
+              <Input
+                className="text-gray-200"
                 isDisabled={true}
                 border="1px"
                 borderColor="#a9a9a9"
@@ -202,8 +222,11 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Assembly Phase</FormLabel>
-              <Select styles={customStyles}
+              <FormLabel fontWeight="bold" color="white">
+                Assembly Phase
+              </FormLabel>
+              <Select
+                styles={customStyles}
                 isDisabled
                 className="rounded mt-2 "
                 options={assemblyPhaseOptions}
@@ -216,8 +239,11 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Supplier</FormLabel>
-              <Select  styles={customStyles}
+              <FormLabel fontWeight="bold" color="white">
+                Supplier
+              </FormLabel>
+              <Select
+                styles={customStyles}
                 isDisabled
                 className="rounded mt-2 "
                 options={suppliersOptionsList}
@@ -230,8 +256,11 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Comments</FormLabel>
-              <Input className="text-gray-200"
+              <FormLabel fontWeight="bold" color="white">
+                Comments
+              </FormLabel>
+              <Input
+                className="text-gray-200"
                 isDisabled
                 border="1px"
                 borderColor="#a9a9a9"
@@ -244,8 +273,11 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">Unit Cost</FormLabel>
-              <Input className="text-gray-200"
+              <FormLabel fontWeight="bold" color="white">
+                Unit Cost
+              </FormLabel>
+              <Input
+                className="text-gray-200"
                 isDisabled={true}
                 border="1px"
                 borderColor="#a9a9a9"
@@ -258,8 +290,10 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">Total Part Cost</FormLabel>
-              <input 
+              <FormLabel fontWeight="bold" color="white">
+                Total Part Cost
+              </FormLabel>
+              <input
                 disabled={true}
                 onChange={(e) => {
                   onChangeHandler(e.target.name, e.target.value, ind);
