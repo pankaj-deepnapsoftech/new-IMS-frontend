@@ -120,13 +120,10 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
   return (
     <div>
       <FormControl isRequired>
-        <FormLabel fontWeight="bold" color="white" paddingBottom="10px">
-          Raw Materials
-        </FormLabel>
         {inputs.map((input, ind) => (
           <div className=" border-b-[#a9a9a9] pb-2 mb-2" key={ind}>
             <FormControl className="mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Product Name
               </FormLabel>
               <Select
@@ -144,7 +141,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Description
               </FormLabel>
               <Input
@@ -161,7 +158,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Estimated Quantity
               </FormLabel>
               <Input
@@ -178,7 +175,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Used Quantity
               </FormLabel>
               <Input
@@ -194,7 +191,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 UOM
               </FormLabel>
               <Input
@@ -208,7 +205,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Category
               </FormLabel>
               <Input
@@ -222,7 +219,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Assembly Phase
               </FormLabel>
               <Select
@@ -239,7 +236,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Supplier
               </FormLabel>
               <Select
@@ -256,7 +253,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Comments
               </FormLabel>
               <Input
@@ -273,7 +270,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Unit Cost
               </FormLabel>
               <Input
@@ -290,7 +287,7 @@ const ProcessRawMaterial: React.FC<ProcessRawMaterialProps> = ({
               ></Input>
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold" color="white">
+              <FormLabel fontWeight="bold" color="black">
                 Total Part Cost
               </FormLabel>
               <input

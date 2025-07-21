@@ -83,7 +83,7 @@ const UploadDesignFile = ({ show, setShow, saleId, refresh }) => {
               </button>
             </div>
           )}
-
+    
           <Button
             mt={4}
             colorScheme="blue"

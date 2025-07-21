@@ -149,23 +149,34 @@ const Dashboard: React.FC = () => {
   const [totalProformaInvoices, setTotalProformaInvoices] = useState<number>(0);
   const [totalInvoices, setTotalInvoices] = useState<number>(0);
   const [totalPayments, setTotalPayments] = useState<number>(0);
-  
-  const [verifiedEmployeesCount, setVerifiedEmployeesCount] = useState<number>(0);
+
+  const [verifiedEmployeesCount, setVerifiedEmployeesCount] =
+    useState<number>(0);
   const [totalProductionAmount, setTotalProductionAmount] = useState<number>(0);
   const [totalSalesAmount, setTotalSalesAmount] = useState<number>(0);
   const [totalProductBuyPrice, setTotalProductBuyPrice] = useState<number>(0);
-  const [selectedDay, setSelectedDay] = useState<{day: string, tasks: string[]} | null>(null);
+  const [selectedDay, setSelectedDay] = useState<{
+    day: string;
+    tasks: string[];
+  } | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedProductionDay, setSelectedProductionDay] = useState<{day: string, tasks: string[]}>(
-    { day: "Sun 01", tasks: [] }
-  );
 
-  const handleDayClick = (day: {day: string, tasks: string[]}) => {
+  // Initialize selectedProductionDay with current day after component mounts
+  const [selectedProductionDay, setSelectedProductionDay] = useState<{
+    day: string;
+    tasks: string[];
+  }>({
+    day: "",
+    tasks: [],
+  });
+  const [lastUpdated, setLastUpdated] = useState<string>("");
+
+  const handleDayClick = (day: { day: string; tasks: string[] }) => {
     setSelectedDay(day);
     onOpen();
   };
 
-  const handleProductionDayClick = (day: {day: string, tasks: string[]}) => {
+  const handleProductionDayClick = (day: { day: string; tasks: string[] }) => {
     setSelectedProductionDay(day);
   };
 
@@ -246,15 +257,155 @@ const Dashboard: React.FC = () => {
     { name: "In Progress", value: 10, color: "#6366f1" },
   ];
 
-  const productionPlanData = [
-    { day: "Sun 01", tasks: [] },
-    { day: "Mon 02", tasks: ["Raw Material Processing", "Quality Check", "Inventory Update"] },
-    { day: "Tue 03", tasks: ["Batch Processing", "Machine Operation", "Packaging", "Dispatch Preparation"] },
-    { day: "Wed 04", tasks: ["Maintenance Check"] },
-    { day: "Thu 05", tasks: ["Order Fulfillment", "Final Quality Inspection"] },
-    { day: "Fri 06", tasks: ["Weekly Report Generation", "Equipment Cleaning"] },
-    { day: "Sat 07", tasks: [] },
-  ];
+  // Generate current week data dynamically
+  const getProductionPlanForCurrentWeek = () => {
+    const today = new Date();
+    const currentDayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday...
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - currentDayOfWeek);
+
+    const weekDays = [];
+    const dayNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+
+      const dayName = dayNames[i];
+      const formattedDate = `${date.getDate()}/${
+        date.getMonth() + 1
+      }/${date.getFullYear()}`; // dd/m/yyyy
+
+      // Find matching tasks from backend
+      const dayTasks =
+        backendProductionPlan?.[dayName]?.filter(
+          (task: any) => task.date === formattedDate
+        ) || [];
+
+      weekDays.push({
+        day: `${dayName.slice(0, 3)} ${String(date.getDate()).padStart(
+          2,
+          "0"
+        )}`,
+        tasks: dayTasks.map((t: any) => t.name),
+        date,
+        isToday: date.toDateString() === today.toDateString(),
+      });
+    }
+
+    return weekDays;
+  };
+
+  const [backendProductionPlan, setBackendProductionPlan] = useState<any>({});
+  const fetchProductionPlan = async () => {
+    try {
+      const res = await fetch("http://localhost:8085/api/bom/weekly");
+      const data = await res.json();
+      if (data.success) {
+        setBackendProductionPlan(data.weekMap);
+      }
+    } catch (err) {
+      console.error("Failed to fetch production plan", err);
+    }
+  };
+
+  fetchProductionPlan();
+  const getBackendWeekData = () => {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    const result: {
+      day: string;
+      tasks: string[];
+      date: Date;
+      isToday: boolean;
+    }[] = [];
+
+    
+ 
+    const dayNamesMap: Record<string, number> = {
+      Sunday: 0,
+      Monday: 1,
+      Tuesday: 2,
+      Wednesday: 3,
+      Thursday: 4,
+      Friday: 5,
+      Saturday: 6,
+    };
+
+    Object.entries(backendProductionPlan).forEach(([day, tasks]) => {
+      const filteredTasks = (tasks as any[]).filter((task) => {
+        const [d, m, y] = task.date.split("/").map(Number);
+        const taskDate = new Date(y, m - 1, d);
+        return taskDate >= startOfWeek && taskDate <= endOfWeek;
+      });
+
+      if (filteredTasks.length > 0) {
+        const sampleDate = filteredTasks[0].date;
+        const [d, m, y] = sampleDate.split("/").map(Number);
+        const date = new Date(y, m - 1, d);
+
+        result.push({
+          day: `${day.slice(0, 3)} ${String(d).padStart(2, "0")}`,
+          tasks: filteredTasks.map((t) => t.name),
+          date,
+          isToday: date.toDateString() === today.toDateString(),
+        });
+      }
+    });
+
+    return result;
+  };
+
+  // Get current week date range for header
+  const getCurrentWeekRange = () => {
+    const today = new Date();
+    const currentDayOfWeek = today.getDay();
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - currentDayOfWeek);
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const startMonth = monthNames[weekStart.getMonth()];
+    const endMonth = monthNames[weekEnd.getMonth()];
+    const year = weekStart.getFullYear();
+
+    if (weekStart.getMonth() === weekEnd.getMonth()) {
+      return `${startMonth} ${weekStart.getDate()}-${weekEnd.getDate()}, ${year}`;
+    } else {
+      return `${startMonth} ${weekStart.getDate()} - ${endMonth} ${weekEnd.getDate()}, ${year}`;
+    }
+  };
+
+  const productionPlanData = getProductionPlanForCurrentWeek();
 
   const fetchSummaryHandler = async () => {
     try {
@@ -298,7 +449,7 @@ const Dashboard: React.FC = () => {
       setTotalProformaInvoices(data.proforma_invoices);
       setTotalInvoices(data.invoices);
       setTotalPayments(data.payments);
-      
+
       // Set dashboard card data
       setVerifiedEmployeesCount(data.verified_employees_count || 0);
       setTotalProductionAmount(data.total_production_amount || 0);
@@ -346,6 +497,18 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchSummaryHandler();
+
+    // Set default selected day to today
+    const weekData = getProductionPlanForCurrentWeek();
+
+    const today = weekData.find((day) => day.isToday);
+    if (today) {
+      setSelectedProductionDay(today);
+    } else {
+      // If today is not in current week, default to first day
+      setSelectedProductionDay(weekData[0]);
+    }
+    setLastUpdated(new Date().toLocaleTimeString());
   }, []);
 
   if (!isAllowed) {
@@ -555,9 +718,29 @@ const Dashboard: React.FC = () => {
                   border="1px"
                   borderColor="gray.200"
                 >
-                  <Text fontSize="lg" fontWeight="bold" mb={4} color="gray.800">
-                    Production Plan - December 2024
-                  </Text>
+                  <HStack justify="space-between" align="center" mb={4}>
+                    <Text fontSize="lg" fontWeight="bold" color="gray.800">
+                      Production Plan - {getCurrentWeekRange()}
+                    </Text>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        const weekData = getProductionPlanForCurrentWeek();
+
+                        const today = weekData.find((day) => day.isToday);
+                        if (today) {
+                          setSelectedProductionDay(today);
+                        }
+                        setLastUpdated(new Date().toLocaleTimeString());
+                      }}
+                      _hover={{ bg: "gray.100" }}
+                    >
+                      <Text fontSize="xs" color="blue.600">
+                        Refresh
+                      </Text>
+                    </Button>
+                  </HStack>
                   <Box>
                     <SimpleGrid columns={7} spacing={2} mb={6}>
                       {productionPlanData.map((day, index) => (
@@ -575,19 +758,34 @@ const Dashboard: React.FC = () => {
                           p={2}
                           rounded="md"
                           bg={
-                            selectedProductionDay.day === day.day
+                            day.isToday
+                              ? "blue.100"
+                              : selectedProductionDay.day === day.day
                               ? "blue.50"
                               : "white"
                           }
                           border="2px"
                           borderColor={
-                            selectedProductionDay.day === day.day
+                            day.isToday
+                              ? "blue.500"
+                              : selectedProductionDay.day === day.day
                               ? "blue.300"
                               : "transparent"
                           }
                         >
                           <Text fontSize="xs" color="gray.600" mb={1}>
                             {day.day.split(" ")[0]}
+                            {day.isToday && (
+                              <Box
+                                as="span"
+                                ml={1}
+                                w={1.5}
+                                h={1.5}
+                                bg="blue.500"
+                                rounded="full"
+                                display="inline-block"
+                              />
+                            )}
                           </Text>
                           <Text fontSize="xs" fontWeight="bold" mb={2}>
                             {day.day.split(" ")[1]}
@@ -614,6 +812,18 @@ const Dashboard: React.FC = () => {
                       <HStack spacing={3} mb={3}>
                         <Text fontSize="sm" fontWeight="bold" color="gray.700">
                           {selectedProductionDay.day}
+                          {getProductionPlanForCurrentWeek().find(
+                            (day) => day.day === selectedProductionDay.day
+                          )?.isToday && (
+                            <Text
+                              as="span"
+                              fontSize="xs"
+                              color="blue.600"
+                              ml={2}
+                            >
+                              (Today)
+                            </Text>
+                          )}
                         </Text>
                         <Box
                           px={2}
@@ -671,6 +881,16 @@ const Dashboard: React.FC = () => {
                       )}
                     </Box>
                   </Box>
+                  {lastUpdated && (
+                    <Text
+                      fontSize="xs"
+                      color="gray.500"
+                      mt={3}
+                      textAlign="center"
+                    >
+                      Last updated: {lastUpdated}
+                    </Text>
+                  )}
                 </Box>
 
                 {/* Actual vs Target Chart */}
