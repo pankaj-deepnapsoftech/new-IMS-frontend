@@ -126,7 +126,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
         <>
           {/* Page Size Selector */}
           <div
-            className="flex justify-between items-center p-4"
+            className="flex justify-between items-center p-4 "
             style={{ borderBottom: `1px solid ${colors.border.light}` }}
           >
             <h2
@@ -162,7 +162,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
           </div>
 
           {/* Table */}
-          <TableContainer>
+          <TableContainer className="m-4 border rounded-md shadow-sm">
             <Table {...getTableProps()} variant="simple">
               <Thead style={{ backgroundColor: colors.table.header }}>
                 {headerGroups.map((headerGroup) => (
@@ -286,7 +286,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           {cell.column.id === "subtotal" && (
                             <span
                               className="font-semibold"
-                              style={{ color: colors.primary[600] }}
+                              style={{ color: colors.text.secondary }}
                             >
                               ₹{row.original.subtotal?.toLocaleString()}
                             </span>
@@ -296,7 +296,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           {cell.column.id === "total" && (
                             <span
                               className="font-bold"
-                              style={{ color: colors.success[600] }}
+                              style={{ color: colors.text.secondary }}
                             >
                               ₹{row.original.total?.toLocaleString()}
                             </span>
@@ -347,16 +347,16 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                                 }
                                 className="p-1 rounded-md transition-all duration-200 hover:scale-110"
                                 style={{
-                                  color: colors.warning[600],
-                                  backgroundColor: colors.warning[50],
+                                  color: colors.primary[600],
+                                  backgroundColor: colors.primary[50],
                                 }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.backgroundColor =
-                                    colors.warning[100];
+                                    colors.primary[100];
                                 }}
                                 onMouseLeave={(e) => {
                                   e.currentTarget.style.backgroundColor =
-                                    colors.warning[50];
+                                    colors.primary[50];
                                 }}
                               >
                                 <MdEdit size={16} />
@@ -372,16 +372,16 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                                 }
                                 className="p-1 rounded-md transition-all duration-200 hover:scale-110"
                                 style={{
-                                  color: colors.success[600],
-                                  backgroundColor: colors.success[50],
+                                  color: colors.primary[600],
+                                  backgroundColor: colors.primary[50],
                                 }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.backgroundColor =
-                                    colors.success[100];
+                                    colors.primary[100];
                                 }}
                                 onMouseLeave={(e) => {
                                   e.currentTarget.style.backgroundColor =
-                                    colors.success[50];
+                                    colors.primary[50];
                                 }}
                               >
                                 <MdOutlinePayment size={16} />

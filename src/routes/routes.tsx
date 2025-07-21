@@ -12,7 +12,6 @@ import { FaPeopleGroup } from "react-icons/fa6";
 import { BiPurchaseTagAlt } from "react-icons/bi";
 import { VscServerProcess } from "react-icons/vsc";
 import { GiProgression } from "react-icons/gi";
-import Dashboard from "../pages/Dashboard";
 import Products from "../pages/Products";
 import Approvals from "../pages/Approvals";
 import Stores from "../pages/Stores";
@@ -36,6 +35,7 @@ import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
 import Task from "../pages/Task";
 import { HandCoins } from "lucide-react";
+import Dashboard from "../pages/Dashboard";
 
 const routes = [
   {

@@ -151,7 +151,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
               to="/register"
               className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
-              Create account
+              Login account
             </Link>
             <button
               type="button"

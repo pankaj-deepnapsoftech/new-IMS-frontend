@@ -35,16 +35,16 @@ const UserProfile: React.FC = () => {
     >
       <Box maxW="4xl" mx="auto">
         {/* Page Header */}
-        <Box mb={8}>
+        {/* <Box mb={8}>
           <Heading size="lg" mb={2} style={{ color: colors.text.primary }}>
             User Profile
           </Heading>
           <Text style={{ color: colors.text.secondary }}>
             Manage your personal information and account settings
           </Text>
-        </Box>
+        </Box> */}
 
-        <Flex direction={{ base: "column", lg: "row" }} gap={6}>
+        <Flex direction={{ base: "column", lg: "row" }} gap={5}>
           {/* Profile Card */}
           <Card
             style={{
@@ -54,16 +54,16 @@ const UserProfile: React.FC = () => {
             }}
           >
             <CardHeader>
-              <Heading size="md" style={{ color: colors.text.primary }}>
+              <Heading size="md" className="text-center" style={{ color: colors.text.primary }}>
                 Profile Information
               </Heading>
             </CardHeader>
             <CardBody>
-              <VStack spacing={6} align="stretch">
+              <VStack spacing={5} align="stretch">
                 {/* Avatar Section */}
-                <Flex direction="column" align="center" py={4}>
+                <Flex direction="column" align="center" py={3}>
                   <Avatar
-                    size="2xl"
+                    size="xl"
                     name={`${data.firstname} ${data.lastname}`}
                     src={data.avatarUrl}
                     mb={4}
@@ -110,7 +110,7 @@ const UserProfile: React.FC = () => {
                 <Divider style={{ borderColor: colors.border.light }} />
 
                 {/* Form Fields */}
-                <Stack spacing={5}>
+                <Stack spacing={4}>
                   <Box>
                     <HStack mb={2}>
                       <Icon
