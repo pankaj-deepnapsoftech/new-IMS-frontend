@@ -21,7 +21,9 @@ import { MdEmail, MdPhone, MdPerson, MdVerifiedUser } from "react-icons/md";
 import { colors } from "../theme/colors";
 
 const UserProfile: React.FC = () => {
-  const data = useSelector((state: any) => state.auth);
+  const data = useSelector((state: any) => state?.auth);
+  
+
 
   return (
     <Box

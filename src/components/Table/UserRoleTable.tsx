@@ -187,7 +187,14 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                 size="md"
                 minWidth="800px"
               >
-                <Thead bg={colors.table.header}>
+                <Thead
+                  bg={colors.table.header}
+                  style={{
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 1,
+                  }}
+                >
                   {headerGroups.map((hg) => (
                     <Tr
                       {...hg.getHeaderGroupProps()}
@@ -196,24 +203,21 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                     >
                       {hg.headers.map((column) => (
                         <Th
-                          {...column.getHeaderProps(
-                            column.getSortByToggleProps()
-                          )}
+                          {...column.getHeaderProps(column.getSortByToggleProps())}
                           fontSize="14px"
                           color="gray.700"
                           fontWeight="600"
                           whiteSpace="nowrap"
                           px={4}
                           py={3}
+                          style={{
+                            backgroundColor: colors.table.header, // Ensures the background stays solid when sticky
+                          }}
                         >
-                          <div className="flex items-center  gap-1">
+                          <div className="flex items-center gap-1">
                             {column.render("Header")}
                             {column.isSorted &&
-                              (column.isSortedDesc ? (
-                                <FaCaretDown />
-                              ) : (
-                                <FaCaretUp />
-                              ))}
+                              (column.isSortedDesc ? <FaCaretDown /> : <FaCaretUp />)}
                           </div>
                         </Th>
                       ))}
@@ -224,12 +228,16 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                         whiteSpace="nowrap"
                         px={4}
                         py={3}
+                        style={{
+                          backgroundColor: colors.table.header,
+                        }}
                       >
                         Actions
                       </Th>
                     </Tr>
                   ))}
                 </Thead>
+
 
                 <Tbody {...getTableBodyProps()}>
                   {page.map((row, index) => {

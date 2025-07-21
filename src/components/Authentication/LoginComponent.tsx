@@ -46,7 +46,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       }).unwrap();
       // dispatch(userExists(data.user));
 
-      console.log('data.user =', data.user)
+
       if (data.user.role) {
         dispatch(userExists(data.user));
       } else if (data?.user?.isSuper) {
