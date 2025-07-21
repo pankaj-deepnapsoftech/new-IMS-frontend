@@ -34,6 +34,14 @@ import {
   Icon,
   VStack,
   HStack,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 import {
   LineChart,
@@ -146,6 +154,20 @@ const Dashboard: React.FC = () => {
   const [totalProductionAmount, setTotalProductionAmount] = useState<number>(0);
   const [totalSalesAmount, setTotalSalesAmount] = useState<number>(0);
   const [totalProductBuyPrice, setTotalProductBuyPrice] = useState<number>(0);
+  const [selectedDay, setSelectedDay] = useState<{day: string, tasks: string[]} | null>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedProductionDay, setSelectedProductionDay] = useState<{day: string, tasks: string[]}>(
+    { day: "Sun 01", tasks: [] }
+  );
+
+  const handleDayClick = (day: {day: string, tasks: string[]}) => {
+    setSelectedDay(day);
+    onOpen();
+  };
+
+  const handleProductionDayClick = (day: {day: string, tasks: string[]}) => {
+    setSelectedProductionDay(day);
+  };
 
   const dashboardCards = [
     {
@@ -217,13 +239,20 @@ const Dashboard: React.FC = () => {
     { name: "Break", value: 5, color: "#8dd1e1" },
   ];
 
+  const inspectionValuesData = [
+    { name: "Passed", value: 10, color: "#10b981" },
+    { name: "Failed", value: 5, color: "#ef4444" },
+    { name: "Pending", value: 25, color: "#f59e0b" },
+    { name: "In Progress", value: 10, color: "#6366f1" },
+  ];
+
   const productionPlanData = [
     { day: "Sun 01", tasks: [] },
-    { day: "Mon 02", tasks: ["Raw Material Processing"] },
-    { day: "Tue 03", tasks: ["Batch Processing", "Machine Operation"] },
-    { day: "Wed 04", tasks: [] },
-    { day: "Thu 05", tasks: ["Order Fulfillment"] },
-    { day: "Fri 06", tasks: [] },
+    { day: "Mon 02", tasks: ["Raw Material Processing", "Quality Check", "Inventory Update"] },
+    { day: "Tue 03", tasks: ["Batch Processing", "Machine Operation", "Packaging", "Dispatch Preparation"] },
+    { day: "Wed 04", tasks: ["Maintenance Check"] },
+    { day: "Thu 05", tasks: ["Order Fulfillment", "Final Quality Inspection"] },
+    { day: "Fri 06", tasks: ["Weekly Report Generation", "Equipment Cleaning"] },
     { day: "Sat 07", tasks: [] },
   ];
 
@@ -526,7 +555,7 @@ const Dashboard: React.FC = () => {
               </SimpleGrid>
 
               {/* Charts Section */}
-              <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={8} mb={8}>
+              <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6} mb={8}>
                 {/* Production Plan Schedule */}
                 <Box
                   bg="white"
@@ -540,46 +569,117 @@ const Dashboard: React.FC = () => {
                     Production Plan - December 2024
                   </Text>
                   <Box>
-                    <SimpleGrid columns={7} spacing={2} mb={4}>
+                    <SimpleGrid columns={7} spacing={2} mb={6}>
                       {productionPlanData.map((day, index) => (
-                        <Box key={index} textAlign="center">
-                          <Text fontSize="xs" color="gray.600" mb={2}>
+                        <Box
+                          key={index}
+                          textAlign="center"
+                          cursor="pointer"
+                          onClick={() => handleProductionDayClick(day)}
+                          _hover={{
+                            bg: "gray.50",
+                            transform: "translateY(-2px)",
+                            shadow: "md",
+                          }}
+                          transition="all 0.2s"
+                          p={2}
+                          rounded="md"
+                          bg={
+                            selectedProductionDay.day === day.day
+                              ? "blue.50"
+                              : "white"
+                          }
+                          border="2px"
+                          borderColor={
+                            selectedProductionDay.day === day.day
+                              ? "blue.300"
+                              : "transparent"
+                          }
+                        >
+                          <Text fontSize="xs" color="gray.600" mb={1}>
                             {day.day.split(" ")[0]}
                           </Text>
                           <Text fontSize="xs" fontWeight="bold" mb={2}>
                             {day.day.split(" ")[1]}
                           </Text>
-                          <Box minH="120px" position="relative">
-                            {day.tasks.map((task, taskIndex) => (
-                              <Box
-                                key={taskIndex}
-                                bg={
-                                  taskIndex === 0
-                                    ? "purple.100"
-                                    : taskIndex === 1
-                                    ? "blue.100"
-                                    : "green.100"
-                                }
-                                color={
-                                  taskIndex === 0
-                                    ? "purple.700"
-                                    : taskIndex === 1
-                                    ? "blue.700"
-                                    : "green.700"
-                                }
-                                p={1}
-                                rounded="md"
-                                fontSize="xs"
-                                mb={1}
-                                textAlign="center"
-                              >
-                                {task}
-                              </Box>
-                            ))}
-                          </Box>
+                          <Box
+                            w={2}
+                            h={2}
+                            rounded="full"
+                            mx="auto"
+                            bg={day.tasks.length > 0 ? "green.400" : "gray.300"}
+                          />
                         </Box>
                       ))}
                     </SimpleGrid>
+
+                    {/* Task Display Section */}
+                    <Box
+                      bg="gray.50"
+                      p={4}
+                      rounded="lg"
+                      border="1px"
+                      borderColor="gray.200"
+                    >
+                      <HStack spacing={3} mb={3}>
+                        <Text fontSize="sm" fontWeight="bold" color="gray.700">
+                          {selectedProductionDay.day}
+                        </Text>
+                        <Box
+                          px={2}
+                          py={1}
+                          bg={
+                            selectedProductionDay.tasks.length > 0
+                              ? "green.100"
+                              : "gray.100"
+                          }
+                          color={
+                            selectedProductionDay.tasks.length > 0
+                              ? "green.700"
+                              : "gray.600"
+                          }
+                          rounded="full"
+                          fontSize="xs"
+                          fontWeight="medium"
+                        >
+                          {selectedProductionDay.tasks.length} task
+                          {selectedProductionDay.tasks.length !== 1 ? "s" : ""}
+                        </Box>
+                      </HStack>
+
+                      {selectedProductionDay.tasks.length > 0 ? (
+                        <VStack align="start" spacing={2}>
+                          {selectedProductionDay.tasks.map((task, index) => (
+                            <HStack key={index} spacing={3} w="100%">
+                              <Box
+                                w={3}
+                                h={3}
+                                rounded="full"
+                                bg={
+                                  index % 3 === 0
+                                    ? "purple.400"
+                                    : index % 3 === 1
+                                    ? "blue.400"
+                                    : "green.400"
+                                }
+                                flexShrink={0}
+                              />
+                              <Text
+                                fontSize="sm"
+                                color="gray.700"
+                                fontWeight="medium"
+                              >
+                                {task}
+                              </Text>
+                            </HStack>
+                          ))}
+                        </VStack>
+                      ) : (
+                        <Text fontSize="sm" color="gray.500" fontStyle="italic">
+                          No tasks scheduled for this day
+                        </Text>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
 
@@ -597,29 +697,29 @@ const Dashboard: React.FC = () => {
                   </Text>
                   <Box height="250px">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={actualVsTargetData}>
+                      <LineChart data={actualVsTargetData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="time" />
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Area
+                        <Line
                           type="monotone"
                           dataKey="target"
-                          stackId="1"
-                          stroke="#8884d8"
-                          fill="#8884d8"
-                          fillOpacity={0.3}
+                          stroke="#ff7c7c"
+                          strokeWidth={3}
+                          dot={{ fill: "#ff7c7c", strokeWidth: 2, r: 4 }}
+                          activeDot={{ r: 6 }}
                         />
-                        <Area
+                        <Line
                           type="monotone"
                           dataKey="actual"
-                          stackId="1"
-                          stroke="#82ca9d"
-                          fill="#82ca9d"
-                          fillOpacity={0.3}
+                          stroke="#8dd1e1"
+                          strokeWidth={3}
+                          dot={{ fill: "#8dd1e1", strokeWidth: 2, r: 4 }}
+                          activeDot={{ r: 6 }}
                         />
-                      </AreaChart>
+                      </LineChart>
                     </ResponsiveContainer>
                   </Box>
                 </Box>
@@ -636,28 +736,47 @@ const Dashboard: React.FC = () => {
                   <Text fontSize="lg" fontWeight="bold" mb={4} color="gray.800">
                     Inspection Values
                   </Text>
-                  <Box height="250px">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={inspectionData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis
-                          dataKey="name"
-                          angle={-45}
-                          textAnchor="end"
-                          height={80}
-                        />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="target" fill="#3182ce" name="Target" />
-                        <Bar
-                          dataKey="inspection"
-                          fill="#38a169"
-                          name="Inspection"
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </Box>
+                  <Flex align="center" justify="space-between">
+                    <Box height="230px" width="260px">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={inspectionValuesData}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                            label={({ value }) => `${value}%`}
+                          >
+                            {inspectionValuesData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </Box>
+                    <VStack align="start" spacing={3} ml={6}>
+                      {inspectionValuesData.map((item, index) => (
+                        <HStack key={index} spacing={3}>
+                          <Box w={3} h={3} bg={item.color} rounded="full" />
+                          <VStack align="start" spacing={0}>
+                            <Text
+                              fontSize="sm"
+                              fontWeight="bold"
+                              color="gray.800"
+                            >
+                              {item.name}
+                            </Text>
+                            <Text fontSize="xs" color="gray.600">
+                              {item.value}%
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      ))}
+                    </VStack>
+                  </Flex>
                 </Box>
 
                 {/* Status History Pie Chart */}
@@ -673,7 +792,7 @@ const Dashboard: React.FC = () => {
                     Status History
                   </Text>
                   <Flex align="center" justify="space-between">
-                    <Box height="200px" width="200px">
+                    <Box height="230px" width="260px">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
@@ -1143,6 +1262,88 @@ const Dashboard: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Production Plan Details Modal */}
+      <Modal isOpen={isOpen} onClose={onClose} size="lg">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Production Plan - {selectedDay?.day}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {selectedDay?.tasks && selectedDay.tasks.length > 0 ? (
+              <VStack align="start" spacing={3}>
+                <Text fontWeight="bold" color="gray.700">
+                  Scheduled Processes:
+                </Text>
+                {selectedDay.tasks.map((task, index) => (
+                  <Box
+                    key={index}
+                    w="100%"
+                    p={3}
+                    bg={
+                      index % 3 === 0
+                        ? "purple.50"
+                        : index % 3 === 1
+                        ? "blue.50"
+                        : "green.50"
+                    }
+                    border="1px"
+                    borderColor={
+                      index % 3 === 0
+                        ? "purple.200"
+                        : index % 3 === 1
+                        ? "blue.200"
+                        : "green.200"
+                    }
+                    rounded="lg"
+                  >
+                    <HStack spacing={3}>
+                      <Box
+                        w={4}
+                        h={4}
+                        rounded="full"
+                        bg={
+                          index % 3 === 0
+                            ? "purple.400"
+                            : index % 3 === 1
+                            ? "blue.400"
+                            : "green.400"
+                        }
+                      />
+                      <Text
+                        fontWeight="medium"
+                        color={
+                          index % 3 === 0
+                            ? "purple.700"
+                            : index % 3 === 1
+                            ? "blue.700"
+                            : "green.700"
+                        }
+                      >
+                        {task}
+                      </Text>
+                    </HStack>
+                  </Box>
+                ))}
+              </VStack>
+            ) : (
+              <Box textAlign="center" py={8}>
+                <Text color="gray.500" fontSize="lg">
+                  No processes scheduled for this day
+                </Text>
+                <Text color="gray.400" fontSize="sm" mt={2}>
+                  This is a free day with no production activities
+                </Text>
+              </Box>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

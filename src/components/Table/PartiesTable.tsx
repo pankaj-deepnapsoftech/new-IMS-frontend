@@ -457,34 +457,34 @@ const PartiesTable = ({
                   >
                     {party.createdAt
                       ? new Date(party.createdAt).toLocaleDateString()
-                      : "—"}
+                      : "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
                     style={{ color: colors.text.primary }}
                     title={party.consignee_name}
                   >
-                    {party.consignee_name || "—"}
+                    {party.consignee_name || "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
                     style={{ color: colors.text.secondary }}
                     title={party.company_name}
                   >
-                    {party.company_name || "—"}
+                    {party.company_name || "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
                     style={{ color: colors.text.secondary }}
                     title={party.email_id}
                   >
-                    {party.email_id || "—"}
+                    {party.email_id || "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                   >
-                    {party.contact_number || "—"}
+                    {party.contact_number || "N/A"}
                   </td>
                   <td className="px-4 py-3 text-sm whitespace-nowrap">
                     <span
@@ -504,7 +504,7 @@ const PartiesTable = ({
                             : colors.gray[700],
                       }}
                     >
-                      {party.type || "—"}
+                      {party.type || "N/A"}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm whitespace-nowrap">
@@ -515,42 +515,42 @@ const PartiesTable = ({
                         color: colors.secondary[700],
                       }}
                     >
-                      {party.parties_type || "—"}
+                      {party.parties_type || "N/A"}
                     </span>
                   </td>
                   <td
                     className="px-4 py-3 text-sm font-mono whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                   >
-                    {party.gst_in || "—"}
+                    {party.gst_in || "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                     title={party.gst_add}
                   >
-                    {party.gst_add || "—"}
+                    {party.gst_add || "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                     title={party.delivery_address}
                   >
-                    {party.delivery_address || "—"}
+                    {party.delivery_address || "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                     title={party.shipped_to}
                   >
-                    {party.shipped_to || "—"}
+                    {party.shipped_to || "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                     title={party.bill_to}
                   >
-                    {party.bill_to || "—"}
+                    {party.bill_to || "N/A"}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center justify-center gap-2">
