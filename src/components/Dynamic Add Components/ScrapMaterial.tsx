@@ -76,8 +76,11 @@ const ScrapMaterial: React.FC<ScrapMaterialProps> = ({
   useEffect(() => {
     let prods = [];
     prods = inputs?.map((material: any) => ({
-      value: material.item_id,
-      label: material.item_name,
+      value: material.item_id || material.item_name?.value || "",
+      label:
+        typeof material.item_name === "object"
+          ? material.item_name.label
+          : material.item_name,
     }));
     setSelectedProducts(prods);
   }, [inputs]);
