@@ -5,10 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import { useAddBomMutation } from "../../../redux/api/api";
 import { toast } from "react-toastify";
-import RawMaterial from "../../Dynamic Add Components/RawMaterial";
-import Process from "../../Dynamic Add Components/Process";
 import { useCookies } from "react-cookie";
-import ScrapMaterial from "../../Dynamic Add Components/ScrapMaterial";
 import { colors } from "../../../theme/colors";
 import {
   Package,
@@ -20,6 +17,7 @@ import {
   Upload,
   MessageSquare,
   Calculator,
+  Plus,
 } from "lucide-react";
 
 interface AddBomProps {
@@ -188,7 +186,7 @@ const AddBom: React.FC<AddBomProps> = ({
       toast.success(response?.message);
       fetchBomsHandler();
       closeDrawerHandler();
-      console.log(response)
+      console.log(response);
     } catch (error: any) {
       if (error?.data?.message?.includes("Insufficient stock")) {
         fetchBomsHandler();
@@ -314,335 +312,614 @@ const AddBom: React.FC<AddBomProps> = ({
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
 
       {/* Drawer */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full  bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
+      <div className="fixed inset-y-0 right-0 z-50 w-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="px-6 py-4 flex items-center justify-between border-b">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/20 border rounded-lg">
-                <Package className="h-5 w-5 text-black  " />
-              </div>
-              <h2 className="text-xl font-semibold text-black">Add New BOM</h2>
-            </div>
+          <div className="px-6 py-4 text-black flex border items-center justify-between">
+            <h2 className="text-xl font-semibold">Add New BOM</h2>
             <button
               onClick={closeDrawerHandler}
-              className="p-2 hover:bg-white/20 border rounded-lg transition-colors duration-200"
+              className="p-1 border rounded transition-colors duration-200"
             >
-              <BiX size={24} className="text-black" />
+              <BiX size={24} />
             </button>
           </div>
 
           {/* Form Content */}
-          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-            <form onSubmit={addBomHandler} className="space-y-6">
-              {/* Raw Materials Section */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-blue-600" />
-                  Raw Materials
-                </h3>
-                <RawMaterial
-                  products={products}
-                  productOptions={productOptions}
-                  inputs={rawMaterials}
-                  setInputs={setRawMaterials}
-                />
-              </div>
-
-              {/* Process Section */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-blue-600" />
-                  Process
-                </h3>
-                <Process inputs={processes} setInputs={setProcesses} />
-              </div>
-
+          <div className="flex-1 overflow-y-auto bg-gray-50">
+            <form onSubmit={addBomHandler}>
               {/* Finished Good Section */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                  <Package className="h-5 w-5 text-blue-600" />
-                  Finished Good
-                </h3>
+              <div className="bg-white border-b">
+                <div className="px-6 py-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Finished Good 
+                  </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Finished Good Selection */}
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <Package className="h-4 w-4 text-gray-500" />
-                      Finished Good *
-                    </label>
-                    <Select
-                      styles={customStyles}
-                      className="text-sm"
-                      options={productOptions}
-                      placeholder="Select Finished Good"
-                      value={finishedGood}
-                      name="assembly_phase"
-                      onChange={onFinishedGoodChangeHandler}
-                      required
-                    />
+                  {/* Table Header for Finished Good */}
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold uppercase tracking-wider">
+                    <div className="grid grid-cols-7 gap-1 px-3 py-2">
+                      <div>FINISHED GOODS</div>
+                      <div>QUANTITY</div>
+                      <div>UOM</div>
+                      <div>CATEGORY</div>
+                      <div>COMMENTS</div>
+                      <div>UNIT COST</div>
+                      <div>COST</div>
+                    </div>
                   </div>
 
-                  {/* Description */}
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <FileText className="h-4 w-4 text-gray-500" />
-                      Description
-                    </label>
-                    <input
-                      type="text"
-                      value={description || ""}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Enter description"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                    />
-                  </div>
-
-                  {/* Quantity */}
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <Hash className="h-4 w-4 text-gray-500" />
-                      Quantity *
-                    </label>
-                    <input
-                      type="number"
-                      value={quantity || ""}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        onFinishedGoodQntyChangeHandler(+e.target.value)
-                      }
-                      placeholder="Enter quantity"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                      required
-                    />
-                  </div>
-
-                  {/* UOM */}
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <Calculator className="h-4 w-4 text-gray-500" />
-                      Unit of Measurement
-                    </label>
-                    <input
-                      type="text"
-                      value={uom || ""}
-                      readOnly
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-                    />
-                  </div>
-
-                  {/* Category */}
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <Layers className="h-4 w-4 text-gray-500" />
-                      Category
-                    </label>
-                    <input
-                      type="text"
-                      value={category || ""}
-                      readOnly
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-                    />
-                  </div>
-
-                  {/* Supporting Doc */}
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <Upload className="h-4 w-4 text-gray-500" />
-                      Supporting Document
-                    </label>
-                    <input
-                      ref={supportingDoc}
-                      type="file"
-                      accept=".pdf"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    />
-                  </div>
-
-                  {/* Comments */}
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <MessageSquare className="h-4 w-4 text-gray-500" />
-                      Comments
-                    </label>
-                    <input
-                      type="text"
-                      value={comments || ""}
-                      onChange={(e) => setComments(e.target.value)}
-                      placeholder="Enter comments"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                    />
-                  </div>
-
-                  {/* Unit Cost */}
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <DollarSign className="h-4 w-4 text-gray-500" />
-                      Unit Cost
-                    </label>
-                    <input
-                      type="number"
-                      value={unitCost || ""}
-                      readOnly
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-                    />
-                  </div>
-
-                  {/* Total Cost */}
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <DollarSign className="h-4 w-4 text-gray-500" />
-                      Total Cost
-                    </label>
-                    <input
-                      type="number"
-                      value={cost || ""}
-                      readOnly
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-                    />
+                  {/* Finished Good Row */}
+                  <div className="border border-t-0 border-gray-300">
+                    <div className="grid grid-cols-7 gap-1 px-3 py-2 items-center bg-white">
+                      <div>
+                        <Select
+                          styles={customStyles}
+                          className="text-sm"
+                          options={productOptions}
+                          placeholder="Select"
+                          value={finishedGood}
+                          onChange={onFinishedGoodChangeHandler}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="number"
+                          value={quantity || ""}
+                          onChange={(e) =>
+                            onFinishedGoodQntyChangeHandler(+e.target.value)
+                          }
+                          placeholder="Quantity"
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          value={uom || ""}
+                          readOnly
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          value={category || ""}
+                          readOnly
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          value={comments || ""}
+                          onChange={(e) => setComments(e.target.value)}
+                          placeholder="Comments"
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="number"
+                          value={unitCost || ""}
+                          readOnly
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="number"
+                          value={cost || ""}
+                          readOnly
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+              {/* Raw Materials Section */}
+              <div className="bg-white border-b">
+                <div className="px-6 py-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Raw Materials 
+                    </h3>
+                    <button
+                      type="button"
+                      className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white  text-sm rounded transition-colors"
+                      onClick={() => {
+                        setRawMaterials([
+                          ...rawMaterials,
+                          {
+                            item_name: "",
+                            description: "",
+                            quantity: "",
+                            uom: "",
+                            category: "",
+                            assembly_phase: "",
+                            supplier: "",
+                            supporting_doc: "",
+                            comments: "",
+                            unit_cost: "",
+                            total_part_cost: "",
+                          },
+                        ]);
+                      }}
+                    >
+                      <Plus /> Add
+                    </button>
+                  </div>
 
-              {/* Scrap Material Section */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Package className="h-5 w-5 text-red-600" />
-                  Scrap Materials
-                </h3>
-                <ScrapMaterial
-                  products={products}
-                  productOptions={productOptions}
-                  inputs={scrapMaterials}
-                  setInputs={setScrapMaterials}
-                />
+                  {/* Table Header for Raw Materials */}
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white  text-sm font-semibold uppercase tracking-wider">
+                    <div className="grid grid-cols-8 gap-1 px-3 py-2">
+                      <div>PRODUCT NAME</div>
+                      <div>QUANTITY</div>
+                      <div>UOM</div>
+                      <div>CATEGORY</div>
+                      <div>COMMENTS</div>
+                      <div>UNIT COST</div>
+                      <div>TOTAL PART COST</div>
+                      <div>ACTION</div>
+                    </div>
+                  </div>
+
+                  {/* Raw Materials Rows */}
+                  <div className="border border-t-0 border-gray-300">
+                    {rawMaterials.map((material, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-8 gap-1 px-3 py-2 items-center bg-white border-b border-gray-200 last:border-b-0"
+                      >
+                        {/* Product Name */}
+                        <div>
+                          <Select
+                            styles={customStyles}
+                            className="text-sm"
+                            options={productOptions}
+                            placeholder="Select"
+                            value={material.item_name}
+                            onChange={(d) => {
+                              const newMaterials = [...rawMaterials];
+                              newMaterials[index].item_name = d;
+                              const product = products.find(
+                                (p) => p._id === d?.value
+                              );
+                              if (product) {
+                                newMaterials[index].unit_cost = product.price;
+                                newMaterials[index].uom = product.uom;
+                                newMaterials[index].category = product.category;
+                                if (material.quantity) {
+                                  newMaterials[index].total_part_cost =
+                                    product.price * +material.quantity;
+                                }
+                              }
+                              setRawMaterials(newMaterials);
+                            }}
+                          />
+                        </div>
+
+                        {/* Quantity */}
+                        <div>
+                          <input
+                            type="number"
+                            value={material.quantity || ""}
+                            onChange={(e) => {
+                              const newMaterials = [...rawMaterials];
+                              newMaterials[index].quantity = e.target.value;
+                              if (material.unit_cost && e.target.value) {
+                                newMaterials[index].total_part_cost =
+                                  +material.unit_cost * +e.target.value;
+                              }
+                              setRawMaterials(newMaterials);
+                            }}
+                            placeholder="0"
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
+
+                        {/* UOM */}
+                        <div>
+                          <input
+                            type="text"
+                            value={material.uom || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Category */}
+                        <div>
+                          <input
+                            type="text"
+                            value={material.category || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Comments */}
+                        <div>
+                          <input
+                            type="text"
+                            value={material.comments || ""}
+                            onChange={(e) => {
+                              const newMaterials = [...rawMaterials];
+                              newMaterials[index].comments = e.target.value;
+                              setRawMaterials(newMaterials);
+                            }}
+                            placeholder="Comments"
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
+
+                        {/* Unit Cost */}
+                        <div>
+                          <input
+                            type="number"
+                            value={material.unit_cost || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Total Part Cost */}
+                        <div>
+                          <input
+                            type="number"
+                            value={material.total_part_cost || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Action - Remove Button */}
+                        <div className="flex justify-center">
+                          {rawMaterials.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newMaterials = rawMaterials.filter(
+                                  (_, i) => i !== index
+                                );
+                                setRawMaterials(newMaterials);
+                              }}
+                              className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>{" "}
+              {/* Process Section */}
+              <div className="bg-white border-b">
+                <div className="px-6 py-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Processes
+                    </h3>
+                    <button
+                      type="button"
+                      className="px-3 py-1 bg-gradient-to-r flex justify-center items-center gap-2 from-blue-600 to-blue-700 text-white  text-sm rounded transition-colors"
+                      onClick={() => setProcesses([...processes, ""])}
+                    >
+                      <Plus /> Add
+                    </button>
+                  </div>
+
+                  {processes.map((process, index) => (
+                    <div key={index} className="mb-4 flex items-end gap-3">
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Process {index + 1} 
+                        </label>
+                        <input
+                          type="text"
+                          value={process}
+                          onChange={(e) => {
+                            const newProcesses = [...processes];
+                            newProcesses[index] = e.target.value;
+                            setProcesses(newProcesses);
+                          }}
+                          placeholder={`Enter Process ${index + 1}`}
+                          className="w-full px-3 py-2 border border-gray-300 rounded"
+                        />
+                      </div>
+                      {processes.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newProcesses = processes.filter(
+                              (_, i) => i !== index
+                            );
+                            setProcesses(newProcesses);
+                          }}
+                          className="px-3 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors mb-0"
+                        >
+                          ✕ Remove
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-
-              {/* Other Charges Section */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-green-600" />
-                  Other Charges
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <DollarSign className="h-4 w-4 text-gray-500" />
-                      Labour Charges
-                    </label>
-                    <input
-                      type="number"
-                      value={labourCharges || ""}
-                      onChange={(e) => setLabourCharges(+e.target.value)}
-                      placeholder="Enter labour charges"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                    />
+              {/* Scrap Materials Section */}
+              <div className="bg-white border-b">
+                <div className="px-6 py-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Scrap Materials 
+                    </h3>
+                    <button
+                      type="button"
+                      className="px-3 py-1 bg-gradient-to-r flex justify-center items-center gap-2 from-blue-600 to-blue-700 text-white  text-sm rounded transition-colors"
+                      onClick={() => {
+                        setScrapMaterials([
+                          ...scrapMaterials,
+                          {
+                            item_name: "",
+                            description: "",
+                            quantity: "",
+                            uom: "",
+                            unit_cost: "",
+                            total_part_cost: "",
+                          },
+                        ]);
+                      }}
+                    >
+                      <Plus /> Add
+                    </button>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <Settings className="h-4 w-4 text-gray-500" />
-                      Machinery Charges
-                    </label>
-                    <input
-                      type="number"
-                      value={machineryCharges || ""}
-                      onChange={(e) => setMachineryCharges(+e.target.value)}
-                      placeholder="Enter machinery charges"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                    />
+                  {/* Table Header for Scrap Materials */}
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white  text-sm font-semibold uppercase tracking-wider">
+                    <div className="grid grid-cols-7 gap-1 px-3 py-2">
+                      <div>PRODUCT NAME</div>
+                      <div>COMMENT</div>
+                      <div>ESTIMATED QUANTITY</div>
+                      <div>UOM</div>
+                      <div>UNIT COST</div>
+                      <div>TOTAL PART COST</div>
+                      <div>ACTION</div>
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <DollarSign className="h-4 w-4 text-gray-500" />
-                      Electricity Charges
-                    </label>
-                    <input
-                      type="number"
-                      value={electricityCharges || ""}
-                      onChange={(e) => setElectricityCharges(+e.target.value)}
-                      placeholder="Enter electricity charges"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                    />
-                  </div>
+                  {/* Scrap Materials Rows */}
+                  <div className="border border-t-0 border-gray-300">
+                    {scrapMaterials.map((material, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-7 gap-1 px-3 py-2 items-center bg-white border-b border-gray-200 last:border-b-0"
+                      >
+                        {/* Product Name */}
+                        <div>
+                          <Select
+                            styles={customStyles}
+                            className="text-sm"
+                            options={productOptions}
+                            placeholder="Select"
+                            value={material.item_name}
+                            onChange={(d) => {
+                              const newMaterials = [...scrapMaterials];
+                              newMaterials[index].item_name = d;
+                              const product = products.find(
+                                (p) => p._id === d?.value
+                              );
+                              if (product) {
+                                newMaterials[index].unit_cost = product.price;
+                                newMaterials[index].uom = product.uom;
+                                if (material.quantity) {
+                                  newMaterials[index].total_part_cost =
+                                    product.price * +material.quantity;
+                                }
+                              }
+                              setScrapMaterials(newMaterials);
+                            }}
+                          />
+                        </div>
 
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <DollarSign className="h-4 w-4 text-gray-500" />
-                      Other Charges
-                    </label>
-                    <input
-                      type="number"
-                      value={otherCharges || ""}
-                      onChange={(e) => setOtherCharges(+e.target.value)}
-                      placeholder="Enter other charges"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                    />
+                        {/* Comment */}
+                        <div>
+                          <input
+                            type="text"
+                            value={material.description || ""}
+                            onChange={(e) => {
+                              const newMaterials = [...scrapMaterials];
+                              newMaterials[index].description = e.target.value;
+                              setScrapMaterials(newMaterials);
+                            }}
+                            placeholder="Comment"
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
+
+                        {/* Estimated Quantity */}
+                        <div>
+                          <input
+                            type="number"
+                            value={material.quantity || ""}
+                            onChange={(e) => {
+                              const newMaterials = [...scrapMaterials];
+                              newMaterials[index].quantity = e.target.value;
+                              if (material.unit_cost && e.target.value) {
+                                newMaterials[index].total_part_cost =
+                                  +material.unit_cost * +e.target.value;
+                              }
+                              setScrapMaterials(newMaterials);
+                            }}
+                            placeholder="0"
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
+
+                        {/* UOM */}
+                        <div>
+                          <input
+                            type="text"
+                            value={material.uom || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Unit Cost */}
+                        <div>
+                          <input
+                            type="number"
+                            value={material.unit_cost || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Total Part Cost */}
+                        <div>
+                          <input
+                            type="number"
+                            value={material.total_part_cost || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Action - Remove Button */}
+                        <div className="flex justify-center">
+                          {scrapMaterials.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newMaterials = scrapMaterials.filter(
+                                  (_, i) => i !== index
+                                );
+                                setScrapMaterials(newMaterials);
+                              }}
+                              className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
+              {/* Charges Section */}
+              <div className="bg-white border-b">
+                <div className="px-6 py-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Charges
+                  </h3>
 
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Labour Charges
+                      </label>
+                      <input
+                        type="number"
+                        value={labourCharges || ""}
+                        onChange={(e) => setLabourCharges(+e.target.value)}
+                        placeholder="Labour Charges"
+                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Machinery Charges
+                      </label>
+                      <input
+                        type="number"
+                        value={machineryCharges || ""}
+                        onChange={(e) => setMachineryCharges(+e.target.value)}
+                        placeholder="Machinery Charges"
+                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Electricity Charges
+                      </label>
+                      <input
+                        type="number"
+                        value={electricityCharges || ""}
+                        onChange={(e) => setElectricityCharges(+e.target.value)}
+                        placeholder="Electricity Charges"
+                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Other Charges
+                      </label>
+                      <input
+                        type="number"
+                        value={otherCharges || ""}
+                        onChange={(e) => setOtherCharges(+e.target.value)}
+                        placeholder="Other Charges"
+                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
               {/* BOM Summary Section */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                  <Calculator className="h-5 w-5 text-purple-600" />
-                  BOM Summary
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <FileText className="h-4 w-4 text-gray-500" />
-                      BOM Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={bomName || ""}
-                      onChange={(e) => setBomName(e.target.value)}
-                      placeholder="Enter BOM name"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                      required
-                    />
+              <div className="bg-white">
+                <div className="px-6 py-4">
+                  <div className="grid grid-cols-3 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        BOM Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={bomName || ""}
+                        onChange={(e) => setBomName(e.target.value)}
+                        placeholder="Enter BOM Name"
+                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Parts Count *
+                      </label>
+                      <input
+                        type="number"
+                        value={partsCount}
+                        readOnly
+                        className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Total Parts Cost *
+                      </label>
+                      <input
+                        type="number"
+                        value={totalPartsCost}
+                        readOnly
+                        className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                      />
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <Hash className="h-4 w-4 text-gray-500" />
-                      Parts Count
-                    </label>
-                    <input
-                      type="number"
-                      value={partsCount}
-                      readOnly
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-                    />
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <DollarSign className="h-4 w-4 text-gray-500" />
-                      Total Parts Cost
-                    </label>
-                    <input
-                      type="number"
-                      value={totalPartsCost}
-                      readOnly
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-                    />
+                  {/* Submit Button */}
+                  <div className="mt-6">
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white  rounded transition-colors duration-200"
+                    >
+                      Submit
+                    </button>
                   </div>
                 </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="bg-white border-t p-6 -mx-6 -mb-6">
-                <button
-                  type="submit"
-                  className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                  Create BOM
-                </button>
               </div>
             </form>
           </div>
