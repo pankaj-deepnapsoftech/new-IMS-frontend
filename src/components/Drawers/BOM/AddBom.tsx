@@ -188,6 +188,7 @@ const AddBom: React.FC<AddBomProps> = ({
       toast.success(response?.message);
       fetchBomsHandler();
       closeDrawerHandler();
+      console.log(response)
     } catch (error: any) {
       if (error?.data?.message?.includes("Insufficient stock")) {
         fetchBomsHandler();
@@ -313,7 +314,7 @@ const AddBom: React.FC<AddBomProps> = ({
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
 
       {/* Drawer */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
+      <div className="fixed inset-y-0 right-0 z-50 w-full  bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
         <div className="h-full flex flex-col">
           {/* Header */}
           <div className="px-6 py-4 flex items-center justify-between border-b">

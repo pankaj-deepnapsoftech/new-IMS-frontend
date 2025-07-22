@@ -43,7 +43,7 @@ const Layout: React.FC = () => {
       loginWithTokenHandler(cookies?.access_token);
     }
   }, []);
-
+     
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex h-screen">

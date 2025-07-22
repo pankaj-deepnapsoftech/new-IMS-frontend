@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import Login from "./pages/Login";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Register from "./pages/Register";
+// import Register from "./pages/Register";
 import Layout from "./pages/Layout";
 import routes from "./routes/routes";
 import { useSelector } from "react-redux";
@@ -20,7 +20,7 @@ const App: React.FC = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            {/* <Route path="/register" element={<Register />} /> */}
             <Route path="/" element={<Layout />}>
               {routes.map((route, ind) => {
                 const isAllowed =

@@ -38,7 +38,7 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
         email: email,
         otp: otp,
       }).unwrap();
-      toast.success(data.message);
+      toast.success(data?.message);
       navigate("/login");
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
@@ -127,8 +127,8 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
                 type="text"
                 placeholder="000000"
-                maxLength={6}
-                pattern="[0-9]{6}"
+                maxLength={4}
+                pattern="[0-9]{4}"
               />
             </div>
           </div>

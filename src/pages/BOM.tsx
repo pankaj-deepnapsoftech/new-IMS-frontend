@@ -80,6 +80,7 @@ const BOM: React.FC = () => {
       }
       setBoms(data.boms);
       setFilteredBoms(data.boms);
+      console.log(data)
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
