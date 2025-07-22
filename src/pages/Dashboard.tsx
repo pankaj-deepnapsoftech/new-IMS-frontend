@@ -328,6 +328,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     fetchProductionPlan()
   }, [])
+  
   const getBackendWeekData = () => {
     const today = new Date();
     const startOfWeek = new Date(today);
