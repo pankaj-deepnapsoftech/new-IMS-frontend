@@ -46,9 +46,12 @@ const SalesTable = ({
     }
   };
 
-  const handleUpdatedDesign = (purchase) => {
-    // Handle updated design logic
-    console.log("Updated design for:", purchase);
+  const handleUpdatedDesign = (designFile) => {
+    if (designFile) {
+      window.open(designFile, "_blank");
+    } else {
+      alert("Design file not available.");
+    }
   };
 
   if (isLoading) {
@@ -283,7 +286,7 @@ const SalesTable = ({
                 color: colors.secondary[700],
                 backgroundColor: colors.background.card,
               }}
-              onClick={() => handleUpdatedDesign(purchase)}
+              onClick={() => handleUpdatedDesign(purchase?.designFile)}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = colors.secondary[50];
               }}
