@@ -307,7 +307,15 @@ const Dashboard: React.FC = () => {
   const [backendProductionPlan, setBackendProductionPlan] = useState<any>({});
   const fetchProductionPlan = async () => {
     try {
-      const res = await fetch("http://localhost:8085/api/bom/weekly");
+      const res = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "bom/weekly",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
       const data = await res.json();
       if (data.success) {
         setBackendProductionPlan(data.weekMap);
@@ -317,7 +325,10 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  fetchProductionPlan();
+  useEffect(() => {
+    fetchProductionPlan();
+  }, []);
+
   const getBackendWeekData = () => {
     const today = new Date();
     const startOfWeek = new Date(today);
@@ -333,8 +344,6 @@ const Dashboard: React.FC = () => {
       isToday: boolean;
     }[] = [];
 
-    
- 
     const dayNamesMap: Record<string, number> = {
       Sunday: 0,
       Monday: 1,
