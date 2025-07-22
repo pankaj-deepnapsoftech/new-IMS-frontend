@@ -79,23 +79,18 @@ const BomDetails: React.FC<BomDetailsProps> = ({
       <div className="fixed inset-y-0 right-0 z-50 w-full  bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="px-6 py-4 flex items-center justify-between border-b">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg border">
-                <Eye className="h-5 w-5 text-black" />
-              </div>
-              <h2 className="text-xl font-semibold text-black">BOM Details</h2>
-            </div>
+          <div className="px-6 py-4 text-black flex border items-center justify-between">
+            <h2 className="text-xl font-semibold">BOM Details</h2>
             <button
               onClick={closeDrawerHandler}
-              className="p-2 hover:bg-white/20 border rounded-lg transition-colors duration-200"
+              className="p-1 border rounded transition-colors duration-200"
             >
-              <BiX size={24} className="text-black" />
+              <BiX size={24} />
             </button>
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+          <div className="flex-1 overflow-y-auto bg-gray-50">
             {isLoadingBom && (
               <div className="flex items-center justify-center h-64">
                 <Loading />
@@ -103,338 +98,393 @@ const BomDetails: React.FC<BomDetailsProps> = ({
             )}
 
             {!isLoadingBom && (
-              <div className="space-y-6">
-                {/* BOM Summary */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                    <Package className="h-5 w-5 text-blue-600" />
-                    BOM Summary
-                  </h3>
+              <div>
+                {/* Finished Good Section */}
+                {finishedGood && (
+                  <div className="bg-white border-b">
+                    <div className="px-6 py-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        Finished Good
+                      </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-blue-50 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FileText className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium text-gray-700">
+                      {/* Table Header for Finished Good */}
+                      <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
+                        <div className="grid grid-cols-7 gap-1 px-3 py-2">
+                          <div>FINISHED GOODS</div>
+                          <div>QUANTITY</div>
+                          <div>UOM</div>
+                          <div>CATEGORY</div>
+                          <div>COMMENTS</div>
+                          <div>UNIT COST</div>
+                          <div>COST</div>
+                        </div>
+                      </div>
+
+                      {/* Finished Good Row */}
+                      <div className="border border-t-0 border-gray-300">
+                        <div className="grid grid-cols-7 gap-1 px-3 py-2 items-center bg-white">
+                          <div>
+                            <input
+                              type="text"
+                              value={finishedGood?.item?.name || "N/A"}
+                              readOnly
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              value={finishedGood?.quantity || "N/A"}
+                              readOnly
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              value={finishedGood?.item?.uom || "N/A"}
+                              readOnly
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              value={
+                                finishedGood?.item?.category ||
+                                finishedGood?.category ||
+                                "N/A"
+                              }
+                              readOnly
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              value={finishedGood?.comments || "N/A"}
+                              readOnly
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              value={finishedGood?.item?.price || "N/A"}
+                              readOnly
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              value={finishedGood?.cost || "N/A"}
+                              readOnly
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Raw Materials Section */}
+                {rawMaterials && rawMaterials.length > 0 && (
+                  <div className="bg-white border-b">
+                    <div className="px-6 py-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        Raw Materials
+                      </h3>
+
+                      {/* Table Header for Raw Materials */}
+                      <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
+                        <div className="grid grid-cols-7 gap-1 px-3 py-2">
+                          <div>PRODUCT NAME</div>
+                          <div>QUANTITY</div>
+                          <div>UOM</div>
+                          <div>CATEGORY</div>
+                          <div>COMMENTS</div>
+                          <div>UNIT COST</div>
+                          <div>TOTAL PART COST</div>
+                        </div>
+                      </div>
+
+                      {/* Raw Materials Rows */}
+                      <div className="border border-t-0 border-gray-300">
+                        {rawMaterials.map((material, index) => (
+                          <div
+                            key={index}
+                            className="grid grid-cols-7 gap-1 px-3 py-2 items-center bg-white border-b border-gray-200 last:border-b-0"
+                          >
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.item?.name || "N/A"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.quantity || "N/A"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.item?.uom || "N/A"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.item?.category || "N/A"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.comments || "N/A"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.unit_cost || "0"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.total_part_cost || "0"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Process Section */}
+                {processes && processes.length > 0 && (
+                  <div className="bg-white border-b">
+                    <div className="px-6 py-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        Processes
+                      </h3>
+
+                      {processes.map((process: string, index: number) => (
+                        <div key={index} className="mb-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Process {index + 1}
+                          </label>
+                          <input
+                            type="text"
+                            value={process}
+                            readOnly
+                            className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Scrap Materials Section */}
+                {scrapMaterials && scrapMaterials.length > 0 && (
+                  <div className="bg-white border-b">
+                    <div className="px-6 py-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        Scrap Materials
+                      </h3>
+
+                      {/* Table Header for Scrap Materials */}
+                      <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
+                        <div className="grid grid-cols-6 gap-1 px-3 py-2">
+                          <div>PRODUCT NAME</div>
+                          <div>COMMENT</div>
+                          <div>ESTIMATED QUANTITY</div>
+                          <div>UOM</div>
+                          <div>UNIT COST</div>
+                          <div>TOTAL PART COST</div>
+                        </div>
+                      </div>
+
+                      {/* Scrap Materials Rows */}
+                      <div className="border border-t-0 border-gray-300">
+                        {scrapMaterials.map((material, index) => (
+                          <div
+                            key={index}
+                            className="grid grid-cols-6 gap-1 px-3 py-2 items-center bg-white border-b border-gray-200 last:border-b-0"
+                          >
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.item?.name || "N/A"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.description || "N/A"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.quantity || "N/A"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.item?.uom || "N/A"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.unit_cost || "0"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={material?.total_part_cost || "0"}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Charges Section */}
+                {otherCharges && (
+                  <div className="bg-white border-b">
+                    <div className="px-6 py-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        Charges
+                      </h3>
+
+                      <div className="grid grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Labour Charges
+                          </label>
+                          <input
+                            type="text"
+                            value={otherCharges?.labour_charges || "0"}
+                            readOnly
+                            className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Machinery Charges
+                          </label>
+                          <input
+                            type="text"
+                            value={otherCharges?.machinery_charges || "0"}
+                            readOnly
+                            className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Electricity Charges
+                          </label>
+                          <input
+                            type="text"
+                            value={otherCharges?.electricity_charges || "0"}
+                            readOnly
+                            className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Other Charges
+                          </label>
+                          <input
+                            type="text"
+                            value={otherCharges?.other_charges || "0"}
+                            readOnly
+                            className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* BOM Summary Section */}
+                <div className="bg-white">
+                  <div className="px-6 py-4">
+                    <div className="grid grid-cols-3 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           BOM Name
-                        </span>
+                        </label>
+                        <input
+                          type="text"
+                          value={bomName || "N/A"}
+                          readOnly
+                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                        />
                       </div>
-                      <p className="text-lg font-semibold text-gray-900">
-                        {bomName}
-                      </p>
-                    </div>
-
-                    <div className="bg-green-50 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Hash className="h-4 w-4 text-green-600" />
-                        <span className="text-sm font-medium text-gray-700">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           Parts Count
-                        </span>
+                        </label>
+                        <input
+                          type="text"
+                          value={partsCount || "0"}
+                          readOnly
+                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                        />
                       </div>
-                      <p className="text-lg font-semibold text-gray-900">
-                        {partsCount}
-                      </p>
-                    </div>
-
-                    <div className="bg-purple-50 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <DollarSign className="h-4 w-4 text-purple-600" />
-                        <span className="text-sm font-medium text-gray-700">
-                          Total Cost
-                        </span>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Total BOM Cost
+                        </label>
+                        <input
+                          type="text"
+                          value={totalBomCost || "0"}
+                          readOnly
+                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                        />
                       </div>
-                      <p className="text-lg font-semibold text-gray-900">
-                        ₹ {totalBomCost}/-
-                      </p>
                     </div>
                   </div>
                 </div>
-
-                {/* Raw Materials */}
-                {rawMaterials && rawMaterials.length > 0 && (
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                      <Layers className="h-5 w-5 text-orange-600" />
-                      Raw Materials
-                    </h3>
-
-                    <div className="space-y-4">
-                      {rawMaterials.map((material, index) => (
-                        <div
-                          key={index}
-                          className="bg-gray-50 rounded-lg p-4 border border-gray-200"
-                        >
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            <div>
-                              <span className="text-sm font-medium text-gray-600">
-                                Item ID:
-                              </span>
-                              <p className="text-gray-900">
-                                {material?.item?.product_id || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-sm font-medium text-gray-600">
-                                Item Name:
-                              </span>
-                              <p className="text-gray-900">
-                                {material?.item?.name || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-sm font-medium text-gray-600">
-                                Quantity:
-                              </span>
-                              <p className="text-gray-900">
-                                {material?.quantity || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-sm font-medium text-gray-600">
-                                UOM:
-                              </span>
-                              <p className="text-gray-900">
-                                {material?.item?.uom || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-sm font-medium text-gray-600">
-                                Unit Cost:
-                              </span>
-                              <p className="text-gray-900">
-                                ₹ {material?.unit_cost || 0}/-
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-sm font-medium text-gray-600">
-                                Total Cost:
-                              </span>
-                              <p className="text-gray-900 font-semibold">
-                                ₹ {material?.total_part_cost || 0}/-
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Processes */}
-                {processes && processes.length > 0 && (
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                      <Settings className="h-5 w-5 text-blue-600" />
-                      Processes
-                    </h3>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {processes.map((process: string, index: number) => (
-                        <div
-                          key={index}
-                          className="bg-blue-50 rounded-lg p-4 border border-blue-200"
-                        >
-                          <div className="flex items-center gap-2">
-                            <List className="h-4 w-4 text-blue-600" />
-                            <span className="font-medium text-gray-900">
-                              Process {index + 1}
-                            </span>
-                          </div>
-                          <p className="text-gray-700 mt-2">{process}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Finished Good */}
-                {finishedGood && (
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                      <Package className="h-5 w-5 text-green-600" />
-                      Finished Good
-                    </h3>
-
-                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <div>
-                          <span className="text-sm font-medium text-gray-600">
-                            Item ID:
-                          </span>
-                          <p className="text-gray-900">
-                            {finishedGood?.item?.product_id || "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-sm font-medium text-gray-600">
-                            Item Name:
-                          </span>
-                          <p className="text-gray-900">
-                            {finishedGood?.item?.name || "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-sm font-medium text-gray-600">
-                            Quantity:
-                          </span>
-                          <p className="text-gray-900">
-                            {finishedGood?.quantity || "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-sm font-medium text-gray-600">
-                            UOM:
-                          </span>
-                          <p className="text-gray-900">
-                            {finishedGood?.item?.uom || "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-sm font-medium text-gray-600">
-                            Category:
-                          </span>
-                          <p className="text-gray-900">
-                            {finishedGood?.item?.category ||
-                              finishedGood?.category ||
-                              "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-sm font-medium text-gray-600">
-                            Cost:
-                          </span>
-                          <p className="text-gray-900 font-semibold">
-                            ₹ {finishedGood?.cost || 0}/-
-                          </p>
-                        </div>
-                      </div>
-
-                      {finishedGood?.supporting_doc && (
-                        <div className="mt-4 pt-4 border-t border-green-200">
-                          <span className="text-sm font-medium text-gray-600">
-                            Supporting Document:
-                          </span>
-                          <a
-                            href={finishedGood.supporting_doc}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-2 inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors"
-                          >
-                            <Eye className="h-4 w-4" />
-                            View Document
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Scrap Materials */}
-                {scrapMaterials && scrapMaterials.length > 0 && (
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                      <Package className="h-5 w-5 text-red-600" />
-                      Scrap Materials
-                    </h3>
-
-                    <div className="space-y-4">
-                      {scrapMaterials.map((material, index) => (
-                        <div
-                          key={index}
-                          className="bg-red-50 rounded-lg p-4 border border-red-200"
-                        >
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            <div>
-                              <span className="text-sm font-medium text-gray-600">
-                                Item ID:
-                              </span>
-                              <p className="text-gray-900">
-                                {material?.item?.product_id || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-sm font-medium text-gray-600">
-                                Item Name:
-                              </span>
-                              <p className="text-gray-900">
-                                {material?.item?.name || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-sm font-medium text-gray-600">
-                                Quantity:
-                              </span>
-                              <p className="text-gray-900">
-                                {material?.quantity || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-sm font-medium text-gray-600">
-                                UOM:
-                              </span>
-                              <p className="text-gray-900">
-                                {material?.item?.uom || "N/A"}
-                              </p>
-                            </div>
-                            <div className="md:col-span-2">
-                              <span className="text-sm font-medium text-gray-600">
-                                Total Part Cost:
-                              </span>
-                              <p className="text-gray-900 font-semibold">
-                                ₹ {material?.total_part_cost || 0}/-
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Other Charges */}
-                {otherCharges && (
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                      <DollarSign className="h-5 w-5 text-purple-600" />
-                      Other Charges
-                    </h3>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                        <span className="text-sm font-medium text-gray-600">
-                          Labour Charges:
-                        </span>
-                        <p className="text-lg font-semibold text-gray-900">
-                          ₹ {otherCharges?.labour_charges || 0}/-
-                        </p>
-                      </div>
-                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                        <span className="text-sm font-medium text-gray-600">
-                          Machinery Charges:
-                        </span>
-                        <p className="text-lg font-semibold text-gray-900">
-                          ₹ {otherCharges?.machinery_charges || 0}/-
-                        </p>
-                      </div>
-                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                        <span className="text-sm font-medium text-gray-600">
-                          Electricity Charges:
-                        </span>
-                        <p className="text-lg font-semibold text-gray-900">
-                          ₹ {otherCharges?.electricity_charges || 0}/-
-                        </p>
-                      </div>
-                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                        <span className="text-sm font-medium text-gray-600">
-                          Other Charges:
-                        </span>
-                        <p className="text-lg font-semibold text-gray-900">
-                          ₹ {otherCharges?.other_charges || 0}/-
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>

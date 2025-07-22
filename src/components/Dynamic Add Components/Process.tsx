@@ -34,7 +34,7 @@ const Process: React.FC<ProcessProps> = ({inputs, setInputs}) => {
           <FormControl key={ind} isRequired>
             <FormLabel color="black">Process</FormLabel>
             <Input
-            className="text-gray-200"
+            className="text-gray-800"
               border="1px"
               borderColor="#a9a9a9"
               onChange={(e) => {
