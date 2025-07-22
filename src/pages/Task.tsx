@@ -31,6 +31,7 @@ import Loading from "../ui/Loading";
 import EmptyData from "../ui/emptyData";
 import { colors } from "../theme/colors";
 import { CheckSquare, Calendar, User, Package, Building } from "lucide-react";
+import { useFormik } from "formik";
 const Task = () => {
   const [cookies] = useCookies();
   const [tasks, setTasks] = useState([]);
@@ -46,6 +47,11 @@ const Task = () => {
   const [searchKey, setSearchKey] = useState<string | undefined>();
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [processFilter, setProcessFilter] = useState<string>("");
+  const [showUpload, setShowUpload] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [file, setFile] = useState(null);
+  const [activeTaskId, setActiveTaskId] = useState(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
 
   const role = cookies?.role;
 
@@ -53,6 +59,9 @@ const Task = () => {
   const [halfAmount, sethalfAmount] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedTask, setSelectedTask] = useState(null);
+ 
+
   const fetchTasks = async () => {
     try {
       setIsLoading(true);
@@ -141,14 +150,26 @@ const Task = () => {
       );
       toast.success(response.data.message);
       fetchTasks();
+
+      if (role?.toLowerCase() === "designer") {
+        setActiveTaskId(id);
+        localStorage.setItem("activeTaskId", id); // 👈 persist it
+      }
+
     } catch (error) {
       console.log(error);
-
-      toast.error(error);
+      toast.error("Something went wrong");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    const savedTaskId = localStorage.getItem("activeTaskId");
+    if (savedTaskId) {
+      setActiveTaskId(savedTaskId);
+    }
+  }, []);
 
   const colorChange = (color) => {
     if (color === "Pending") {
@@ -270,6 +291,89 @@ const Task = () => {
     });
     setFilteredTasks(results);
   }, [searchKey, statusFilter, processFilter, tasks]);
+
+  // const UploadDesignImage = async (id) => {
+  //   try {
+  //     const res = await axios.patch(
+  //       `${process.env.REACT_APP_BACKEND_URL}/sale/upload-image/${id}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${cookies?.access_token}`,
+  //         },
+  //       }
+  //     );
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
+  const handleOpenUploadModal = (task) => {
+
+    setSelectedTask(task);
+    console.log(task)
+    setShowModal(true);
+  };
+
+  const ImageUploader = async (formData) => {
+    // console.log(formData)
+    try {
+      const res = await axios.post(
+        "https://images.deepmart.shop/upload",
+        formData
+      );
+      console.log(res.data?.[0]);
+      return res.data?.[0];
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      return null;
+    }
+  };
+  const formik = useFormik({
+    initialValues: {
+      comment: "",
+    },
+    onSubmit: async (values, { resetForm }) => {
+     
+      if (!file) {
+        toast.error("Please select an image.");
+        return;
+      }
+
+      try {
+       
+        const formData = new FormData();
+        formData.append("file", file);
+        const imageUrl = await ImageUploader(formData)
+        
+        const payload = {
+          assined_to: selectedTask?.id,
+          designFile: imageUrl,
+          assinedto_comment: values.comment || "No comment",
+        };
+        console.log(payload)
+
+        await axios.patch(
+          `${process.env.REACT_APP_BACKEND_URL}sale/upload-image/${selectedTask?.sale_id}`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies?.access_token}`,
+            },
+          }
+        );
+
+
+        toast.success("Design uploaded successfully");
+        setShowModal(false);
+        setFile(null);
+        resetForm();
+        localStorage.removeItem("activeTaskId"); 
+      } catch (err) {
+        console.error(err);
+        toast.error("Something went wrong.");
+      }
+    },
+  });
+
 
   if (isLoading) {
     return (
@@ -601,13 +705,12 @@ const Task = () => {
                     {/* Status Badge */}
                     <div className="flex items-center gap-2">
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          task?.design_status === "Completed"
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${task?.design_status === "Completed"
                             ? "bg-green-100 text-green-800"
                             : task?.design_status === "UnderProcessing"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
                       >
                         {task?.design_status === "Completed" && (
                           <CheckSquare className="h-3 w-3 mr-1" />
@@ -637,16 +740,16 @@ const Task = () => {
                         {(role === "Accountant" ||
                           role === "Sales" ||
                           role === "admin") && (
-                          <div className="flex items-center gap-2">
-                            <FaDollarSign className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-600">
-                              Price:
-                            </span>
-                            <span className="text-sm font-medium text-gray-900">
-                              {task?.productPrice}
-                            </span>
-                          </div>
-                        )}
+                            <div className="flex items-center gap-2">
+                              <FaDollarSign className="h-4 w-4 text-gray-400" />
+                              <span className="text-sm text-gray-600">
+                                Price:
+                              </span>
+                              <span className="text-sm font-medium text-gray-900">
+                                {task?.productPrice}
+                              </span>
+                            </div>
+                          )}
                       </div>
 
                       {[
@@ -656,28 +759,28 @@ const Task = () => {
                         "dispatch",
                         "dis",
                       ].includes(role?.toLowerCase()) && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="flex items-center gap-2">
-                            <Building className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-600">
-                              Customer:
-                            </span>
-                            <span className="text-sm font-medium text-gray-900">
-                              {task?.customer_name}
-                            </span>
-                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="flex items-center gap-2">
+                              <Building className="h-4 w-4 text-gray-400" />
+                              <span className="text-sm text-gray-600">
+                                Customer:
+                              </span>
+                              <span className="text-sm font-medium text-gray-900">
+                                {task?.customer_name}
+                              </span>
+                            </div>
 
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-600">
-                              Sale By:
-                            </span>
-                            <span className="text-sm font-medium text-gray-900">
-                              {task?.sale_by}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4 text-gray-400" />
+                              <span className="text-sm text-gray-600">
+                                Sale By:
+                              </span>
+                              <span className="text-sm font-medium text-gray-900">
+                                {task?.sale_by}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-gray-400" />
@@ -743,11 +846,10 @@ const Task = () => {
                           <button
                             onClick={() => handleAccept(task.id)}
                             disabled={isSubmitting}
-                            className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${
-                              isSubmitting
+                            className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${isSubmitting
                                 ? "opacity-50 cursor-not-allowed"
                                 : ""
-                            }`}
+                              }`}
                           >
                             <FaCheck className="h-4 w-4" />
                             Accept Task
@@ -766,8 +868,8 @@ const Task = () => {
                           >
                             Create BOM
                           </button>
-                        )} 
-                            
+                        )}
+
 
                         {task?.design_status !== "Completed" && (
                           <button
@@ -786,11 +888,10 @@ const Task = () => {
                             <button
                               onClick={() => handleAccept(task.id)}
                               disabled={isSubmitting}
-                              className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${
-                                isSubmitting
+                              className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${isSubmitting
                                   ? "opacity-50 cursor-not-allowed"
                                   : ""
-                              }`}
+                                }`}
                             >
                               <FaCheck className="h-4 w-4" />
                               Accept Task
@@ -800,24 +901,105 @@ const Task = () => {
                       </div>
                     ) : (
                       <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                          {task?.design_status === "Pending" && (
-                            <button
-                              onClick={() => handleAccept(task.id)}
-                              disabled={isSubmitting}
-                              className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${
-                                isSubmitting
-                                  ? "opacity-50 cursor-not-allowed"
-                                  : ""
-                              }`}
-                            >
-                              <FaCheck className="h-4 w-4" />
-                              Accept Task
-                            </button>
-                          )}
-                        </div>
+                            <div>
+                             
+                              {task?.design_status === "Pending" && (
+                                <button
+                                  onClick={() => handleAccept(task.id)}
+                                  disabled={isSubmitting}
+                                  className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                                    }`}
+                                >
+                                  <FaCheck className="h-4 w-4" />
+                                  Accept Task
+                                </button>
+                              )}
+
+                            
+                              {activeTaskId === task.id && role?.toLowerCase() === "designer" && (
+                                <button
+                                  onClick={() => handleOpenUploadModal(task)}
+                                  className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                                >
+                                  Upload Image
+                                </button>
+                              )}
+
+                             
+                              {showModal && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+                                  <div className="pointer-events-auto w-full max-w-md mx-auto p-6 backdrop-blur-lg bg-white/80 rounded-2xl shadow-xl border border-gray-200 transition-all duration-300 animate-fade-in">
+
+                                    <div className="flex items-center justify-between mb-6">
+                                      <h2 className="text-xl font-semibold text-gray-800">Upload Design</h2>
+                                      <button
+                                        onClick={() => setShowModal(false)}
+                                        className="text-gray-500 hover:text-gray-700 transition"
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          className="h-5 w-5"
+                                          viewBox="0 0 20 20"
+                                          fill="currentColor"
+                                        >
+                                          <path
+                                            fillRule="evenodd"
+                                            d="M10 8.586L15.293 3.293a1 1 0 111.414 1.414L11.414 10l5.293 5.293a1 1 0 01-1.414 1.414L10 11.414l-5.293 5.293a1 1 0 01-1.414-1.414L8.586 10 3.293 4.707a1 1 0 011.414-1.414L10 8.586z"
+                                            clipRule="evenodd"
+                                          />
+                                        </svg>
+                                      </button>
+                                    </div>
+
+                                    <form onSubmit={formik.handleSubmit} className="space-y-5">
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Design Image</label>
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          required
+                                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                          onChange={(e) => setFile(e.currentTarget.files[0])}
+                                        />
+                                      </div>
+
+                                      <div>
+                                        <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">Comment</label>
+                                        <textarea
+                                          id="comment"
+                                          name="comment"
+                                          rows={3}
+                                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                                          onChange={formik.handleChange}
+                                          value={formik.values.comment}
+                                        />
+                                      </div>
+
+                                      <div className="flex justify-end gap-3">
+                                        <button
+                                          type="button"
+                                          onClick={() => setShowModal(false)}
+                                          className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+                                        >
+                                          Cancel
+                                        </button>
+                                        <button
+                                          type="submit"
+                                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 transition shadow-md"
+                                        >
+                                          Upload
+                                        </button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              )}
+
+                            </div>
+
                       </div>
                     )}
+
                   </div>
                 </div>
               </div>
@@ -833,7 +1015,7 @@ const Task = () => {
             </div>
           </div>
         )}
-      </div>  
+      </div>
 
       {/* Drawer Components - Commented out for now */}
       {/* <AddToken showToken={showToken} setShowToken={setShowToken} tokenAmount={tokenAmount} sale={saleId} refresh={fetchTasks} />

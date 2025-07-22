@@ -81,11 +81,11 @@ const Navigation: React.FC = () => {
          fixed z-40 w-80 lg:w-64 top-0 left-0 transition-transform duration-300 ease-in-out`}
       >
         {/* Logo */}
-        <div className="p-6 border-b border-gray-100">
+        <div className="border-b border-gray-100">
           <img
-            src={logo}
+            src='/company logo.png'
             alt="Logo"
-            className="w-[190px] h-auto filter brightness-0"
+            className="w-[220px] h-auto "
           />
         </div>
 

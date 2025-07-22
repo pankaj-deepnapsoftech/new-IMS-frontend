@@ -1,4 +1,4 @@
-import { FaRegCheckCircle } from "react-icons/fa";
+import { FaQuoteLeft, FaRegCheckCircle } from "react-icons/fa";
 import { IoDocumentTextOutline, IoStorefrontOutline } from "react-icons/io5";
 import { MdOutlineShoppingCart, MdOutlineSpeed, MdOutlineSell, MdOutlineAttachMoney, MdOutlinePayment, MdOutlineProductionQuantityLimits, MdTask } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
@@ -36,6 +36,7 @@ import { IoIosPeople } from "react-icons/io";
 import Task from "../pages/Task";
 import { HandCoins } from "lucide-react";
 import Dashboard from "../pages/Dashboard";
+import Quotation from "../pages/Quotation";
 
 const routes = [
   {
@@ -71,6 +72,13 @@ const routes = [
     icon: <HandCoins/>,
     path: "sales",
     element: <Sales />,
+    isSublink: false
+  },
+  {
+    name: "Quotation",
+    icon: <FaQuoteLeft />,
+    path: "quotation",
+    element: <Quotation />,
     isSublink: false
   },
   {
