@@ -336,7 +336,7 @@ const AddBom: React.FC<AddBomProps> = ({
                   </h3>
 
                   {/* Table Header for Finished Good */}
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold uppercase tracking-wider">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
                     <div className="grid grid-cols-7 gap-1 px-3 py-2">
                       <div>FINISHED GOODS</div>
                       <div>QUANTITY</div>
@@ -428,7 +428,7 @@ const AddBom: React.FC<AddBomProps> = ({
                     </h3>
                     <button
                       type="button"
-                      className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white  text-sm rounded transition-colors"
+                      className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white  text-sm rounded transition-colors"
                       onClick={() => {
                         setRawMaterials([
                           ...rawMaterials,
@@ -453,7 +453,7 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
 
                   {/* Table Header for Raw Materials */}
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white  text-sm font-semibold uppercase tracking-wider">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white  text-sm font-semibold uppercase tracking-wider">
                     <div className="grid grid-cols-8 gap-1 px-3 py-2">
                       <div>PRODUCT NAME</div>
                       <div>QUANTITY</div>
@@ -606,7 +606,7 @@ const AddBom: React.FC<AddBomProps> = ({
                     </h3>
                     <button
                       type="button"
-                      className="px-3 py-1 bg-gradient-to-r flex justify-center items-center gap-2 from-blue-600 to-blue-700 text-white  text-sm rounded transition-colors"
+                      className="px-3 py-1 bg-gradient-to-r flex justify-center items-center gap-2 from-blue-500 to-blue-500 text-white  text-sm rounded transition-colors"
                       onClick={() => setProcesses([...processes, ""])}
                     >
                       <Plus /> Add
@@ -658,7 +658,7 @@ const AddBom: React.FC<AddBomProps> = ({
                     </h3>
                     <button
                       type="button"
-                      className="px-3 py-1 bg-gradient-to-r flex justify-center items-center gap-2 from-blue-600 to-blue-700 text-white  text-sm rounded transition-colors"
+                      className="px-3 py-1 bg-gradient-to-r flex justify-center items-center gap-2 from-blue-500 to-blue-500 text-white  text-sm rounded transition-colors"
                       onClick={() => {
                         setScrapMaterials([
                           ...scrapMaterials,
@@ -678,7 +678,7 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
 
                   {/* Table Header for Scrap Materials */}
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white  text-sm font-semibold uppercase tracking-wider">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white  text-sm font-semibold uppercase tracking-wider">
                     <div className="grid grid-cols-7 gap-1 px-3 py-2">
                       <div>PRODUCT NAME</div>
                       <div>COMMENT</div>
@@ -914,7 +914,7 @@ const AddBom: React.FC<AddBomProps> = ({
                   <div className="mt-6">
                     <button
                       type="submit"
-                      className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white  rounded transition-colors duration-200"
+                      className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white  rounded transition-colors duration-200"
                     >
                       Submit
                     </button>
