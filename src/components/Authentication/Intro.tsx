@@ -1,5 +1,4 @@
-import logo from "../../assets/images/logo/logo.png";
-import { FaCheck, FaShieldAlt, FaCog, FaChartLine } from "react-icons/fa";
+import logo from "../../assets/images/logo/logo.png";  
 import { Link } from "react-router-dom";
 
 const Intro: React.FC = () => {

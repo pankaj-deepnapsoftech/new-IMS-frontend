@@ -13,13 +13,16 @@ interface RegisterComponentProps {
   setEmail: (email: string | undefined) => void;
   setShowRegisterComponent: (show: boolean) => void;
   setShowOTPVerificationComponent: (show: boolean) => void;
+  setShowLoginComponent: (show: boolean) => void; 
 }
+
 
 const RegisterComponent: React.FC<RegisterComponentProps> = ({
   email,
   setEmail,
   setShowRegisterComponent,
   setShowOTPVerificationComponent,
+  setShowLoginComponent
 }) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [firstname, setFirstname] = useState<string | undefined>();
@@ -56,7 +59,7 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({
   return (
     <div className="w-full max-w-lg mx-auto">
       {/* Register Card */}
-      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20 max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#fff] backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
@@ -191,13 +194,18 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({
 
           {/* Links */}
           <div className="text-center">
-            <Link
-              to="/login"
+            <button
+              type="button"
+              onClick={() => {
+                setShowRegisterComponent(false);
+                setShowLoginComponent(true);
+              }}
               className="text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
             >
               Already have an account? Sign in
-            </Link>
+            </button>
           </div>
+
 
           {/* Submit Button */}
           <button

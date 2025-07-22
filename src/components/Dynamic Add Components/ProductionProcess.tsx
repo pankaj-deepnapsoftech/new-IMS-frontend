@@ -21,15 +21,15 @@ const ProductionProcess: React.FC<ProductionProcessProps> = ({
 
   return (
     <div>
-      <FormLabel fontWeight="bold" color="white">Processes</FormLabel>
+      <FormLabel fontWeight="bold" color="black">Processes</FormLabel>
       <div className="flex flex-col gap-3  w-[200px]">
         {inputs.map((input, ind) => (
           <>
             <FormControl className="flex gap-1 items-center" key={ind}>
-              <Input className="text-gray-200"
+              <Input className="text-black"
                 isDisabled
                 border="1px"
-                borderColor="white"
+                borderColor="black"
                 type="text"
                 name="process"
                 value={input.process}

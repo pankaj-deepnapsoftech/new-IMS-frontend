@@ -91,7 +91,7 @@ const Navigation: React.FC = () => {
 
         {/* Menu List */}
         <div className="px-4 py-6">
-          <ul className="space-y-2">
+          <ul className="space-y-2 whitespace-nowrap">
             {routes.map((route, ind) => {
               const isAllowed =
                 isSuper ||
@@ -101,7 +101,7 @@ const Navigation: React.FC = () => {
                 return (
                   <div key={ind}>
                     <li
-                      className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 group
+                      className={`flex items-center justify-between  px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 group
                         ${
                           isAllowed
                             ? "hover:bg-blue-50 hover:text-blue-700 text-gray-700"
@@ -111,9 +111,9 @@ const Navigation: React.FC = () => {
                         isAllowed && toggleSubMenusHandler(route.path)
                       }
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 whitespace-nowrap">
                         <span className="text-xl">{route.icon}</span>
-                        <span className="font-medium">{route.name}</span>
+                        <span className="font-medium ">{route.name}</span>
                       </div>
                       {isAllowed && (
                         <span className="transition-transform duration-200">

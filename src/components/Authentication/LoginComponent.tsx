@@ -18,7 +18,9 @@ interface LoginComponentProps {
   setShowLoginComponent: (show: boolean) => void;
   setShowForgetPasswordComponent: (show: boolean) => void;
   setShowOTPVerificationComponent: (show: boolean) => void;
+  setShowRegisterComponent: (show: boolean) => void; 
 }
+
 
 const LoginComponent: React.FC<LoginComponentProps> = ({
   email,
@@ -28,6 +30,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
   setShowLoginComponent,
   setShowForgetPasswordComponent,
   setShowOTPVerificationComponent,
+  setShowRegisterComponent
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -76,104 +79,107 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
   return (
     <div className="w-full max-w-md mx-auto">
       {/* Login Card */}
-      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20">
+      <div className="max-w-md mx-auto bg-white/70 backdrop-blur-md rounded-2xl shadow-2xl p-10 border border-white/30">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight mb-2">
             Welcome Back
           </h1>
-          <p className="text-gray-600">Sign in to your account to continue</p>
+          <p className="text-gray-600 text-sm">Sign in to access your dashboard</p>
         </div>
 
         {/* Login Form */}
         <form onSubmit={loginHandler} className="space-y-6">
           {/* Email Field */}
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-              <FaStarOfLife size={6} className="text-red-500" />
-              Email Address
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <span className="inline-flex items-center gap-1">
+                <FaStarOfLife size={6} className="text-red-500" />
+                Email Address
+              </span>
             </label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                 <BiUser size={20} />
-              </div>
+              </span>
               <input
                 value={email || ""}
                 required
                 onChange={(e) => setEmail(e.target.value)}
-                className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 
-                  focus:ring-2 focus:ring-${colors.primary[500]} focus:border-${colors.primary[500]} 
-                  transition-all duration-200 hover:border-gray-400`}
+                className="w-full pl-10 pr-4 py-3 rounded-lg bg-white text-gray-900 border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="you@example.com"
               />
             </div>
           </div>
 
           {/* Password Field */}
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-              <FaStarOfLife size={6} className="text-red-500" />
-              Password
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <span className="inline-flex items-center gap-1">
+                <FaStarOfLife size={6} className="text-red-500" />
+                Password
+              </span>
             </label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                 <BiLockAlt size={20} />
-              </div>
+              </span>
               <input
                 value={password || ""}
                 required
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 
-                  focus:ring-2 focus:ring-${colors.primary[500]} focus:border-${colors.primary[500]} 
-                  transition-all duration-200 hover:border-gray-400`}
+                className="w-full pl-10 pr-12 py-3 rounded-lg bg-white text-gray-900 border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               >
-                {showPassword ? (
-                  <IoEyeOutline size={20} />
-                ) : (
-                  <IoEyeOffOutline size={20} />
-                )}
+                {showPassword ? <IoEyeOutline size={20} /> : <IoEyeOffOutline size={20} />}
               </button>
             </div>
           </div>
 
           {/* Links */}
-          <div className="flex items-center justify-between text-sm">
-            <Link
-              to="/register"
-              className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-            >
-              Login account
-            </Link>
+          <div className="flex items-center justify-between text-sm mt-2">
             <button
               type="button"
+              onClick={() => {
+                setShowLoginComponent(false);
+                setShowRegisterComponent(true);
+                setShowForgetPasswordComponent(false);
+                setShowOTPVerificationComponent(false);
+              }}
               className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              Create account
+            </button>
+
+            <button
+              type="button"
               onClick={() => {
                 setShowForgetPasswordComponent(true);
                 setShowLoginComponent(false);
                 setShowOTPVerificationComponent(false);
+                setShowRegisterComponent(false);
               }}
+              className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
               Forgot password?
             </button>
           </div>
 
+
           {/* Submit Button */}
           <button
             disabled={isLoginLoading}
-            className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 
-              ${
-                isLoginLoading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 transform hover:scale-[1.02] active:scale-[0.98]"
-              } shadow-lg hover:shadow-xl`}
+            className={`w-full py-3 px-4 mt-4 rounded-lg font-semibold text-white transition-all duration-200 ${isLoginLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 transform hover:scale-105 active:scale-95"
+              } shadow-lg`}
           >
             {isLoginLoading ? (
               <div className="flex items-center justify-center gap-2">
@@ -186,6 +192,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           </button>
         </form>
       </div>
+
     </div>
   );
 };

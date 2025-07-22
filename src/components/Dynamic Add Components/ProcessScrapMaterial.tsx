@@ -56,18 +56,18 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
       ...provided,
       backgroundColor: "transparent",
       borderColor: "#a9a9a9",
-      color: "#fff",
+      color: "#000",
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#fff" : "#d3d3d3", // darker on hover
+      backgroundColor: state.isFocused ? "#d3d3d3" : "#fff", // darker on hover
       color: "black",
       cursor: "pointer",
     }),
     multiValue: (provided: any) => ({
       ...provided,
       backgroundColor: "#808080",
-      color: "#fff",
+      color: "#000",
     }),
     menu: (provided: any) => ({
       ...provided,
@@ -75,24 +75,21 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
     }),
     placeholder: (provided: any) => ({
       ...provided,
-      color: "#fff", // light gray placeholder
+      color: "#000", // light gray placeholder
     }),
     singleValue: (provided: any) => ({
       ...provided,
-      color: "#fff", // ensures selected value is white
+      color: "#000", // ensures selected value is white
     }),
   };
   return (
     <div>
       <FormControl>
-        <FormLabel fontWeight="bold" color="white">
-          Scrap Materials
-        </FormLabel>
         {inputs &&
           inputs.map((input, ind) => (
             <div key={ind}>
               <FormControl className="mb-5">
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Product Name
                 </FormLabel>
                 <Select
@@ -110,7 +107,7 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Description
                 </FormLabel>
                 <Input
@@ -127,7 +124,7 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
                 ></Input>
               </FormControl>
               <FormControl>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Estimated Quantity
                 </FormLabel>
                 <Input
@@ -144,7 +141,7 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
                 ></Input>
               </FormControl>
               <FormControl>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Produced Quantity
                 </FormLabel>
                 <Input
@@ -160,7 +157,7 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
                 ></Input>
               </FormControl>
               <FormControl>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   UOM
                 </FormLabel>
                 <Input
@@ -174,7 +171,7 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
                 ></Input>
               </FormControl>
               <FormControl>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Unit Cost
                 </FormLabel>
                 <Input
@@ -191,7 +188,7 @@ const ProcessScrapMaterial: React.FC<ProcessScrapMaterialProps> = ({
                 ></Input>
               </FormControl>
               <FormControl>
-                <FormLabel fontWeight="bold" color="white">
+                <FormLabel fontWeight="bold" color="black">
                   Total Part Cost
                 </FormLabel>
                 <input
