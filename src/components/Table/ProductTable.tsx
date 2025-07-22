@@ -185,18 +185,33 @@ const ProductTable: React.FC<ProductTableProps> = ({
               border: `1px solid ${colors.border.light}`,
             }}
           >
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[600px]">
               <table className="w-full">
-                <thead style={{ backgroundColor: colors.table.header }}>
+                <thead
+                  style={{
+                    backgroundColor: colors.table.header,
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 2,
+                  }}
+                >
                   <tr
                     style={{ borderBottom: `1px solid ${colors.table.border}` }}
                   >
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{ color: colors.table.headerText }}
+                      style={{
+                        color: colors.table.headerText,
+                        position: "sticky",
+                        top: 0,
+                        left: 0,
+                        zIndex: 3,
+                        backgroundColor: colors.table.header,
+                      }}
                     >
-                     Product Id
+                      Product Id
                     </th>
+
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -286,22 +301,32 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       >
                         <td
                           className="px-4 py-3 text-sm font-mono whitespace-nowrap"
-                          style={{ color: colors.text.secondary }}
+                          style={{
+                            color: colors.text.secondary,
+                            position: "sticky",
+                            left: 0,
+                            zIndex: 1,
+                            backgroundColor:
+                              index % 2 === 0
+                                ? colors.background.card
+                                : colors.table.stripe,
+                          }}
                         >
-                          {row.original.product_id || "—"}
+                          {row.original.product_id || "N/A"}
                         </td>
+
                         <td
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap max-w-xs truncate"
                           style={{ color: colors.text.primary }}
                           title={row.original.name}
                         >
-                          {row.original.name || "—"}
+                          {row.original.name || "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
-                          {row.original.category || "—"}
+                          {row.original.category || "N/A"}
                         </td>
                         <td className="px-4 py-3 text-sm whitespace-nowrap">
                           {row.original.inventory_category && (
@@ -329,13 +354,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
-                          {row.original.item_type || "—"}
+                          {row.original.item_type || "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
-                          {row.original.uom || "—"}
+                          {row.original.uom || "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap"
@@ -384,7 +409,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                             ? moment(row.original.createdAt).format(
                                 "DD/MM/YYYY"
                               )
-                            : "—"}
+                            : "N/A"}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-center gap-2">

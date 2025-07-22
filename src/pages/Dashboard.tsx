@@ -895,7 +895,7 @@ const Dashboard: React.FC = () => {
                         </VStack>
                       ) : (
                         <Text fontSize="sm" color="gray.500" fontStyle="italic">
-                          No tasks scheduled for this day
+                          No BOM scheduled for this day
                         </Text>
                       )}
                     </Box>

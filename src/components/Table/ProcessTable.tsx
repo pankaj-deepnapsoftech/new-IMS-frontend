@@ -203,15 +203,29 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
               border: `1px solid ${colors.border.light}`,
             }}
           >
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[600px]">
               <table className="w-full">
-                <thead style={{ backgroundColor: colors.table.header }}>
+                <thead
+                  style={{
+                    backgroundColor: colors.table.header,
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 2,
+                  }}
+                >
                   <tr
                     style={{ borderBottom: `1px solid ${colors.table.border}` }}
                   >
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{ color: colors.table.headerText }}
+                      style={{
+                        color: colors.table.headerText,
+                        position: "sticky",
+                        top: 0,
+                        left: 0,
+                        zIndex: 3,
+                        backgroundColor: colors.table.header,
+                      }}
                     >
                       Created By
                     </th>
@@ -291,14 +305,23 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                         }}
                       >
                         <td
-                          className="px-4 py-3 text-sm whitespace-nowrap"
-                          style={{ color: colors.text.secondary }}
+                          className="px-4 py-3 text-sm font-mono whitespace-nowrap"
+                          style={{
+                            color: colors.text.secondary,
+                            position: "sticky",
+                            left: 0,
+                            zIndex: 1,
+                            backgroundColor:
+                              index % 2 === 0
+                                ? colors.background.card
+                                : colors.table.stripe,
+                          }}
                         >
                           {row.original.creator
                             ? `${row.original.creator.first_name || ""} ${
                                 row.original.creator.last_name || ""
-                              }`.trim() || "—"
-                            : "—"}
+                              }`.trim() || "N/A"
+                            : "N/A"}
                         </td>
                         <td className="px-4 py-3 text-sm whitespace-nowrap">
                           {row.original.status && (
@@ -320,25 +343,25 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
-                          {row.original.item?.name || "—"}
+                          {row.original.item?.name || "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
-                          {row.original.rm_store?.name || "—"}
+                          {row.original.rm_store?.name || "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
-                          {row.original.fg_store?.name || "—"}
+                          {row.original.fg_store?.name || "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
-                          {row.original.scrap_store?.name || "—"}
+                          {row.original.scrap_store?.name || "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
@@ -348,7 +371,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                             ? moment(row.original.createdAt).format(
                                 "DD/MM/YYYY"
                               )
-                            : "—"}
+                            : "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
@@ -358,7 +381,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                             ? moment(row.original.updatedAt).format(
                                 "DD/MM/YYYY"
                               )
-                            : "—"}
+                            : "N/A"}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center justify-center gap-2">
