@@ -51,7 +51,6 @@ const Task = () => {
   const [showModal, setShowModal] = useState(false);
   const [file, setFile] = useState(null);
   const [activeTaskId, setActiveTaskId] = useState(null);
-  const [viewImage,setViewImage] = useState(false)
   const role = cookies?.role;
   const [halfAmountId, sethalfAmountId] = useState("");
   const [halfAmount, sethalfAmount] = useState(null);
@@ -364,7 +363,6 @@ const Task = () => {
         setFile(null);
         resetForm();
         fetchTasks();
-        setViewImage(true)
         localStorage.removeItem("activeTaskId");
       } catch (err) {
         console.error(err);
@@ -380,8 +378,7 @@ const Task = () => {
       alert("Design file not available.");
     }
   };
- console.log(viewImage)
-
+ 
   useEffect(() => {
     fetchTasks();
   }, [cookies?.access_token, page, limit]);
@@ -939,7 +936,7 @@ const Task = () => {
                                 )}
 
                             
-                               { viewImage && <button
+                               {task?.allsale?.designFile && <button
                                   onClick={() => hanldeViewImage(task?.allsale?.designFile)}
                                   className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
                                 >
