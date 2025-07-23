@@ -34,9 +34,16 @@ import Dispatch from "../pages/Dispatch";
 import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
 import Task from "../pages/Task";
-import { HandCoins } from "lucide-react";
+import { Box, Calendar, Component, Construction, Container, HandCoins, Presentation, ShieldCheck } from "lucide-react";
 import Dashboard from "../pages/Dashboard";
 import Quotation from "../pages/Quotation";
+import Planning from "../pages/Planning";
+import Designing from "../pages/Designing";
+import Supplier from "../pages/Supplier";
+import Scheduling from "../pages/Scheduling";
+import Precurement from "../pages/Precurement";
+import Quality from "../pages/Quality";
+import Maintenance from "../pages/Maintenance";
 
 const routes = [
   {
@@ -44,42 +51,90 @@ const routes = [
     icon: <MdOutlineSpeed />,
     path: "",
     element: <Dashboard />,
-    isSublink: false
+    isSublink: false,
   },
   {
     name: "Employees",
     icon: <FaPeopleGroup />,
     path: "employee",
     element: <Employees />,
-    isSublink: false
+    isSublink: false,
   },
   {
     name: "User Roles",
     icon: <TbLockAccess />,
     path: "role",
     element: <UserRole />,
-    isSublink: false
+    isSublink: false,
   },
   {
     name: "Merchant",
     icon: <IoIosPeople />,
     path: "merchant",
-    element: <Parties />
-
+    element: <Parties />,
   },
   {
     name: "Sales Order",
-    icon: <HandCoins/>,
+    icon: <HandCoins />,
     path: "sales",
     element: <Sales />,
-    isSublink: false
+    isSublink: false,
   },
   {
     name: "Quotation",
     icon: <FaQuoteLeft />,
     path: "quotation",
     element: <Quotation />,
-    isSublink: false
+    isSublink: false,
+  },
+  {
+    name: "Designing",
+    icon: <Component />,
+    path: "designing",
+    element: <Designing />,
+    isSublink: false,
+  },
+  {
+    name: "Planning",
+    icon: <Presentation />,
+    path: "planning",
+    element: <Planning />,
+    isSublink: false,
+  },
+  {
+    name: "Supplier",
+    icon: <Container />,
+    path: "supplier",
+    element: <Supplier />,
+    isSublink: false,
+  },
+  {
+    name: "Scheduling",
+    icon: <Calendar />,
+    path: "scheduling",
+    element: <Scheduling />,
+    isSublink: false,
+  },
+  {
+    name: "Precurement",
+    icon: <Box />,
+    path: "precurement",
+    element: <Precurement />,
+    isSublink: false,
+  },
+  {
+    name: "Quality",
+    icon: <ShieldCheck />,
+    path: "quality",
+    element: <Quality />,
+    isSublink: false,
+  },
+  {
+    name: "Maintenance",
+    icon: <Construction />,
+    path: "maintenance",
+    element: <Maintenance />,
+    isSublink: false,
   },
   {
     name: "Invioces",
@@ -105,7 +160,7 @@ const routes = [
         element: <Payment />,
       },
     ],
-    isSublink: true
+    isSublink: true,
   },
   {
     name: "Inventory",
@@ -135,45 +190,45 @@ const routes = [
         icon: <FaRegCheckCircle />,
         path: "approval",
         element: <InventoryApprovals />,
-      }
+      },
     ],
-    isSublink: true
+    isSublink: true,
   },
- 
+
   {
-   name:"Task",
-   icon:<MdTask />,
-   path:"task",
-   element:<Task/>,
-   isSublink:false
+    name: "Task",
+    icon: <MdTask />,
+    path: "task",
+    element: <Task />,
+    isSublink: false,
   },
   {
-   name:"Dispatch",
-   icon:<TbTruckDelivery />,
-   path:"dispatch",
-   element:<Dispatch/>,
-   isSublink:false
+    name: "Dispatch",
+    icon: <TbTruckDelivery />,
+    path: "dispatch",
+    element: <Dispatch />,
+    isSublink: false,
   },
   {
     name: "Scrap Management",
     icon: <SiScrapy />,
     path: "scrap",
     element: <Scrap />,
-    isSublink: false
+    isSublink: false,
   },
   {
     name: "Store",
     icon: <IoStorefrontOutline />,
     path: "store",
     element: <Stores />,
-    isSublink: false
+    isSublink: false,
   },
   {
     name: "Admin Approval",
     icon: <FaRegCheckCircle />,
     path: "approval",
     element: <Approvals />,
-    isSublink: false
+    isSublink: false,
   },
   // {
   //   name: "Merchant",
@@ -213,7 +268,7 @@ const routes = [
         element: <Process />,
       },
     ],
-    isSublink: true 
+    isSublink: true,
   },
   // {
   //   name: "Dispatch",
@@ -226,9 +281,8 @@ const routes = [
     icon: <CgProfile />,
     path: "userprofile",
     element: <Userprofile />,
-    isSublink: false
+    isSublink: false,
   },
-
 ];
 
 export default routes;
