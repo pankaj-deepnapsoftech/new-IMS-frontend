@@ -109,7 +109,7 @@ const AddStore: React.FC<AddStoreProps> = ({
                 Store Name
               </FormLabel>
               <Input
-                className="text-gray-200"
+                className="text-gray-800"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 type="text"
@@ -121,7 +121,7 @@ const AddStore: React.FC<AddStoreProps> = ({
                 GST Number
               </FormLabel>
               <Input
-                className="text-gray-200"
+                className="text-gray-800"
                 value={gst}
                 onChange={(e) => setGst(e.target.value)}
                 type="text"
@@ -134,7 +134,7 @@ const AddStore: React.FC<AddStoreProps> = ({
               </FormLabel>
               <Input
                 value={addressLine1}
-                className="no-scrollbar text-gray-200"
+                className="no-scrollbar text-gray-800"
                 onChange={(e) => setAddressLine1(e.target.value)}
                 type="text"
                 placeholder="Address Line 1"
@@ -146,7 +146,7 @@ const AddStore: React.FC<AddStoreProps> = ({
               </FormLabel>
               <Input
                 value={addressLine2}
-                className="no-scrollbar text-gray-200"
+                className="no-scrollbar text-gray-800"
                 onChange={(e) => setAddressLine2(e.target.value)}
                 type="text"
                 placeholder="Address Line 2"
@@ -157,7 +157,7 @@ const AddStore: React.FC<AddStoreProps> = ({
                 Pincode
               </FormLabel>
               <Input
-                className="no-scrollbar text-gray-200"
+                className="no-scrollbar text-gray-800"
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
                 type="text"
@@ -169,7 +169,7 @@ const AddStore: React.FC<AddStoreProps> = ({
                 City
               </FormLabel>
               <Input
-                className="text-gray-200"
+                className="text-gray-800"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 type="text"
@@ -181,7 +181,7 @@ const AddStore: React.FC<AddStoreProps> = ({
                 State
               </FormLabel>
               <Input
-                className="text-gray-200"
+                className="text-gray-800"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
                 type="text"

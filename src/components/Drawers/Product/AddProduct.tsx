@@ -457,7 +457,7 @@ const AddProduct: React.FC<AddProductProps> = ({
                 onChange={(e: any) => setCategory(e)}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
+            <FormControl className="mt-3 mb-5" >
               <FormLabel fontWeight="bold" color="black">UOM (Unit of Measurement)</FormLabel>
               {/* Existing dropdown */}
               <Select
@@ -465,7 +465,8 @@ const AddProduct: React.FC<AddProductProps> = ({
                 value={uom}
                 options={uomOptions}
                 onChange={(e: any) => setUom(e)}
-              />
+                required={true}
+                />
 
               {/* Input to add new UOM */}
               <Input
@@ -505,7 +506,7 @@ const AddProduct: React.FC<AddProductProps> = ({
               >
                 Add UOM
               </Button>
-            </FormControl>
+                </FormControl>
 
 
 
