@@ -946,7 +946,7 @@ const Task = () => {
                          
                           {showModal && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-                              <div className="pointer-events-auto w-full max-w-md mx-auto p-6  bg-white/80 rounded-2xl shadow-xl border border-gray-200 transition-all duration-300 animate-fade-in">
+                              <div className="pointer-events-auto w-full max-w-md mx-auto p-6  bg-white rounded-2xl shadow-xl border border-gray-200 transition-all duration-300 animate-fade-in">
 
                                 <div className="flex items-center justify-between mb-6">
                                   <h2 className="text-xl font-semibold text-gray-800">Upload Design</h2>
