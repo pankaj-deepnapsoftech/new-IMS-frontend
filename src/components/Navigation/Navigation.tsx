@@ -54,7 +54,7 @@ const Navigation: React.FC = () => {
       {/* Mobile Menu Button */}
       <div
         className={`fixed top-2 z-50 lg:hidden transition-all duration-300 ease-in-out ${
-          checkMenu ? "left-[296px]" : "left-4"
+          checkMenu ? "left-[335px]" : "left-4"
         }`}
       >
         <button
