@@ -51,16 +51,15 @@ const Task = () => {
   const [showModal, setShowModal] = useState(false);
   const [file, setFile] = useState(null);
   const [activeTaskId, setActiveTaskId] = useState(null);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
-
+  const [viewImage,setViewImage] = useState(false)
   const role = cookies?.role;
-
   const [halfAmountId, sethalfAmountId] = useState("");
   const [halfAmount, sethalfAmount] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState(null);
- 
+  const [showImage, setShowImage] = useState(false);
+
 
   const fetchTasks = async () => {
     try {
@@ -73,7 +72,7 @@ const Task = () => {
           },
         }
       );
-      // console.log("testing", response);
+
       const tasks = response.data.data.map((task: any) => {
         const sale = task?.sale_id?.length ? task.sale_id[0] : null;
         const product = sale?.product_id?.length ? sale.product_id[0] : null;
@@ -125,7 +124,6 @@ const Task = () => {
       let totalPages = Math.ceil(totalData / limit);
       setTotalPage(totalPages);
 
-      // console.log(totalPage)
     } catch (error) {
       console.log(error);
     } finally {
@@ -153,7 +151,8 @@ const Task = () => {
 
       if (role?.toLowerCase() === "designer") {
         setActiveTaskId(id);
-        localStorage.setItem("activeTaskId", id); // 👈 persist it
+        setShowUpload(true)
+        localStorage.setItem("activeTaskId", id);
       }
 
     } catch (error) {
@@ -266,9 +265,7 @@ const Task = () => {
     }
   };
 
-  useEffect(() => {
-    fetchTasks();
-  }, [cookies?.access_token, page, limit]);
+  
 
   // Filter tasks based on search and filters
   useEffect(() => {
@@ -309,7 +306,7 @@ const Task = () => {
   const handleOpenUploadModal = (task) => {
 
     setSelectedTask(task);
-    console.log(task)
+
     setShowModal(true);
   };
 
@@ -332,24 +329,24 @@ const Task = () => {
       comment: "",
     },
     onSubmit: async (values, { resetForm }) => {
-     
+
       if (!file) {
         toast.error("Please select an image.");
         return;
       }
 
       try {
-       
+
         const formData = new FormData();
         formData.append("file", file);
         const imageUrl = await ImageUploader(formData)
-        
+     
         const payload = {
           assined_to: selectedTask?.id,
           designFile: imageUrl,
           assinedto_comment: values.comment || "No comment",
         };
-        console.log(payload)
+        
 
         await axios.patch(
           `${process.env.REACT_APP_BACKEND_URL}sale/upload-image/${selectedTask?.sale_id}`,
@@ -366,7 +363,9 @@ const Task = () => {
         setShowModal(false);
         setFile(null);
         resetForm();
-        localStorage.removeItem("activeTaskId"); 
+        fetchTasks();
+        setViewImage(true)
+        localStorage.removeItem("activeTaskId");
       } catch (err) {
         console.error(err);
         toast.error("Something went wrong.");
@@ -374,6 +373,18 @@ const Task = () => {
     },
   });
 
+//   const hanldeViewImage = (designFile) => {
+//     if (designFile) {
+//       window.open(designFile, "_blank");
+//     } else {
+//       alert("Design file not available.");
+//     }
+//   };
+//  console.log(viewImage)
+
+  useEffect(() => {
+    fetchTasks();
+  }, [cookies?.access_token, page, limit]);
 
   if (isLoading) {
     return (
@@ -706,10 +717,10 @@ const Task = () => {
                     <div className="flex items-center gap-2">
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${task?.design_status === "Completed"
-                            ? "bg-green-100 text-green-800"
-                            : task?.design_status === "UnderProcessing"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-gray-100 text-gray-800"
+                          ? "bg-green-100 text-green-800"
+                          : task?.design_status === "UnderProcessing"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-gray-100 text-gray-800"
                           }`}
                       >
                         {task?.design_status === "Completed" && (
@@ -847,8 +858,8 @@ const Task = () => {
                             onClick={() => handleAccept(task.id)}
                             disabled={isSubmitting}
                             className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${isSubmitting
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
                               }`}
                           >
                             <FaCheck className="h-4 w-4" />
@@ -889,8 +900,8 @@ const Task = () => {
                               onClick={() => handleAccept(task.id)}
                               disabled={isSubmitting}
                               className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${isSubmitting
-                                  ? "opacity-50 cursor-not-allowed"
-                                  : ""
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
                                 }`}
                             >
                               <FaCheck className="h-4 w-4" />
@@ -901,101 +912,111 @@ const Task = () => {
                       </div>
                     ) : (
                       <div className="flex flex-wrap items-center justify-between gap-3">
-                            <div>
-                             
-                              {task?.design_status === "Pending" && (
-                                <button
-                                  onClick={() => handleAccept(task.id)}
-                                  disabled={isSubmitting}
-                                  className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                                    }`}
-                                >
-                                  <FaCheck className="h-4 w-4" />
-                                  Accept Task
-                                </button>
-                              )}
+                        <div>
+
+                          {task?.design_status === "Pending" && (
+                            <button
+                              onClick={() => handleAccept(task.id)}
+                              disabled={isSubmitting}
+                              className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                                }`}
+                            >
+                              <FaCheck className="h-4 w-4" />
+                              Accept Task
+                            </button>
+                          )}
+
+                              {activeTaskId === task.id &&
+                                role?.toLowerCase() === "designer" &&
+                                !task.designFile &&
+                                task.design_status !== "Completed" && (
+                                  <button
+                                    onClick={() => handleOpenUploadModal(task)}
+                                    className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                                  >
+                                    Upload Image
+                                  </button>
+                                )}
 
                             
-                              {activeTaskId === task.id && role?.toLowerCase() === "designer" && (
-                                <button
-                                  onClick={() => handleOpenUploadModal(task)}
+                               {/* { viewImage && <button
+                                  onClick={() => hanldeViewImage(task?.allsale?.designFile)}
                                   className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
                                 >
-                                  Upload Image
-                                </button>
-                              )}
+                                  View Images
+                                </button>} */}
+                              
+                         
+                          {showModal && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+                              <div className="pointer-events-auto w-full max-w-md mx-auto p-6  bg-white/80 rounded-2xl shadow-xl border border-gray-200 transition-all duration-300 animate-fade-in">
 
-                             
-                              {showModal && (
-                                <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-                                  <div className="pointer-events-auto w-full max-w-md mx-auto p-6 backdrop-blur-lg bg-white/80 rounded-2xl shadow-xl border border-gray-200 transition-all duration-300 animate-fade-in">
-
-                                    <div className="flex items-center justify-between mb-6">
-                                      <h2 className="text-xl font-semibold text-gray-800">Upload Design</h2>
-                                      <button
-                                        onClick={() => setShowModal(false)}
-                                        className="text-gray-500 hover:text-gray-700 transition"
-                                      >
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-5 w-5"
-                                          viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M10 8.586L15.293 3.293a1 1 0 111.414 1.414L11.414 10l5.293 5.293a1 1 0 01-1.414 1.414L10 11.414l-5.293 5.293a1 1 0 01-1.414-1.414L8.586 10 3.293 4.707a1 1 0 011.414-1.414L10 8.586z"
-                                            clipRule="evenodd"
-                                          />
-                                        </svg>
-                                      </button>
-                                    </div>
-
-                                    <form onSubmit={formik.handleSubmit} className="space-y-5">
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Design Image</label>
-                                        <input
-                                          type="file"
-                                          accept="image/*"
-                                          required
-                                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                          onChange={(e) => setFile(e.currentTarget.files[0])}
-                                        />
-                                      </div>
-
-                                      <div>
-                                        <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">Comment</label>
-                                        <textarea
-                                          id="comment"
-                                          name="comment"
-                                          rows={3}
-                                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
-                                          onChange={formik.handleChange}
-                                          value={formik.values.comment}
-                                        />
-                                      </div>
-
-                                      <div className="flex justify-end gap-3">
-                                        <button
-                                          type="button"
-                                          onClick={() => setShowModal(false)}
-                                          className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
-                                        >
-                                          Cancel
-                                        </button>
-                                        <button
-                                          type="submit"
-                                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 transition shadow-md"
-                                        >
-                                          Upload
-                                        </button>
-                                      </div>
-                                    </form>
-                                  </div>
+                                <div className="flex items-center justify-between mb-6">
+                                  <h2 className="text-xl font-semibold text-gray-800">Upload Design</h2>
+                                  <button
+                                    onClick={() => setShowModal(false)}
+                                    className="text-gray-500 hover:text-gray-700 transition"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-5 w-5"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M10 8.586L15.293 3.293a1 1 0 111.414 1.414L11.414 10l5.293 5.293a1 1 0 01-1.414 1.414L10 11.414l-5.293 5.293a1 1 0 01-1.414-1.414L8.586 10 3.293 4.707a1 1 0 011.414-1.414L10 8.586z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  </button>
                                 </div>
-                              )}
 
+                                <form onSubmit={formik.handleSubmit} className="space-y-5">
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Design Image</label>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      required
+                                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                      onChange={(e) => setFile(e.currentTarget.files[0])}
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">Comment</label>
+                                    <textarea
+                                      id="comment"
+                                      name="comment"
+                                      rows={3}
+                                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                                      onChange={formik.handleChange}
+                                      value={formik.values.comment}
+                                    />
+                                  </div>
+
+                                  <div className="flex justify-end gap-3">
+                                    <button
+                                      type="button"
+                                      onClick={() => setShowModal(false)}
+                                      className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      type="submit"
+                                      className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 transition shadow-md"
+                                    >
+                                      Upload
+                                    </button>
+                                  </div>
+                                </form>
+                              </div>
                             </div>
+                          )}
+
+                        </div>
 
                       </div>
                     )}

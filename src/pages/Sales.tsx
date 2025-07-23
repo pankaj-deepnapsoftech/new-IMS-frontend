@@ -32,7 +32,7 @@ const Sales = () => {
     //     setSelectedSale(data);
     //     seteditsale(true);
     // };
-    console.log(role);
+  
 
     const fetchPurchases = async () => {
         try {
