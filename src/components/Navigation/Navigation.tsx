@@ -54,12 +54,12 @@ const Navigation: React.FC = () => {
       {/* Mobile Menu Button */}
       <div
         className={`fixed top-2 z-50 lg:hidden transition-all duration-300 ease-in-out ${
-          checkMenu ? "left-[335px]" : "left-4"
+          checkMenu ? "left-[250px]" : "left-4"
         }`}
       >
         <button
           onClick={() => setCheckMenu(!checkMenu)}
-          className="p-3 rounded-xl bg-white shadow-lg border border-gray-200 hover:bg-gray-50 hover:shadow-xl transition-all duration-300 hover:scale-105"
+          className="p-3 rounded-xl bg-white    transition-all duration-300 hover:scale-105"
         >
           {checkMenu ? (
             <IoCloseSharp size={24} className="text-gray-700" />

@@ -373,14 +373,14 @@ const Task = () => {
     },
   });
 
-//   const hanldeViewImage = (designFile) => {
-//     if (designFile) {
-//       window.open(designFile, "_blank");
-//     } else {
-//       alert("Design file not available.");
-//     }
-//   };
-//  console.log(viewImage)
+  const hanldeViewImage = (designFile) => {
+    if (designFile) {
+      window.open(designFile, "_blank");
+    } else {
+      alert("Design file not available.");
+    }
+  };
+ console.log(viewImage)
 
   useEffect(() => {
     fetchTasks();
@@ -939,12 +939,12 @@ const Task = () => {
                                 )}
 
                             
-                               {/* { viewImage && <button
+                               { viewImage && <button
                                   onClick={() => hanldeViewImage(task?.allsale?.designFile)}
                                   className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
                                 >
                                   View Images
-                                </button>} */}
+                                </button>}
                               
                          
                           {showModal && (
