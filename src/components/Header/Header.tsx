@@ -34,7 +34,7 @@ const Header: React.FC = () => {
     <div className="relative bg-white border-b border-gray-200 shadow-sm">
       <div className="flex justify-between items-center h-16 px-4 lg:px-6">
         {/* Greeting */}
-        <div className=" flex-col justify-center hidden md:flex">
+        <div className=" flex-col justify-center hidden md:flex ml-20 lg:ml-0">
           <h1 className="text-2xl font-semibold text-gray-800">
             Welcome back,
             <span className="ml-1 text-blue-600">

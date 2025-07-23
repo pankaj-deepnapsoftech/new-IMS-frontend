@@ -32,11 +32,11 @@ interface StoreTableProps {
   stores: Array<{
     _id: string;
     name: string;
-    location: string;
-    manager: string;
-    capacity: number;
-    current_stock: number;
-    status: string;
+    address_line1: string;
+    pincode: number;
+    city: string;
+    state: string;
+    approved: boolean;
     createdAt: string;
     updatedAt: string;
   }>;
@@ -63,11 +63,11 @@ const StoreTable: React.FC<StoreTableProps> = ({
   const columns: Column<any>[] = useMemo(
     () => [
       { Header: "Name", accessor: "name" },
-      { Header: "Location", accessor: "location" },
-      { Header: "Manager", accessor: "manager" },
-      { Header: "Capacity", accessor: "capacity" },
-      { Header: "Current Stock", accessor: "current_stock" },
-      { Header: "Status", accessor: "status" },
+      { Header: "Address", accessor: "address_line1" },
+      { Header: "City", accessor: "city" },
+      { Header: "State", accessor: "state" },
+      { Header: "Pincode", accessor: "pincode" },
+      { Header: "Status", accessor: "approved" },
       { Header: "Created On", accessor: "createdAt" },
       { Header: "Last Updated", accessor: "updatedAt" },
     ],
@@ -236,30 +236,28 @@ const StoreTable: React.FC<StoreTableProps> = ({
                     let displayValue;
                     if (colId === "name") {
                       displayValue = original.name || "N/A";
-                    } else if (colId === "location") {
-                      displayValue = original.location || "N/A";
-                    } else if (colId === "manager") {
-                      displayValue = original.manager || "N/A";
-                    } else if (colId === "capacity") {
-                      displayValue = original.capacity || "N/A";
-                    } else if (colId === "current_stock") {
-                      displayValue = original.current_stock || "0";
-                    } else if (colId === "status") {
+                    } else if (colId === "address_line1") {
+                      displayValue = original.address_line1 || "N/A";
+                    } else if (colId === "city") {
+                      displayValue = original.city || "N/A";
+                    } else if (colId === "state") {
+                      displayValue = original.state || "N/A";
+                    } else if (colId === "pincode") {
+                      displayValue = original.pincode || "N/A";
+                    } else if (colId === "approved") {
                       displayValue = (
                         <span
                           className="px-2 py-1 rounded-full text-xs font-medium"
                           style={{
-                            backgroundColor:
-                              original.status === "Active"
-                                ? colors.success[100]
-                                : colors.error[100],
-                            color:
-                              original.status === "Active"
-                                ? colors.success[800]
-                                : colors.error[800],
+                            backgroundColor: original.approved
+                              ? colors.success[100]
+                              : colors.error[100],
+                            color: original.approved
+                              ? colors.success[800]
+                              : colors.error[800],
                           }}
                         >
-                          {original.status || "N/A"}
+                          {original.approved ? "Approved" : "Pending"}
                         </span>
                       );
                     } else if (colId === "createdAt") {
@@ -343,7 +341,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
                           _hover={{ bg: colors.button.dangerHover }}
                           onClick={() => handleDeleteClick(row.original._id)}
                         >
-                         <MdDeleteOutline size={16} />
+                          <MdDeleteOutline size={16} />
                         </Button>
                       )}
                     </div>

@@ -1,4 +1,10 @@
-import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormLabel,
+  Input,
+} from "@chakra-ui/react";
 import { BiX } from "react-icons/bi";
 import React, { useEffect, useRef, useState } from "react";
 import Select from "react-select";
@@ -29,6 +35,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   const [totalCost, setTotalCost] = useState<string | undefined>();
   const [createdBy, setCreatedBy] = useState<string | undefined>();
   const [processes, setProcesses] = useState<string[] | []>([]);
+  const [processStatuses, setProcessStatuses] = useState<{
+    [key: number]: { started: boolean; done: boolean };
+  }>({});
 
   const [products, setProducts] = useState<any[]>([]);
   const [productOptions, setProductOptions] = useState<
@@ -120,6 +129,34 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
     }
   };
 
+  const handleProcessStatusChange = (
+    processIndex: number,
+    statusType: "started" | "done",
+    checked: boolean
+  ) => {
+    setProcessStatuses((prev) => {
+      const updated = {
+        ...prev,
+        [processIndex]: {
+          ...prev[processIndex],
+          [statusType]: checked,
+        },
+      };
+
+      // Auto-check "started" when "done" is checked
+      if (statusType === "done" && checked) {
+        updated[processIndex].started = true;
+      }
+
+      // Uncheck "done" when "started" is unchecked
+      if (statusType === "started" && !checked) {
+        updated[processIndex].done = false;
+      }
+
+      return updated;
+    });
+  };
+
   const updateProcessHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -163,6 +200,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       // Production Process
       status: processStatus,
       _id: productionProcessId,
+      // Process Statuses
+      process_statuses: processStatuses,
     };
 
     try {
@@ -290,6 +329,23 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setScrapMaterials(scrap);
 
       setProcesses(data?.production_process?.bom?.processes);
+
+      // Initialize process statuses for all processes
+      const initialStatuses: {
+        [key: number]: { started: boolean; done: boolean };
+      } = {};
+      data?.production_process?.bom?.processes?.forEach(
+        (_: any, index: number) => {
+          // Load existing statuses if available, otherwise default to false
+          const existingStatus =
+            data?.production_process?.process_statuses?.[index];
+          initialStatuses[index] = {
+            started: existingStatus?.started || false,
+            done: existingStatus?.done || false,
+          };
+        }
+      );
+      setProcessStatuses(initialStatuses);
 
       setFinishedGood({
         value: data.production_process.bom.finished_good.item._id,
@@ -731,23 +787,103 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     <h3 className="text-lg font-semibold text-gray-900">
                       Processes
                     </h3>
+                    <div className="text-sm text-gray-600">
+                      {
+                        Object.values(processStatuses).filter(
+                          (status) => status?.done
+                        ).length
+                      }{" "}
+                      of {processes.length} completed
+                    </div>
                   </div>
 
-                  {processes.map((process, index) => (
-                    <div key={index} className="mb-4 flex items-end gap-3">
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Process {index + 1}
-                        </label>
-                        <input
-                          type="text"
-                          value={process}
-                          readOnly
-                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                        />
-                      </div>
-                    </div>
-                  ))}
+                  <div className="flex gap-4 flex-wrap">
+                    {processes.map((process, index) => {
+                      const status = processStatuses[index];
+                      const isStarted = status?.started || false;
+                      const isDone = status?.done || false;
+
+                      return (
+                        <div key={index} className="mb-4 flex items-end gap-1">
+                          <div
+                            className={`border p-3 rounded-lg min-w-[300px] ${
+                              isDone
+                                ? "bg-green-50 border-green-200"
+                                : isStarted
+                                ? "bg-blue-50 border-blue-200"
+                                : "bg-gray-50 border-gray-200"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <label className="block text-sm font-medium text-gray-700">
+                                Process {index + 1}
+                              </label>
+                              <div
+                                className={`px-2 py-1 rounded text-xs font-medium ${
+                                  isDone
+                                    ? "bg-green-100 text-green-800"
+                                    : isStarted
+                                    ? "bg-blue-100 text-blue-800"
+                                    : "bg-gray-100 text-gray-600"
+                                }`}
+                              >
+                                {isDone
+                                  ? "Completed"
+                                  : isStarted
+                                  ? "In Progress"
+                                  : "Not Started"}
+                              </div>
+                            </div>
+                            <input
+                              type="text"
+                              value={process}
+                              readOnly
+                              className="w-full px-3 py-2 border border-gray-300 rounded bg-white mb-3"
+                            />
+
+                            {/* Process Status Checkboxes */}
+                            <div className="flex gap-4">
+                              <label className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={isStarted}
+                                  onChange={(e) =>
+                                    handleProcessStatusChange(
+                                      index,
+                                      "started",
+                                      e.target.checked
+                                    )
+                                  }
+                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <span className="text-sm text-gray-700">
+                                  Started
+                                </span>
+                              </label>
+
+                              <label className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={isDone}
+                                  onChange={(e) =>
+                                    handleProcessStatusChange(
+                                      index,
+                                      "done",
+                                      e.target.checked
+                                    )
+                                  }
+                                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                                />
+                                <span className="text-sm text-gray-700">
+                                  Done
+                                </span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 

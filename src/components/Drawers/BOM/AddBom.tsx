@@ -332,7 +332,7 @@ const AddBom: React.FC<AddBomProps> = ({
               <div className="bg-white border-b">
                 <div className="px-6 py-4">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Finished Good 
+                    Finished Good
                   </h3>
 
                   {/* Table Header for Finished Good */}
@@ -424,7 +424,7 @@ const AddBom: React.FC<AddBomProps> = ({
                 <div className="px-6 py-4">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      Raw Materials 
+                      Raw Materials
                     </h3>
                     <button
                       type="button"
@@ -613,23 +613,24 @@ const AddBom: React.FC<AddBomProps> = ({
                     </button>
                   </div>
 
+                  <div className="flex gap-4 flex-wrap">
                   {processes.map((process, index) => (
-                    <div key={index} className="mb-4 flex items-end gap-3">
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Process {index + 1} 
-                        </label>
-                        <input
-                          type="text"
-                          value={process}
-                          onChange={(e) => {
-                            const newProcesses = [...processes];
-                            newProcesses[index] = e.target.value;
-                            setProcesses(newProcesses);
-                          }}
-                          placeholder={`Enter Process ${index + 1}`}
-                          className="w-full px-3 py-2 border border-gray-300 rounded"
-                        />
+                    <div key={index} className="mb-4 flex items-end gap-1">
+                        <div className="border p-3 rounded-lg">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Process {index + 1}
+                          </label>
+                          <input
+                            type="text"
+                            value={process}
+                            onChange={(e) => {
+                              const newProcesses = [...processes];
+                              newProcesses[index] = e.target.value;
+                              setProcesses(newProcesses);
+                            }}
+                            placeholder={`Enter Process ${index + 1}`}
+                            className="w-full px-3 py-2 border border-gray-300 rounded"
+                          />
                       </div>
                       {processes.length > 1 && (
                         <button
@@ -647,6 +648,7 @@ const AddBom: React.FC<AddBomProps> = ({
                       )}
                     </div>
                   ))}
+                  </div>
                 </div>
               </div>
               {/* Scrap Materials Section */}
@@ -654,7 +656,7 @@ const AddBom: React.FC<AddBomProps> = ({
                 <div className="px-6 py-4">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      Scrap Materials 
+                      Scrap Materials
                     </h3>
                     <button
                       type="button"
