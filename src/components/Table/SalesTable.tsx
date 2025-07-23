@@ -23,7 +23,7 @@ const SalesTable = ({
   isLoading,
   setEditTable,
   setShow,
-    fetchPurchases
+  fetchPurchases
 }) => {
   const [showassign, setShowAssign] = useState(false);
   const calculateTotalPrice = (price: number, qty: number, gst: number) => {
@@ -32,7 +32,7 @@ const SalesTable = ({
     const totalPrice = basePrice + gstVal;
     return totalPrice;
   };
-  // console.log(filteredPurchases)
+  console.log(filteredPurchases)
   const [selectedSale, setSelectedSale] = useState([]);
   const [paymentshow, setPaymentshow] = useState(false);
   const [isOpen, setViewDesign] = useState(false);
@@ -61,8 +61,8 @@ const SalesTable = ({
   if (!filteredPurchases || filteredPurchases.length === 0) {
     return <EmptyData />;
   }
-  
-    console.log(filteredPurchases)
+
+  console.log(filteredPurchases)
 
   return (
     <div className="space-y-4 bg-[#f8f9fa]">
@@ -82,7 +82,7 @@ const SalesTable = ({
                 className="text-lg font-semibold"
                 style={{ color: colors.text.primary }}
               >
-                          Order Id : {purchase.order_id}
+                Order Id : {purchase.order_id}
               </h3>
               <p
                 className="text-sm mt-1"
@@ -95,8 +95,18 @@ const SalesTable = ({
                 • {new Date(purchase?.createdAt).toLocaleDateString()}
               </p>
             </div>
-
-        
+            {/* <p>Design Approval:
+            </p> */}
+            <span
+              className={`inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium ${purchase?.assinedto[0]?.isCompleted === "Completed"
+                  ? "bg-green-100 text-green-800"
+                : purchase?.assinedto[0]?.isCompleted === "UnderProcessing"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+            >
+            Design Approval:  {purchase?.assinedto[0]?.isCompleted}
+            </span>
           </div>
 
           {/* Sale Details Grid */}
@@ -303,24 +313,24 @@ const SalesTable = ({
                 (process) => process?.done === true
               )
             ) && (
-              <button
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
-                style={{
-                  backgroundColor: colors.success[500],
-                  color: colors.text.inverse,
-                }}
-                onClick={() => setIsChecked(!isChecked)}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.success[600];
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.success[500];
-                }}
-              >
-                <FaCheckCircle size="16px" />
-                Approve Sample
-              </button>
-            )}
+                <button
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                  style={{
+                    backgroundColor: colors.success[500],
+                    color: colors.text.inverse,
+                  }}
+                  onClick={() => setIsChecked(!isChecked)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = colors.success[600];
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = colors.success[500];
+                  }}
+                >
+                  <FaCheckCircle size="16px" />
+                  Approve Sample
+                </button>
+              )}
           </div>
         </div>
       ))}
@@ -330,7 +340,7 @@ const SalesTable = ({
         setShow={setShowAssign}
         employeeData={empData}
         saleData={selectedSale}
-              fetchPurchases={fetchPurchases}
+        fetchPurchases={fetchPurchases}
       />
       <ApproveSample isChecked={isChecked} setIsChecked={setIsChecked} />
     </div>

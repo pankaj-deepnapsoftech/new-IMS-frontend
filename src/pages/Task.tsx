@@ -936,7 +936,7 @@ const Task = () => {
                                 )}
 
                             
-                               {task?.allsale?.designFile && <button
+                              {task?.allsale?.designFile && task?.design_status === "Completed" && <button
                                   onClick={() => hanldeViewImage(task?.allsale?.designFile)}
                                   className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
                                 >
