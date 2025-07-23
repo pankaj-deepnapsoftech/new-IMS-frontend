@@ -229,27 +229,43 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
       }
     }
 
-    let modifiedRawMaterials = rawMaterials.map((material) => ({
-      _id: material?._id,
-      item: material?.item_name?.value,
-      description: material?.description,
-      quantity: material?.quantity,
-      assembly_phase: material?.assembly_phase?.value,
-      supplier: material?.supplier?.value,
-      supporting_doc: material?.supporting_doc,
-      comments: material?.comments,
-      total_part_cost: material?.total_part_cost,
-    }));
-
-    let modifiedScrapMaterials =
-      scrapMaterials?.[0]?.item_name &&
-      scrapMaterials?.map((material) => ({
-        _id: material?._id,
+    let modifiedRawMaterials = rawMaterials.map((material) => {
+      const materialData: any = {
         item: material?.item_name?.value,
         description: material?.description,
         quantity: material?.quantity,
+        assembly_phase: material?.assembly_phase?.value,
+        supplier: material?.supplier?.value,
+        supporting_doc: material?.supporting_doc,
+        comments: material?.comments,
         total_part_cost: material?.total_part_cost,
-      }));
+      };
+
+      // Only include _id if it exists and is not empty
+      if (material?._id && material._id.trim() !== "") {
+        materialData._id = material._id;
+      }
+
+      return materialData;
+    });
+
+    let modifiedScrapMaterials =
+      scrapMaterials?.[0]?.item_name &&
+      scrapMaterials?.map((material) => {
+        const materialData: any = {
+          item: material?.item_name?.value,
+          description: material?.description,
+          quantity: material?.quantity,
+          total_part_cost: material?.total_part_cost,
+        };
+
+        // Only include _id if it exists and is not empty
+        if (material?._id && material._id.trim() !== "") {
+          materialData._id = material._id;
+        }
+
+        return materialData;
+      });
 
     const body = {
       _id: bomId,
