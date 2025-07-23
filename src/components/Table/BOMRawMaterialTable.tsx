@@ -33,6 +33,7 @@ import {
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
+import { FaArrowDownLong, FaArrowUpLong } from "react-icons/fa6";
 
 interface BOMRawMaterialTableProps {
   products: Array<{
@@ -161,7 +162,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
       text: "#409503",
     },
   };
-
+  console.log(products)
   const {
     getTableProps,
     getTableBodyProps,
@@ -352,6 +353,28 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                           displayValue = original.updatedAt
                             ? moment(original.updatedAt).format("DD/MM/YYYY")
                             : "N/A";
+                        } else if (colId === "change") {
+                          displayValue = original.change_type ? (
+                            <div className="flex gap-1 items-center">
+                              {original.change_type === "increase" ? (
+                                <FaArrowUpLong size={16} style={{ color: colors.success[500] }} />
+                              ) : (
+                                <FaArrowDownLong size={16} style={{ color: colors.error[500] }} />
+                              )}
+                              <span
+                                style={{
+                                  color:
+                                    original.change_type === "increase"
+                                      ? colors.success[600]
+                                      : colors.error[600],
+                                }}
+                              >
+                                {original.quantity_changed}
+                              </span>
+                            </div>
+                          ) : (
+                            "N/A"
+                          );
                         } else {
                           displayValue = cell.render("Cell");
                         }

@@ -117,7 +117,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
   if (!isLoadingStores && stores.length === 0) {
     return <EmptyData />;
   }
-
+  console.log(stores)
   return (
     <div className="p-4 space-y-4">
       {/* Page Size Selector */}
