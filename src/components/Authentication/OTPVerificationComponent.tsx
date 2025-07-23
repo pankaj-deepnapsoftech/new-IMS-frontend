@@ -102,7 +102,7 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
             </h1>
           </div>
           <p className="text-gray-600">
-            Enter the 6-digit verification code sent to <br />
+            Enter the 4-digit verification code sent to <br />
             <span className="font-semibold text-gray-800">{email}</span>
           </p>
         </div>
@@ -112,7 +112,7 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
           {/* OTP Field */}
           <div className="space-y-2">
             <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-              <FaStarOfLife size={6} className="text-red-500" />
+              <FaStarOfLife size={4} className="text-red-500" />
               Verification Code
             </label>
             <div className="relative">
