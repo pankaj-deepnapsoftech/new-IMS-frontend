@@ -797,31 +797,35 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                     </button>
                   </div>
 
-                  {processes.map((process, index) => (
-                    <div key={index} className="mb-4 flex items-end gap-3">
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Process {index + 1}
-                        </label>
-                        <input
-                          type="text"
-                          value={process}
-                          onChange={(e) => updateProcess(index, e.target.value)}
-                          placeholder={`Enter Process ${index + 1}`}
-                          className="w-full px-3 py-2 border border-gray-300 rounded"
-                        />
+                  <div className="flex gap-4 flex-wrap">
+                    {processes.map((process, index) => (
+                      <div key={index} className="mb-4 flex items-end gap-1">
+                        <div className="border p-3 rounded-lg">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Process {index + 1}
+                          </label>
+                          <input
+                            type="text"
+                            value={process}
+                            onChange={(e) =>
+                              updateProcess(index, e.target.value)
+                            }
+                            placeholder={`Enter Process ${index + 1}`}
+                            className="w-full px-3 py-2 border border-gray-300 rounded"
+                          />
+                        </div>
+                        {processes.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeProcess(index)}
+                            className="px-3 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors mb-0"
+                          >
+                            ✕ Remove
+                          </button>
+                        )}
                       </div>
-                      {processes.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeProcess(index)}
-                          className="px-3 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors mb-0"
-                        >
-                          ✕ Remove
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
               {/* Scrap Materials Section */}
