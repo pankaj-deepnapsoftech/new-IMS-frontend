@@ -329,6 +329,20 @@ const Dashboard: React.FC = () => {
     fetchProductionPlan();
   }, []);
 
+  // Update selected production day when backend production plan data is loaded
+  useEffect(() => {
+    if (Object.keys(backendProductionPlan).length > 0) {
+      const weekData = getProductionPlanForCurrentWeek();
+      const today = weekData.find((day) => day.isToday);
+      if (today) {
+        setSelectedProductionDay(today);
+      } else if (weekData.length > 0) {
+        // If today is not in current week, default to first day
+        setSelectedProductionDay(weekData[0]);
+      }
+    }
+  }, [backendProductionPlan]);
+
   const getBackendWeekData = () => {
     const today = new Date();
     const startOfWeek = new Date(today);
@@ -506,17 +520,6 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchSummaryHandler();
-
-    // Set default selected day to today
-    const weekData = getProductionPlanForCurrentWeek();
-
-    const today = weekData.find((day) => day.isToday);
-    if (today) {
-      setSelectedProductionDay(today);
-    } else {
-      // If today is not in current week, default to first day
-      setSelectedProductionDay(weekData[0]);
-    }
     setLastUpdated(new Date().toLocaleTimeString());
   }, []);
 
@@ -538,7 +541,6 @@ const Dashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div>
             {/* Welcome Section */}
-           
 
             {/* Filter Form */}
             <div
@@ -734,13 +736,8 @@ const Dashboard: React.FC = () => {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => {
-                        const weekData = getProductionPlanForCurrentWeek();
-
-                        const today = weekData.find((day) => day.isToday);
-                        if (today) {
-                          setSelectedProductionDay(today);
-                        }
+                      onClick={async () => {
+                        await fetchProductionPlan();
                         setLastUpdated(new Date().toLocaleTimeString());
                       }}
                       _hover={{ bg: "gray.100" }}
