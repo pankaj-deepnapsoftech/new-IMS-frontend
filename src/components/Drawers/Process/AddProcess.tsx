@@ -264,172 +264,203 @@ const AddProcess: React.FC<AddProcess> = ({
       <div className="fixed inset-y-0 right-0 z-50 w-full  bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="px-6 py-4 text-black flex border items-center justify-between">
-            <h2 className="text-xl font-semibold">Add Production Process</h2>
+          <div className=" px-6 py-4 flex items-center justify-between border-b">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 border rounded-lg">
+                <Factory className="h-5 w-5 text-black" />
+              </div>
+              <h2 className="text-xl font-semibold text-black">
+                Add Production Process
+              </h2>
+            </div>
             <button
               onClick={closeDrawerHandler}
-              className="p-1 border rounded transition-colors duration-200"
+              className="p-2 hover:bg-white/20 border rounded-lg transition-colors duration-200"
             >
-              <BiX size={24} />
+              <BiX size={24} className="text-black" />
             </button>
           </div>
 
           {/* Form Content */}
-          <div className="flex-1 overflow-y-auto bg-gray-50">
-            <form onSubmit={addProcessHandler}>
-              {/* Item Information Section */}
-              <div className="bg-white border-b">
-                <div className="px-6 py-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Item Information
-                  </h3>
+          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+            <form onSubmit={addProcessHandler} className="space-y-6">
+              {/* Item Information */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                  <Package className="h-5 w-5 text-blue-600" />
+                  Item Information
+                </h3>
 
-                  {/* Table Header for Item Information */}
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
-                    <div className="grid grid-cols-6 gap-1 px-3 py-2">
-                      <div>ITEM ID</div>
-                      <div>ITEM NAME</div>
-                      <div>BOM</div>
-                      <div>CURRENT STOCK</div>
-                      <div>QUANTITY</div>
-                      <div>UOM</div>
-                    </div>
+                <div className="grid grid-cols-1 gap-6">
+                  {/* Item ID */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Hash className="h-4 w-4 text-gray-500" />
+                      Item ID
+                    </label>
+                    <input
+                      type="text"
+                      value={itemId || ""}
+                      readOnly
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
                   </div>
 
-                  {/* Item Information Row */}
-                  <div className="border border-t-0 border-gray-300">
-                    <div className="grid grid-cols-6 gap-1 px-3 py-2 items-center bg-white">
-                      <div>
-                        <input
-                          type="text"
-                          value={itemId || ""}
-                          readOnly
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <Select
-                          styles={customStyles}
-                          className="text-sm"
-                          value={itemName}
-                          options={itemNameOptions}
-                          onChange={(d: any) => setItemName(d)}
-                          placeholder="Select item"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Select
-                          styles={customStyles}
-                          className="text-sm"
-                          value={bom}
-                          options={bomOptions}
-                          onChange={(d: any) => setBom(d)}
-                          placeholder="Select BOM"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <input
-                          type="number"
-                          value={currentStock || ""}
-                          readOnly
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <input
-                          type="number"
-                          value={quantity || ""}
-                          onChange={(e) => setQuantity(+e.target.value)}
-                          placeholder="Quantity"
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          value={uom || ""}
-                          readOnly
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Store Information Section */}
-              <div className="bg-white border-b">
-                <div className="px-6 py-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Store Information
-                  </h3>
-
-                  {/* Table Header for Store Information */}
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
-                    <div className="grid grid-cols-3 gap-1 px-3 py-2">
-                      <div>FINISHED GOODS STORE</div>
-                      <div>RAW MATERIALS STORE</div>
-                      <div>SCRAP STORE</div>
-                    </div>
+                  {/* Item Name */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Package className="h-4 w-4 text-gray-500" />
+                      Item Name *
+                    </label>
+                    <Select
+                      styles={customStyles}
+                      value={itemName}
+                      options={itemNameOptions}
+                      onChange={(d: any) => setItemName(d)}
+                      placeholder="Select an item"
+                      required
+                    />
                   </div>
 
-                  {/* Store Information Row */}
-                  <div className="border border-t-0 border-gray-300">
-                    <div className="grid grid-cols-3 gap-1 px-3 py-2 items-center bg-white">
-                      <div>
-                        <Select
-                          styles={customStyles}
-                          className="text-sm"
-                          value={fgStore}
-                          options={fgStoreOptions}
-                          onChange={(d: any) => setFgStore(d)}
-                          placeholder="Select FG store"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Select
-                          styles={customStyles}
-                          className="text-sm"
-                          value={rmStore}
-                          options={rmStoreOptions}
-                          onChange={(d: any) => setRmStore(d)}
-                          placeholder="Select RM store"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Select
-                          styles={customStyles}
-                          className="text-sm"
-                          value={scrapStore}
-                          options={scrapStoreOptions}
-                          onChange={(d: any) => setScrapStore(d)}
-                          placeholder="Select scrap store"
-                          required
-                        />
-                      </div>
-                    </div>
+                  {/* BOM */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Layers className="h-4 w-4 text-gray-500" />
+                      BOM *
+                    </label>
+                    <Select
+                      styles={customStyles}
+                      value={bom}
+                      options={bomOptions}
+                      onChange={(d: any) => setBom(d)}
+                      placeholder="Select a BOM"
+                      required
+                    />
+                  </div>
+
+                  {/* Current Stock */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Hash className="h-4 w-4 text-gray-500" />
+                      Current Stock
+                    </label>
+                    <input
+                      type="number"
+                      value={currentStock || ""}
+                      readOnly
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
+                  </div>
+
+                  {/* Quantity */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Hash className="h-4 w-4 text-gray-500" />
+                      Quantity *
+                    </label>
+                    <input
+                      type="number"
+                      value={quantity || ""}
+                      onChange={(e) => setQuantity(+e.target.value)}
+                      placeholder="Enter quantity"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                      required
+                    />
+                  </div>
+
+                  {/* UOM */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Package className="h-4 w-4 text-gray-500" />
+                      Unit of Measurement
+                    </label>
+                    <input
+                      type="text"
+                      value={uom || ""}
+                      readOnly
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Submit Section */}
-              <div className="bg-white">
-                <div className="px-6 py-4">
-                  <div className="mt-6">
-                    <button
-                      type="submit"
-                      disabled={isAdding}
-                      className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white rounded transition-colors duration-200 disabled:opacity-50"
-                    >
-                      {isAdding ? "Creating..." : "Create Process"}
-                    </button>
+              {/* Store Information */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                  <Store className="h-5 w-5 text-green-600" />
+                  Store Information
+                </h3>
+
+                <div className="grid grid-cols-1 gap-6">
+                  {/* FG Store */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Store className="h-4 w-4 text-gray-500" />
+                      Finished Goods Store *
+                    </label>
+                    <Select
+                      styles={customStyles}
+                      value={fgStore}
+                      options={fgStoreOptions}
+                      onChange={(d: any) => setFgStore(d)}
+                      placeholder="Select FG store"
+                      required
+                    />
+                  </div>
+
+                  {/* RM Store */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Store className="h-4 w-4 text-gray-500" />
+                      Raw Materials Store *
+                    </label>
+                    <Select
+                      styles={customStyles}
+                      value={rmStore}
+                      options={rmStoreOptions}
+                      onChange={(d: any) => setRmStore(d)}
+                      placeholder="Select RM store"
+                      required
+                    />
+                  </div>
+
+                  {/* Scrap Store */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Store className="h-4 w-4 text-gray-500" />
+                      Scrap Store *
+                    </label>
+                    <Select
+                      styles={customStyles}
+                      value={scrapStore}
+                      options={scrapStoreOptions}
+                      onChange={(d: any) => setScrapStore(d)}
+                      placeholder="Select scrap store"
+                      required
+                    />
                   </div>
                 </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="bg-white border-t p-6 -mx-6 -mb-6">
+                <button
+                  type="submit"
+                  disabled={isAdding}
+                  className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
+                >
+                  {isAdding ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4" />
+                      Create Process
+                    </>
+                  )}
+                </button>
               </div>
             </form>
           </div>
