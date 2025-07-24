@@ -66,7 +66,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
         password: newPassword,
       }).unwrap();
       toast.success(data.message);
-      navigate(0);
+      navigate("/");
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally {
