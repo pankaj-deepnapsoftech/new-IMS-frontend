@@ -358,7 +358,7 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
 
       {/* Drawer */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
+      <div className="fixed inset-y-0 right-0 z-50 w-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
         <div className="h-full flex flex-col">
           {/* Header */}
           <div className="px-6 py-4 flex items-center justify-between border-b">
@@ -366,7 +366,9 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
               <div className="p-2 bg-blue-100 rounded-lg">
                 <MdEdit className="h-5 w-5 text-blue-600" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Update Invoice</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Update Invoice
+              </h2>
             </div>
             <button
               onClick={closeDrawerHandler}
@@ -404,11 +406,14 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
                 </div>
 
                 {/* Customer/Supplier Section */}
-                {(category?.value === "sale" || category?.value === "purchase") && (
+                {(category?.value === "sale" ||
+                  category?.value === "purchase") && (
                   <div className="bg-white rounded-lg border border-gray-200 p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                       <FaUser className="h-5 w-5 text-green-600" />
-                      {category?.value === "sale" ? "Customer Details" : "Supplier Details"}
+                      {category?.value === "sale"
+                        ? "Customer Details"
+                        : "Supplier Details"}
                     </h3>
 
                     {category.value === "sale" && (

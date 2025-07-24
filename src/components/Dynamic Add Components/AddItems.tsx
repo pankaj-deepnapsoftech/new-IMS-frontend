@@ -118,7 +118,7 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
             <FormControl>
               <FormLabel color="black">Quantity</FormLabel>
               <Input
-                className="text-gray-400"
+                className="text-gray-600"
                 value={input.quantity}
                 onChange={(e) => onChangeHandler(ind, "quantity", e.target.value)}
                 type="number"
@@ -128,7 +128,7 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
             <FormControl>
               <FormLabel color="black">Price</FormLabel>
               <Input
-                className="text-gray-400"
+                className="text-gray-600"
                 value={input.price}
                 onChange={(e) => onChangeHandler(ind, "price", e.target.value)}
                 type="number"
