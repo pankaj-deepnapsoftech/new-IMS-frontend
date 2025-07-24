@@ -185,40 +185,33 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                 minWidth="800px"
               >
                 <Thead bg={colors.table.header}>
-                  {headerGroups.map(
-                    (
-                      hg: HeaderGroup<{
-                        createdBy: string;
-                        createdOn: string;
-                        customer?: string;
-                        startdate: string;
-                        subtotal: string;
-                        total: string;
-                        status: string;
-                      }>
-                    ) => {
-                      return (
-                        <Tr
-                          {...hg.getHeaderGroupProps()}
-                          borderBottom="1px solid"
-                          borderColor={colors.table.border}
-                        >
-                          {hg.headers.map((column: any) => {
-                            return (
-                              <Th
-                                {...column.getHeaderProps(
-                                  column.getSortByToggleProps()
-                                )}
-                                style={{
-                                  position: "sticky",
-                                  top: 0,
-                                  left: column.id === "creator" ? 0 : undefined,
-                                  zIndex: column.id === "creator" ? 11 : 10,
-                                  backgroundColor: colors.table.header,
-                                }}
-                                px={4}
-                                py={3}
-                              >
+                  {headerGroups.map((hg, headerIndex) => {
+                    const { key, ...headerGroupProps } = hg.getHeaderGroupProps();
+                    return (
+                      <Tr
+                        key={key}
+                        {...headerGroupProps}
+                        borderBottom="1px solid"
+                        borderColor={colors.table.border}
+                      >
+                        {hg.headers.map((column: any) => {
+                          const { key: columnKey, ...columnProps } = column.getHeaderProps(
+                            column.getSortByToggleProps()
+                          );
+                          return (
+                            <Th
+                              key={columnKey}
+                              {...columnProps}
+                              style={{
+                                position: "sticky",
+                                top: 0,
+                                left: column.id === "creator" ? 0 : undefined,
+                                zIndex: column.id === "creator" ? 11 : 10,
+                                backgroundColor: colors.table.header,
+                              }}
+                              px={4}
+                              py={3}
+                            >
                                 <div className="flex items-center gap-1">
                                   {column.render("Header")}
                                   {column.isSorted && (
@@ -254,10 +247,12 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                 <Tbody {...getTableBodyProps()}>
                   {page.map((row: any, index) => {
                     prepareRow(row);
+                    const { key: rowKey, ...rowProps } = row.getRowProps();
 
                     return (
                       <Tr
-                        {...row.getRowProps()}
+                        key={rowKey}
+                        {...rowProps}
                         _hover={{
                           bg: colors.table.hover,
                           transform: "translateY(-1px)",
@@ -274,10 +269,12 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                         borderBottom="1px solid"
                         borderColor={colors.table.border}
                       >
-                        {row.cells.map((cell: Cell) => {
+                        {row.cells.map((cell: any) => {
+                          const { key: cellKey, ...cellProps } = cell.getCellProps();
                           return (
                             <Td
-                              {...cell.getCellProps()}
+                              key={cellKey}
+                              {...cellProps}
                               style={{
                                 position:
                                   cell.column.id === "creator"

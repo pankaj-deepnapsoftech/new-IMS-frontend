@@ -136,17 +136,18 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
         throw new Error(data.message);
       }
 
-      if (data.proforma_invoice.buyer) {
+      if (data.proforma_invoice.buyer?._id) {
         setBuyer({
           value: data.proforma_invoice.buyer._id,
           label: data.proforma_invoice.buyer.name,
         });
-      } else {
+      } else if (data.proforma_invoice.supplier?._id) {
         setSupplier({
           value: data.proforma_invoice.supplier._id,
           label: data.proforma_invoice.supplier.name,
         });
       }
+      
       setProformaInvoiceNo(data.proforma_invoice.proforma_invoice_no);
       setDocumentDate(
         moment(data.proforma_invoice.document_date).format("YYYY-DD-MM")
@@ -672,7 +673,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
               </FormControl>
               <Button
                 isLoading={isUpdating}
-                type="submit"
+                type="submit" 
                 className="mt-1 w-full"
                 colorScheme="blue"
                 size="lg"
