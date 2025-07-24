@@ -204,7 +204,7 @@ const Parties = () => {
                 className="block text-sm font-medium mb-2"
                 style={{ color: colors.text.primary }}
               >
-                Role
+                Merchant Role
               </label>
               <select
                 className="w-full px-4 py-3 text-sm border rounded-lg transition-colors focus:outline-none focus:ring-2"

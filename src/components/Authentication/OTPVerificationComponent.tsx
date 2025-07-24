@@ -39,7 +39,7 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
         otp: otp,
       }).unwrap();
       toast.success(data?.message);
-      navigate("/login");
+      navigate(0);
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally {

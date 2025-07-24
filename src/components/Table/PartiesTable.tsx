@@ -272,7 +272,7 @@ const PartiesTable = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-3"> 
+        <div className="flex items-center gap-3">
           <span
             className="text-sm font-medium"
             style={{ color: colors.text.secondary }}
@@ -313,7 +313,7 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                 Cust Id
+                  Cust Id
                 </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
@@ -325,7 +325,7 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{
                     color: colors.table.headerText,
-                    position: 'sticky',
+                    position: "sticky",
                     top: 0,
                     left: 0,
                     zIndex: 3,
@@ -362,26 +362,26 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Parties Type
+                  Merchant Type
                 </th>
-                <th
+                {/* <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
                   GST No.
-                </th>
-                <th
+                </th> */}
+                {/* <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
                   GST Address
-                </th>
-                <th
+                </th> */}
+                {/* <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
                   Delivery Address
-                </th>
+                </th> */}
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
@@ -393,6 +393,18 @@ const PartiesTable = ({
                   style={{ color: colors.table.headerText }}
                 >
                   Bill To
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Shipped GST To
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Bill GST To
                 </th>
                 <th
                   className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
@@ -442,9 +454,12 @@ const PartiesTable = ({
                     className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
                     style={{
                       color: colors.text.primary,
-                      position: 'sticky',
+                      position: "sticky",
                       left: 0,
-                      backgroundColor: index % 2 === 0 ? colors.background.card : colors.table.stripe,
+                      backgroundColor:
+                        index % 2 === 0
+                          ? colors.background.card
+                          : colors.table.stripe,
                       zIndex: 1,
                     }}
                     title={party.consignee_name}
@@ -503,7 +518,7 @@ const PartiesTable = ({
                       {party.parties_type || "N/A"}
                     </span>
                   </td>
-                  <td
+                  {/* <td
                     className="px-4 py-3 text-sm font-mono whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                   >
@@ -522,7 +537,7 @@ const PartiesTable = ({
                     title={party.delivery_address}
                   >
                     {party.delivery_address || "N/A"}
-                  </td>
+                  </td> */}
                   <td
                     className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
@@ -536,6 +551,20 @@ const PartiesTable = ({
                     title={party.bill_to}
                   >
                     {party.bill_to || "N/A"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                    style={{ color: colors.text.secondary }}
+                    title={party.shipped_gst_to}
+                  >
+                    {party.shipped_gst_to || "N/A"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                    style={{ color: colors.text.secondary }}
+                    title={party.bill_gst_to}
+                  >
+                    {party.bill_gst_to || "N/A"}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center justify-center gap-2">

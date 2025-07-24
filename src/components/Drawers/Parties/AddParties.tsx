@@ -30,9 +30,9 @@ const AddParties = ({
   fetchPartiesData,
 }) => {
   const [consigneeNames, setConsigneeNames] = useState([""]);
-  const [gstIns, setGstIns] = useState([""]);
+  // const [gstIns, setGstIns] = useState([""]);
   const [contactNumbers, setContactNumbers] = useState([""]);
-  const [deliveryAddresses, setDeliveryAddresses] = useState([""]);
+  // const [deliveryAddresses, setDeliveryAddresses] = useState([""]);
   const [emailIds, setEmailIds] = useState([""]);
   const [cookies] = useCookies();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,15 +40,15 @@ const AddParties = ({
   useEffect(() => {
     if (edittable) {
       setConsigneeNames(edittable.consignee_name || [""]);
-      setGstIns(edittable.gst_in || [""]);
+      // setGstIns(edittable.gst_in || [""]);
       setContactNumbers(edittable.contact_number || [""]);
-      setDeliveryAddresses(edittable.delivery_address || [""]);
+      // setDeliveryAddresses(edittable.delivery_address || [""]);
       setEmailIds(edittable.email_id || [""]);
     } else {
       setConsigneeNames([""]);
-      setGstIns([""]);
+      // setGstIns([""]);
       setContactNumbers([""]);
-      setDeliveryAddresses([""]);
+      // setDeliveryAddresses([""]);
       setEmailIds([""]);
     }
   }, [edittable]);
@@ -57,9 +57,11 @@ const AddParties = ({
     initialValues: {
       type: edittable?.type || "",
       parties_type: edittable?.parties_type || "",
-      gst_add: edittable?.gst_add || "",
+      // gst_add: edittable?.gst_add || "",
       shipped_to: edittable?.shipped_to || "",
       bill_to: edittable?.bill_to || "",
+      shipped_gst_to: edittable?.shipped_gst_to || "",
+      bill_gst_to: edittable?.bill_gst_to || "",
       company_name: edittable?.company_name,
     },
     enableReinitialize: true,
@@ -67,14 +69,15 @@ const AddParties = ({
     onSubmit: async (values) => {
       if (isSubmitting) return;
       setIsSubmitting(true);
+          
 
       const payload = {
         ...values,
         consignee_name: consigneeNames,
-        gst_in: gstIns,
+        // gst_in: gstIns,
         contact_number: contactNumbers,
-        delivery_address: deliveryAddresses,
-        email_id: emailIds,
+        // delivery_address: deliveryAddresses,
+        email_id: emailIds, 
       };
 
       try {
@@ -106,9 +109,9 @@ const AddParties = ({
         fetchPartiesData();
         formik.resetForm();
         setConsigneeNames([""]);
-        setGstIns([""]);
+        // setGstIns([""]);
         setContactNumbers([""]);
-        setDeliveryAddresses([""]);
+        // setDeliveryAddresses([""]);
         setEmailIds([""]);
         setshowData(false);
         setEditTable(null);
@@ -121,7 +124,13 @@ const AddParties = ({
     },
   });
 
-  const renderFieldList = (label, values, setValues, icon) => (
+  const renderFieldList = (
+    label,
+    values,
+    setValues,
+    icon,
+    { allowAdd = true } = {} 
+  ) => (
     <div className="space-y-3">
       <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
         {icon}
@@ -155,16 +164,20 @@ const AddParties = ({
           )}
         </div>
       ))}
-      <button
-        type="button"
-        onClick={() => setValues([...values, ""])}
-        className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-lg transition-colors duration-200"
-      >
-        <Plus className="h-4 w-4" />
-        Add More {label}
-      </button>
+
+      {allowAdd && ( 
+        <button
+          type="button"
+          onClick={() => setValues([...values, ""])}
+          className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-lg transition-colors duration-200"
+        >
+          <Plus className="h-4 w-4" />
+          Add More {label}
+        </button>
+      )}
     </div>
   );
+  
 
   return (
     <>
@@ -175,8 +188,8 @@ const AddParties = ({
 
       {/* Drawer */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full sm:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
-          showData ? "translate-x-0" : "translate-x-full" 
+        className={`fixed inset-y-0 right-0 z-50 w-full  bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
+          showData ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="h-full flex flex-col">
@@ -288,7 +301,7 @@ const AddParties = ({
                   )}
 
                   {/* GST Address */}
-                  <div className="space-y-2 md:col-span-2">
+                  {/* <div className="space-y-2 md:col-span-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <MapPin className="h-4 w-4 text-gray-500" />
                       GST Add
@@ -307,7 +320,7 @@ const AddParties = ({
                         {formik.errors.gst_add}
                       </p>
                     )}
-                  </div>
+                  </div> */}
 
                   {/* Shipped To */}
                   <div className="space-y-2">
@@ -352,6 +365,49 @@ const AddParties = ({
                       </p>
                     )}
                   </div>
+
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <MapPin className="h-4 w-4 text-gray-500" />
+                      Shipped GST To
+                    </label>
+                    <input
+                      type="text"
+                      name="shipped_gst_to"
+                      value={formik.values.shipped_gst_to}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      placeholder="Enter shipping address"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                    />
+                    {formik.touched.shipped_gst_to && formik.errors.shipped_gst_to && (
+                      <p className="text-sm text-red-600 flex items-center gap-1">
+                        {formik.errors.shipped_gst_to}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Bill To */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <FileText className="h-4 w-4 text-gray-500" />
+                      Bill GST To
+                    </label>
+                    <input
+                      type="text"
+                      name="bill_gst_to"
+                      value={formik.values.bill_gst_to}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      placeholder="Enter billing address"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                    />
+                    {formik.touched.bill_gst_to && formik.errors.bill_gst_to && (
+                      <p className="text-sm text-red-600 flex items-center gap-1">
+                        {formik.errors.bill_gst_to}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -367,15 +423,16 @@ const AddParties = ({
                     "Consignee Name",
                     consigneeNames,
                     setConsigneeNames,
-                    <User className="h-4 w-4 text-gray-500" />
+                    <User className="h-4 w-4 text-gray-500" />,
+                    { allowAdd: false } 
                   )}
 
-                  {renderFieldList(
+                  {/* {renderFieldList(
                     "GST IN",
                     gstIns,
                     setGstIns,
                     <FileText className="h-4 w-4 text-gray-500" />
-                  )}
+                  )} */}
 
                   {renderFieldList(
                     "Contact Number",
@@ -384,12 +441,12 @@ const AddParties = ({
                     <Phone className="h-4 w-4 text-gray-500" />
                   )}
 
-                  {renderFieldList(
+                  {/* {renderFieldList(
                     "Delivery Address",
                     deliveryAddresses,
                     setDeliveryAddresses,
                     <MapPin className="h-4 w-4 text-gray-500" />
-                  )}
+                  )} */}
 
                   {renderFieldList(
                     "Email ID",
@@ -420,9 +477,9 @@ const AddParties = ({
                       {edittable ? "Updating..." : "Creating..."}
                     </>
                   ) : edittable ? (
-                    "Update Party"
+                    "Update Merchant"
                   ) : (
-                    "Create Party"
+                    "Create Merchant"
                   )}
                 </button>
               </div>
