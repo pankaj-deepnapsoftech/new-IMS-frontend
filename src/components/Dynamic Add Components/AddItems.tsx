@@ -40,20 +40,33 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
           },
         }
       );
+
       const results = await response.json();
+
       if (!results.success) {
         throw new Error(results?.message);
       }
-      const products = results.products.map((product: any) => ({
+
+      // ✅ Filter products where category is exactly "finished goods"
+      const finishedGoods = results.products.filter(
+        (product: any) => product.category?.toLowerCase() === "finished goods"
+      );
+
+      // Convert to options for Select
+      const productOptions = finishedGoods.map((product: any) => ({
         value: product._id,
         label: product.name,
       }));
-      setProductOptions(products);
-      setProducts(results.products);
+
+      // Set filtered data
+      setProductOptions(productOptions);
+      setProducts(finishedGoods);
+
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
   };
+
 
   const onChangeHandler = (ind: number, name: string, value: any) => {
     const inputsArr = [...inputs];
