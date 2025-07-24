@@ -39,7 +39,7 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   const fetchInvoiceDetails = async (id: string) => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + `invoice/${id}`,
+        process.env.REACT_APP_BACKEND_URL + `proforma-invoice/${id}`,
         {
           method: "GET",
           headers: {
@@ -51,19 +51,19 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
       if (!data.success) {
         throw new Error(data.message);
       }
-      setInvoiceNo(data.invoice.invoice_no);
-      setDocumentDate(data.invoice.document_date);
-      setSalesOrderDate(data.invoice.sales_order_date);
-      setNote(data.invoice?.note || "Not Available");
-      setSubtotal(data.invoice.subtotal);
-      setTotal(data.invoice.total);
-      setTax(data.invoice.tax);
-      setItems(data.invoice.items);
-      setStore(data.invoice.store.name);
-      setCategory(data.invoice.category);
-      setBuyer(data.invoice?.buyer?.name);
-      setSupplier(data.invoice?.supplier?.name);
-      setCreator(data.invoice.creator);
+      setInvoiceNo(data.proforma_invoice.proforma_invoice_no);
+      setDocumentDate(data.proforma_invoice.document_date);
+      setSalesOrderDate(data.proforma_invoice.sales_order_date);
+      setNote(data.proforma_invoice?.note || "Not Available");
+      setSubtotal(data.proforma_invoice.subtotal);
+      setTotal(data.proforma_invoice.total);
+      setTax(data.proforma_invoice.tax);
+      setItems(data.proforma_invoice.items);
+      setStore(data.proforma_invoice.store.name);
+      setCategory(data.proforma_invoice.category);
+      setBuyer(data.proforma_invoice?.buyer?.name);
+      setSupplier(data.proforma_invoice?.supplier?.name);
+      setCreator(data.proforma_invoice.creator);
     } catch (error: any) {
       toast.error(error.messsage || "Something went wrong");
     }
@@ -72,6 +72,7 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   useEffect(() => {
     fetchInvoiceDetails(id || "");
   }, [id]);
+
 
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
@@ -114,48 +115,54 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
           {isLoading && <Loading />}
           {!isLoading && (
             <div className="space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">Created By</h3>
-                <p className="text-gray-600">
-                  {creator?.first_name + " " + creator?.last_name}
-                </p>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">Category</h3>
-                <p className="text-gray-600">{category?.toUpperCase()}</p>
-              </div>
-
-              {buyer && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Buyer</h3>
-                  <p className="text-gray-600">{buyer}</p>
+                  <h3 className="font-semibold text-gray-700 mb-2">
+                    Created By
+                  </h3>
+                  <p className="text-gray-600">
+                    {creator?.first_name + " " + creator?.last_name}
+                  </p>
                 </div>
-              )}
 
-              {supplier && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Supplier</h3>
-                  <p className="text-gray-600">{supplier}</p>
+                  <h3 className="font-semibold text-gray-700 mb-2">Category</h3>
+                  <p className="text-gray-600">{category?.toUpperCase()}</p>
                 </div>
-              )}
 
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">
-                  Proforma Invoice No.
-                </h3>
-                <p className="text-gray-600">{invoiceNo}</p>
-              </div>
+                {buyer && (
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <h3 className="font-semibold text-gray-700 mb-2">Buyer</h3>
+                    <p className="text-gray-600">{buyer}</p>
+                  </div>
+                )}
 
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">
-                  Document Date
-                </h3>
-                <p className="text-gray-600">
-                  {documentDate
-                    ? new Date(documentDate).toLocaleDateString()
-                    : "N/A"}
-                </p>
+                {supplier && (
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <h3 className="font-semibold text-gray-700 mb-2">
+                      Supplier
+                    </h3>
+                    <p className="text-gray-600">{supplier}</p>
+                  </div>
+                )}
+
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <h3 className="font-semibold text-gray-700 mb-2">
+                    Proforma Invoice No.
+                  </h3>
+                  <p className="text-gray-600">{invoiceNo}</p>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <h3 className="font-semibold text-gray-700 mb-2">
+                    Document Date
+                  </h3>
+                  <p className="text-gray-600">
+                    {documentDate
+                      ? new Date(documentDate).toLocaleDateString()
+                      : "N/A"}
+                  </p>
+                </div>
               </div>
 
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
@@ -210,26 +217,28 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">Store</h3>
-                <p className="text-gray-600">{store}</p>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <h3 className="font-semibold text-gray-700 mb-2">Store</h3>
+                  <p className="text-gray-600">{store}</p>
+                </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">Note</h3>
-                <p className="text-gray-600">{note}</p>
-              </div>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <h3 className="font-semibold text-gray-700 mb-2">Note</h3>
+                  <p className="text-gray-600">{note}</p>
+                </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">Subtotal</h3>
-                <p className="text-gray-600 text-lg font-medium">
-                  ₹ {subtotal}/-
-                </p>
-              </div>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <h3 className="font-semibold text-gray-700 mb-2">Subtotal</h3>
+                  <p className="text-gray-600 text-lg font-medium">
+                    ₹ {subtotal}/-
+                  </p>
+                </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">Tax</h3>
-                <p className="text-gray-600">{tax?.tax_name}</p>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <h3 className="font-semibold text-gray-700 mb-2">Tax</h3>
+                  <p className="text-gray-600">{tax?.tax_name}</p>
+                </div>
               </div>
 
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
