@@ -32,7 +32,7 @@ const SalesTable = ({
     const totalPrice = basePrice + gstVal;
     return totalPrice;
   };
-  console.log(filteredPurchases)
+  // console.log(filteredPurchases)
   const [selectedSale, setSelectedSale] = useState([]);
   const [paymentshow, setPaymentshow] = useState(false);
   const [isOpen, setViewDesign] = useState(false);
@@ -62,7 +62,7 @@ const SalesTable = ({
     return <EmptyData />;
   }
 
-  console.log(filteredPurchases)
+  // console.log(filteredPurchases)
 
   return (
     <div className="space-y-4 bg-[#f8f9fa]">
@@ -98,15 +98,16 @@ const SalesTable = ({
             {/* <p>Design Approval:
             </p> */}
             <span
-              className={`inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium ${purchase?.assinedto[0]?.isCompleted === "Completed"
+              className={`inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium ${purchase?.assinedto?.[0]?.isCompleted === "Completed"
                   ? "bg-green-100 text-green-800"
-                : purchase?.assinedto[0]?.isCompleted === "UnderProcessing"
+                  : purchase?.assinedto?.[0]?.isCompleted === "UnderProcessing"
                     ? "bg-yellow-100 text-yellow-800"
                     : "bg-gray-100 text-gray-800"
                 }`}
             >
-            Design Approval:  {purchase?.assinedto[0]?.isCompleted}
+              Design Approval: {purchase?.assinedto?.[0]?.isCompleted || "N/A"}
             </span>
+
           </div>
 
           {/* Sale Details Grid */}

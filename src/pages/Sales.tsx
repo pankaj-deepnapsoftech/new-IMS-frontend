@@ -118,6 +118,8 @@ const Sales = () => {
         setFilteredPurchases(filtered);
     }, [filterText, filterDate, filterStatus, purchases]);
 
+    // console.log(purchases)
+
     return (
         <div
             className="min-h-screen"
