@@ -384,74 +384,75 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
             {!isLoading && (
               <form onSubmit={updateInvoiceHandler} className="space-y-6">
                 {/* Invoice Type Section */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <FaTags className="h-5 w-5 text-blue-600" />
-                    Invoice Type
-                  </h3>
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <MdReceipt className="h-4 w-4 text-gray-500" />
-                      Category *
-                    </label>
-                    <Select
-                      styles={customSelectStyles}
-                      isDisabled
-                      value={category}
-                      options={categoryOptions}
-                      placeholder="Select category"
-                      className="text-sm"
-                    />
-                  </div>
-                </div>
-
-                {/* Customer/Supplier Section */}
-                {(category?.value === "sale" ||
-                  category?.value === "purchase") && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-white rounded-lg border border-gray-200 p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <FaUser className="h-5 w-5 text-green-600" />
-                      {category?.value === "sale"
-                        ? "Customer Details"
-                        : "Supplier Details"}
+                      <FaTags className="h-5 w-5 text-blue-600" />
+                      Invoice Type
                     </h3>
-
-                    {category.value === "sale" && (
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                          <FaUser className="h-4 w-4 text-gray-500" />
-                          Buyer *
-                        </label>
-                        <Select
-                          styles={customSelectStyles}
-                          isDisabled
-                          value={buyer}
-                          options={buyerOptions}
-                          placeholder="Select buyer"
-                          className="text-sm"
-                        />
-                      </div>
-                    )}
-
-                    {category.value === "purchase" && (
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                          <FaUser className="h-4 w-4 text-gray-500" />
-                          Supplier *
-                        </label>
-                        <Select
-                          styles={customSelectStyles}
-                          isDisabled
-                          value={supplier}
-                          options={supplierOptions}
-                          placeholder="Select supplier"
-                          className="text-sm"
-                        />
-                      </div>
-                    )}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <MdReceipt className="h-4 w-4 text-gray-500" />
+                        Category *
+                      </label>
+                      <Select
+                        styles={customSelectStyles}
+                        isDisabled
+                        value={category}
+                        options={categoryOptions}
+                        placeholder="Select category"
+                        className="text-sm"
+                      />
+                    </div>
                   </div>
-                )}
 
+                  {/* Customer/Supplier Section */}
+                  {(category?.value === "sale" ||
+                    category?.value === "purchase") && (
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <FaUser className="h-5 w-5 text-green-600" />
+                        {category?.value === "sale"
+                          ? "Customer Details"
+                          : "Supplier Details"}
+                      </h3>
+
+                      {category.value === "sale" && (
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                            <FaUser className="h-4 w-4 text-gray-500" />
+                            Buyer *
+                          </label>
+                          <Select
+                            styles={customSelectStyles}
+                            isDisabled
+                            value={buyer}
+                            options={buyerOptions}
+                            placeholder="Select buyer"
+                            className="text-sm"
+                          />
+                        </div>
+                      )}
+
+                      {category.value === "purchase" && (
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                            <FaUser className="h-4 w-4 text-gray-500" />
+                            Supplier *
+                          </label>
+                          <Select
+                            styles={customSelectStyles}
+                            isDisabled
+                            value={supplier}
+                            options={supplierOptions}
+                            placeholder="Select supplier"
+                            className="text-sm"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
                 {/* Invoice Details Section */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
@@ -549,7 +550,7 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
                     Pricing & Tax
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700">
                         Subtotal
@@ -576,7 +577,7 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
                       />
                     </div>
 
-                    <div className="space-y-2 md:col-span-2">
+                    <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700">
                         Total Amount
                       </label>

@@ -316,151 +316,152 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
         <div className="p-6">
           <form onSubmit={addInvoiceHandler} className="space-y-6">
             {/* Category */}
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Category
-              </FormLabel>
-              <Select
-                value={category}
-                options={categoryOptions}
-                onChange={(e: any) => setCategory(e)}
-                styles={customSelectStyles}
-                placeholder="Select category"
-              />
-            </FormControl>
-
-            {/* Buyer (for sale) */}
-            {category && category.value === "sale" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormControl isRequired>
                 <FormLabel
                   className="text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
                 >
-                  Buyer
+                  Category
                 </FormLabel>
                 <Select
-                  value={buyer}
-                  options={buyerOptions}
-                  onChange={(e: any) => setBuyer(e)}
+                  value={category}
+                  options={categoryOptions}
+                  onChange={(e: any) => setCategory(e)}
                   styles={customSelectStyles}
-                  placeholder="Select buyer"
+                  placeholder="Select category"
                 />
               </FormControl>
-            )}
 
-            {/* Supplier (for purchase) */}
-            {category && category.value === "purchase" && (
+              {/* Buyer (for sale) */}
+              {category && category.value === "sale" && (
+                <FormControl isRequired>
+                  <FormLabel
+                    className="text-sm font-medium mb-2"
+                    style={{ color: colors.text.primary }}
+                  >
+                    Buyer
+                  </FormLabel>
+                  <Select
+                    value={buyer}
+                    options={buyerOptions}
+                    onChange={(e: any) => setBuyer(e)}
+                    styles={customSelectStyles}
+                    placeholder="Select buyer"
+                  />
+                </FormControl>
+              )}
+
+              {/* Supplier (for purchase) */}
+              {category && category.value === "purchase" && (
+                <FormControl isRequired>
+                  <FormLabel
+                    className="text-sm font-medium mb-2"
+                    style={{ color: colors.text.primary }}
+                  >
+                    Supplier
+                  </FormLabel>
+                  <Select
+                    value={supplier}
+                    options={supplierOptions}
+                    onChange={(e: any) => setSupplier(e)}
+                    styles={customSelectStyles}
+                    placeholder="Select supplier"
+                  />
+                </FormControl>
+              )}
+
+              {/* Invoice Number */}
               <FormControl isRequired>
                 <FormLabel
                   className="text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
                 >
-                  Supplier
+                  Invoice Number
                 </FormLabel>
-                <Select
-                  value={supplier}
-                  options={supplierOptions}
-                  onChange={(e: any) => setSupplier(e)}
-                  styles={customSelectStyles}
-                  placeholder="Select supplier"
+                <Input
+                  value={invoiceNo}
+                  onChange={(e) => setInvoiceNo(e.target.value)}
+                  type="text"
+                  placeholder="Enter invoice number"
+                  className="w-full"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                    borderRadius: "8px",
+                    height: "44px",
+                  }}
+                  _focus={{
+                    borderColor: colors.input.borderFocus,
+                    boxShadow: `0 0 0 3px ${colors.primary[100]}`,
+                  }}
+                  _hover={{
+                    borderColor: colors.input.borderHover,
+                  }}
                 />
               </FormControl>
-            )}
 
-            {/* Invoice Number */}
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Invoice Number
-              </FormLabel>
-              <Input
-                value={invoiceNo}
-                onChange={(e) => setInvoiceNo(e.target.value)}
-                type="text"
-                placeholder="Enter invoice number"
-                className="w-full"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                  borderRadius: "8px",
-                  height: "44px",
-                }}
-                _focus={{
-                  borderColor: colors.input.borderFocus,
-                  boxShadow: `0 0 0 3px ${colors.primary[100]}`,
-                }}
-                _hover={{
-                  borderColor: colors.input.borderHover,
-                }}
-              />
-            </FormControl>
+              {/* Document Date */}
+              <FormControl isRequired>
+                <FormLabel
+                  className="text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Document Date
+                </FormLabel>
+                <Input
+                  value={documentDate}
+                  onChange={(e) => setDocumentDate(e.target.value)}
+                  type="date"
+                  className="w-full"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                    borderRadius: "8px",
+                    height: "44px",
+                  }}
+                  _focus={{
+                    borderColor: colors.input.borderFocus,
+                    boxShadow: `0 0 0 3px ${colors.primary[100]}`,
+                  }}
+                  _hover={{
+                    borderColor: colors.input.borderHover,
+                  }}
+                />
+              </FormControl>
 
-            {/* Document Date */}
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Document Date
-              </FormLabel>
-              <Input
-                value={documentDate}
-                onChange={(e) => setDocumentDate(e.target.value)}
-                type="date"
-                className="w-full"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                  borderRadius: "8px",
-                  height: "44px",
-                }}
-                _focus={{
-                  borderColor: colors.input.borderFocus,
-                  boxShadow: `0 0 0 3px ${colors.primary[100]}`,
-                }}
-                _hover={{
-                  borderColor: colors.input.borderHover,
-                }}
-              />
-            </FormControl>
-
-            {/* Sales Order Date */}
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Sales Order Date
-              </FormLabel>
-              <Input
-                value={salesOrderDate}
-                onChange={(e) => setSalesOrderDate(e.target.value)}
-                type="date"
-                className="w-full"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                  borderRadius: "8px",
-                  height: "44px",
-                }}
-                _focus={{
-                  borderColor: colors.input.borderFocus,
-                  boxShadow: `0 0 0 3px ${colors.primary[100]}`,
-                }}
-                _hover={{
-                  borderColor: colors.input.borderHover,
-                }}
-              />
-            </FormControl>
-
+              {/* Sales Order Date */}
+              <FormControl isRequired>
+                <FormLabel
+                  className="text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Sales Order Date
+                </FormLabel>
+                <Input
+                  value={salesOrderDate}
+                  onChange={(e) => setSalesOrderDate(e.target.value)}
+                  type="date"
+                  className="w-full"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                    borderRadius: "8px",
+                    height: "44px",
+                  }}
+                  _focus={{
+                    borderColor: colors.input.borderFocus,
+                    boxShadow: `0 0 0 3px ${colors.primary[100]}`,
+                  }}
+                  _hover={{
+                    borderColor: colors.input.borderHover,
+                  }}
+                />
+              </FormControl>
+            </div>
             {/* Store */}
             <FormControl isRequired>
               <FormLabel
@@ -527,6 +528,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
               </div>
             </FormControl>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Subtotal */}
             <FormControl isRequired>
               <FormLabel
@@ -591,6 +593,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                 }}
               />
             </FormControl>
+            </div>
 
             {/* Submit Button */}
             <div className="flex gap-3 pt-4">
