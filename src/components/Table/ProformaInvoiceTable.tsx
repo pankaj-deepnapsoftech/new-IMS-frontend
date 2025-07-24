@@ -71,6 +71,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
     useSortBy,
     usePagination
   );
+  // console.log(proformaInvoices)
 
   return (
     <div className="p-6">

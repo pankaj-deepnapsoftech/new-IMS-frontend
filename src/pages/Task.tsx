@@ -264,7 +264,7 @@ const Task = () => {
     }
   };
 
-  
+
 
   // Filter tasks based on search and filters
   useEffect(() => {
@@ -339,13 +339,13 @@ const Task = () => {
         const formData = new FormData();
         formData.append("file", file);
         const imageUrl = await ImageUploader(formData)
-     
+
         const payload = {
           assined_to: selectedTask?.id,
           designFile: imageUrl,
           assinedto_comment: values.comment || "No comment",
         };
-        
+
 
         await axios.patch(
           `${process.env.REACT_APP_BACKEND_URL}sale/upload-image/${selectedTask?.sale_id}`,
@@ -378,7 +378,7 @@ const Task = () => {
       alert("Design file not available.");
     }
   };
- 
+
   useEffect(() => {
     fetchTasks();
   }, [cookies?.access_token, page, limit]);
@@ -922,28 +922,40 @@ const Task = () => {
                               Accept Task
                             </button>
                           )}
+                              <div className="flex flex-row w-full gap-10">
+                                {activeTaskId === task.id &&
+                                  role?.toLowerCase() === "designer" &&
+                                  !task.designFile &&
+                                  task.design_status !== "Completed" && (
+                                    <button
+                                      onClick={() => handleOpenUploadModal(task)}
+                                      className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                                    >
+                                      Upload Image
+                                    </button>
+                                  )}
 
-                              {activeTaskId === task.id &&
-                                role?.toLowerCase() === "designer" &&
-                                !task.designFile &&
-                                task.design_status !== "Completed" && (
+                                {task?.allsale?.designFile && task?.design_status === "Completed" && (
                                   <button
-                                    onClick={() => handleOpenUploadModal(task)}
-                                    className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                                    onClick={() => hanldeViewImage(task?.allsale?.designFile)}
+                                    className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                                   >
-                                    Upload Image
+                                    View Images
                                   </button>
                                 )}
 
-                            
-                              {task?.allsale?.designFile && task?.design_status === "Completed" && <button
-                                  onClick={() => hanldeViewImage(task?.allsale?.designFile)}
-                                  className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-                                >
-                                  View Images
-                                </button>}
-                              
-                         
+                                {task?.allsale?.productFile &&
+                                  (task?.design_status === "UnderProcessing" || task?.design_status === "Completed") && (
+                                    <button
+                                      onClick={() => hanldeViewImage(task?.allsale?.productFile)}
+                                      className="mt-3 px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
+                                    >
+                                      Sample Images
+                                    </button>
+                                  )}
+                              </div>
+
+
                           {showModal && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
                               <div className="pointer-events-auto w-full max-w-md mx-auto p-6  bg-white rounded-2xl shadow-xl border border-gray-200 transition-all duration-300 animate-fade-in">

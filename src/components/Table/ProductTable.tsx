@@ -207,6 +207,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         left: 0,
                         zIndex: 3,
                         backgroundColor: colors.table.header,
+                        width: "160px", // Fixed width
+                        minWidth: "160px",
                       }}
                     >
                       Product Id
@@ -214,10 +216,20 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{ color: colors.table.headerText }}
+                      style={{
+                        color: colors.table.headerText,
+                        position: "sticky",
+                        top: 0,
+                        left: "100px", // Shifted to right of Product ID
+                        zIndex: 3,
+                        backgroundColor: colors.table.header,
+                        width: "220px",
+                        minWidth: "220px",
+                      }}
                     >
                       Name
                     </th>
+
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -310,6 +322,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                               index % 2 === 0
                                 ? colors.background.card
                                 : colors.table.stripe,
+                            width: "160px",
+                            minWidth: "160px",
                           }}
                         >
                           {row.original.product_id || "N/A"}
@@ -317,11 +331,23 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
                         <td
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap max-w-xs truncate"
-                          style={{ color: colors.text.primary }}
+                          style={{
+                            color: colors.text.secondary,
+                            position: "sticky",
+                            left: "100px", // Match <th>
+                            zIndex: 1,
+                            backgroundColor:
+                              index % 2 === 0
+                                ? colors.background.card
+                                : colors.table.stripe,
+                            width: "220px",
+                            minWidth: "220px",
+                          }}
                           title={row.original.name}
                         >
                           {row.original.name || "N/A"}
                         </td>
+
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}

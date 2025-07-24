@@ -129,7 +129,7 @@ const ProformaInvoice: React.FC = () => {
     );
     setFilteredData(results);
   }, [searchKey]);
-
+  
   if (!isAllowed) {
     return (
       <div className="text-center text-red-500">
