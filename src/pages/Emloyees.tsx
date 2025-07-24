@@ -88,6 +88,7 @@ const Employees: React.FC = () => {
         emp.email.toLowerCase()?.includes(searchTxt) ||
         emp.phone.toLowerCase().toString().includes(searchTxt) ||
         emp?.role?.role?.toLowerCase()?.includes(searchTxt) ||
+        emp?.employeeId?.toLowerCase()?.includes(searchTxt) ||
         (emp?.createdAt &&
           new Date(emp?.createdAt)
             ?.toISOString()
