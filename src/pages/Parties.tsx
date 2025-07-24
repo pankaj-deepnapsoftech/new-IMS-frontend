@@ -204,7 +204,7 @@ const Parties = () => {
                 className="block text-sm font-medium mb-2"
                 style={{ color: colors.text.primary }}
               >
-                Merchant Role
+                Merchant Type
               </label>
               <select
                 className="w-full px-4 py-3 text-sm border rounded-lg transition-colors focus:outline-none focus:ring-2"
@@ -224,7 +224,7 @@ const Parties = () => {
                   e.target.style.boxShadow = "none";
                 }}
               >
-                <option value="">Select Role</option>
+                <option value="">Select Type</option>
                 <option value="Buyer">Buyer</option>
                 <option value="Seller">Seller</option>
               </select>

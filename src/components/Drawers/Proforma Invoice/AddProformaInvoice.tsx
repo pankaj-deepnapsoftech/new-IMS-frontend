@@ -180,15 +180,19 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
         }
       );
       const results = await response.json();
+    
       if (!results.success) {
         throw new Error(results?.message);
       }
+
       const products = results.products.map((product: any) => ({
         value: product._id,
         label: product.name,
       }));
       setItemOptions(products);
       setAllItems(results.products);
+      console.log(response)
+      console.log(results)
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
