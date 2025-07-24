@@ -36,7 +36,6 @@ import { IoIosPeople } from "react-icons/io";
 import Task from "../pages/Task";
 import { Box, Calendar, Component, Construction, Container, HandCoins, Presentation, ShieldCheck } from "lucide-react";
 import Dashboard from "../pages/Dashboard";
-import Quotation from "../pages/Quotation";
 import Planning from "../pages/Planning";
 import Designing from "../pages/Designing";
 import Supplier from "../pages/Supplier";
@@ -78,13 +77,6 @@ const routes = [
     icon: <HandCoins />,
     path: "sales",
     element: <Sales />,
-    isSublink: false,
-  },
-  {
-    name: "Quotation",
-    icon: <FaQuoteLeft />,
-    path: "quotation",
-    element: <Quotation />,
     isSublink: false,
   },
   {
