@@ -16,6 +16,7 @@ import {
 } from "../../../redux/api/api";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
+import Process from "../../Dynamic Add Components/ProductionProcess";
 
 interface UpdateProcess {
   closeDrawerHandler: () => void;
@@ -781,7 +782,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
               </div>
 
               {/* Process Section */}
-              <div className="bg-white border-b">
+              {/* <div className="bg-white border-b">
                 <div className="px-6 py-4">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">
@@ -839,10 +840,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                               value={process}
                               readOnly
                               className="w-full px-3 py-2 border border-gray-300 rounded bg-white mb-3"
-                            />
+                            /> */}
 
-                            {/* Process Status Checkboxes */}
-                            <div className="flex gap-4">
+              {/* Process Status Checkboxes */}
+              {/* <div className="flex gap-4">
                               <label className="flex items-center gap-2">
                                 <input
                                   type="checkbox"
@@ -885,6 +886,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     })}
                   </div>
                 </div>
+              </div> */}
+
+              <div className="bg-white border-b p-6">
+                <Process inputs={processes} setInputs={setProcesses} />
               </div>
 
               {/* Scrap Materials Section */}
