@@ -47,12 +47,12 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
         throw new Error(results?.message);
       }
 
-      // ✅ Filter products where category is exactly "finished goods"
+     
       const finishedGoods = results.products.filter(
         (product: any) => product.category?.toLowerCase() === "finished goods"
       );
 
-      // Convert to options for Select
+     
       const productOptions = finishedGoods.map((product: any) => ({
         value: product._id,
         label: product.name,

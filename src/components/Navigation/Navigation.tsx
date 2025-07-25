@@ -51,9 +51,9 @@ const Navigation: React.FC = () => {
   };
   return (
     <>
-      {/* Mobile Menu Button */}
+     
       <div
-        className={`fixed top-2 z-50 lg:hidden transition-all duration-300 ease-in-out ${
+        className={`absolute top-2 z-40 lg:hidden transition-all duration-300 ease-in-out ${
           checkMenu ? "left-[250px]" : "left-4"
         }`}
       >
@@ -69,10 +69,10 @@ const Navigation: React.FC = () => {
         </button>
       </div>
 
-      {/* Mobile Overlay */}
+    
       {checkMenu && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden transition-opacity duration-300"
           onClick={() => setCheckMenu(false)}
         />
       )}

@@ -75,183 +75,181 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
 
 
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
+    <div
+      className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
+      style={{
+        boxShadow:
+          "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+      }}
+    >
       <div
-        className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
+        className="flex items-center justify-between p-6 border-b"
+        style={{ borderColor: colors.border.light }}
       >
-        <div
-          className="flex items-center justify-between p-6 border-b"
-          style={{ borderColor: colors.border.light }}
+        <h1
+          className="text-xl font-semibold"
+          style={{ color: colors.text.primary }}
         >
-          <h1
-            className="text-xl font-semibold"
-            style={{ color: colors.text.primary }}
-          >
-            Proforma Invoice Details
-          </h1>
-          <button
-            onClick={closeDrawerHandler}
-            className="p-2 rounded-lg transition-colors duration-200"
-            style={{
-              color: colors.text.secondary,
-              backgroundColor: colors.gray[100],
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[200];
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[100];
-            }}
-          >
-            <BiX size={20} />
-          </button>
-        </div>
+          Proforma Invoice Details
+        </h1>
+        <button
+          onClick={closeDrawerHandler}
+          className="p-2 rounded-lg transition-colors duration-200"
+          style={{
+            color: colors.text.secondary,
+            backgroundColor: colors.gray[100],
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[200];
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[100];
+          }}
+        >
+          <BiX size={20} />
+        </button>
+      </div>
 
-        <div className="mt-8 px-5">
-          {isLoading && <Loading />}
-          {!isLoading && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">
-                    Created By
-                  </h3>
-                  <p className="text-gray-600">
-                    {creator?.first_name + " " + creator?.last_name}
-                  </p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Category</h3>
-                  <p className="text-gray-600">{category?.toUpperCase()}</p>
-                </div>
-
-                {buyer && (
-                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <h3 className="font-semibold text-gray-700 mb-2">Buyer</h3>
-                    <p className="text-gray-600">{buyer}</p>
-                  </div>
-                )}
-
-                {supplier && (
-                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <h3 className="font-semibold text-gray-700 mb-2">
-                      Supplier
-                    </h3>
-                    <p className="text-gray-600">{supplier}</p>
-                  </div>
-                )}
-
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">
-                    Proforma Invoice No.
-                  </h3>
-                  <p className="text-gray-600">{invoiceNo}</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">
-                    Document Date
-                  </h3>
-                  <p className="text-gray-600">
-                    {documentDate
-                      ? new Date(documentDate).toLocaleDateString()
-                      : "N/A"}
-                  </p>
-                </div>
-              </div>
-
+      <div className="mt-8 px-5">
+        {isLoading && <Loading />}
+        {!isLoading && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <h3 className="font-semibold text-gray-700 mb-2">
-                  Sales Order Date
+                  Created By
                 </h3>
                 <p className="text-gray-600">
-                  {salesOrderDate
-                    ? new Date(salesOrderDate).toLocaleDateString()
-                    : "N/A"}
+                  {creator?.first_name + " " + creator?.last_name}
                 </p>
               </div>
 
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">Items</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full bg-white border border-gray-300 rounded-md">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                          Item
-                        </th>
-                        <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                          Quantity
-                        </th>
-                        <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                          Amount
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items?.map((item: any, index: number) => (
-                        <tr
-                          key={index}
-                          className={
-                            index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                          }
-                        >
-                          <td className="px-3 py-2 text-sm text-gray-600 border-b">
-                            {item.item.name}
-                          </td>
-                          <td className="px-3 py-2 text-sm text-gray-600 border-b">
-                            {item.quantity}
-                          </td>
-                          <td className="px-3 py-2 text-sm text-gray-600 border-b">
-                            ₹ {item.amount}/-
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <h3 className="font-semibold text-gray-700 mb-2">Category</h3>
+                <p className="text-gray-600">{category?.toUpperCase()}</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {buyer && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Store</h3>
-                  <p className="text-gray-600">{store}</p>
+                  <h3 className="font-semibold text-gray-700 mb-2">Buyer</h3>
+                  <p className="text-gray-600">{buyer}</p>
                 </div>
+              )}
 
+              {supplier && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Note</h3>
-                  <p className="text-gray-600">{note}</p>
+                  <h3 className="font-semibold text-gray-700 mb-2">
+                    Supplier
+                  </h3>
+                  <p className="text-gray-600">{supplier}</p>
                 </div>
+              )}
 
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Subtotal</h3>
-                  <p className="text-gray-600 text-lg font-medium">
-                    ₹ {subtotal}/-
-                  </p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Tax</h3>
-                  <p className="text-gray-600">{tax?.tax_name}</p>
-                </div>
-              </div>
-
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <h3 className="font-semibold text-blue-700 mb-2">
-                  Total Amount
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">
+                  Proforma Invoice No.
                 </h3>
-                <p className="text-blue-600 text-xl font-bold">₹ {total}/-</p>
+                <p className="text-gray-600">{invoiceNo}</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">
+                  Document Date
+                </h3>
+                <p className="text-gray-600">
+                  {documentDate
+                    ? new Date(documentDate).toLocaleDateString()
+                    : "N/A"}
+                </p>
               </div>
             </div>
-          )}
-        </div>
+
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-gray-700 mb-2">
+                Sales Order Date
+              </h3>
+              <p className="text-gray-600">
+                {salesOrderDate
+                  ? new Date(salesOrderDate).toLocaleDateString()
+                  : "N/A"}
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-gray-700 mb-2">Items</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full bg-white border border-gray-300 rounded-md">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Item
+                      </th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Quantity
+                      </th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Amount
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items?.map((item: any, index: number) => (
+                      <tr
+                        key={index}
+                        className={
+                          index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                        }
+                      >
+                        <td className="px-3 py-2 text-sm text-gray-600 border-b">
+                          {item.item.name}
+                        </td>
+                        <td className="px-3 py-2 text-sm text-gray-600 border-b">
+                          {item.quantity}
+                        </td>
+                        <td className="px-3 py-2 text-sm text-gray-600 border-b">
+                          ₹ {item.amount}/-
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">Store</h3>
+                <p className="text-gray-600">{store}</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">Note</h3>
+                <p className="text-gray-600">{note}</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">Subtotal</h3>
+                <p className="text-gray-600 text-lg font-medium">
+                  ₹ {subtotal}/-
+                </p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">Tax</h3>
+                <p className="text-gray-600">{tax?.tax_name}</p>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <h3 className="font-semibold text-blue-700 mb-2">
+                Total Amount
+              </h3>
+              <p className="text-blue-600 text-xl font-bold">₹ {total}/-</p>
+            </div>
+          </div>
+        )}
       </div>
-    </Drawer>
+    </div>
   );
 };
 
