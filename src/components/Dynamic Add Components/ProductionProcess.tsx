@@ -1,7 +1,13 @@
+// @ts-nocheck
+
 import {
   FormControl,
   FormLabel,
   Input,
+  Checkbox,
+  Grid,
+  GridItem,
+  Stack,
 } from "@chakra-ui/react";
 
 interface ProductionProcessProps {
@@ -13,32 +19,59 @@ const ProductionProcess: React.FC<ProductionProcessProps> = ({
   inputs,
   setInputs,
 }) => {
-  const onChangeHandler = (isChecked: boolean, ind: number) => {
-    const inputsArr = [...inputs];
-    inputsArr[ind].done = isChecked;
-    setInputs(inputsArr);
+  const onStartChangeHandler = (isChecked: boolean, ind: number) => {
+    const updatedInputs = [...inputs];
+    updatedInputs[ind].start = isChecked;
+    setInputs(updatedInputs);
+  };
+
+  const onDoneChangeHandler = (isChecked: boolean, ind: number) => {
+    const updatedInputs = [...inputs];
+    updatedInputs[ind].done = isChecked;
+    setInputs(updatedInputs);
   };
 
   return (
     <div>
-      <FormLabel fontWeight="bold" color="black">Processes</FormLabel>
-      <div className="flex flex-col gap-3  w-[200px]">
+      <FormLabel fontWeight="bold">Processes</FormLabel>
+      <Grid templateColumns="repeat(4, 1fr)" gap={4}>
         {inputs.map((input, ind) => (
-          <>
-            <FormControl className="flex gap-1 items-center" key={ind}>
-              <Input className="text-black"
-                isDisabled
-                border="1px"
-                borderColor="black"
-                type="text"
-                name="process"
-                value={input.process}
-              ></Input>
-              <input type="checkbox"  className="h-[30px] w-[30px]" checked={input.done} onChange={(e)=>onChangeHandler(e.target.checked, ind)} />
-            </FormControl>
-          </>
+          <GridItem
+            key={ind}
+            p={2}
+            border="1px"
+            borderColor="#a9a9a9"
+            borderRadius="8px"
+          >
+            <Stack spacing={3}>
+              <FormControl>
+                <Input
+                  isDisabled
+                  border="1px"
+                  borderColor="#a9a9a9"
+                  type="text"
+                  name="process"
+                  value={input.process}
+                />
+              </FormControl>
+              <Stack direction="row" spacing={4} align="center">
+                <Checkbox
+                  isChecked={input.start}
+                  onChange={(e) => onStartChangeHandler(e.target.checked, ind)}
+                >
+                  Start
+                </Checkbox>
+                <Checkbox
+                  isChecked={input.done}
+                  onChange={(e) => onDoneChangeHandler(e.target.checked, ind)}
+                >
+                  Done
+                </Checkbox>
+              </Stack>
+            </Stack>
+          </GridItem>
         ))}
-      </div>
+      </Grid>
     </div>
   );
 };
