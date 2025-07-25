@@ -37,7 +37,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   const [createdBy, setCreatedBy] = useState<string | undefined>();
   const [processes, setProcesses] = useState<string[] | []>([]);
   const [processStatuses, setProcessStatuses] = useState<{
-    [key: number]: { started: boolean; done: boolean };
+    [key: number]: { start: boolean; done: boolean };
   }>({});
 
   const [products, setProducts] = useState<any[]>([]);
@@ -132,7 +132,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
   const handleProcessStatusChange = (
     processIndex: number,
-    statusType: "started" | "done",
+    statusType: "start" | "done",
     checked: boolean
   ) => {
     setProcessStatuses((prev) => {
@@ -144,13 +144,13 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
         },
       };
 
-      // Auto-check "started" when "done" is checked
+      // Auto-check "start" when "done" is checked
       if (statusType === "done" && checked) {
-        updated[processIndex].started = true;
+        updated[processIndex].start = true;
       }
 
-      // Uncheck "done" when "started" is unchecked
-      if (statusType === "started" && !checked) {
+      // Uncheck "done" when "start" is unchecked
+      if (statusType === "start" && !checked) {
         updated[processIndex].done = false;
       }
 
@@ -161,6 +161,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   const updateProcessHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Step 1: Prepare the modified scrap materials
     let modifiedScrapMaterials =
       scrapMaterials?.[0]?.item_name &&
       scrapMaterials?.map((material) => {
@@ -180,13 +181,21 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
         return materialData;
       });
 
+    // Step 2: Create updatedProcesses array from processes and processStatuses
+    const updatedProcesses = processes.map((proc, index) => ({
+      process: proc,
+      start: processStatuses[index]?.start || false,
+      done: processStatuses[index]?.done || false,
+    }));
+
+    // Step 3: Prepare the data object
     const data = {
       // BOM
       bom: {
         _id: bomId,
         raw_materials: selectedProducts,
         scrap_materials: modifiedScrapMaterials,
-        processes: processes,
+        processes: updatedProcesses,  // Add the updated processes here
         finished_good: {
           item: finishedGood?.value,
           description: finishedGoodDescription,
@@ -205,9 +214,11 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       process_statuses: processStatuses,
     };
 
+    // Step 4: Perform the API call to update the process
     try {
       setIsUpdating(true);
       const response = await updateProcess(data).unwrap();
+
       if (!response.success) {
         throw new Error(response.message);
       }
@@ -220,6 +231,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setIsUpdating(false);
     }
   };
+
 
   const markProcessDoneHandler = async () => {
     try {
@@ -261,6 +273,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
         }
       );
       const data = await response.json();
+     
       if (!data.success) {
         throw new Error(data.message);
       }
@@ -329,24 +342,39 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       );
       setScrapMaterials(scrap);
 
-      setProcesses(data?.production_process?.bom?.processes);
+   const processList = data?.production_process?.bom?.processes || [];
+      setProcesses(
+        processList.map((p: any) => ({
+          process: p.process,
+          quantity: p.quantity, // ✅ include quantity here
+        }))
+      );
+
+      setProcessStatuses(
+        processList.map((p: any) => ({
+          start: p.start, // ✅ make sure this is correct
+          done: p.done,
+        }))
+      );
 
       // Initialize process statuses for all processes
+      const fetchedStatuses = data.production_process.processes || [];
+      // const processList = data.production_process.bom.processes || [];
+       console.log(fetchedStatuses)
       const initialStatuses: {
-        [key: number]: { started: boolean; done: boolean };
+        [key: number]: { start: boolean; done: boolean };
       } = {};
-      data?.production_process?.bom?.processes?.forEach(
-        (_: any, index: number) => {
-          // Load existing statuses if available, otherwise default to false
-          const existingStatus =
-            data?.production_process?.process_statuses?.[index];
-          initialStatuses[index] = {
-            started: existingStatus?.started || false,
-            done: existingStatus?.done || false,
-          };
-        }
-      );
+
+      processList.forEach((_: any, index: number) => {
+        initialStatuses[index] = {
+          start: fetchedStatuses[index]?.start ?? false,
+          done: fetchedStatuses[index]?.done ?? false,
+        };
+      });
+      setProcesses(processList); // also update this
       setProcessStatuses(initialStatuses);
+
+      // setProcessStatuses(initialStatuses);
 
       setFinishedGood({
         value: data.production_process.bom.finished_good.item._id,
@@ -485,6 +513,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       color: "#374151",
     }),
   };
+
+  console.log(processStatuses)
   return (
     <>
       {/* Backdrop */}
@@ -782,57 +812,48 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
               </div>
 
               {/* Process Section */}
-              {/* <div className="bg-white border-b">
+              <div className="bg-white border-b">
                 <div className="px-6 py-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Processes
-                    </h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Processes</h3>
                     <div className="text-sm text-gray-600">
-                      {
-                        Object.values(processStatuses).filter(
-                          (status) => status?.done
-                        ).length
-                      }{" "}
+                      {Object.values(processStatuses).filter((status) => status?.done).length}{" "}
                       of {processes.length} completed
                     </div>
                   </div>
 
                   <div className="flex gap-4 flex-wrap">
                     {processes.map((process, index) => {
-                      const status = processStatuses[index];
-                      const isStarted = status?.started || false;
-                      const isDone = status?.done || false;
-
+                      const status = processStatuses[index]
+                     
+                      
                       return (
                         <div key={index} className="mb-4 flex items-end gap-1">
                           <div
-                            className={`border p-3 rounded-lg min-w-[300px] ${
-                              isDone
+                            className={`border p-3 rounded-lg min-w-[300px] ${status.done
                                 ? "bg-green-50 border-green-200"
-                                : isStarted
-                                ? "bg-blue-50 border-blue-200"
-                                : "bg-gray-50 border-gray-200"
-                            }`}
+                                : status.start
+                                  ? "bg-blue-50 border-blue-200"
+                                  : "bg-gray-50 border-gray-200"
+                              }`}
                           >
                             <div className="flex items-center justify-between mb-2">
                               <label className="block text-sm font-medium text-gray-700">
                                 Process {index + 1}
                               </label>
                               <div
-                                className={`px-2 py-1 rounded text-xs font-medium ${
-                                  isDone
+                                className={`px-2 py-1 rounded text-xs font-medium ${status.done
                                     ? "bg-green-100 text-green-800"
-                                    : isStarted
-                                    ? "bg-blue-100 text-blue-800"
-                                    : "bg-gray-100 text-gray-600"
-                                }`}
+                                    : status.start
+                                      ? "bg-blue-100 text-blue-800"
+                                      : "bg-gray-100 text-gray-600"
+                                  }`}
                               >
-                                {isDone
+                                {status.done
                                   ? "Completed"
-                                  : isStarted
-                                  ? "In Progress"
-                                  : "Not Started"}
+                                  : status.start
+                                    ? "In Progress"
+                                    : "Not Start"}
                               </div>
                             </div>
                             <input
@@ -840,44 +861,31 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                               value={process}
                               readOnly
                               className="w-full px-3 py-2 border border-gray-300 rounded bg-white mb-3"
-                            /> */}
+                            />
 
-              {/* Process Status Checkboxes */}
-              {/* <div className="flex gap-4">
+                            <div className="flex gap-4">
                               <label className="flex items-center gap-2">
                                 <input
                                   type="checkbox"
-                                  checked={isStarted}
+                                  checked={status.start}
                                   onChange={(e) =>
-                                    handleProcessStatusChange(
-                                      index,
-                                      "started",
-                                      e.target.checked
-                                    )
+                                    handleProcessStatusChange(index, "start", e.target.checked)
                                   }
-                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded"
                                 />
-                                <span className="text-sm text-gray-700">
-                                  Started
-                                </span>
+                                <span className="text-sm text-gray-700">Start</span>
                               </label>
 
                               <label className="flex items-center gap-2">
                                 <input
                                   type="checkbox"
-                                  checked={isDone}
+                                  checked={status.done}
                                   onChange={(e) =>
-                                    handleProcessStatusChange(
-                                      index,
-                                      "done",
-                                      e.target.checked
-                                    )
+                                    handleProcessStatusChange(index, "done", e.target.checked)
                                   }
-                                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                                  className="w-4 h-4 text-green-600 border-gray-300 rounded"
                                 />
-                                <span className="text-sm text-gray-700">
-                                  Done
-                                </span>
+                                <span className="text-sm text-gray-700">Done</span>
                               </label>
                             </div>
                           </div>
@@ -886,11 +894,12 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     })}
                   </div>
                 </div>
-              </div> */}
-
-              <div className="bg-white border-b p-6">
-                <Process inputs={processes} setInputs={setProcesses} />
               </div>
+
+
+              {/* <div className="bg-white border-b p-6">
+                <Process inputs={processes} setInputs={setProcesses} />
+              </div> */}
 
               {/* Scrap Materials Section */}
               <div className="bg-white border-b">
