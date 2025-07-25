@@ -28,6 +28,7 @@ import {
 } from "react-table";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
+import { colors } from "../../theme/colors";
 
 interface WIPProductTableProps {
   products: Array<{
@@ -167,186 +168,362 @@ const WIPProductTable: React.FC<WIPProductTableProps> = ({
   );
 
   return (
-    <div>
+    <div className="p-6">
       {isLoadingProducts && <Loading />}
-      {products.length === 0 && !isLoadingProducts && (
-        <EmptyData/>
+
+      {!isLoadingProducts && products.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div
+            className="rounded-full p-6 mb-4"
+            style={{ backgroundColor: colors.gray[100] }}
+          >
+            <svg
+              className="w-12 h-12"
+              style={{ color: colors.gray[400] }}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
+          <h3
+            className="text-lg font-semibold mb-2"
+            style={{ color: colors.text.primary }}
+          >
+            No WIP products found
+          </h3>
+          <p className="max-w-md" style={{ color: colors.text.muted }}>
+            No work-in-progress products available at the moment.
+          </p>
+        </div>
       )}
+
       {!isLoadingProducts && products.length > 0 && (
         <div>
-          <div className="flex justify-end mb-2">
-            <Select
-              onChange={(e) => setPageSize(e.target.value)}
-              width="80px"
-            >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-              <option value={100000}>All</option>
-            </Select>
+          {/* Header with count and page size selector */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-6">
+              <div>
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  {products.length} WIP Product
+                  {products.length !== 1 ? "s" : ""} Found
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.text.secondary }}
+              >
+                Show:
+              </span>
+              <select
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                className="px-3 py-2 text-sm rounded-lg border transition-colors"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor: colors.border.light,
+                  color: colors.text.primary,
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={100000}>All</option>
+              </select>
+            </div>
           </div>
-          <TableContainer maxHeight="600px" overflowY="auto">
-            <Table variant="simple" {...getTableProps()}>
-              <Thead className="text-sm font-semibold">
-                {headerGroups.map(
-                  (
-                    hg: HeaderGroup<{
-                      name: string;
-                      product_id: string;
-                      uom: string;
-                      category: string;
-                      current_stock: number;
-                      price: number;
-                      min_stock?: number;
-                      max_stock?: number;
-                      hsn_code?: number;
-                      createdAt: string;
-                      updatedAt: string;
-                    }>
-                  ) => {
-                    return (
-                      <Tr {...hg.getHeaderGroupProps()}>
-                        {hg.headers.map((column: any) => {
-                          return (
-                            <Th
-                              textTransform="capitalize"
-                              fontSize="12px"
-                              fontWeight="700"
-                              color="black"
-                              backgroundColor="#fafafa"
-                              borderLeft="1px solid #d7d7d7"
-                              borderRight="1px solid #d7d7d7"
-                              {...column.getHeaderProps(
-                                column.getSortByToggleProps()
-                              )}
-                            >
-                              <p className="flex">
-                                {column.render("Header")}
-                                {column.isSorted && (
-                                  <span>
-                                    {column.isSortedDesc ? (
-                                      <FaCaretDown />
-                                    ) : (
-                                      <FaCaretUp />
-                                    )}
-                                  </span>
+
+          {/* Enhanced Table */}
+          <div
+            className="rounded-xl shadow-sm overflow-hidden"
+            style={{
+              backgroundColor: colors.background.card,
+              border: `1px solid ${colors.border.light}`,
+            }}
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead style={{ backgroundColor: colors.table.header }}>
+                  {headerGroups.map((hg: HeaderGroup) => (
+                    <tr
+                      key={hg.id}
+                      style={{
+                        borderBottom: `1px solid ${colors.table.border}`,
+                      }}
+                    >
+                      {hg.headers.map((column: any) => (
+                        <th
+                          key={column.id}
+                          className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap cursor-pointer transition-colors"
+                          style={{ color: colors.table.headerText }}
+                          onClick={column.getSortByToggleProps().onClick}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              colors.table.hover;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              colors.table.header;
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            {column.render("Header")}
+                            {column.isSorted && (
+                              <span>
+                                {column.isSortedDesc ? (
+                                  <FaCaretDown className="text-xs" />
+                                ) : (
+                                  <FaCaretUp className="text-xs" />
                                 )}
-                              </p>
-                            </Th>
+                              </span>
+                            )}
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody>
+                  {page.map((row: any, index: number) => {
+                    prepareRow(row);
+                    return (
+                      <tr
+                        key={row.id || index}
+                        className="transition-colors hover:shadow-sm"
+                        style={{
+                          backgroundColor:
+                            index % 2 === 0
+                              ? colors.background.card
+                              : colors.table.stripe,
+                          borderBottom: `1px solid ${colors.table.border}`,
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            colors.table.hover;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            index % 2 === 0
+                              ? colors.background.card
+                              : colors.table.stripe;
+                        }}
+                      >
+                        {row.cells.map((cell: Cell) => {
+                          const colId = cell.column.id;
+                          const original = row.original;
+
+                          let displayValue;
+                          if (colId === "product_id" && original?.item) {
+                            displayValue = original.item.product_id;
+                          } else if (colId === "name" && original?.item) {
+                            displayValue = original.item.name;
+                          } else if (colId === "bom" && original?.bom) {
+                            displayValue = original.bom.bom_name;
+                          } else if (
+                            colId === "finished_good" &&
+                            original?.bom
+                          ) {
+                            displayValue =
+                              original.bom.finished_good?.item?.name;
+                          } else if (colId === "category" && original?.item) {
+                            displayValue = original.item.category;
+                          } else if (
+                            colId === "sub_category" &&
+                            original?.item
+                          ) {
+                            displayValue = original.item.sub_category || "N/A";
+                          } else if (colId === "uom" && original?.item) {
+                            displayValue = original.item.uom;
+                          } else if (colId === "estimated_quantity") {
+                            displayValue = original.estimated_quantity || "0";
+                          } else if (colId === "used_quantity") {
+                            displayValue = original.used_quantity || "0";
+                          } else if (colId === "createdAt") {
+                            displayValue = original.createdAt
+                              ? moment(original.createdAt).format("DD/MM/YYYY")
+                              : "N/A";
+                          } else if (colId === "updatedAt") {
+                            displayValue = original.updatedAt
+                              ? moment(original.updatedAt).format("DD/MM/YYYY")
+                              : "N/A";
+                          } else {
+                            displayValue = cell.render("Cell");
+                          }
+
+                          return (
+                            <td
+                              key={cell.column.id}
+                              className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                              style={{ color: colors.text.secondary }}
+                              title={
+                                typeof displayValue === "string"
+                                  ? displayValue
+                                  : ""
+                              }
+                            >
+                              {displayValue}
+                            </td>
                           );
                         })}
-                      </Tr>
+                        {/* <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center justify-center gap-2">
+                            {openProductDetailsDrawerHandler && (
+                              <button
+                                onClick={() =>
+                                  openProductDetailsDrawerHandler(
+                                    row.original._id
+                                  )
+                                }
+                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  color: colors.primary[600],
+                                  backgroundColor: colors.primary[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.primary[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.primary[50];
+                                }}
+                                title="View details"
+                              >
+                                <MdOutlineVisibility size={16} />
+                              </button>
+                            )}
+                            {openUpdateProductDrawerHandler && (
+                              <button
+                                onClick={() =>
+                                  openUpdateProductDrawerHandler(
+                                    row.original._id
+                                  )
+                                }
+                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  color: colors.warning[600],
+                                  backgroundColor: colors.warning[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.warning[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.warning[50];
+                                }}
+                                title="Edit product"
+                              >
+                                <MdEdit size={16} />
+                              </button>
+                            )}
+                            {approveProductHandler && (
+                              <button
+                                onClick={() =>
+                                  approveProductHandler(row.original._id)
+                                }
+                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  color: colors.success[600],
+                                  backgroundColor: colors.success[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.success[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.success[50];
+                                }}
+                                title="Approve product"
+                              >
+                                <FcApproval size={16} />
+                              </button>
+                            )}
+                            {deleteProductHandler && (
+                              <button
+                                onClick={() =>
+                                  deleteProductHandler(row.original._id)
+                                }
+                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  color: colors.error[600],
+                                  backgroundColor: colors.error[50],
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.error[100];
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.error[50];
+                                }}
+                                title="Delete product"
+                              >
+                                <MdDeleteOutline size={16} />
+                              </button>
+                            )} 
+                          </div>
+                        </td> */}
+                      </tr>
                     );
-                  }
-                )}
-              </Thead>
-              <Tbody {...getTableBodyProps()}>
-                {page.map((row: any) => {
-                  prepareRow(row);
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-                  return (
-                    <Tr
-                      className="relative hover:bg-[#e4e4e4] hover:cursor-pointer text-base lg:text-sm"
-                      {...row.getRowProps()}
-                    >
-                      {row.cells.map((cell: Cell) => {
-                        return (
-                          <Td fontWeight="500" {...cell.getCellProps()}>
-                            {cell.column.id !== "createdAt" &&
-                              cell.column.id !== "updatedAt" &&
-                              cell.column.id !== "bom" &&
-                              cell.column.id !== "finished_good" &&
-                              cell.column.id !== "name" &&
-                              cell.column.id !== "product_id" &&
-                              cell.column.id !== "uom" &&
-                              cell.column.id !== "category" &&
-                              cell.column.id !== "sub_category" &&
-                              cell.render("Cell")}
-
-                            {cell.column.id === "createdAt" &&
-                              row.original?.createdAt && (
-                                <span>
-                                  {moment(row.original?.createdAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "updatedAt" &&
-                              row.original?.updatedAt && (
-                                <span>
-                                  {moment(row.original?.updatedAt).format(
-                                    "DD/MM/YYYY"
-                                  )}
-                                </span>
-                              )}
-                            {cell.column.id === "bom" &&
-                              row.original?.bom && (
-                                <span>
-                                  {row.original?.bom?.bom_name}
-                                </span>
-                              )}
-                            {cell.column.id === "finished_good" &&
-                              row.original?.bom && (
-                                <span>
-                                  {row.original?.bom?.finished_good?.item?.name}
-                                </span>
-                              )}
-                            {cell.column.id === "product_id" &&
-                              row.original?.item && (
-                                <span>
-                                  {row.original?.item?.product_id}
-                                </span>
-                              )}
-                            {cell.column.id === "name" &&
-                              row.original?.item && (
-                                <span>
-                                  {row.original?.item?.name}
-                                </span>
-                              )}
-                            {cell.column.id === "category" &&
-                              row.original?.item && (
-                                <span>
-                                  {row.original?.item?.category}
-                                </span>
-                              )}
-                            {cell.column.id === "sub_category" &&
-                              row.original?.item && (
-                                <span>
-                                  {row.original?.item?.sub_category}
-                                </span>
-                              )}
-                            {cell.column.id === "uom" &&
-                              row.original?.item && (
-                                <span>
-                                  {row.original?.item?.uom}
-                                </span>
-                              )}
-                          </Td>
-                        );
-                      })}
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
-          </TableContainer>
-
-          <div className="w-[max-content] m-auto my-7">
+          {/* Enhanced Pagination */}
+          <div className="flex items-center justify-center gap-4 mt-6">
             <button
-              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canPreviousPage}
               onClick={previousPage}
+              disabled={!canPreviousPage}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                canPreviousPage ? "hover:shadow-md" : "cursor-not-allowed"
+              }`}
+              style={{
+                backgroundColor: canPreviousPage
+                  ? colors.primary[600]
+                  : colors.gray[400],
+                color: "white",
+                opacity: canPreviousPage ? 1 : 0.6,
+              }}
             >
-              Prev
+              Previous
             </button>
-            <span className="mx-3 text-sm md:text-lg lg:text-xl xl:text-base">
-              {pageIndex + 1} of {pageCount}
+
+            <span
+              className="text-sm font-medium"
+              style={{ color: colors.text.secondary }}
+            >
+              Page {pageIndex + 1} of {pageCount}
             </span>
+
             <button
-              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
-              disabled={!canNextPage}
               onClick={nextPage}
+              disabled={!canNextPage}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                canNextPage ? "hover:shadow-md" : "cursor-not-allowed"
+              }`}
+              style={{
+                backgroundColor: canNextPage
+                  ? colors.primary[600]
+                  : colors.gray[400],
+                color: "white",
+                opacity: canNextPage ? 1 : 0.6,
+              }}
             >
               Next
             </button>
