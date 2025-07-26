@@ -187,5 +187,5 @@ const Scrap: React.FC = () => {
     </div>
   );
 };
-
+   
 export default Scrap;
