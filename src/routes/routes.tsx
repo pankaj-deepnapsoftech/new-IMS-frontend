@@ -25,7 +25,6 @@ import Invoice from "../pages/Invoice";
 import Payment from "../pages/Payment";
 import Process from "../pages/Process";
 import IndirectProducts from "../pages/IndirectProducts";
-import Scrap from "../pages/Scrap";
 import WIPProducts from "../pages/WIPProducts";
 import InventoryApprovals from "../pages/InventoryApprovals";
 import Userprofile from "../pages/Userprofile";
@@ -43,6 +42,7 @@ import Scheduling from "../pages/Scheduling";
 import Precurement from "../pages/Precurement";
 import Quality from "../pages/Quality";
 import Maintenance from "../pages/Maintenance";
+import Scrap from "../pages/Scrap";
 
 const routes = [
   {

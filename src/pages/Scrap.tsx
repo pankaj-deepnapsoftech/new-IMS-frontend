@@ -22,6 +22,7 @@ const Scrap: React.FC = () => {
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL + "scrap/all",
         {
+          method:"GET",
           headers: {
             Authorization: `Bearer ${cookies?.access_token}`,
           },
