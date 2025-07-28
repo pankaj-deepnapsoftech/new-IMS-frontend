@@ -2,10 +2,10 @@
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
-import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import Loading from "../../../ui/Loading";
 import { colors } from "../../../theme/colors";
+import Drawer from "../../../ui/Drawer";
 
 interface BomDetailsProps {
   bomId: string | undefined;
@@ -28,6 +28,7 @@ const BomDetails: React.FC<BomDetailsProps> = ({
   const [otherCharges, setOtherCharges] = useState<any>();
 
   const fetchBomDetails = async () => {
+    if (!bomId) return;
     try {
       setIsLoadingBom(true);
       const response = await fetch(
@@ -40,9 +41,8 @@ const BomDetails: React.FC<BomDetailsProps> = ({
         }
       );
       const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
-      }
+      if (!data.success) throw new Error(data.message);
+
       setFinishedGood(data.bom.finished_good);
       setRawMaterials(data.bom.raw_materials);
       setBomName(data.bom.bom_name);

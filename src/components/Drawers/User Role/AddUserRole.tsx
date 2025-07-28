@@ -26,15 +26,15 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
   >([]);
 
   const permissionOptions = [
-    { value: "inventory", label: "inventory" },
-    { value: "store", label: "store" },
-    { value: "approval", label: "approval" },
-    { value: "agent", label: "agent" },
-    { value: "production", label: "production" },
-    { value: "sale & purchase", label: "sale & purchase" },
-    { value: "parties", label: "parties" },
-    { value: "sales", label: "sales" },
-    { value: "task", label: "task" },
+    { value: "inventory", label: "Inventory" },
+    { value: "store", label: "Store" },
+    { value: "approval", label: "Approval" },
+    { value: "agent", label: "Agent" },
+    { value: "production", label: "Production" },
+    { value: "sale & purchase", label: "Sale & Purchase" },
+    { value: "parties", label: "Parties" },
+    { value: "sales", label: "Sales" },
+    { value: "task", label: "Task" },
   ];
 
   const [addRole] = useAddRoleMutation();

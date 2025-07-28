@@ -18,6 +18,8 @@ import Stores from "../pages/Stores";
 import Buyers from "../pages/Buyers";
 import Sellers from "../pages/Sellers";
 import BOM from "../pages/BOM";  
+
+
 import UserRole from "../pages/UserRoles";
 import Employees from "../pages/Emloyees";
 import ProformaInvoice from "../pages/ProformaInvoice";
@@ -33,13 +35,12 @@ import Dispatch from "../pages/Dispatch";
 import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
 import Task from "../pages/Task";
-import { Box, Calendar, Component, Construction, Container, HandCoins, Presentation, ShieldCheck, TicketPercent, Workflow } from "lucide-react";
+import { Box, Calendar, Component, Construction, Container, HandCoins, Presentation, ScanBarcode, ShieldCheck, TicketPercent, Workflow } from "lucide-react";
 import Dashboard from "../pages/Dashboard";
 import Planning from "../pages/Planning";
 import Designing from "../pages/Designing";
 import Supplier from "../pages/Supplier";
 import Scheduling from "../pages/Scheduling";
-import Precurement from "../pages/Precurement";
 import Quality from "../pages/Quality";
 import Maintenance from "../pages/Maintenance";
 import Scrap from "../pages/Scrap";
@@ -48,6 +49,7 @@ import ResourcesApproval from "../pages/ResourcesApproval";
 import Packaging from "../pages/Packaging";
 import Vouchers from "../pages/Vouchers";
 import Integration from "../pages/Integration";
+import PurchaseOrder from "../pages/PurchaseOrder";
 
 const routes = [
   {
@@ -117,13 +119,22 @@ const routes = [
     element: <Sales />,
     isSublink: false,
   },
+
   {
     name: "Precurement",
     icon: <Box />,
     path: "precurement",
-    element: <Precurement />,
-    isSublink: false,
+    sublink: [
+      {
+        name: "Purchase Order",
+        icon: <ScanBarcode />,
+        path: "purchase-order",
+        element: <PurchaseOrder />,
+      }
+    ],
+    isSublink: true,
   },
+
   {
     name: "Production",
     path: "production",
@@ -203,7 +214,7 @@ const routes = [
         icon: <TicketPercent />,
         path: "voucher",
         element: <Vouchers />,
-      }
+      },
     ],
     isSublink: true,
   },
@@ -211,7 +222,7 @@ const routes = [
     name: "Integration",
     icon: <Workflow />,
     path: "integration",
-    element: <Integration />
+    element: <Integration />,
   },
   {
     name: "Designing",
