@@ -27,6 +27,7 @@ import moment from "moment";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
+import { useCookies } from "react-cookie";
 
 interface BOMTableProps {
   boms: Array<{
@@ -54,7 +55,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
 }) => {
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
-
+  const [cookies] = useCookies()
   const columns = useMemo(
     () => [
       { Header: "BOM Name", accessor: "bom_name" },
@@ -288,7 +289,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap"
                           style={{ color: colors.success[600] }}
                         >
-                          ₹{row.original.total_cost || "0"}
+                          {cookies?.role === "admin" ? `₹${row.original.total_cost}` : "₹*****"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
@@ -296,8 +297,8 @@ const BOMTable: React.FC<BOMTableProps> = ({
                         >
                           {row.original.createdAt
                             ? moment(row.original.createdAt).format(
-                                "DD/MM/YYYY"
-                              )
+                              "DD/MM/YYYY"
+                            )
                             : "—"}
                         </td>
                         <td
@@ -306,8 +307,8 @@ const BOMTable: React.FC<BOMTableProps> = ({
                         >
                           {row.original.updatedAt
                             ? moment(row.original.updatedAt).format(
-                                "DD/MM/YYYY"
-                              )
+                              "DD/MM/YYYY"
+                            )
                             : "—"}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">

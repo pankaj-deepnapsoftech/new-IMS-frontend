@@ -36,7 +36,8 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
   const supportingDoc = useRef<HTMLInputElement | null>(null);
   const [comments, setComments] = useState<string | undefined>();
   const [cost, setCost] = useState<number | undefined>();
-
+  const [finishedGoodsOptions, setFinishedGoodsOptions] = useState<{ value: string; label: string }[]>([]);
+  const [rawMaterialsOptions, setRawMaterialsOptions] = useState<{ value: string; label: string }[]>([]);
   const [processes, setProcesses] = useState<string[]>([""]);
 
   const [products, setProducts] = useState<any[]>([]);
@@ -389,11 +390,22 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
   }, [bomId]);
 
   useEffect(() => {
-    const modifiedProducts = products.map((prd) => ({
-      value: prd._id,
-      label: prd.name,
-    }));
-    setProductOptions(modifiedProducts);
+    const finishedGoodsOptions = products
+      .filter((prd) => prd.category === "finished goods")
+      .map((prd) => ({
+        value: prd._id,
+        label: prd.name,
+      }));
+
+    const rawMaterialsOptions = products
+      .filter((prd) => prd.category === "raw materials")
+      .map((prd) => ({
+        value: prd._id,
+        label: prd.name,
+      }));
+
+    setFinishedGoodsOptions(finishedGoodsOptions);
+    setRawMaterialsOptions(rawMaterialsOptions);
   }, [products]);
 
   useEffect(() => {
@@ -515,9 +527,15 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                         Total Parts Cost
                       </label>
                       <input
-                        type="number"
-                        value={totalPartsCost || 0}
-                        readOnly
+                        type={cookies?.role === "admin" ? "number" : "text"}
+                        value={
+                          cookies?.role === "admin"
+                            ? totalPartsCost || ""
+                            : totalPartsCost
+                              ? "*****"
+                              : ""
+                        }
+                        readOnly 
                         className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
                       />
                     </div>
@@ -554,7 +572,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                         <Select
                           styles={customStyles}
                           className="text-sm"
-                          options={productOptions}
+                          options={finishedGoodsOptions}
                           placeholder="Select"
                           value={finishedGood}
                           onChange={onFinishedGoodChangeHandler}
@@ -625,8 +643,14 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                           Unit Cost
                         </label>
                         <input
-                          type="number"
-                          value={unitCost || ""}
+                          type={cookies?.role === "admin" ? "number" : "text"}
+                          value={
+                            cookies?.role === "admin"
+                              ? unitCost || ""
+                              : unitCost
+                                ? "*****"
+                                : ""
+                          }
                           readOnly
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                         />
@@ -638,8 +662,14 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                           Cost
                         </label>
                         <input
-                          type="number"
-                          value={cost || ""}
+                          type={cookies?.role === "admin" ? "number" : "text"}
+                          value={
+                            cookies?.role === "admin"
+                              ? cost || ""
+                              : cost
+                                ? "*****"
+                                : ""
+                          }
                           readOnly
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                         />
@@ -685,7 +715,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                           <Select
                             styles={customStyles}
                             className="text-sm"
-                            options={productOptions}
+                            options={rawMaterialsOptions}
                             placeholder="Select"
                             value={material.item_name}
                             onChange={(d: any) => {
@@ -780,8 +810,14 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                             Unit Cost
                           </label>
                           <input
-                            type="number"
-                            value={material.unit_cost || ""}
+                            type={cookies?.role === "admin" ? "number" : "text"}
+                            value={
+                              cookies?.role === "admin"
+                                ? material.unit_cost || ""
+                                : material.unit_cost
+                                  ? "*****"
+                                  : ""
+                            }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />
@@ -793,8 +829,14 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                             Total Part Cost
                           </label>
                           <input
-                            type="number"
-                            value={material.total_part_cost || ""}
+                            type={cookies?.role === "admin" ? "number" : "text"}
+                            value={
+                              cookies?.role === "admin"
+                                ? material.total_part_cost || ""
+                                : material.total_part_cost
+                                  ? "*****"
+                                  : ""
+                            }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />
@@ -995,8 +1037,14 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                             Unit Cost
                           </label>
                           <input
-                            type="number"
-                            value={material.unit_cost || ""}
+                            type={cookies?.role === "admin" ? "number" : "text"}
+                            value={
+                              cookies?.role === "admin"
+                                ? material.unit_cost  || ""
+                                : material.unit_cost 
+                                  ? "*****"
+                                  : ""
+                            }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />
@@ -1008,8 +1056,14 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                             Total Part Cost
                           </label>
                           <input
-                            type="number"
-                            value={material.total_part_cost || ""}
+                            type={cookies?.role === "admin" ? "number" : "text"}
+                            value={
+                              cookies?.role === "admin"
+                                ? material.total_part_cost  || ""
+                                : material.total_part_cost 
+                                  ? "*****"
+                                  : ""
+                            }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />

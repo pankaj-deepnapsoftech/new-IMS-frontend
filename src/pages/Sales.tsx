@@ -203,7 +203,7 @@ const Sales = () => {
                         </div>
                     </div>
 
-                    {/* Search and Filters Row */}
+                   
                     <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
                         {/* Search Input */}
                         <div className="flex-1 max-w-md">
