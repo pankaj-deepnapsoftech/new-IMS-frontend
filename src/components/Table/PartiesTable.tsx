@@ -291,7 +291,7 @@ const PartiesTable = ({
               color: colors.text.primary,
             }}
           >
-            {[10, 20, 50, 100].map((size) => (
+            {[5,10, 20, 50, 100].map((size) => (
               <option key={size} value={size}>
                 {size === 100 ? "All" : size}
               </option>

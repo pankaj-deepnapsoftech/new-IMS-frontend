@@ -430,9 +430,7 @@ const AddBom: React.FC<AddBomProps> = ({
                         <input
                           type="number"
                           value={quantity || ""}
-                          onChange={(e) =>
-                            onFinishedGoodQntyChangeHandler(+e.target.value)
-                          }
+                          onChange={(e) => onFinishedGoodQntyChangeHandler(+e.target.value)}
                           placeholder="Quantity"
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                           required
@@ -550,16 +548,13 @@ const AddBom: React.FC<AddBomProps> = ({
                             onChange={(d) => {
                               const newMaterials = [...rawMaterials];
                               newMaterials[index].item_name = d;
-                              const product = products.find(
-                                (p) => p._id === d?.value
-                              );
+                              const product = products.find((p) => p._id === d?.value);
                               if (product) {
                                 newMaterials[index].unit_cost = product.price;
                                 newMaterials[index].uom = product.uom;
                                 newMaterials[index].category = product.category;
                                 if (material.quantity) {
-                                  newMaterials[index].total_part_cost =
-                                    product.price * +material.quantity;
+                                  newMaterials[index].total_part_cost = product.price * +material.quantity;
                                 }
                               }
                               setRawMaterials(newMaterials);
@@ -841,9 +836,7 @@ const AddBom: React.FC<AddBomProps> = ({
                             onChange={(d) => {
                               const newMaterials = [...scrapMaterials];
                               newMaterials[index].item_name = d;
-                              const product = products.find(
-                                (p) => p._id === d?.value
-                              );
+                              const product = products.find((p) => p._id === d?.value);
                               if (product) {
                                 newMaterials[index].unit_cost = product.price;
                                 newMaterials[index].uom = product.uom;
@@ -1130,6 +1123,7 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
                 </div>
               </div>
+
             </form>
           </div>
         </div>
