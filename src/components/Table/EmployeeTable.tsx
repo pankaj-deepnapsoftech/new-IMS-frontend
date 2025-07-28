@@ -167,7 +167,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   boxShadow: `0 0 0 1px ${colors.primary[500]}`,
                 }}
               >
-                {[10, 20, 50, 100, 100000].map((size) => (
+                {[5,10, 20, 50, 100, 100000].map((size) => (
                   <option key={size} value={size}>
                     {size === 100000 ? "All" : size}
                   </option>

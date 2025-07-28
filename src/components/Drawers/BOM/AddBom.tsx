@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
@@ -33,6 +35,9 @@ const AddBom: React.FC<AddBomProps> = ({
   const [bomName, setBomName] = useState<string | undefined>();
   const [partsCount, setPartsCount] = useState<number>(0);
   const [totalPartsCost, setTotalPartsCost] = useState<number>(0);
+  const [finishedGoodsOptions, setFinishedGoodsOptions] = useState<{ value: string; label: string }[]>([]);
+  const [rawMaterialsOptions, setRawMaterialsOptions] = useState<{ value: string; label: string }[]>([]);
+
   const [finishedGood, setFinishedGood] = useState<
     { value: string; label: string } | undefined
   >();
@@ -50,6 +55,8 @@ const AddBom: React.FC<AddBomProps> = ({
   const [productOptions, setProductOptions] = useState<
     { value: string; label: string }[] | []
   >([]);
+  const [finishedGoodName, setFinishedGoodName] = useState("");
+  // const [category, setCategory] = useState("");
   const [labourCharges, setLabourCharges] = useState<number | undefined>();
   const [machineryCharges, setMachineryCharges] = useState<
     number | undefined
@@ -219,17 +226,35 @@ const AddBom: React.FC<AddBomProps> = ({
       setIsLoadingProducts(false);
     }
   };
+ 
 
+  // console.log(products)
   const onFinishedGoodChangeHandler = (d: any) => {
     setFinishedGood(d);
-    const product: any = products.filter((prd: any) => prd._id === d.value)[0];
-    setCategory(product.category);
-    setUom(product.uom);
-    setUnitCost(product.price);
-    if (quantity) {
-      setCost(product.price * +quantity);
+
+    const product: any = products.find((prd: any) => prd._id === d.value);
+
+    if (product) {
+      setCategory(product.category || "N/A");
+      setUom(product.uom || "");
+      setUnitCost(product.price || 0);
+
+    
+      if (product.category === "finished goods") {
+        setFinishedGoodName(product.name || "");
+      } else {
+        setFinishedGoodName(""); // Clear name otherwise
+      }
+
+      if (quantity) {
+        setCost((product.price || 0) * +quantity);
+      }
+    } else {
+      toast.error("Product not found");
     }
   };
+
+
 
   const onFinishedGoodQntyChangeHandler = (qty: number) => {
     setQuantity(qty);
@@ -257,12 +282,27 @@ const AddBom: React.FC<AddBomProps> = ({
   }, []);
 
   useEffect(() => {
-    const modifiedProducts = products.map((prd) => ({
-      value: prd._id,
-      label: prd.name,
-    }));
-    setProductOptions(modifiedProducts);
+    const finishedGoodsOptions = products
+      .filter((prd) => prd.category === "finished goods")
+      .map((prd) => ({
+        value: prd._id,
+        label: prd.name,
+      }));
+
+    const rawMaterialsOptions = products
+      .filter((prd) => prd.category === "raw materials")
+      .map((prd) => ({
+        value: prd._id,
+        label: prd.name,
+      }));
+
+    setFinishedGoodsOptions(finishedGoodsOptions);
+    setRawMaterialsOptions(rawMaterialsOptions);
   }, [products]);
+
+
+
+
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
@@ -306,6 +346,8 @@ const AddBom: React.FC<AddBomProps> = ({
       color: colors.gray[900],
     }),
   };
+
+  console.log(productOptions)
   return (
     <>
       {/* Backdrop */}
@@ -357,13 +399,28 @@ const AddBom: React.FC<AddBomProps> = ({
                         <Select
                           styles={customStyles}
                           className="text-sm"
-                          options={productOptions}
+                          options={finishedGoodsOptions}
                           placeholder="Select"
                           value={finishedGood}
                           onChange={onFinishedGoodChangeHandler}
                           required
                         />
+
+{/*                        
+                        {category === "finished goods" && finishedGoodName && (
+                          <div className="mt-2"> 
+                            <label className="text-xs font-medium text-gray-600">Name</label>
+                            <input
+                              type="text"
+                              className="w-full border border-gray-300 px-3 py-1 rounded-md text-sm text-gray-700 bg-gray-50"
+                              value={finishedGoodName}
+                              readOnly
+                            />
+                          </div>
+                        )} */}
                       </div>
+
+
 
                       {/* Quantity */}
                       <div>
@@ -487,7 +544,7 @@ const AddBom: React.FC<AddBomProps> = ({
                           <Select
                             styles={customStyles}
                             className="text-sm"
-                            options={productOptions}
+                            options={rawMaterialsOptions}
                             placeholder="Select"
                             value={material.item_name}
                             onChange={(d) => {
@@ -778,7 +835,7 @@ const AddBom: React.FC<AddBomProps> = ({
                           <Select
                             styles={customStyles}
                             className="text-sm"
-                            options={productOptions}
+                            options={rawMaterialsOptions}
                             placeholder="Select"
                             value={material.item_name}
                             onChange={(d) => {
