@@ -73,7 +73,8 @@ const AddParties = ({
 
       const payload = {
         ...values,
-        consignee_name: consigneeNames,
+        consignee_name: values.type === "Individual" ? consigneeNames : [],
+        company_name: values.type === "Company" ? values.company_name : "",
         // gst_in: gstIns,
         contact_number: contactNumbers,
         // delivery_address: deliveryAddresses,
@@ -235,7 +236,16 @@ const AddParties = ({
                     <select
                       name="type"
                       value={formik.values.type}
-                      onChange={formik.handleChange}
+                      onChange={(e) => {
+                        const selectedType = e.target.value;
+                        formik.setFieldValue("type", selectedType);
+
+                        if (selectedType === "Individual") {
+                          formik.setFieldValue("company_name", "");
+                        } else if (selectedType === "Company") {
+                          setConsigneeNames([""]);
+                        }
+                      }}
                       onBlur={formik.handleBlur}
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                     >
@@ -299,15 +309,17 @@ const AddParties = ({
                         )}
                     </div>
                   )}
-                  <div className="space-y-2 md:col-span-2">
-                    {renderFieldList(
-                      "Consignee Name",
-                      consigneeNames,
-                      setConsigneeNames,
-                      <User className="h-4 w-4 text-gray-500" />,
-                      { allowAdd: false }
-                    )}
-                  </div>
+                  {formik.values.type === "Individual" && (
+                    <div className="space-y-2 md:col-span-2">
+                      {renderFieldList(
+                        "Consignee Name",
+                        consigneeNames,
+                        setConsigneeNames,
+                        <User className="h-4 w-4 text-gray-500" />,
+                        { allowAdd: false }
+                      )}
+                    </div>
+                  )}
                   {/* {renderFieldList(
                     "GST IN",
                     gstIns,
@@ -414,9 +426,17 @@ const AddParties = ({
                       type="text"
                       name="shipped_gst_to"
                       value={formik.values.shipped_gst_to}
-                      onChange={formik.handleChange}
+                      onChange={(e) => {
+                        const uppercase = e.target.value
+                          .toUpperCase()
+                          .replace(/[^A-Z0-9]/g, "");
+                        formik.setFieldValue(
+                          "shipped_gst_to",
+                          uppercase.slice(0, 15)
+                        );
+                      }}
                       onBlur={formik.handleBlur}
-                      placeholder="Enter shipping address"
+                      placeholder="Enter Shipped GSTIN"
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                     />
                     {formik.touched.shipped_gst_to &&
@@ -437,9 +457,17 @@ const AddParties = ({
                       type="text"
                       name="bill_gst_to"
                       value={formik.values.bill_gst_to}
-                      onChange={formik.handleChange}
+                      onChange={(e) => {
+                        const uppercase = e.target.value
+                          .toUpperCase()
+                          .replace(/[^A-Z0-9]/g, "");
+                        formik.setFieldValue(
+                          "bill_gst_to",
+                          uppercase.slice(0, 15)
+                        );
+                      }}
                       onBlur={formik.handleBlur}
-                      placeholder="Enter billing address"
+                      placeholder="Enter Bill GSTIN"
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                     />
                     {formik.touched.bill_gst_to &&

@@ -59,16 +59,18 @@ const PartiesTable = ({
   // );
   console.log(partiesData)
   const filteredParties = partiesData.filter((party) => {
+    const searchLower = searchTerm.toLowerCase();
+
     const matchSearch =
-      party?.consignee_name?.[0]
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      party?.email_id?.[0].toLowerCase().includes(searchTerm.toLowerCase()) ||
-      party?.contact_number?.[0]
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      party?.type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      party?.company_name?.toLowerCase().includes(searchTerm.toLowerCase());
+      (party?.consignee_name?.[0]?.toLowerCase?.() || "").includes(
+        searchLower
+      ) ||
+      (party?.email_id?.[0]?.toLowerCase?.() || "").includes(searchLower) ||
+      (party?.contact_number?.[0]?.toLowerCase?.() || "").includes(
+        searchLower
+      ) ||
+      (party?.type?.toLowerCase?.() || "").includes(searchLower) ||
+      (party?.company_name?.toLowerCase?.() || "").includes(searchLower);
 
     const matchType = selectedType ? party?.type === selectedType : true;
     const matchRole = selectedRole
@@ -77,6 +79,7 @@ const PartiesTable = ({
 
     return matchSearch && matchType && matchRole;
   });
+  
 
   const handleDelete = async (partyId) => {
     if (isSubmitting) return;
@@ -462,10 +465,11 @@ const PartiesTable = ({
                           : colors.table.stripe,
                       zIndex: 1,
                     }}
-                    title={party.consignee_name}
+                    title={party?.consignee_name?.[0] || "N/A"}
                   >
-                    {party.consignee_name || "N/A"}
+                    {party?.consignee_name?.[0] || "N/A"}
                   </td>
+
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
                     style={{ color: colors.text.secondary }}
@@ -478,13 +482,18 @@ const PartiesTable = ({
                     style={{ color: colors.text.secondary }}
                     title={party.email_id}
                   >
-                    {party.email_id || "N/A"}
+                    {Array.isArray(party.email_id) && party.email_id.length > 0
+                      ? party.email_id.join(", ")
+                      : "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                   >
-                    {party.contact_number || "N/A"}
+                    {Array.isArray(party.contact_number) &&
+                    party.contact_number.length > 0
+                      ? party.contact_number.join(", ")
+                      : "N/A"}
                   </td>
                   <td className="px-4 py-3 text-sm whitespace-nowrap">
                     <span
