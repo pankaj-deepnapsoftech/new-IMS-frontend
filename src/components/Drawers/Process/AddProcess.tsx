@@ -163,12 +163,14 @@ const AddProcess: React.FC<AddProcess> = ({
   };
 
   useEffect(() => {
-    const results = items.map((item: any) => ({
-      value: item._id,
-      label: item.name,
-    }));
+    const results = items.filter((prd) => prd.category === "finished goods")
+      .map((prd) => ({
+        value: prd._id,
+        label: prd.name,
+      }));
     setItemNameOptions(results);
   }, [items]);
+
 
   useEffect(() => {
     const item = items.find((item: any) => item._id === itemName?.value);

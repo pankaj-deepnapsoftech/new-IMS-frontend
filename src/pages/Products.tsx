@@ -42,7 +42,7 @@ const Products: React.FC = () => {
   const [showBulkUploadMenu, setShowBulkUploadMenu] = useState<boolean>(false);
 
   // Filters
-  const [productServiceFilter, setProductServiceFilter] = useState<string>("");
+  const [productTypeFilter, setProductTypeFilter] = useState<string>("");
   const [storeOptions, setStoreOptions] = useState<
     { value: string; label: string }[] | []
   >([]);
@@ -53,7 +53,15 @@ const Products: React.FC = () => {
   const [bulkUploading, setBulkUploading] = useState<boolean>(false);
 
   const [bulkUpload] = useProductBulKUploadMutation();
-
+  // const categoryOptions = [
+  //   { value: "finished goods", label: "Finished Goods" },
+  //   { value: "raw materials", label: "Raw Materials" },
+  //   { value: "semi finished goods", label: "Semi Finished Goods" },
+  //   { value: "consumables", label: "Consumables" },
+  //   { value: "bought out parts", label: "Bought Out Parts" },
+  //   { value: "trading goods", label: "Trading Goods" },
+  //   { value: "service", label: "Service" },
+  // ];
   const {
     isAddProductDrawerOpened,
     isUpdateProductDrawerOpened,
@@ -117,6 +125,7 @@ const Products: React.FC = () => {
       if (!results.success) {
         throw new Error(results?.message);
       }
+      console.log(results)
       setData(results.products);
       setFilteredData(results.products);
     } catch (error: any) {
@@ -227,44 +236,49 @@ const Products: React.FC = () => {
   useEffect(() => {
     const searchTxt = searchKey?.toLowerCase();
     // // @ts-ignore
-    const results = data.filter(
-      (prod: any) =>
-        prod.product_or_service?.toLowerCase().includes(productServiceFilter) &&
-        storeFilter &&
-        (storeFilter?.value === "" ||
-          prod?.store?._id === storeFilter?.value) &&
-        (prod.name?.toLowerCase()?.includes(searchTxt) ||
-          prod.product_id?.toLowerCase()?.includes(searchTxt) ||
-          prod.category?.toLowerCase()?.includes(searchTxt) ||
-          prod.price
-            ?.toString()
-            ?.toLowerCase()
-            ?.toString()
-            .includes(searchTxt) ||
-          prod.uom?.toLowerCase()?.includes(searchTxt) ||
-          prod.current_stock?.toString().toString().includes(searchTxt) ||
-          prod?.min_stock?.toString()?.includes(searchTxt) ||
-          prod?.max_stock?.toString()?.includes(searchTxt) ||
-          prod?.hsn?.includes(searchTxt) ||
-          (prod?.createdAt &&
-            new Date(prod?.createdAt)
-              ?.toISOString()
-              ?.substring(0, 10)
-              ?.split("-")
-              .reverse()
-              .join("")
-              ?.includes(searchTxt?.replaceAll("/", "") || "")) ||
-          (prod?.updatedAt &&
-            new Date(prod?.updatedAt)
-              ?.toISOString()
-              ?.substring(0, 10)
-              ?.split("-")
-              ?.reverse()
-              ?.join("")
-              ?.includes(searchTxt?.replaceAll("/", "") || "")))
-    );
+    const results = data.filter((prod: any) => {
+      const searchTxt = searchKey?.toLowerCase() || "";
+
+      const matchesCategory =
+        !productTypeFilter ||
+        (prod.category?.toLowerCase() === productTypeFilter.toLowerCase());
+
+      const matchesStore =
+        !storeFilter || storeFilter.value === "" || prod?.store?._id === storeFilter?.value;
+
+      const matchesSearch =
+        prod.name?.toLowerCase()?.includes(searchTxt) ||
+        prod.product_id?.toLowerCase()?.includes(searchTxt) ||
+        prod.category?.toLowerCase()?.includes(searchTxt) ||
+        prod.price?.toString()?.includes(searchTxt) ||
+        prod.uom?.toLowerCase()?.includes(searchTxt) ||
+        prod.current_stock?.toString().includes(searchTxt) ||
+        prod?.min_stock?.toString()?.includes(searchTxt) ||
+        prod?.max_stock?.toString()?.includes(searchTxt) ||
+        prod?.hsn?.includes(searchTxt) ||
+        (prod?.createdAt &&
+          new Date(prod?.createdAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            .reverse()
+            .join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || "")) ||
+        (prod?.updatedAt &&
+          new Date(prod?.updatedAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            .reverse()
+            .join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || ""));
+
+      return matchesCategory && matchesStore && matchesSearch;
+    });
+
+
     setFilteredData(results);
-  }, [searchKey, productServiceFilter, storeFilter]);
+  }, [searchKey, productTypeFilter, storeFilter]);
 
   if (!isAllowed) {
     return (
@@ -273,7 +287,7 @@ const Products: React.FC = () => {
       </div>
     );
   }
-
+  console.log(data)
   return (
     <div
       className="min-h-screen"
@@ -439,11 +453,11 @@ const Products: React.FC = () => {
                 className="block text-sm font-medium mb-2"
                 style={{ color: colors.text.primary }}
               >
-                Type
+                Type 
               </label>
               <select
-                value={productServiceFilter}
-                onChange={(e) => setProductServiceFilter(e.target.value)}
+                value={productTypeFilter}
+                onChange={(e) => setProductTypeFilter(e.target.value)}
                 className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
                 style={{
                   backgroundColor: colors.input.background,
@@ -459,10 +473,16 @@ const Products: React.FC = () => {
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                <option value="">All Types</option>
-                <option value="product">Products</option>
-                <option value="service">Services</option>
+                <option value="">All Categories</option>
+                <option value="finished goods">Finished Goods</option>
+                <option value="raw materials">Raw Materials</option>
+                <option value="semi finished goods">Semi Finished Goods</option>
+                <option value="consumables">Consumables</option>
+                <option value="bought out parts">Bought Out Parts</option>
+                <option value="trading goods">Trading Goods</option>
+                <option value="service">Service</option>
               </select>
+
             </div>
 
             {/* Store Filter */}

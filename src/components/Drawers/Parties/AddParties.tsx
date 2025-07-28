@@ -77,7 +77,7 @@ const AddParties = ({
         // gst_in: gstIns,
         contact_number: contactNumbers,
         // delivery_address: deliveryAddresses,
-        email_id: emailIds, 
+        email_id: emailIds,
       };
 
       try {
@@ -129,7 +129,7 @@ const AddParties = ({
     values,
     setValues,
     icon,
-    { allowAdd = true } = {} 
+    { allowAdd = true } = {}
   ) => (
     <div className="space-y-3">
       <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
@@ -165,7 +165,7 @@ const AddParties = ({
         </div>
       ))}
 
-      {allowAdd && ( 
+      {allowAdd && (
         <button
           type="button"
           onClick={() => setValues([...values, ""])}
@@ -299,6 +299,45 @@ const AddParties = ({
                         )}
                     </div>
                   )}
+                  <div className="space-y-2 md:col-span-2">
+                    {renderFieldList(
+                      "Consignee Name",
+                      consigneeNames,
+                      setConsigneeNames,
+                      <User className="h-4 w-4 text-gray-500" />,
+                      { allowAdd: false }
+                    )}
+                  </div>
+                  {/* {renderFieldList(
+                    "GST IN",
+                    gstIns,
+                    setGstIns,
+                    <FileText className="h-4 w-4 text-gray-500" />
+                    )} */}
+
+                  <div className="space-y-6">
+                    {renderFieldList(
+                      "Contact Number",
+                      contactNumbers,
+                      setContactNumbers,
+                      <Phone className="h-4 w-4 text-gray-500" />
+                    )}
+                  </div>
+
+                  {/* {renderFieldList(
+                    "Delivery Address",
+                    deliveryAddresses,
+                    setDeliveryAddresses,
+                    <MapPin className="h-4 w-4 text-gray-500" />
+                  )} */}
+                  <div className="space-y-6">
+                    {renderFieldList(
+                      "Email ID",
+                      emailIds,
+                      setEmailIds,
+                      <Mail className="h-4 w-4 text-gray-500" />
+                    )}
+                  </div>
 
                   {/* GST Address */}
                   {/* <div className="space-y-2 md:col-span-2">
@@ -369,7 +408,7 @@ const AddParties = ({
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <MapPin className="h-4 w-4 text-gray-500" />
-                      Shipped GST To
+                      Shipped GSTIN
                     </label>
                     <input
                       type="text"
@@ -380,18 +419,19 @@ const AddParties = ({
                       placeholder="Enter shipping address"
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                     />
-                    {formik.touched.shipped_gst_to && formik.errors.shipped_gst_to && (
-                      <p className="text-sm text-red-600 flex items-center gap-1">
-                        {formik.errors.shipped_gst_to}
-                      </p>
-                    )}
+                    {formik.touched.shipped_gst_to &&
+                      formik.errors.shipped_gst_to && (
+                        <p className="text-sm text-red-600 flex items-center gap-1">
+                          {formik.errors.shipped_gst_to}
+                        </p>
+                      )}
                   </div>
 
                   {/* Bill To */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <FileText className="h-4 w-4 text-gray-500" />
-                      Bill GST To
+                      Bill GSTIN
                     </label>
                     <input
                       type="text"
@@ -402,17 +442,18 @@ const AddParties = ({
                       placeholder="Enter billing address"
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                     />
-                    {formik.touched.bill_gst_to && formik.errors.bill_gst_to && (
-                      <p className="text-sm text-red-600 flex items-center gap-1">
-                        {formik.errors.bill_gst_to}
-                      </p>
-                    )}
+                    {formik.touched.bill_gst_to &&
+                      formik.errors.bill_gst_to && (
+                        <p className="text-sm text-red-600 flex items-center gap-1">
+                          {formik.errors.bill_gst_to}
+                        </p>
+                      )}
                   </div>
                 </div>
               </div>
 
               {/* Additional Details Section */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              {/* <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                   <Users className="h-5 w-5 text-blue-600" />
                   Additional Contact Details
@@ -424,38 +465,38 @@ const AddParties = ({
                     consigneeNames,
                     setConsigneeNames,
                     <User className="h-4 w-4 text-gray-500" />,
-                    { allowAdd: false } 
-                  )}
+                    { allowAdd: false }
+                  )} */}
 
-                  {/* {renderFieldList(
+              {/* {renderFieldList(
                     "GST IN",
                     gstIns,
                     setGstIns,
                     <FileText className="h-4 w-4 text-gray-500" />
                   )} */}
 
-                  {renderFieldList(
+              {/* {renderFieldList(
                     "Contact Number",
                     contactNumbers,
                     setContactNumbers,
                     <Phone className="h-4 w-4 text-gray-500" />
-                  )}
+                  )} */}
 
-                  {/* {renderFieldList(
+              {/* {renderFieldList(
                     "Delivery Address",
                     deliveryAddresses,
                     setDeliveryAddresses,
                     <MapPin className="h-4 w-4 text-gray-500" />
                   )} */}
 
-                  {renderFieldList(
+              {/* {renderFieldList(
                     "Email ID",
                     emailIds,
                     setEmailIds,
                     <Mail className="h-4 w-4 text-gray-500" />
                   )}
                 </div>
-              </div>
+              </div> */}
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
