@@ -656,13 +656,6 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                     <h3 className="text-lg font-semibold text-gray-900">
                       Raw Materials
                     </h3>
-                    <button
-                      type="button"
-                      className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
-                      onClick={addRawMaterial}
-                    >
-                      <Plus size={16} /> Add
-                    </button>
                   </div>
 
                   {/* Header */}
@@ -808,13 +801,20 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                         </div>
 
                         {/* Action */}
-                        <div className="flex sm:justify-center">
+                        <div className="flex sm:justify-center items-center gap-2">
                           <button
                             type="button"
                             className="inline-flex items-center justify-center px-2 py-1 text-red-600 hover:text-red-800"
                             onClick={() => removeRawMaterial(index)}
                           >
                             <Trash2 size={18} />
+                          </button>
+                          <button
+                            type="button"
+                            className="px-2 py-1 flex justify-center items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
+                            onClick={addRawMaterial}
+                          >
+                            <Plus size={16} /> Add
                           </button>
                         </div>
                       </div>
@@ -830,6 +830,44 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                     <h3 className="text-lg font-semibold text-gray-900">
                       Processes
                     </h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {processes.map((proc, idx) => (
+                      <div className="border rounded-md p-3" key={idx}>
+                        <div
+                          key={idx}
+                          className="flex flex-col sm:flex-row gap-2 sm:items-center"
+                        >
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Process {idx + 1}
+                          </label>
+                          <input
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm"
+                            placeholder={`Process ${idx + 1}`}
+                            value={proc}
+                            onChange={(e) => {
+                              const next = [...processes];
+                              next[idx] = e.target.value;
+                              setProcesses(next);
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="text-red-600 hover:text-red-800 sm:ml-2"
+                            onClick={() => {
+                              if (processes.length <= 1) return;
+                              setProcesses(
+                                processes.filter((_, i) => i !== idx)
+                              );
+                            }}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-end mt-3">
                     <button
                       type="button"
                       onClick={() => setProcesses([...processes, ""])}
@@ -837,38 +875,6 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                     >
                       <Plus size={16} /> Add
                     </button>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {processes.map((proc, idx) => (
-                      <div
-                        key={idx}
-                        className="flex flex-col sm:flex-row gap-2 sm:items-center mb-3"
-                      >
-                        <label className="sm:hidden text-xs font-semibold text-gray-700">
-                          Process {idx + 1}
-                        </label>
-                        <input
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm"
-                          placeholder={`Process ${idx + 1}`}
-                          value={proc}
-                          onChange={(e) => {
-                            const next = [...processes];
-                            next[idx] = e.target.value;
-                            setProcesses(next);
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="text-red-600 hover:text-red-800 sm:ml-2"
-                          onClick={() => {
-                            if (processes.length <= 1) return;
-                            setProcesses(processes.filter((_, i) => i !== idx));
-                          }}
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    ))}
                   </div>
                 </div>
               </div>
@@ -880,13 +886,6 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                     <h3 className="text-lg font-semibold text-gray-900">
                       Scrap Materials
                     </h3>
-                    <button
-                      type="button"
-                      className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
-                      onClick={addScrapMaterial}
-                    >
-                      <Plus size={16} /> Add
-                    </button>
                   </div>
 
                   {/* Header */}
@@ -1017,13 +1016,20 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                         </div>
 
                         {/* Action */}
-                        <div className="flex sm:justify-center">
+                        <div className="flex sm:justify-center items-center gap-2">
                           <button
                             type="button"
                             className="inline-flex items-center justify-center px-2 py-1 text-red-600 hover:text-red-800"
                             onClick={() => removeScrapMaterial(index)}
                           >
                             <Trash2 size={18} />
+                          </button>
+                          <button
+                            type="button"
+                            className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
+                            onClick={addScrapMaterial}
+                          >
+                            <Plus size={16} /> Add
                           </button>
                         </div>
                       </div>
