@@ -51,9 +51,9 @@ const Navigation: React.FC = () => {
   };
   return (
     <>
-      {/* Mobile Menu Button */}
+     
       <div
-        className={`fixed top-2 z-50 lg:hidden transition-all duration-300 ease-in-out ${
+        className={`absolute top-2 z-40 lg:hidden transition-all duration-300 ease-in-out ${
           checkMenu ? "left-[250px]" : "left-4"
         }`}
       >
@@ -69,10 +69,10 @@ const Navigation: React.FC = () => {
         </button>
       </div>
 
-      {/* Mobile Overlay */}
+    
       {checkMenu && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden transition-opacity duration-300"
           onClick={() => setCheckMenu(false)}
         />
       )}
@@ -82,7 +82,7 @@ const Navigation: React.FC = () => {
         className={`bg-white border-r border-gray-200 shadow-xl h-full overflow-y-auto
          lg:block lg:relative lg:translate-x-0
          ${checkMenu ? "translate-x-0" : "-translate-x-full"}
-         fixed z-40 w-80 lg:w-64 top-0 left-0 transition-transform duration-300 ease-in-out`}
+         fixed z-30 w-80 lg:w-64 top-0 left-0 transition-transform duration-300 ease-in-out`}
       >
         {/* Logo */}
         <div className="border-b border-gray-100">

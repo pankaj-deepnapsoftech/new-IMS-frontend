@@ -137,7 +137,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
             boxShadow: `0 0 0 3px ${colors.primary[100]}`,
           }}
         >
-          {[10, 20, 50, 100, 100000].map((size) => (
+          {[5,10, 20, 50, 100, 100000].map((size) => (
             <option
               key={size}
               value={size}

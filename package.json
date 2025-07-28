@@ -50,7 +50,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "host": "vite --host"
+    "host": "vite --host",
+    "preview":"vite preview"
+    
   },
   "eslintConfig": {
     "extends": [

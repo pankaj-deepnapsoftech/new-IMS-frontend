@@ -6,12 +6,12 @@ import { IoIosAdd } from "react-icons/io";
 import { toast } from "react-toastify";
 import Select from 'react-select';
 
-interface AddItemsProps{
-    inputs: { item: { value: string, label: string }, quantity: number, price: number }[] | [],
-    setInputs: (input: any)=> void
+interface AddItemsProps {
+  inputs: { item: { value: string, label: string }, quantity: number, price: number }[] | [],
+  setInputs: (input: any) => void
 }
 
-const AddItems: React.FC<AddItemsProps> = ({inputs, setInputs}) => {
+const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
   const [cookies] = useCookies();
   const [products, setProducts] = useState<any[] | []>([]);
   const [productOptions, setProductOptions] = useState<any[] | []>([]);
@@ -40,40 +40,53 @@ const AddItems: React.FC<AddItemsProps> = ({inputs, setInputs}) => {
           },
         }
       );
+
       const results = await response.json();
+
       if (!results.success) {
         throw new Error(results?.message);
       }
-      const products = results.products.map((product: any) => ({
+
+     
+      const finishedGoods = results.products.filter(
+        (product: any) => product.category?.toLowerCase() === "finished goods"
+      );
+
+     
+      const productOptions = finishedGoods.map((product: any) => ({
         value: product._id,
         label: product.name,
       }));
-      setProductOptions(products);
-      setProducts(results.products);
+
+      // Set filtered data
+      setProductOptions(productOptions);
+      setProducts(finishedGoods);
+
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
   };
 
-  const onChangeHandler = (ind: number, name: string, value: any)=>{
+
+  const onChangeHandler = (ind: number, name: string, value: any) => {
     const inputsArr = [...inputs];
-    
-    if(name === 'quantity' && inputsArr[ind].item){
-        const product = products.find(prod => prod._id === inputsArr[ind].item.value);
-        inputsArr[ind]["price"] = (+value || 0) * (+product.price || 0);
-        inputsArr[ind]["quantity"] = +value;
+
+    if (name === 'quantity' && inputsArr[ind].item) {
+      const product = products.find(prod => prod._id === inputsArr[ind].item.value);
+      inputsArr[ind]["price"] = (+value || 0) * (+product.price || 0);
+      inputsArr[ind]["quantity"] = +value;
     }
-    else if(name === 'price'){
-        inputsArr[ind]["price"] = +value;
+    else if (name === 'price') {
+      inputsArr[ind]["price"] = +value;
     }
-    else{
-        inputsArr[ind]["item"] = value;
+    else {
+      inputsArr[ind]["item"] = value;
     }
 
     setInputs(inputsArr);
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchItemsHandler();
   }, [])
   const customStyles = {
@@ -113,16 +126,29 @@ const AddItems: React.FC<AddItemsProps> = ({inputs, setInputs}) => {
           <div key={ind} className="grid grid-cols-3 gap-x-1 gap-y-2">
             <FormControl>
               <FormLabel color="black">Product</FormLabel>
-              <Select  styles={customStyles} onChange={(d: any)=>onChangeHandler(ind, "item", d)} value={input.item} options={productOptions} />
+              <Select styles={customStyles} onChange={(d: any) => onChangeHandler(ind, "item", d)} value={input.item} options={productOptions} />
             </FormControl>
             <FormControl>
               <FormLabel color="black">Quantity</FormLabel>
-              <Input className="text-gray-400" value={input.quantity} onChange={(e)=>onChangeHandler(ind, "quantity", e.target.value)} type="number" />
+              <Input
+                className="text-gray-600"
+                value={input.quantity}
+                onChange={(e) => onChangeHandler(ind, "quantity", e.target.value)}
+                type="number"
+                isDisabled={!input.item?.value}
+              />
             </FormControl>
             <FormControl>
               <FormLabel color="black">Price</FormLabel>
-              <Input className="text-gray-400" value={input.price} onChange={(e)=>onChangeHandler(ind, "price", e.target.value)} type="number" />
+              <Input
+                className="text-gray-600"
+                value={input.price}
+                onChange={(e) => onChangeHandler(ind, "price", e.target.value)}
+                type="number"
+                isDisabled={!input.item?.value}
+              />
             </FormControl>
+
           </div>
         ))}
       </div>
@@ -142,7 +168,7 @@ const AddItems: React.FC<AddItemsProps> = ({inputs, setInputs}) => {
           leftIcon={<IoIosAdd className=" hover:text-black" />}
           variant="outline"
           color="gray.400"
-          _hover={{color:"black" ,bg:"white"}}
+          _hover={{ color: "black", bg: "white" }}
         >
           Add
         </Button>

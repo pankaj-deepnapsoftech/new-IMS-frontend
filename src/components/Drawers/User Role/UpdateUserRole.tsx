@@ -30,14 +30,14 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
   >([]);
 
   const permissionOptions = [
-    { value: "inventory", label: "inventory" },
-    { value: "store", label: "store" },
-    { value: "approval", label: "approval" },
-    { value: "agent", label: "agent" },
-    { value: "production", label: "production" },
-    { value: "Parties", label: "Parties" },
-    { value: "Sales", label: "Sales" },
-    { value: "Task", label: "Task" },
+    { value: "inventory", label: "Inventory" },
+    { value: "store", label: "Store" },
+    { value: "approval", label: "Approval" },
+    { value: "agent", label: "Agent" },
+    { value: "production", label: "Production" },
+    { value: "parties", label: "Parties" },
+    { value: "sales", label: "Sales" },
+    { value: "task", label: "Task" },
   ];
 
   const [updateRole] = useUpdateRoleMutation();

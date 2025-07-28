@@ -34,8 +34,14 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   deleteEmployeeHandler,
   approveEmployeeHandler,
 }) => {
+
   const columns = useMemo(
     () => [
+      {
+        Header: "Employee Id",
+        accessor: "employeeId",
+        Cell: ({ value }) => value || "N/A",
+      },
       { Header: "First Name", accessor: "first_name" },
       { Header: "Last Name", accessor: "last_name" },
       { Header: "Email", accessor: "email" },
@@ -47,7 +53,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     ],
     []
   );
-
+  console.log(employees)
   const dynamicBg = (index) => {
     return index % 2 !== 0 ? colors.table.stripe : colors.background.card;
   };
@@ -161,7 +167,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   boxShadow: `0 0 0 1px ${colors.primary[500]}`,
                 }}
               >
-                {[10, 20, 50, 100, 100000].map((size) => (
+                {[5,10, 20, 50, 100, 100000].map((size) => (
                   <option key={size} value={size}>
                     {size === 100000 ? "All" : size}
                   </option>

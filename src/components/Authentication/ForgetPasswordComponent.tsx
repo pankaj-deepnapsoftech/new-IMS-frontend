@@ -66,7 +66,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
         password: newPassword,
       }).unwrap();
       toast.success(data.message);
-      navigate(0);
+      navigate("/");
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally {
@@ -103,7 +103,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <span className="inline-flex items-center gap-1">
-                  <FaStarOfLife size={6} className="text-red-500" />
+                  <FaStarOfLife size={4} className="text-red-500" />
                   Email Address
                 </span>
               </label>
@@ -148,7 +148,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <span className="inline-flex items-center gap-1">
-                  <FaStarOfLife size={6} className="text-red-500" />
+                  <FaStarOfLife size={4} className="text-red-500" />
                   Verification Code
                 </span>
               </label>
@@ -160,9 +160,9 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
                   value={otp || ""}
                   onChange={(e) => setOtp(e.target.value)}
                   required
-                  maxLength={6}
+                  maxLength={4}
                   type="text"
-                  placeholder="Enter 6-digit code"
+                  placeholder="Enter 4-digit code"
                   className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 />
               </div>
@@ -172,7 +172,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <span className="inline-flex items-center gap-1">
-                  <FaStarOfLife size={6} className="text-red-500" />
+                  <FaStarOfLife size={4} className="text-red-500" />
                   New Password
                 </span>
               </label>

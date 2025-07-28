@@ -39,7 +39,7 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   const fetchInvoiceDetails = async (id: string) => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + `invoice/${id}`,
+        process.env.REACT_APP_BACKEND_URL + `proforma-invoice/${id}`,
         {
           method: "GET",
           headers: {
@@ -51,19 +51,19 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
       if (!data.success) {
         throw new Error(data.message);
       }
-      setInvoiceNo(data.invoice.invoice_no);
-      setDocumentDate(data.invoice.document_date);
-      setSalesOrderDate(data.invoice.sales_order_date);
-      setNote(data.invoice?.note || "Not Available");
-      setSubtotal(data.invoice.subtotal);
-      setTotal(data.invoice.total);
-      setTax(data.invoice.tax);
-      setItems(data.invoice.items);
-      setStore(data.invoice.store.name);
-      setCategory(data.invoice.category);
-      setBuyer(data.invoice?.buyer?.name);
-      setSupplier(data.invoice?.supplier?.name);
-      setCreator(data.invoice.creator);
+      setInvoiceNo(data.proforma_invoice.proforma_invoice_no);
+      setDocumentDate(data.proforma_invoice.document_date);
+      setSalesOrderDate(data.proforma_invoice.sales_order_date);
+      setNote(data.proforma_invoice?.note || "Not Available");
+      setSubtotal(data.proforma_invoice.subtotal);
+      setTotal(data.proforma_invoice.total);
+      setTax(data.proforma_invoice.tax);
+      setItems(data.proforma_invoice.items);
+      setStore(data.proforma_invoice.store.name);
+      setCategory(data.proforma_invoice.category);
+      setBuyer(data.proforma_invoice?.buyer?.name);
+      setSupplier(data.proforma_invoice?.supplier?.name);
+      setCreator(data.proforma_invoice.creator);
     } catch (error: any) {
       toast.error(error.messsage || "Something went wrong");
     }
@@ -73,49 +73,52 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
     fetchInvoiceDetails(id || "");
   }, [id]);
 
-  return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
-      <div
-        className="absolute overflow-auto h-screen w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
-      >
-        <div
-          className="flex items-center justify-between p-6 border-b"
-          style={{ borderColor: colors.border.light }}
-        >
-          <h1
-            className="text-xl font-semibold"
-            style={{ color: colors.text.primary }}
-          >
-            Proforma Invoice Details
-          </h1>
-          <button
-            onClick={closeDrawerHandler}
-            className="p-2 rounded-lg transition-colors duration-200"
-            style={{
-              color: colors.text.secondary,
-              backgroundColor: colors.gray[100],
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[200];
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[100];
-            }}
-          >
-            <BiX size={20} />
-          </button>
-        </div>
 
-        <div className="mt-8 px-5">
-          {isLoading && <Loading />}
-          {!isLoading && (
-            <div className="space-y-4">
+  return (
+    <div
+      className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
+      style={{
+        boxShadow:
+          "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+      }}
+    >
+      <div
+        className="flex items-center justify-between p-6 border-b"
+        style={{ borderColor: colors.border.light }}
+      >
+        <h1
+          className="text-xl font-semibold"
+          style={{ color: colors.text.primary }}
+        >
+          Proforma Invoice Details
+        </h1>
+        <button
+          onClick={closeDrawerHandler}
+          className="p-2 rounded-lg transition-colors duration-200"
+          style={{
+            color: colors.text.secondary,
+            backgroundColor: colors.gray[100],
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[200];
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[100];
+          }}
+        >
+          <BiX size={20} />
+        </button>
+      </div>
+
+      <div className="mt-8 px-5">
+        {isLoading && <Loading />}
+        {!isLoading && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">Created By</h3>
+                <h3 className="font-semibold text-gray-700 mb-2">
+                  Created By
+                </h3>
                 <p className="text-gray-600">
                   {creator?.first_name + " " + creator?.last_name}
                 </p>
@@ -135,7 +138,9 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
 
               {supplier && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Supplier</h3>
+                  <h3 className="font-semibold text-gray-700 mb-2">
+                    Supplier
+                  </h3>
                   <p className="text-gray-600">{supplier}</p>
                 </div>
               )}
@@ -157,59 +162,61 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                     : "N/A"}
                 </p>
               </div>
+            </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">
-                  Sales Order Date
-                </h3>
-                <p className="text-gray-600">
-                  {salesOrderDate
-                    ? new Date(salesOrderDate).toLocaleDateString()
-                    : "N/A"}
-                </p>
-              </div>
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-gray-700 mb-2">
+                Sales Order Date
+              </h3>
+              <p className="text-gray-600">
+                {salesOrderDate
+                  ? new Date(salesOrderDate).toLocaleDateString()
+                  : "N/A"}
+              </p>
+            </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-700 mb-2">Items</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full bg-white border border-gray-300 rounded-md">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                          Item
-                        </th>
-                        <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                          Quantity
-                        </th>
-                        <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                          Amount
-                        </th>
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-gray-700 mb-2">Items</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full bg-white border border-gray-300 rounded-md">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Item
+                      </th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Quantity
+                      </th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Amount
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items?.map((item: any, index: number) => (
+                      <tr
+                        key={index}
+                        className={
+                          index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                        }
+                      >
+                        <td className="px-3 py-2 text-sm text-gray-600 border-b">
+                          {item.item.name}
+                        </td>
+                        <td className="px-3 py-2 text-sm text-gray-600 border-b">
+                          {item.quantity}
+                        </td>
+                        <td className="px-3 py-2 text-sm text-gray-600 border-b">
+                          ₹ {item.amount}/-
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {items?.map((item: any, index: number) => (
-                        <tr
-                          key={index}
-                          className={
-                            index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                          }
-                        >
-                          <td className="px-3 py-2 text-sm text-gray-600 border-b">
-                            {item.item.name}
-                          </td>
-                          <td className="px-3 py-2 text-sm text-gray-600 border-b">
-                            {item.quantity}
-                          </td>
-                          <td className="px-3 py-2 text-sm text-gray-600 border-b">
-                            ₹ {item.amount}/-
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <h3 className="font-semibold text-gray-700 mb-2">Store</h3>
                 <p className="text-gray-600">{store}</p>
@@ -231,18 +238,18 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                 <h3 className="font-semibold text-gray-700 mb-2">Tax</h3>
                 <p className="text-gray-600">{tax?.tax_name}</p>
               </div>
-
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <h3 className="font-semibold text-blue-700 mb-2">
-                  Total Amount
-                </h3>
-                <p className="text-blue-600 text-xl font-bold">₹ {total}/-</p>
-              </div>
             </div>
-          )}
-        </div>
+
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <h3 className="font-semibold text-blue-700 mb-2">
+                Total Amount
+              </h3>
+              <p className="text-blue-600 text-xl font-bold">₹ {total}/-</p>
+            </div>
+          </div>
+        )}
       </div>
-    </Drawer>
+    </div>
   );
 };
 

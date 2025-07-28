@@ -27,43 +27,35 @@ const UserProfile: React.FC = () => {
 
   return (
     <Box
-      minH="80vh"
-      py={8}
-      px={6}
+      // minH="100vh"
+      // py={{ base: 6, md: 10 }}
+      // px={{ base: 4, md: 10 }}
       style={{
         backgroundColor: colors.background.page,
       }}
-      className="flex justify-center items-center"  
+      className="flex justify-center items-center"
     >
-      <Box maxW="4xl" mx="auto">
-        {/* Page Header */}
-        {/* <Box mb={8}>
-          <Heading size="lg" mb={2} style={{ color: colors.text.primary }}>
-            User Profile
-          </Heading>
-          <Text style={{ color: colors.text.secondary }}>
-            Manage your personal information and account settings
-          </Text>
-        </Box> */}
-
-        <Flex direction={{ base: "column", lg: "row" }} gap={5}>
-          {/* Profile Card */}
+      <Box w="full" maxW="6xl" mx="auto">
+        <Flex
+          direction={{ base: "column", lg: "row" }}
+          gap={8}
+          align="flex-start"
+          justify="center"
+        >
           <Card
+            w="full"
+            maxW={{ base: "100%", md: "500px", lg: "450px" }}
+            mx="auto"
             style={{
               backgroundColor: colors.background.card,
               border: `1px solid ${colors.border.light}`,
               boxShadow: colors.shadow.sm,
             }}
           >
-            <CardHeader>
-              <Heading size="md" className="text-center" style={{ color: colors.text.primary }}>
-                Profile Information
-              </Heading>
-            </CardHeader>
             <CardBody>
-              <VStack spacing={5} align="stretch">
-                {/* Avatar Section */}
-                <Flex direction="column" align="center" py={3}>
+              <VStack spacing={6} align="stretch">
+                {/* Avatar and Info */}
+                <Flex direction="column" align="center" py={4}>
                   <Avatar
                     size="xl"
                     name={`${data.firstname} ${data.lastname}`}
@@ -74,13 +66,13 @@ const UserProfile: React.FC = () => {
                     }}
                   />
                   <Heading
-                    size="lg"
+                    size={{ base: "md", md: "lg" }}
                     style={{ color: colors.text.primary }}
                     textAlign="center"
                   >
                     {data.firstname} {data.lastname}
                   </Heading>
-                  <HStack mt={2} spacing={2}>
+                  <HStack mt={2} spacing={3} flexWrap="wrap" justify="center">
                     <Badge
                       variant="subtle"
                       style={{
@@ -112,18 +104,12 @@ const UserProfile: React.FC = () => {
                 <Divider style={{ borderColor: colors.border.light }} />
 
                 {/* Form Fields */}
-                <Stack spacing={4}>
+                <Stack spacing={5}>
+                  {/* First Name */}
                   <Box>
                     <HStack mb={2}>
-                      <Icon
-                        as={MdPerson}
-                        style={{ color: colors.primary[500] }}
-                      />
-                      <Text
-                        fontWeight="semibold"
-                        fontSize="sm"
-                        style={{ color: colors.text.secondary }}
-                      >
+                      <Icon as={MdPerson} style={{ color: colors.primary[500] }} />
+                      <Text fontWeight="semibold" fontSize="sm" style={{ color: colors.text.secondary }}>
                         First Name
                       </Text>
                     </HStack>
@@ -142,17 +128,11 @@ const UserProfile: React.FC = () => {
                     />
                   </Box>
 
+                  {/* Last Name */}
                   <Box>
                     <HStack mb={2}>
-                      <Icon
-                        as={MdPerson}
-                        style={{ color: colors.primary[500] }}
-                      />
-                      <Text
-                        fontWeight="semibold"
-                        fontSize="sm"
-                        style={{ color: colors.text.secondary }}
-                      >
+                      <Icon as={MdPerson} style={{ color: colors.primary[500] }} />
+                      <Text fontWeight="semibold" fontSize="sm" style={{ color: colors.text.secondary }}>
                         Last Name
                       </Text>
                     </HStack>
@@ -171,17 +151,11 @@ const UserProfile: React.FC = () => {
                     />
                   </Box>
 
+                  {/* Email */}
                   <Box>
                     <HStack mb={2}>
-                      <Icon
-                        as={MdEmail}
-                        style={{ color: colors.primary[500] }}
-                      />
-                      <Text
-                        fontWeight="semibold"
-                        fontSize="sm"
-                        style={{ color: colors.text.secondary }}
-                      >
+                      <Icon as={MdEmail} style={{ color: colors.primary[500] }} />
+                      <Text fontWeight="semibold" fontSize="sm" style={{ color: colors.text.secondary }}>
                         Email Address
                       </Text>
                     </HStack>
@@ -200,22 +174,17 @@ const UserProfile: React.FC = () => {
                     />
                   </Box>
 
+                  {/* Phone Number */}
                   <Box>
                     <HStack mb={2}>
-                      <Icon
-                        as={MdPhone}
-                        style={{ color: colors.primary[500] }}
-                      />
-                      <Text
-                        fontWeight="semibold"
-                        fontSize="sm"
-                        style={{ color: colors.text.secondary }}
-                      >
+                      <Icon as={MdPhone} style={{ color: colors.primary[500] }} />
+                      <Text fontWeight="semibold" fontSize="sm" style={{ color: colors.text.secondary }}>
                         Phone Number
                       </Text>
                     </HStack>
                     <Input
                       value={data.phone || ""}
+                      placeholder="Enter your phone number"
                       style={{
                         backgroundColor: colors.input.background,
                         borderColor: colors.input.border,
@@ -226,7 +195,6 @@ const UserProfile: React.FC = () => {
                         borderColor: colors.input.borderFocus,
                         boxShadow: `0 0 0 3px ${colors.primary[100]}`,
                       }}
-                      placeholder="Enter your phone number"
                     />
                   </Box>
                 </Stack>
@@ -234,35 +202,21 @@ const UserProfile: React.FC = () => {
                 <Divider style={{ borderColor: colors.border.light }} />
 
                 {/* Action Buttons */}
-                <Stack direction={{ base: "column", sm: "row" }} spacing={3}>
+                <Stack
+                  direction={{ base: "column", sm: "row" }}
+                  spacing={4}
+                  pt={2}
+                >
                   <Button
                     flex="1"
                     style={{
                       backgroundColor: colors.button.primary,
                       color: colors.text.inverse,
+                      padding: "12px 24px",
                     }}
-                    _hover={{
-                      backgroundColor: colors.button.primaryHover,
-                    }}
-                    _active={{
-                      backgroundColor: colors.button.primaryHover,
-                    }}
+                    _hover={{ backgroundColor: colors.button.primaryHover }}
                   >
-                    Update Profile
-                  </Button>
-                  <Button
-                    flex="1"
-                    variant="outline"
-                    style={{
-                      borderColor: colors.border.medium,
-                      color: colors.text.secondary,
-                    }}
-                    _hover={{
-                      backgroundColor: colors.gray[50],
-                      borderColor: colors.border.dark,
-                    }}
-                  >
-                    Change Password
+                    User Profile
                   </Button>
                 </Stack>
               </VStack>
@@ -271,6 +225,7 @@ const UserProfile: React.FC = () => {
         </Flex>
       </Box>
     </Box>
+
   );
 };
 

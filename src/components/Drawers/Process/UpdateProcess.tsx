@@ -16,6 +16,7 @@ import {
 } from "../../../redux/api/api";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
+import Process from "../../Dynamic Add Components/ProductionProcess";
 
 interface UpdateProcess {
   closeDrawerHandler: () => void;
@@ -36,7 +37,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   const [createdBy, setCreatedBy] = useState<string | undefined>();
   const [processes, setProcesses] = useState<string[] | []>([]);
   const [processStatuses, setProcessStatuses] = useState<{
-    [key: number]: { started: boolean; done: boolean };
+    [key: number]: { start: boolean; done: boolean };
   }>({});
 
   const [products, setProducts] = useState<any[]>([]);
@@ -131,7 +132,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
   const handleProcessStatusChange = (
     processIndex: number,
-    statusType: "started" | "done",
+    statusType: "start" | "done",
     checked: boolean
   ) => {
     setProcessStatuses((prev) => {
@@ -143,13 +144,13 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
         },
       };
 
-      // Auto-check "started" when "done" is checked
+      // Auto-check "start" when "done" is checked
       if (statusType === "done" && checked) {
-        updated[processIndex].started = true;
+        updated[processIndex].start = true;
       }
 
-      // Uncheck "done" when "started" is unchecked
-      if (statusType === "started" && !checked) {
+      // Uncheck "done" when "start" is unchecked
+      if (statusType === "start" && !checked) {
         updated[processIndex].done = false;
       }
 
@@ -171,7 +172,6 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
           total_part_cost: material?.total_part_cost,
         };
 
-        // Only include _id if it exists and is not empty
         if (material?._id && material._id.trim() !== "") {
           materialData._id = material._id;
         }
@@ -179,13 +179,19 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
         return materialData;
       });
 
+    const updatedProcesses = processes.map((proc: any, index) => ({
+      process: (proc as any)?.process ?? proc,
+      start: processStatuses[index]?.start || false,
+      done: processStatuses[index]?.done || false,
+    }));
+
     const data = {
       // BOM
       bom: {
         _id: bomId,
         raw_materials: selectedProducts,
         scrap_materials: modifiedScrapMaterials,
-        processes: processes,
+        processes: updatedProcesses,
         finished_good: {
           item: finishedGood?.value,
           description: finishedGoodDescription,
@@ -207,6 +213,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
     try {
       setIsUpdating(true);
       const response = await updateProcess(data).unwrap();
+
       if (!response.success) {
         throw new Error(response.message);
       }
@@ -260,6 +267,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
         }
       );
       const data = await response.json();
+
       if (!data.success) {
         throw new Error(data.message);
       }
@@ -328,23 +336,33 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       );
       setScrapMaterials(scrap);
 
-      setProcesses(data?.production_process?.bom?.processes);
-
-      // Initialize process statuses for all processes
-      const initialStatuses: {
-        [key: number]: { started: boolean; done: boolean };
-      } = {};
-      data?.production_process?.bom?.processes?.forEach(
-        (_: any, index: number) => {
-          // Load existing statuses if available, otherwise default to false
-          const existingStatus =
-            data?.production_process?.process_statuses?.[index];
-          initialStatuses[index] = {
-            started: existingStatus?.started || false,
-            done: existingStatus?.done || false,
-          };
-        }
+      const processList = data?.production_process?.bom?.processes || [];
+      setProcesses(
+        processList.map((p: any) => ({
+          process: p.process,
+          quantity: p.quantity,
+        }))
       );
+
+      setProcessStatuses(
+        processList.map((p: any) => ({
+          start: p.start,
+          done: p.done,
+        }))
+      );
+
+      const fetchedStatuses = data.production_process.processes || [];
+      const initialStatuses: {
+        [key: number]: { start: boolean; done: boolean };
+      } = {};
+
+      processList.forEach((_: any, index: number) => {
+        initialStatuses[index] = {
+          start: fetchedStatuses[index]?.start ?? false,
+          done: fetchedStatuses[index]?.done ?? false,
+        };
+      });
+      setProcesses(processList);
       setProcessStatuses(initialStatuses);
 
       setFinishedGood({
@@ -441,6 +459,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setTotalCost(cost);
     }
   }, [selectedProducts]);
+
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
@@ -484,6 +503,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       color: "#374151",
     }),
   };
+
+  console.log(processStatuses);
   return (
     <>
       {/* Backdrop */}
@@ -508,11 +529,11 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
             <form onSubmit={updateProcessHandler}>
               {/* BOM Details Section */}
               <div className="bg-white border-b">
-                <div className="px-6 py-4">
+                <div className="px-4 py-4 sm:px-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     BOM Details
                   </h3>
-                  <div className="grid grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         BOM Name
@@ -552,29 +573,30 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
               {/* Finished Good Section */}
               <div className="bg-white border-b">
-                <div className="px-6 py-4">
+                <div className="px-4 py-4 sm:px-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Finished Good
                   </h3>
 
-                  {/* Table Header for Finished Good */}
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
-                    <div className="grid grid-cols-8 gap-1 px-3 py-2">
-                      <div>FINISHED GOODS</div>
-                      <div>EST. QTY</div>
-                      <div>PROD. QTY</div>
-                      <div>UOM</div>
-                      <div>CATEGORY</div>
-                      <div>COMMENTS</div>
-                      <div>UNIT COST</div>
-                      <div>COST</div>
-                    </div>
+                  {/* Header (desktop) */}
+                  <div className="hidden sm:grid grid-cols-8 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                    <div>FINISHED GOODS</div>
+                    <div>EST. QTY</div>
+                    <div>PROD. QTY</div>
+                    <div>UOM</div>
+                    <div>CATEGORY</div>
+                    <div>COMMENTS</div>
+                    <div>UNIT COST</div>
+                    <div>COST</div>
                   </div>
 
-                  {/* Finished Good Row */}
+                  {/* Row */}
                   <div className="border border-t-0 border-gray-300">
-                    <div className="grid grid-cols-8 gap-1 px-3 py-2 items-center bg-white">
+                    <div className="grid grid-cols-1 sm:grid-cols-8 gap-4 px-3 py-4 items-center bg-white">
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          Finished Goods
+                        </label>
                         <Select
                           styles={customStyles}
                           className="text-sm"
@@ -586,6 +608,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         />
                       </div>
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          Est. Qty
+                        </label>
                         <input
                           type="number"
                           value={finishedGoodQuantity || ""}
@@ -598,6 +623,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         />
                       </div>
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          Prod. Qty
+                        </label>
                         <input
                           type="number"
                           value={finishedGoodProducedQuantity || ""}
@@ -609,6 +637,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         />
                       </div>
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          UOM
+                        </label>
                         <input
                           type="text"
                           value={finishedGoodUom || ""}
@@ -617,6 +648,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         />
                       </div>
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          Category
+                        </label>
                         <input
                           type="text"
                           value={finishedGoodCategory || ""}
@@ -625,6 +659,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         />
                       </div>
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          Comments
+                        </label>
                         <input
                           type="text"
                           value={finishedGoodComments || ""}
@@ -637,6 +674,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         />
                       </div>
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          Unit Cost
+                        </label>
                         <input
                           type="number"
                           value={finishedGoodUnitCost || ""}
@@ -645,6 +685,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         />
                       </div>
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          Cost
+                        </label>
                         <input
                           type="number"
                           value={finishedGoodCost || ""}
@@ -659,36 +702,36 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
               {/* Raw Materials Section */}
               <div className="bg-white border-b">
-                <div className="px-6 py-4">
+                <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">
                       Raw Materials
                     </h3>
                   </div>
 
-                  {/* Table Header for Raw Materials */}
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
-                    <div className="grid grid-cols-8 gap-1 px-3 py-2">
-                      <div>PRODUCT NAME</div>
-                      <div>EST. QTY</div>
-                      <div>USED QTY</div>
-                      <div>UOM</div>
-                      <div>CATEGORY</div>
-                      <div>COMMENTS</div>
-                      <div>UNIT COST</div>
-                      <div>TOTAL COST</div>
-                    </div>
+                  {/* Header (desktop) */}
+                  <div className="hidden sm:grid grid-cols-8 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                    <div>PRODUCT NAME</div>
+                    <div>EST. QTY</div>
+                    <div>USED QTY</div>
+                    <div>UOM</div>
+                    <div>CATEGORY</div>
+                    <div>COMMENTS</div>
+                    <div>UNIT COST</div>
+                    <div>TOTAL COST</div>
                   </div>
 
-                  {/* Raw Materials Rows */}
+                  {/* Rows */}
                   <div className="border border-t-0 border-gray-300">
                     {selectedProducts.map((material, index) => (
                       <div
                         key={index}
-                        className="grid grid-cols-8 gap-1 px-3 py-2 items-center bg-white border-b border-gray-200 last:border-b-0"
+                        className="grid grid-cols-1 sm:grid-cols-8 gap-4 px-3 py-4 items-center bg-white border-b border-gray-200 last:border-b-0"
                       >
-                        {/* Product Name */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Product Name
+                          </label>
                           <Select
                             styles={customStyles}
                             className="text-sm"
@@ -699,8 +742,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Estimated Quantity */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Est. Qty
+                          </label>
                           <input
                             type="number"
                             value={material.estimated_quantity || ""}
@@ -709,8 +754,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Used Quantity */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Used Qty
+                          </label>
                           <input
                             type="number"
                             value={material.used_quantity || ""}
@@ -725,8 +772,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* UOM */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            UOM
+                          </label>
                           <input
                             type="text"
                             value={material.uom || ""}
@@ -735,8 +784,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Category */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Category
+                          </label>
                           <input
                             type="text"
                             value={material.category || ""}
@@ -745,8 +796,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Comments */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Comments
+                          </label>
                           <input
                             type="text"
                             value={material.comments || ""}
@@ -755,8 +808,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Unit Cost */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Unit Cost
+                          </label>
                           <input
                             type="number"
                             value={material.unit_cost || ""}
@@ -765,8 +820,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Total Part Cost */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Total Cost
+                          </label>
                           <input
                             type="number"
                             value={material.total_part_cost || ""}
@@ -782,7 +839,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
               {/* Process Section */}
               <div className="bg-white border-b">
-                <div className="px-6 py-4">
+                <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">
                       Processes
@@ -798,18 +855,16 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   </div>
 
                   <div className="flex gap-4 flex-wrap">
-                    {processes.map((process, index) => {
+                    {processes.map((process: any, index) => {
                       const status = processStatuses[index];
-                      const isStarted = status?.started || false;
-                      const isDone = status?.done || false;
 
                       return (
                         <div key={index} className="mb-4 flex items-end gap-1">
                           <div
-                            className={`border p-3 rounded-lg min-w-[300px] ${
-                              isDone
+                            className={`border p-3 rounded-lg min-w-[280px] sm:min-w-[300px] ${
+                              status?.done
                                 ? "bg-green-50 border-green-200"
-                                : isStarted
+                                : status?.start
                                 ? "bg-blue-50 border-blue-200"
                                 : "bg-gray-50 border-gray-200"
                             }`}
@@ -820,51 +875,50 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                               </label>
                               <div
                                 className={`px-2 py-1 rounded text-xs font-medium ${
-                                  isDone
+                                  status?.done
                                     ? "bg-green-100 text-green-800"
-                                    : isStarted
+                                    : status?.start
                                     ? "bg-blue-100 text-blue-800"
                                     : "bg-gray-100 text-gray-600"
                                 }`}
                               >
-                                {isDone
+                                {status?.done
                                   ? "Completed"
-                                  : isStarted
+                                  : status?.start
                                   ? "In Progress"
-                                  : "Not Started"}
+                                  : "Not Start"}
                               </div>
                             </div>
                             <input
                               type="text"
-                              value={process}
+                              value={(process as any)?.process ?? process}
                               readOnly
                               className="w-full px-3 py-2 border border-gray-300 rounded bg-white mb-3"
                             />
 
-                            {/* Process Status Checkboxes */}
                             <div className="flex gap-4">
                               <label className="flex items-center gap-2">
                                 <input
                                   type="checkbox"
-                                  checked={isStarted}
+                                  checked={status?.start || false}
                                   onChange={(e) =>
                                     handleProcessStatusChange(
                                       index,
-                                      "started",
+                                      "start",
                                       e.target.checked
                                     )
                                   }
-                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded"
                                 />
                                 <span className="text-sm text-gray-700">
-                                  Started
+                                  Start
                                 </span>
                               </label>
 
                               <label className="flex items-center gap-2">
                                 <input
                                   type="checkbox"
-                                  checked={isDone}
+                                  checked={status?.done || false}
                                   onChange={(e) =>
                                     handleProcessStatusChange(
                                       index,
@@ -872,7 +926,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                                       e.target.checked
                                     )
                                   }
-                                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                                  className="w-4 h-4 text-green-600 border-gray-300 rounded"
                                 />
                                 <span className="text-sm text-gray-700">
                                   Done
@@ -889,35 +943,35 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
               {/* Scrap Materials Section */}
               <div className="bg-white border-b">
-                <div className="px-6 py-4">
+                <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">
                       Scrap Materials
                     </h3>
                   </div>
 
-                  {/* Table Header for Scrap Materials */}
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
-                    <div className="grid grid-cols-7 gap-1 px-3 py-2">
-                      <div>PRODUCT NAME</div>
-                      <div>COMMENT</div>
-                      <div>EST. QTY</div>
-                      <div>PROD. QTY</div>
-                      <div>UOM</div>
-                      <div>UNIT COST</div>
-                      <div>TOTAL COST</div>
-                    </div>
+                  {/* Header (desktop) */}
+                  <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                    <div>PRODUCT NAME</div>
+                    <div>COMMENT</div>
+                    <div>EST. QTY</div>
+                    <div>PROD. QTY</div>
+                    <div>UOM</div>
+                    <div>UNIT COST</div>
+                    <div>TOTAL COST</div>
                   </div>
 
-                  {/* Scrap Materials Rows */}
+                  {/* Rows */}
                   <div className="border border-t-0 border-gray-300">
                     {scrapMaterials.map((material, index) => (
                       <div
                         key={index}
-                        className="grid grid-cols-7 gap-1 px-3 py-2 items-center bg-white border-b border-gray-200 last:border-b-0"
+                        className="grid grid-cols-1 sm:grid-cols-7 gap-4 px-3 py-4 items-center bg-white border-b border-gray-200 last:border-b-0"
                       >
-                        {/* Product Name */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Product Name
+                          </label>
                           <Select
                             styles={customStyles}
                             className="text-sm"
@@ -928,8 +982,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Comment */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Comment
+                          </label>
                           <input
                             type="text"
                             value={material.description || ""}
@@ -938,8 +994,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Estimated Quantity */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Est. Qty
+                          </label>
                           <input
                             type="number"
                             value={material.estimated_quantity || ""}
@@ -948,8 +1006,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Produced Quantity */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Prod. Qty
+                          </label>
                           <input
                             type="number"
                             value={material.produced_quantity || ""}
@@ -964,8 +1024,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* UOM */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            UOM
+                          </label>
                           <input
                             type="text"
                             value={material.uom || ""}
@@ -974,8 +1036,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Unit Cost */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Unit Cost
+                          </label>
                           <input
                             type="number"
                             value={material.unit_cost || ""}
@@ -984,8 +1048,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        {/* Total Part Cost */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Total Cost
+                          </label>
                           <input
                             type="number"
                             value={material.total_part_cost || ""}
@@ -1001,7 +1067,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
               {/* Action Buttons */}
               <div className="bg-white">
-                <div className="px-6 py-4">
+                <div className="px-4 py-4 sm:px-6">
                   <div className="flex gap-4">
                     <button
                       disabled={isCompleted || rawMaterialApprovalPending}

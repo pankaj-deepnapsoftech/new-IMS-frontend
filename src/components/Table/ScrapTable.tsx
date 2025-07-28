@@ -109,7 +109,7 @@ const ScrapTable: React.FC<ScrapTableProps> = ({
             boxShadow: `0 0 0 1px ${colors.primary}`,
           }}
         >
-          {[10, 20, 50, 100, 100000].map((size) => (
+          {[5,10, 20, 50, 100, 100000].map((size) => (
             <option
               key={size}
               value={size}

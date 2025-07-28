@@ -1,20 +1,8 @@
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
-import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import Loading from "../../../ui/Loading";
-import { colors } from "../../../theme/colors";
-import {
-  Package,
-  FileText,
-  Hash,
-  Layers,
-  DollarSign,
-  Settings,
-  Eye,
-  List,
-} from "lucide-react";
 
 interface BomDetailsProps {
   bomId: string | undefined;
@@ -37,6 +25,7 @@ const BomDetails: React.FC<BomDetailsProps> = ({
   const [otherCharges, setOtherCharges] = useState<any>();
 
   const fetchBomDetails = async () => {
+    if (!bomId) return;
     try {
       setIsLoadingBom(true);
       const response = await fetch(
@@ -49,9 +38,8 @@ const BomDetails: React.FC<BomDetailsProps> = ({
         }
       );
       const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
-      }
+      if (!data.success) throw new Error(data.message);
+
       setFinishedGood(data.bom.finished_good);
       setRawMaterials(data.bom.raw_materials);
       setBomName(data.bom.bom_name);
@@ -69,7 +57,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
 
   useEffect(() => {
     fetchBomDetails();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bomId]);
+
   return (
     <>
       {/* Backdrop */}
@@ -99,31 +89,76 @@ const BomDetails: React.FC<BomDetailsProps> = ({
 
             {!isLoadingBom && (
               <div>
+                {/* Summary */}
+                <div className="bg-white border-b">
+                  <div className="px-4 py-4 sm:px-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      Summary
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          BOM Name
+                        </label>
+                        <input
+                          type="text"
+                          value={bomName || "N/A"}
+                          readOnly
+                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Parts Count
+                        </label>
+                        <input
+                          type="text"
+                          value={partsCount ?? "0"}
+                          readOnly
+                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Total BOM Cost
+                        </label>
+                        <input
+                          type="text"
+                          value={totalBomCost ?? "0"}
+                          readOnly
+                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Finished Good Section */}
                 {finishedGood && (
                   <div className="bg-white border-b">
-                    <div className="px-6 py-4">
+                    <div className="px-4 py-4 sm:px-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">
                         Finished Good
                       </h3>
 
-                      {/* Table Header for Finished Good */}
-                      <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
-                        <div className="grid grid-cols-7 gap-1 px-3 py-2">
-                          <div>FINISHED GOODS</div>
-                          <div>QUANTITY</div>
-                          <div>UOM</div>
-                          <div>CATEGORY</div>
-                          <div>COMMENTS</div>
-                          <div>UNIT COST</div>
-                          <div>COST</div>
-                        </div>
+                      {/* Header (desktop) */}
+                      <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                        <div>Finished Goods</div>
+                        <div>Quantity</div>
+                        <div>UOM</div>
+                        <div>Category</div>
+                        <div>Comments</div>
+                        <div>Unit Cost</div>
+                        <div>Cost</div>
                       </div>
 
-                      {/* Finished Good Row */}
+                      {/* Row */}
                       <div className="border border-t-0 border-gray-300">
-                        <div className="grid grid-cols-7 gap-1 px-3 py-2 items-center bg-white">
+                        <div className="grid grid-cols-1 sm:grid-cols-7 gap-4 px-3 py-4 items-center bg-white">
                           <div>
+                            <label className="sm:hidden text-xs font-semibold text-gray-700">
+                              Finished Goods
+                            </label>
                             <input
                               type="text"
                               value={finishedGood?.item?.name || "N/A"}
@@ -132,6 +167,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                             />
                           </div>
                           <div>
+                            <label className="sm:hidden text-xs font-semibold text-gray-700">
+                              Quantity
+                            </label>
                             <input
                               type="text"
                               value={finishedGood?.quantity || "N/A"}
@@ -140,6 +178,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                             />
                           </div>
                           <div>
+                            <label className="sm:hidden text-xs font-semibold text-gray-700">
+                              UOM
+                            </label>
                             <input
                               type="text"
                               value={finishedGood?.item?.uom || "N/A"}
@@ -148,6 +189,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                             />
                           </div>
                           <div>
+                            <label className="sm:hidden text-xs font-semibold text-gray-700">
+                              Category
+                            </label>
                             <input
                               type="text"
                               value={
@@ -160,6 +204,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                             />
                           </div>
                           <div>
+                            <label className="sm:hidden text-xs font-semibold text-gray-700">
+                              Comments
+                            </label>
                             <input
                               type="text"
                               value={finishedGood?.comments || "N/A"}
@@ -168,6 +215,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                             />
                           </div>
                           <div>
+                            <label className="sm:hidden text-xs font-semibold text-gray-700">
+                              Unit Cost
+                            </label>
                             <input
                               type="text"
                               value={finishedGood?.item?.price || "N/A"}
@@ -176,6 +226,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                             />
                           </div>
                           <div>
+                            <label className="sm:hidden text-xs font-semibold text-gray-700">
+                              Cost
+                            </label>
                             <input
                               type="text"
                               value={finishedGood?.cost || "N/A"}
@@ -192,32 +245,33 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                 {/* Raw Materials Section */}
                 {rawMaterials && rawMaterials.length > 0 && (
                   <div className="bg-white border-b">
-                    <div className="px-6 py-4">
+                    <div className="px-4 py-4 sm:px-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">
                         Raw Materials
                       </h3>
 
-                      {/* Table Header for Raw Materials */}
-                      <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
-                        <div className="grid grid-cols-7 gap-1 px-3 py-2">
-                          <div>PRODUCT NAME</div>
-                          <div>QUANTITY</div>
-                          <div>UOM</div>
-                          <div>CATEGORY</div>
-                          <div>COMMENTS</div>
-                          <div>UNIT COST</div>
-                          <div>TOTAL PART COST</div>
-                        </div>
+                      {/* Header */}
+                      <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                        <div>Product Name</div>
+                        <div>Quantity</div>
+                        <div>UOM</div>
+                        <div>Category</div>
+                        <div>Comments</div>
+                        <div>Unit Cost</div>
+                        <div>Total Part Cost</div>
                       </div>
 
-                      {/* Raw Materials Rows */}
+                      {/* Rows */}
                       <div className="border border-t-0 border-gray-300">
                         {rawMaterials.map((material, index) => (
                           <div
                             key={index}
-                            className="grid grid-cols-7 gap-1 px-3 py-2 items-center bg-white border-b border-gray-200 last:border-b-0"
+                            className="grid grid-cols-1 sm:grid-cols-7 gap-4 px-3 py-4 items-center bg-white border-b border-gray-200 last:border-b-0"
                           >
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Product Name
+                              </label>
                               <input
                                 type="text"
                                 value={material?.item?.name || "N/A"}
@@ -226,6 +280,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Quantity
+                              </label>
                               <input
                                 type="text"
                                 value={material?.quantity || "N/A"}
@@ -234,6 +291,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                UOM
+                              </label>
                               <input
                                 type="text"
                                 value={material?.item?.uom || "N/A"}
@@ -242,6 +302,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Category
+                              </label>
                               <input
                                 type="text"
                                 value={material?.item?.category || "N/A"}
@@ -250,6 +313,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Comments
+                              </label>
                               <input
                                 type="text"
                                 value={material?.comments || "N/A"}
@@ -258,6 +324,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Unit Cost
+                              </label>
                               <input
                                 type="text"
                                 value={material?.unit_cost || "0"}
@@ -266,6 +335,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Total Part Cost
+                              </label>
                               <input
                                 type="text"
                                 value={material?.total_part_cost || "0"}
@@ -283,24 +355,25 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                 {/* Process Section */}
                 {processes && processes.length > 0 && (
                   <div className="bg-white border-b">
-                    <div className="px-6 py-4">
+                    <div className="px-4 py-4 sm:px-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">
                         Processes
                       </h3>
-
-                      {processes.map((process: string, index: number) => (
-                        <div key={index} className="mb-4">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Process {index + 1}
-                          </label>
-                          <input
-                            type="text"
-                            value={process}
-                            readOnly
-                            className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                          />
-                        </div>
-                      ))}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {processes.map((process: string, index: number) => (
+                          <div key={index} className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Process {index + 1}
+                            </label>
+                            <input
+                              type="text"
+                              value={process}
+                              readOnly
+                              className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -308,31 +381,32 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                 {/* Scrap Materials Section */}
                 {scrapMaterials && scrapMaterials.length > 0 && (
                   <div className="bg-white border-b">
-                    <div className="px-6 py-4">
+                    <div className="px-4 py-4 sm:px-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">
                         Scrap Materials
                       </h3>
 
-                      {/* Table Header for Scrap Materials */}
-                      <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
-                        <div className="grid grid-cols-6 gap-1 px-3 py-2">
-                          <div>PRODUCT NAME</div>
-                          <div>COMMENT</div>
-                          <div>ESTIMATED QUANTITY</div>
-                          <div>UOM</div>
-                          <div>UNIT COST</div>
-                          <div>TOTAL PART COST</div>
-                        </div>
+                      {/* Header */}
+                      <div className="hidden sm:grid grid-cols-6 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                        <div>Product Name</div>
+                        <div>Comment</div>
+                        <div>Estimated Quantity</div>
+                        <div>UOM</div>
+                        <div>Unit Cost</div>
+                        <div>Total Part Cost</div>
                       </div>
 
-                      {/* Scrap Materials Rows */}
+                      {/* Rows */}
                       <div className="border border-t-0 border-gray-300">
                         {scrapMaterials.map((material, index) => (
                           <div
                             key={index}
-                            className="grid grid-cols-6 gap-1 px-3 py-2 items-center bg-white border-b border-gray-200 last:border-b-0"
+                            className="grid grid-cols-1 sm:grid-cols-6 gap-4 px-3 py-4 items-center bg-white border-b border-gray-200 last:border-b-0"
                           >
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Product Name
+                              </label>
                               <input
                                 type="text"
                                 value={material?.item?.name || "N/A"}
@@ -341,6 +415,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Comment
+                              </label>
                               <input
                                 type="text"
                                 value={material?.description || "N/A"}
@@ -349,6 +426,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Estimated Quantity
+                              </label>
                               <input
                                 type="text"
                                 value={material?.quantity || "N/A"}
@@ -357,6 +437,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                UOM
+                              </label>
                               <input
                                 type="text"
                                 value={material?.item?.uom || "N/A"}
@@ -365,17 +448,23 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Unit Cost
+                              </label>
                               <input
                                 type="text"
-                                value={material?.unit_cost || "0"}
+                                value={material?.item?.price || "N/A"}
                                 readOnly
                                 className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                               />
                             </div>
                             <div>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">
+                                Total Part Cost
+                              </label>
                               <input
                                 type="text"
-                                value={material?.total_part_cost || "0"}
+                                value={material?.total_part_cost || "N/A"}
                                 readOnly
                                 className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                               />
@@ -387,55 +476,55 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                   </div>
                 )}
 
-                {/* Charges Section */}
+                {/* Other Charges */}
                 {otherCharges && (
                   <div className="bg-white border-b">
-                    <div className="px-6 py-4">
+                    <div className="px-4 py-4 sm:px-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        Charges
+                        Other Charges
                       </h3>
 
-                      <div className="grid grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-gray-700">
                             Labour Charges
                           </label>
                           <input
                             type="text"
-                            value={otherCharges?.labour_charges || "0"}
+                            value={otherCharges.labour_charges || 0}
                             readOnly
                             className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-gray-700">
                             Machinery Charges
                           </label>
                           <input
                             type="text"
-                            value={otherCharges?.machinery_charges || "0"}
+                            value={otherCharges.machinery_charges || 0}
                             readOnly
                             className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-gray-700">
                             Electricity Charges
                           </label>
                           <input
                             type="text"
-                            value={otherCharges?.electricity_charges || "0"}
+                            value={otherCharges.electricity_charges || 0}
                             readOnly
                             className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-gray-700">
                             Other Charges
                           </label>
                           <input
                             type="text"
-                            value={otherCharges?.other_charges || "0"}
+                            value={otherCharges.other_charges || 0}
                             readOnly
                             className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
                           />
@@ -444,47 +533,6 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                     </div>
                   </div>
                 )}
-
-                {/* BOM Summary Section */}
-                <div className="bg-white">
-                  <div className="px-6 py-4">
-                    <div className="grid grid-cols-3 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          BOM Name
-                        </label>
-                        <input
-                          type="text"
-                          value={bomName || "N/A"}
-                          readOnly
-                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Parts Count
-                        </label>
-                        <input
-                          type="text"
-                          value={partsCount || "0"}
-                          readOnly
-                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Total BOM Cost
-                        </label>
-                        <input
-                          type="text"
-                          value={totalBomCost || "0"}
-                          readOnly
-                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
           </div>

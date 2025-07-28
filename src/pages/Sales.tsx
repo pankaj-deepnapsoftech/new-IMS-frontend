@@ -107,16 +107,21 @@ const Sales = () => {
                 !filterDate ||
                 new Date(purchase?.createdAt).toISOString().split("T")[0] ===
                 filterDate;
+            const assignedList = purchase?.assinedto || [];
+
+            const derivedStatus = assignedList.some(item => item?.isCompleted?.toLowerCase() === "pending")
+                ? "pending"
+                : "completed";
 
             const matchesStatus =
-                !filterStatus ||
-                purchase?.Status?.toLowerCase() === filterStatus.toLowerCase();
-
+                !filterStatus || derivedStatus === filterStatus.toLowerCase();
             return matchesText && matchesDate && matchesStatus;
         });
 
         setFilteredPurchases(filtered);
     }, [filterText, filterDate, filterStatus, purchases]);
+
+    console.log(purchases)
 
     return (
         <div
@@ -294,7 +299,7 @@ const Sales = () => {
                             >
                                 <option value="">Filter by sale status</option>
                                 <option value="Pending">Pending</option>
-                                <option value="Approval">Approval</option>
+                                <option value="Completed">Approval</option>
                             </select>
                         </div>
                     </div>

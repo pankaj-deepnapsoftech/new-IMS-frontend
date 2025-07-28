@@ -33,7 +33,7 @@ const Header: React.FC = () => {
   return (
     <div className="relative bg-white border-b border-gray-200 shadow-sm">
       <div className="flex justify-between items-center h-16 px-4 lg:px-6">
-        {/* Greeting */}
+      
         <div className=" flex-col justify-center hidden md:flex ml-20 lg:ml-0">
           <h1 className="text-2xl font-semibold text-gray-800">
             Welcome back,
@@ -44,9 +44,9 @@ const Header: React.FC = () => {
           <i className="text-sm text-gray-500">SOPASB2B Dashboard</i>
         </div>
 
-        {/* Header Actions */}
+       
         <div className="flex items-center gap-4 ml-auto">
-          {/* Notifications */}
+      
           <button
             className="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200"
             aria-label="Notifications"
@@ -55,7 +55,7 @@ const Header: React.FC = () => {
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
 
-          {/* User Avatar */}
+     
           <div className="relative">
             <Avatar
               cursor="pointer"

@@ -330,28 +330,26 @@ const AddBom: React.FC<AddBomProps> = ({
             <form onSubmit={addBomHandler}>
               {/* Finished Good Section */}
               <div className="bg-white border-b">
-                <div className="px-6 py-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Finished Good
-                  </h3>
+                <div className="px-4 py-4 sm:px-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Finished Good</h3>
 
-                  {/* Table Header for Finished Good */}
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider">
-                    <div className="grid grid-cols-7 gap-1 px-3 py-2">
-                      <div>FINISHED GOODS</div>
-                      <div>QUANTITY</div>
-                      <div>UOM</div>
-                      <div>CATEGORY</div>
-                      <div>COMMENTS</div>
-                      <div>UNIT COST</div>
-                      <div>COST</div>
-                    </div>
+                  {/* Table Header */}
+                  <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                    <div>Finished Goods</div>
+                    <div>Quantity</div>
+                    <div>UOM</div>
+                    <div>Category</div>
+                    <div>Comments</div>
+                    <div>Unit Cost</div>
+                    <div>Cost</div>
                   </div>
 
-                  {/* Finished Good Row */}
+                  {/* Responsive Row */}
                   <div className="border border-t-0 border-gray-300">
-                    <div className="grid grid-cols-7 gap-1 px-3 py-2 items-center bg-white">
+                    <div className="grid grid-cols-1 sm:grid-cols-7 gap-4 px-3 py-4 sm:items-center bg-white">
+                      {/* Finished Goods */}
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">Finished Goods</label>
                         <Select
                           styles={customStyles}
                           className="text-sm"
@@ -362,19 +360,23 @@ const AddBom: React.FC<AddBomProps> = ({
                           required
                         />
                       </div>
+
+                      {/* Quantity */}
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">Quantity</label>
                         <input
                           type="number"
                           value={quantity || ""}
-                          onChange={(e) =>
-                            onFinishedGoodQntyChangeHandler(+e.target.value)
-                          }
+                          onChange={(e) => onFinishedGoodQntyChangeHandler(+e.target.value)}
                           placeholder="Quantity"
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                           required
                         />
                       </div>
+
+                      {/* UOM */}
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">UOM</label>
                         <input
                           type="text"
                           value={uom || ""}
@@ -382,7 +384,10 @@ const AddBom: React.FC<AddBomProps> = ({
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                         />
                       </div>
+
+                      {/* Category */}
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">Category</label>
                         <input
                           type="text"
                           value={category || ""}
@@ -390,7 +395,10 @@ const AddBom: React.FC<AddBomProps> = ({
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                         />
                       </div>
+
+                      {/* Comments */}
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">Comments</label>
                         <input
                           type="text"
                           value={comments || ""}
@@ -399,7 +407,10 @@ const AddBom: React.FC<AddBomProps> = ({
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                         />
                       </div>
+
+                      {/* Unit Cost */}
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">Unit Cost</label>
                         <input
                           type="number"
                           value={unitCost || ""}
@@ -407,7 +418,10 @@ const AddBom: React.FC<AddBomProps> = ({
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                         />
                       </div>
+
+                      {/* Cost */}
                       <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">Cost</label>
                         <input
                           type="number"
                           value={cost || ""}
@@ -419,16 +433,15 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
                 </div>
               </div>
+
               {/* Raw Materials Section */}
               <div className="bg-white border-b">
-                <div className="px-6 py-4">
+                <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Raw Materials
-                    </h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Raw Materials</h3>
                     <button
                       type="button"
-                      className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white  text-sm rounded transition-colors"
+                      className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
                       onClick={() => {
                         setRawMaterials([
                           ...rawMaterials,
@@ -452,29 +465,27 @@ const AddBom: React.FC<AddBomProps> = ({
                     </button>
                   </div>
 
-                  {/* Table Header for Raw Materials */}
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white  text-sm font-semibold uppercase tracking-wider">
-                    <div className="grid grid-cols-8 gap-1 px-3 py-2">
-                      <div>PRODUCT NAME</div>
-                      <div>QUANTITY</div>
-                      <div>UOM</div>
-                      <div>CATEGORY</div>
-                      <div>COMMENTS</div>
-                      <div>UNIT COST</div>
-                      <div>TOTAL PART COST</div>
-                      <div>ACTION</div>
-                    </div>
+                  {/* Table Header for larger screens */}
+                  <div className="hidden sm:grid grid-cols-8 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                    <div>Product Name</div>
+                    <div>Quantity</div>
+                    <div>UOM</div>
+                    <div>Category</div>
+                    <div>Comments</div>
+                    <div>Unit Cost</div>
+                    <div>Total Part Cost</div>
+                    <div>Action</div>
                   </div>
 
-                  {/* Raw Materials Rows */}
                   <div className="border border-t-0 border-gray-300">
                     {rawMaterials.map((material, index) => (
                       <div
                         key={index}
-                        className="grid grid-cols-8 gap-1 px-3 py-2 items-center bg-white border-b border-gray-200 last:border-b-0"
+                        className="grid grid-cols-1 sm:grid-cols-8 gap-4 px-3 py-4 items-start sm:items-center bg-white border-b border-gray-200 last:border-b-0"
                       >
                         {/* Product Name */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">Product Name</label>
                           <Select
                             styles={customStyles}
                             className="text-sm"
@@ -484,16 +495,13 @@ const AddBom: React.FC<AddBomProps> = ({
                             onChange={(d) => {
                               const newMaterials = [...rawMaterials];
                               newMaterials[index].item_name = d;
-                              const product = products.find(
-                                (p) => p._id === d?.value
-                              );
+                              const product = products.find((p) => p._id === d?.value);
                               if (product) {
                                 newMaterials[index].unit_cost = product.price;
                                 newMaterials[index].uom = product.uom;
                                 newMaterials[index].category = product.category;
                                 if (material.quantity) {
-                                  newMaterials[index].total_part_cost =
-                                    product.price * +material.quantity;
+                                  newMaterials[index].total_part_cost = product.price * +material.quantity;
                                 }
                               }
                               setRawMaterials(newMaterials);
@@ -503,6 +511,7 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Quantity */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">Quantity</label>
                           <input
                             type="number"
                             value={material.quantity || ""}
@@ -522,6 +531,7 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* UOM */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">UOM</label>
                           <input
                             type="text"
                             value={material.uom || ""}
@@ -532,6 +542,7 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Category */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">Category</label>
                           <input
                             type="text"
                             value={material.category || ""}
@@ -542,6 +553,7 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Comments */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">Comments</label>
                           <input
                             type="text"
                             value={material.comments || ""}
@@ -557,6 +569,7 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Unit Cost */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">Unit Cost</label>
                           <input
                             type="number"
                             value={material.unit_cost || ""}
@@ -567,6 +580,7 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Total Part Cost */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">Total Part Cost</label>
                           <input
                             type="number"
                             value={material.total_part_cost || ""}
@@ -575,49 +589,52 @@ const AddBom: React.FC<AddBomProps> = ({
                           />
                         </div>
 
-                        {/* Action - Remove Button */}
-                        <div className="flex justify-center">
+                        {/* Remove Button */}
+                        <div className="flex justify-center items-center">
                           {rawMaterials.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const newMaterials = rawMaterials.filter(
-                                  (_, i) => i !== index
-                                );
-                                setRawMaterials(newMaterials);
-                              }}
-                              className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
-                            >
-                              ✕
-                            </button>
+                            <>
+                              <label className="sm:hidden text-xs font-semibold text-gray-700">Remove</label>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newMaterials = rawMaterials.filter((_, i) => i !== index);
+                                  setRawMaterials(newMaterials);
+                                }}
+                                className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                              >
+                                ✕
+                              </button>
+                            </>
                           )}
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>{" "}
+              </div>
+
               {/* Process Section */}
               <div className="bg-white border-b">
-                <div className="px-6 py-4">
+                <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Processes
-                    </h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Processes</h3>
                     <button
                       type="button"
-                      className="px-3 py-1 bg-gradient-to-r flex justify-center items-center gap-2 from-blue-500 to-blue-500 text-white  text-sm rounded transition-colors"
+                      className="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-500 flex justify-center items-center gap-2 text-white text-sm rounded transition-colors"
                       onClick={() => setProcesses([...processes, ""])}
                     >
                       <Plus /> Add
                     </button>
                   </div>
 
-                  <div className="flex gap-4 flex-wrap">
-                  {processes.map((process, index) => (
-                    <div key={index} className="mb-4 flex items-end gap-1">
-                        <div className="border p-3 rounded-lg">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {processes.map((process, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-col sm:flex-row sm:items-end sm:gap-2 border p-3 rounded-lg relative"
+                      >
+                        <div className="w-full">
+                          <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                             Process {index + 1}
                           </label>
                           <input
@@ -629,39 +646,39 @@ const AddBom: React.FC<AddBomProps> = ({
                               setProcesses(newProcesses);
                             }}
                             placeholder={`Enter Process ${index + 1}`}
-                            className="w-full px-3 py-2 border border-gray-300 rounded"
+                            className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                           />
+                        </div>
+
+                        {processes.length > 1 && (
+                          <div className="mt-2 sm:mt-0">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newProcesses = processes.filter((_, i) => i !== index);
+                                setProcesses(newProcesses);
+                              }}
+                              className="w-full sm:w-auto px-3 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+                            >
+                              ✕ Remove
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      {processes.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newProcesses = processes.filter(
-                              (_, i) => i !== index
-                            );
-                            setProcesses(newProcesses);
-                          }}
-                          className="px-3 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors mb-0"
-                        >
-                          ✕ Remove
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                    ))}
                   </div>
                 </div>
               </div>
+
               {/* Scrap Materials Section */}
               <div className="bg-white border-b">
-                <div className="px-6 py-4">
+                <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Scrap Materials
-                    </h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Scrap Materials</h3>
                     <button
                       type="button"
-                      className="px-3 py-1 bg-gradient-to-r flex justify-center items-center gap-2 from-blue-500 to-blue-500 text-white  text-sm rounded transition-colors"
-                      onClick={() => {
+                      className="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-500 flex justify-center items-center gap-2 text-white text-sm rounded transition-colors"
+                      onClick={() =>
                         setScrapMaterials([
                           ...scrapMaterials,
                           {
@@ -672,35 +689,36 @@ const AddBom: React.FC<AddBomProps> = ({
                             unit_cost: "",
                             total_part_cost: "",
                           },
-                        ]);
-                      }}
+                        ])
+                      }
                     >
                       <Plus /> Add
                     </button>
                   </div>
 
-                  {/* Table Header for Scrap Materials */}
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-500 text-white  text-sm font-semibold uppercase tracking-wider">
-                    <div className="grid grid-cols-7 gap-1 px-3 py-2">
-                      <div>PRODUCT NAME</div>
-                      <div>COMMENT</div>
-                      <div>ESTIMATED QUANTITY</div>
-                      <div>UOM</div>
-                      <div>UNIT COST</div>
-                      <div>TOTAL PART COST</div>
-                      <div>ACTION</div>
-                    </div>
+                  {/* Table Header (Desktop Only) */}
+                  <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                    <div>Product Name</div>
+                    <div>Comment</div>
+                    <div>Estimated Quantity</div>
+                    <div>UOM</div>
+                    <div>Unit Cost</div>
+                    <div>Total Part Cost</div>
+                    <div>Action</div>
                   </div>
 
-                  {/* Scrap Materials Rows */}
+                  {/* Rows */}
                   <div className="border border-t-0 border-gray-300">
                     {scrapMaterials.map((material, index) => (
                       <div
                         key={index}
-                        className="grid grid-cols-7 gap-1 px-3 py-2 items-center bg-white border-b border-gray-200 last:border-b-0"
+                        className="grid grid-cols-1 sm:grid-cols-7 gap-4 px-3 py-4 items-start sm:items-center bg-white border-b border-gray-200 last:border-b-0"
                       >
                         {/* Product Name */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Product Name
+                          </label>
                           <Select
                             styles={customStyles}
                             className="text-sm"
@@ -710,9 +728,7 @@ const AddBom: React.FC<AddBomProps> = ({
                             onChange={(d) => {
                               const newMaterials = [...scrapMaterials];
                               newMaterials[index].item_name = d;
-                              const product = products.find(
-                                (p) => p._id === d?.value
-                              );
+                              const product = products.find((p) => p._id === d?.value);
                               if (product) {
                                 newMaterials[index].unit_cost = product.price;
                                 newMaterials[index].uom = product.uom;
@@ -728,6 +744,9 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Comment */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Comment
+                          </label>
                           <input
                             type="text"
                             value={material.description || ""}
@@ -743,6 +762,9 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Estimated Quantity */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Estimated Quantity
+                          </label>
                           <input
                             type="number"
                             value={material.quantity || ""}
@@ -762,6 +784,9 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* UOM */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            UOM
+                          </label>
                           <input
                             type="text"
                             value={material.uom || ""}
@@ -772,6 +797,9 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Unit Cost */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Unit Cost
+                          </label>
                           <input
                             type="number"
                             value={material.unit_cost || ""}
@@ -782,6 +810,9 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Total Part Cost */}
                         <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Total Part Cost
+                          </label>
                           <input
                             type="number"
                             value={material.total_part_cost || ""}
@@ -790,8 +821,11 @@ const AddBom: React.FC<AddBomProps> = ({
                           />
                         </div>
 
-                        {/* Action - Remove Button */}
-                        <div className="flex justify-center">
+                        {/* Action */}
+                        <div className="flex justify-center items-center">
+                          <label className="sm:hidden text-xs font-semibold text-gray-700 block mb-1">
+                            Remove
+                          </label>
                           {scrapMaterials.length > 1 && (
                             <button
                               type="button"
@@ -812,14 +846,14 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
                 </div>
               </div>
+
               {/* Charges Section */}
               <div className="bg-white border-b">
-                <div className="px-6 py-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Charges
-                  </h3>
+                <div className="px-4 py-4 sm:px-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Charges</h3>
 
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    {/* Labour Charges */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Labour Charges
@@ -829,9 +863,11 @@ const AddBom: React.FC<AddBomProps> = ({
                         value={labourCharges || ""}
                         onChange={(e) => setLabourCharges(+e.target.value)}
                         placeholder="Labour Charges"
-                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                       />
                     </div>
+
+                    {/* Machinery Charges */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Machinery Charges
@@ -841,9 +877,11 @@ const AddBom: React.FC<AddBomProps> = ({
                         value={machineryCharges || ""}
                         onChange={(e) => setMachineryCharges(+e.target.value)}
                         placeholder="Machinery Charges"
-                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                       />
                     </div>
+
+                    {/* Electricity Charges */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Electricity Charges
@@ -853,9 +891,11 @@ const AddBom: React.FC<AddBomProps> = ({
                         value={electricityCharges || ""}
                         onChange={(e) => setElectricityCharges(+e.target.value)}
                         placeholder="Electricity Charges"
-                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                       />
                     </div>
+
+                    {/* Other Charges */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Other Charges
@@ -865,16 +905,18 @@ const AddBom: React.FC<AddBomProps> = ({
                         value={otherCharges || ""}
                         onChange={(e) => setOtherCharges(+e.target.value)}
                         placeholder="Other Charges"
-                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                       />
                     </div>
                   </div>
                 </div>
               </div>
+
               {/* BOM Summary Section */}
               <div className="bg-white">
-                <div className="px-6 py-4">
-                  <div className="grid grid-cols-3 gap-6">
+                <div className="px-4 py-4 sm:px-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                    {/* BOM Name */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         BOM Name *
@@ -884,10 +926,12 @@ const AddBom: React.FC<AddBomProps> = ({
                         value={bomName || ""}
                         onChange={(e) => setBomName(e.target.value)}
                         placeholder="Enter BOM Name"
-                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                         required
                       />
                     </div>
+
+                    {/* Parts Count */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Parts Count *
@@ -896,9 +940,11 @@ const AddBom: React.FC<AddBomProps> = ({
                         type="number"
                         value={partsCount}
                         readOnly
-                        className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                        className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
                       />
                     </div>
+
+                    {/* Total Parts Cost */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Total Parts Cost *
@@ -907,7 +953,7 @@ const AddBom: React.FC<AddBomProps> = ({
                         type="number"
                         value={totalPartsCost}
                         readOnly
-                        className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
+                        className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
                       />
                     </div>
                   </div>
@@ -916,13 +962,14 @@ const AddBom: React.FC<AddBomProps> = ({
                   <div className="mt-6">
                     <button
                       type="submit"
-                      className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white  rounded transition-colors duration-200"
+                      className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white rounded transition-colors duration-200 text-sm"
                     >
                       Submit
                     </button>
                   </div>
                 </div>
               </div>
+
             </form>
           </div>
         </div>

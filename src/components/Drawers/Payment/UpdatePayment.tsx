@@ -102,74 +102,72 @@ const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPayme
   }, [id]);
 
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
-      <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
-      >
-        <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-          <BiX onClick={closeDrawerHandler} size="26px" />
-          Payment
-        </h1>
+    <div
+      className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3"
+      style={{
+        boxShadow:
+          "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+      }}
+    >
+      <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
+        <BiX onClick={closeDrawerHandler} size="26px" />
+        Payment
+      </h1>
 
-        <div className="mt-8 px-5">
-          <h2 className="text-2xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
-            Edit Payment
+      <div className="mt-8 px-5">
+        <h2 className="text-2xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
+          Edit Payment
+        </h2>
+
+        <div>
+          <h2 className="text-xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
+            Invoice Details
           </h2>
-
-          <div>
-            <h2 className="text-xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
-              Invoice Details
-            </h2>
-            <p className="mt-1"><span className="font-bold">Total</span>: ₹ {invoiceTotal}/-</p>
-            <p className="mt-1"><span className="font-bold">Balance</span>: ₹ {invoiceBalance}/-</p>
-          </div>
-
-          <form onSubmit={updatePaymentHandler}>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">Amount</FormLabel>
-              <Input
-                value={amount}
-                onChange={(e) => setAmount(+e.target.value)}
-                type="number"
-                placeholder="Amount"
-              />
-            </FormControl>
-            <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold">Description</FormLabel>
-              <Input
-                value={description}
-                className="no-scrollbar"
-                onChange={(e) => setDescription(e.target.value)}
-                type="text"
-                placeholder="Description"
-              />
-            </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold">Mode</FormLabel>
-              <Select
-                options={modeOptions}
-                value={mode}
-                onChange={(e: any) => setMode(e)}
-                required={true}
-              />
-            </FormControl>
-            <Button
-              isLoading={isUpdating}
-              type="submit"
-              className="mt-1"
-              color="white"
-              backgroundColor="#1640d6"
-            >
-              Submit
-            </Button>
-          </form>
+          <p className="mt-1"><span className="font-bold">Total</span>: ₹ {invoiceTotal}/-</p>
+          <p className="mt-1"><span className="font-bold">Balance</span>: ₹ {invoiceBalance}/-</p>
         </div>
+
+        <form onSubmit={updatePaymentHandler}>
+          <FormControl className="mt-3 mb-5" isRequired>
+            <FormLabel fontWeight="bold">Amount</FormLabel>
+            <Input
+              value={amount}
+              onChange={(e) => setAmount(+e.target.value)}
+              type="number"
+              placeholder="Amount"
+            />
+          </FormControl>
+          <FormControl className="mt-3 mb-5">
+            <FormLabel fontWeight="bold">Description</FormLabel>
+            <Input
+              value={description}
+              className="no-scrollbar"
+              onChange={(e) => setDescription(e.target.value)}
+              type="text"
+              placeholder="Description"
+            />
+          </FormControl>
+          <FormControl className="mt-3 mb-5" isRequired>
+            <FormLabel fontWeight="bold">Mode</FormLabel>
+            <Select
+              options={modeOptions}
+              value={mode}
+              onChange={(e: any) => setMode(e)}
+              required={true}
+            />
+          </FormControl>
+          <Button
+            isLoading={isUpdating}
+            type="submit"
+            className="mt-1"
+            color="white"
+            backgroundColor="#1640d6"
+          >
+            Submit
+          </Button>
+        </form>
       </div>
-    </Drawer>
+    </div>
   );
 };
 

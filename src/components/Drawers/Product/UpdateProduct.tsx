@@ -266,9 +266,8 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
     }),
   };
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
-      <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
+  <div
+        className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
@@ -284,7 +283,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
           >
             Update Product
           </h1>
-          <button
+          <button 
             onClick={closeDrawerHandler}
             className="p-2 rounded-lg transition-colors duration-200"
             style={{
@@ -303,7 +302,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
         </div>
 
         <div className="mt-8 px-5">
-
           {isLoadingProduct && <Loading />}
           {!isLoadingProduct && (
             <form onSubmit={updateProductHandler}>
@@ -324,7 +322,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                   Product ID
                 </FormLabel>
                 <Input
-                  className="text-gray-200"
+                  className="text-gray-800"
                   value={id}
                   onChange={(e) => setId(e.target.value)}
                   type="text"
@@ -336,7 +334,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                   Product Name
                 </FormLabel>
                 <Input
-                  className="text-gray-200"
+                  className="text-gray-800"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   type="text"
@@ -349,7 +347,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 </FormLabel>
                 <Input
                   value={price}
-                  className="no-scrollbar text-gray-200 "
+                  className="no-scrollbar text-gray-800 "
                   onChange={(e) => setPrice(e.target.value)}
                   type="number"
                   placeholder="Product Price"
@@ -361,7 +359,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 </FormLabel>
                 <Input
                   value={regularBuyingPrice}
-                  className="no-scrollbar text-gray-200"
+                  className="no-scrollbar text-gray-800"
                   onChange={(e) => setRegularBuyingPrice(+e.target.value)}
                   type="number"
                   placeholder="Regular Buying Price"
@@ -373,7 +371,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 </FormLabel>
                 <Input
                   value={wholesaleBuyingPrice}
-                  className="no-scrollbar text-gray-200"
+                  className="no-scrollbar text-gray-800"
                   onChange={(e) => setWholeSaleBuyingPrice(+e.target.value)}
                   type="number"
                   placeholder="Regular Buying Price"
@@ -385,7 +383,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 </FormLabel>
                 <Input
                   value={mrp}
-                  className="no-scrollbar text-gray-200"
+                  className="no-scrollbar text-gray-800"
                   onChange={(e) => setMrp(+e.target.value)}
                   type="number"
                   placeholder="MRP"
@@ -397,7 +395,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 </FormLabel>
                 <Input
                   value={dealerPrice}
-                  className="no-scrollbar text-gray-200"
+                  className="no-scrollbar text-gray-800"
                   onChange={(e) => setDealerPrice(+e.target.value)}
                   type="number"
                   placeholder="Dealer Price"
@@ -409,7 +407,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 </FormLabel>
                 <Input
                   value={distributorPrice}
-                  className="no-scrollbar text-gray-200"
+                  className="no-scrollbar text-gray-800"
                   onChange={(e) => setDistributorPrice(+e.target.value)}
                   type="number"
                   placeholder="Distributor Price"
@@ -431,7 +429,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                   Product Subcategory
                 </FormLabel>
                 <Input
-                  className="text-gray-200"
+                  className="text-gray-800"
                   value={subCategory}
                   onChange={(e) => setSubCategory(e.target.value)}
                   type="text"
@@ -454,7 +452,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                   Current Stock
                 </FormLabel>
                 <Input
-                  className="text-gray-200"
+                  className="text-gray-800"
                   value={currentStock}
                   onChange={(e) => setCurrentStock(e.target.value)}
                   type="number"
@@ -466,7 +464,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                   Min Stock
                 </FormLabel>
                 <Input
-                  className="text-gray-200"
+                  className="text-gray-800"
                   value={minStock}
                   onChange={(e) => setMinStock(e.target.value)}
                   type="number"
@@ -478,7 +476,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                   Max Stock
                 </FormLabel>
                 <Input
-                  className="text-gray-200"
+                  className="text-gray-800"
                   value={maxStock}
                   onChange={(e) => setMaxStock(e.target.value)}
                   type="number"
@@ -490,7 +488,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                   HSN
                 </FormLabel>
                 <Input
-                  className="text-gray-200"
+                  className="text-gray-800"
                   value={hsn}
                   onChange={(e) => setHsn(e.target.value)}
                   type="text"
@@ -523,7 +521,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
           )}
         </div>
       </div>
-    </Drawer>
   );
 };
 
