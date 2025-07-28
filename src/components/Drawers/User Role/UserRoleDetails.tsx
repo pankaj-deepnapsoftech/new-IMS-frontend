@@ -114,7 +114,8 @@ const UserRoleDetails: React.FC<UserRoleDetailsProps> = ({
                         className="flex items-center text-gray-600"
                       >
                         <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
-                        {permission}
+                        {permission.charAt(0).toUpperCase() +
+                          permission.slice(1)}
                       </li>
                     ))}
                   </ul>
