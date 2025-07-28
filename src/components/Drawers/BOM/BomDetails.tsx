@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { BiX } from "react-icons/bi";
 import Loading from "../../../ui/Loading";
 import { colors } from "../../../theme/colors";
+import Drawer from "../../../ui/Drawer";
 
 interface BomDetailsProps {
   bomId: string | undefined;
