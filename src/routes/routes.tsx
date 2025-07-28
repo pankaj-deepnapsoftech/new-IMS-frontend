@@ -33,7 +33,7 @@ import Dispatch from "../pages/Dispatch";
 import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
 import Task from "../pages/Task";
-import { Box, Calendar, Component, Construction, Container, HandCoins, Presentation, ShieldCheck } from "lucide-react";
+import { Box, Calendar, Component, Construction, Container, HandCoins, Presentation, ShieldCheck, TicketPercent, Workflow } from "lucide-react";
 import Dashboard from "../pages/Dashboard";
 import Planning from "../pages/Planning";
 import Designing from "../pages/Designing";
@@ -43,6 +43,11 @@ import Precurement from "../pages/Precurement";
 import Quality from "../pages/Quality";
 import Maintenance from "../pages/Maintenance";
 import Scrap from "../pages/Scrap";
+import RawMaterialApprovals from "../pages/RawMaterialApprovals";
+import ResourcesApproval from "../pages/ResourcesApproval";
+import Packaging from "../pages/Packaging";
+import Vouchers from "../pages/Vouchers";
+import Integration from "../pages/Integration";
 
 const routes = [
   {
@@ -71,88 +76,7 @@ const routes = [
     icon: <IoIosPeople />,
     path: "merchant",
     element: <Parties />,
-  },
-  {
-    name: "Sales Order",
-    icon: <HandCoins />,
-    path: "sales",
-    element: <Sales />,
     isSublink: false,
-  },
-  {
-    name: "Designing",
-    icon: <Component />,
-    path: "designing",
-    element: <Designing />,
-    isSublink: false,
-  },
-  {
-    name: "Planning",
-    icon: <Presentation />,
-    path: "planning",
-    element: <Planning />,
-    isSublink: false,
-  },
-  {
-    name: "Supplier",
-    icon: <Container />,
-    path: "supplier",
-    element: <Supplier />,
-    isSublink: false,
-  },
-  {
-    name: "Scheduling",
-    icon: <Calendar />,
-    path: "scheduling",
-    element: <Scheduling />,
-    isSublink: false,
-  },
-  {
-    name: "Precurement",
-    icon: <Box />,
-    path: "precurement",
-    element: <Precurement />,
-    isSublink: false,
-  },
-  {
-    name: "Quality",
-    icon: <ShieldCheck />,
-    path: "quality",
-    element: <Quality />,
-    isSublink: false,
-  },
-  {
-    name: "Maintenance",
-    icon: <Construction />,
-    path: "maintenance",
-    element: <Maintenance />,
-    isSublink: false,
-  },
-  {
-    name: "Invioces",
-    path: "invoices",
-    icon: <BiPurchaseTagAlt />,
-    sublink: [
-      {
-        name: "Proforma Invoices",
-        icon: <IoDocumentTextOutline />,
-        path: "proforma-invoice",
-        element: <ProformaInvoice />,
-      },
-      {
-        name: "Invoices",
-        icon: <RiBillLine />,
-        path: "invoice",
-        element: <Invoice />,
-      },
-      {
-        name: "Payments",
-        icon: <MdOutlinePayment />,
-        path: "payment",
-        element: <Payment />,
-      },
-    ],
-    isSublink: true,
   },
   {
     name: "Inventory",
@@ -186,13 +110,63 @@ const routes = [
     ],
     isSublink: true,
   },
-
   {
-    name: "Task",
-    icon: <MdTask />,
-    path: "task",
-    element: <Task />,
+    name: "Sales Order",
+    icon: <HandCoins />,
+    path: "sales",
+    element: <Sales />,
     isSublink: false,
+  },
+  {
+    name: "Precurement",
+    icon: <Box />,
+    path: "precurement",
+    element: <Precurement />,
+    isSublink: false,
+  },
+  {
+    name: "Production",
+    path: "production",
+    icon: <MdOutlineProductionQuantityLimits />,
+    sublink: [
+      {
+        name: "BOM",
+        icon: <RiBillLine />,
+        path: "bom",
+        element: <BOM />,
+      },
+      {
+        name: "Raw Material Approval",
+        icon: <RiBillLine />,
+        path: "raw-material-approval",
+        element: <RawMaterialApprovals />,
+      },
+      {
+        name: "Resources Approval",
+        icon: <RiBillLine />,
+        path: "resources-approval",
+        element: <ResourcesApproval />,
+      },
+      {
+        name: "Production Process",
+        icon: <VscServerProcess />,
+        path: "production-process",
+        element: <Process />,
+      },
+      {
+        name: "Quality",
+        icon: <ShieldCheck />,
+        path: "quality",
+        element: <Quality />,
+      },
+      {
+        name: "Packaging",
+        icon: <Box />,
+        path: "packaging",
+        element: <Packaging />,
+      },
+    ],
+    isSublink: true,
   },
   {
     name: "Dispatch",
@@ -201,6 +175,89 @@ const routes = [
     element: <Dispatch />,
     isSublink: false,
   },
+  {
+    name: "Accounts",
+    path: "accounts",
+    icon: <BiPurchaseTagAlt />,
+    sublink: [
+      {
+        name: "Proforma Invoices",
+        icon: <IoDocumentTextOutline />,
+        path: "proforma-invoice",
+        element: <ProformaInvoice />,
+      },
+      {
+        name: "Invoices",
+        icon: <RiBillLine />,
+        path: "invoice",
+        element: <Invoice />,
+      },
+      {
+        name: "Payments",
+        icon: <MdOutlinePayment />,
+        path: "payment",
+        element: <Payment />,
+      },
+      {
+        name: "Vouchers",
+        icon: <TicketPercent />,
+        path: "voucher",
+        element: <Vouchers />,
+      }
+    ],
+    isSublink: true,
+  },
+  {
+    name: "Integration",
+    icon: <Workflow />,
+    path: "integration",
+    element: <Integration />
+  },
+  {
+    name: "Designing",
+    icon: <Component />,
+    path: "designing",
+    element: <Designing />,
+    isSublink: false,
+  },
+  {
+    name: "Planning",
+    icon: <Presentation />,
+    path: "planning",
+    element: <Planning />,
+    isSublink: false,
+  },
+  {
+    name: "Supplier",
+    icon: <Container />,
+    path: "supplier",
+    element: <Supplier />,
+    isSublink: false,
+  },
+  {
+    name: "Scheduling",
+    icon: <Calendar />,
+    path: "scheduling",
+    element: <Scheduling />,
+    isSublink: false,
+  },
+
+  {
+    name: "Maintenance",
+    icon: <Construction />,
+    path: "maintenance",
+    element: <Maintenance />,
+    isSublink: false,
+  },
+
+  {
+    name: "Task",
+    icon: <MdTask />,
+    path: "task",
+    element: <Task />,
+    isSublink: false,
+  },
+
   {
     name: "Scrap Management",
     icon: <SiScrapy />,
@@ -242,26 +299,7 @@ const routes = [
   //   ],
   //   isSublink: true
   // },
-  {
-    name: "Production",
-    path: "production",
-    icon: <MdOutlineProductionQuantityLimits />,
-    sublink: [
-      {
-        name: "BOM",
-        icon: <RiBillLine />,
-        path: "bom",
-        element: <BOM />,
-      },
-      {
-        name: "Production Process",
-        icon: <VscServerProcess />,
-        path: "production-process",
-        element: <Process />,
-      },
-    ],
-    isSublink: true,
-  },
+
   // {
   //   name: "Dispatch",
   //   path: "dispatch",

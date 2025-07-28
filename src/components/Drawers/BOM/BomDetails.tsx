@@ -1,8 +1,11 @@
+//@ts-nocheck
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
+import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import Loading from "../../../ui/Loading";
+import { colors } from "../../../theme/colors";
 
 interface BomDetailsProps {
   bomId: string | undefined;
@@ -18,14 +21,13 @@ const BomDetails: React.FC<BomDetailsProps> = ({
   const [rawMaterials, setRawMaterials] = useState<any[] | []>([]);
   const [scrapMaterials, setScrapMaterials] = useState<any[] | []>([]);
   const [finishedGood, setFinishedGood] = useState<any | undefined>();
-  const [processes, setProcesses] = useState<any | undefined>();
+  const [processes, setProcesses] = useState<any[] | undefined>();
   const [bomName, setBomName] = useState<string | undefined>();
   const [partsCount, setPartsCount] = useState<number | undefined>();
   const [totalBomCost, setTotalBomCost] = useState<number | undefined>();
   const [otherCharges, setOtherCharges] = useState<any>();
 
   const fetchBomDetails = async () => {
-    if (!bomId) return;
     try {
       setIsLoadingBom(true);
       const response = await fetch(
@@ -38,8 +40,9 @@ const BomDetails: React.FC<BomDetailsProps> = ({
         }
       );
       const data = await response.json();
-      if (!data.success) throw new Error(data.message);
-
+      if (!data.success) {
+        throw new Error(data.message);
+      }
       setFinishedGood(data.bom.finished_good);
       setRawMaterials(data.bom.raw_materials);
       setBomName(data.bom.bom_name);
@@ -57,488 +60,329 @@ const BomDetails: React.FC<BomDetailsProps> = ({
 
   useEffect(() => {
     fetchBomDetails();
+    // if bomId can change, add it to deps: [bomId]
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bomId]);
+  }, []);
 
   return (
-    <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
+    <Drawer closeDrawerHandler={closeDrawerHandler}>
+      <div
+        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
+        style={{
+          boxShadow:
+            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+        }}
+      >
+        <div
+          className="flex items-center justify-between p-6 border-b"
+          style={{ borderColor: colors.border.light }}
+        >
+          <h1
+            className="text-xl font-semibold"
+            style={{ color: colors.text.primary }}
+          >
+            Employee Details
+          </h1>
+          <button
+            onClick={closeDrawerHandler}
+            className="p-2 rounded-lg transition-colors duration-200"
+            style={{
+              color: colors.text.secondary,
+              backgroundColor: colors.gray[100],
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[200];
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.gray[100];
+            }}
+          >
+            <BiX size={20} />
+          </button>
+        </div>
 
-      {/* Drawer */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full  bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
-        <div className="h-full flex flex-col">
-          {/* Header */}
-          <div className="px-6 py-4 text-black flex border items-center justify-between">
-            <h2 className="text-xl font-semibold">BOM Details</h2>
-            <button
-              onClick={closeDrawerHandler}
-              className="p-1 border rounded transition-colors duration-200"
-            >
-              <BiX size={24} />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto bg-gray-50">
-            {isLoadingBom && (
-              <div className="flex items-center justify-center h-64">
-                <Loading />
-              </div>
-            )}
-
-            {!isLoadingBom && (
-              <div>
-                {/* Summary */}
-                <div className="bg-white border-b">
-                  <div className="px-4 py-4 sm:px-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      Summary
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          BOM Name
-                        </label>
-                        <input
-                          type="text"
-                          value={bomName || "N/A"}
-                          readOnly
-                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Parts Count
-                        </label>
-                        <input
-                          type="text"
-                          value={partsCount ?? "0"}
-                          readOnly
-                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Total BOM Cost
-                        </label>
-                        <input
-                          type="text"
-                          value={totalBomCost ?? "0"}
-                          readOnly
-                          className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                        />
-                      </div>
-                    </div>
+          {isLoadingBom ? (
+            <div className="flex justify-center py-10">
+              <Loading />
+            </div>
+          ) : (
+            <div className="space-y-8 m-3">
+              {/* General Info */}
+              <div className="bg-white p-6 shadow-lg rounded-lg border">
+                <h3 className="text-xl font-semibold mb-4 text-teal-600">
+                  General Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <p className="font-semibold text-gray-600">BOM Name</p>
+                    <p className="text-gray-800">{bomName ?? "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-600">Parts Count</p>
+                    <p className="text-gray-800">{partsCount ?? 0}</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-600">Total Cost</p>
+                    <p className="text-gray-800 text-lg font-bold">
+                      ₹ {totalBomCost?.toLocaleString() ?? 0}/-
+                    </p>
                   </div>
                 </div>
-
-                {/* Finished Good Section */}
-                {finishedGood && (
-                  <div className="bg-white border-b">
-                    <div className="px-4 py-4 sm:px-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        Finished Good
-                      </h3>
-
-                      {/* Header (desktop) */}
-                      <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
-                        <div>Finished Goods</div>
-                        <div>Quantity</div>
-                        <div>UOM</div>
-                        <div>Category</div>
-                        <div>Comments</div>
-                        <div>Unit Cost</div>
-                        <div>Cost</div>
-                      </div>
-
-                      {/* Row */}
-                      <div className="border border-t-0 border-gray-300">
-                        <div className="grid grid-cols-1 sm:grid-cols-7 gap-4 px-3 py-4 items-center bg-white">
-                          <div>
-                            <label className="sm:hidden text-xs font-semibold text-gray-700">
-                              Finished Goods
-                            </label>
-                            <input
-                              type="text"
-                              value={finishedGood?.item?.name || "N/A"}
-                              readOnly
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                            />
-                          </div>
-                          <div>
-                            <label className="sm:hidden text-xs font-semibold text-gray-700">
-                              Quantity
-                            </label>
-                            <input
-                              type="text"
-                              value={finishedGood?.quantity || "N/A"}
-                              readOnly
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                            />
-                          </div>
-                          <div>
-                            <label className="sm:hidden text-xs font-semibold text-gray-700">
-                              UOM
-                            </label>
-                            <input
-                              type="text"
-                              value={finishedGood?.item?.uom || "N/A"}
-                              readOnly
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                            />
-                          </div>
-                          <div>
-                            <label className="sm:hidden text-xs font-semibold text-gray-700">
-                              Category
-                            </label>
-                            <input
-                              type="text"
-                              value={
-                                finishedGood?.item?.category ||
-                                finishedGood?.category ||
-                                "N/A"
-                              }
-                              readOnly
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                            />
-                          </div>
-                          <div>
-                            <label className="sm:hidden text-xs font-semibold text-gray-700">
-                              Comments
-                            </label>
-                            <input
-                              type="text"
-                              value={finishedGood?.comments || "N/A"}
-                              readOnly
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                            />
-                          </div>
-                          <div>
-                            <label className="sm:hidden text-xs font-semibold text-gray-700">
-                              Unit Cost
-                            </label>
-                            <input
-                              type="text"
-                              value={finishedGood?.item?.price || "N/A"}
-                              readOnly
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                            />
-                          </div>
-                          <div>
-                            <label className="sm:hidden text-xs font-semibold text-gray-700">
-                              Cost
-                            </label>
-                            <input
-                              type="text"
-                              value={finishedGood?.cost || "N/A"}
-                              readOnly
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Raw Materials Section */}
-                {rawMaterials && rawMaterials.length > 0 && (
-                  <div className="bg-white border-b">
-                    <div className="px-4 py-4 sm:px-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        Raw Materials
-                      </h3>
-
-                      {/* Header */}
-                      <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
-                        <div>Product Name</div>
-                        <div>Quantity</div>
-                        <div>UOM</div>
-                        <div>Category</div>
-                        <div>Comments</div>
-                        <div>Unit Cost</div>
-                        <div>Total Part Cost</div>
-                      </div>
-
-                      {/* Rows */}
-                      <div className="border border-t-0 border-gray-300">
-                        {rawMaterials.map((material, index) => (
-                          <div
-                            key={index}
-                            className="grid grid-cols-1 sm:grid-cols-7 gap-4 px-3 py-4 items-center bg-white border-b border-gray-200 last:border-b-0"
-                          >
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Product Name
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.item?.name || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Quantity
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.quantity || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                UOM
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.item?.uom || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Category
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.item?.category || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Comments
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.comments || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Unit Cost
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.unit_cost || "0"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Total Part Cost
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.total_part_cost || "0"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Process Section */}
-                {processes && processes.length > 0 && (
-                  <div className="bg-white border-b">
-                    <div className="px-4 py-4 sm:px-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        Processes
-                      </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {processes.map((process: string, index: number) => (
-                          <div key={index} className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Process {index + 1}
-                            </label>
-                            <input
-                              type="text"
-                              value={process}
-                              readOnly
-                              className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Scrap Materials Section */}
-                {scrapMaterials && scrapMaterials.length > 0 && (
-                  <div className="bg-white border-b">
-                    <div className="px-4 py-4 sm:px-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        Scrap Materials
-                      </h3>
-
-                      {/* Header */}
-                      <div className="hidden sm:grid grid-cols-6 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
-                        <div>Product Name</div>
-                        <div>Comment</div>
-                        <div>Estimated Quantity</div>
-                        <div>UOM</div>
-                        <div>Unit Cost</div>
-                        <div>Total Part Cost</div>
-                      </div>
-
-                      {/* Rows */}
-                      <div className="border border-t-0 border-gray-300">
-                        {scrapMaterials.map((material, index) => (
-                          <div
-                            key={index}
-                            className="grid grid-cols-1 sm:grid-cols-6 gap-4 px-3 py-4 items-center bg-white border-b border-gray-200 last:border-b-0"
-                          >
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Product Name
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.item?.name || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Comment
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.description || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Estimated Quantity
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.quantity || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                UOM
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.item?.uom || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Unit Cost
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.item?.price || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="sm:hidden text-xs font-semibold text-gray-700">
-                                Total Part Cost
-                              </label>
-                              <input
-                                type="text"
-                                value={material?.total_part_cost || "N/A"}
-                                readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Other Charges */}
-                {otherCharges && (
-                  <div className="bg-white border-b">
-                    <div className="px-4 py-4 sm:px-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        Other Charges
-                      </h3>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Labour Charges
-                          </label>
-                          <input
-                            type="text"
-                            value={otherCharges.labour_charges || 0}
-                            readOnly
-                            className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Machinery Charges
-                          </label>
-                          <input
-                            type="text"
-                            value={otherCharges.machinery_charges || 0}
-                            readOnly
-                            className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Electricity Charges
-                          </label>
-                          <input
-                            type="text"
-                            value={otherCharges.electricity_charges || 0}
-                            readOnly
-                            className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Other Charges
-                          </label>
-                          <input
-                            type="text"
-                            value={otherCharges.other_charges || 0}
-                            readOnly
-                            className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
-            )}
-          </div>
+
+              {/* Raw Materials */}
+              {rawMaterials && rawMaterials.length > 0 && (
+                <div className="bg-blue-50 p-6 shadow-lg rounded-lg border border-blue-300">
+                  <h3 className="text-xl font-semibold mb-4 text-blue-600">
+                    Raw Materials
+                  </h3>
+                  <ul className="pl-5 list-disc space-y-4">
+                    {rawMaterials.map((material, index) => (
+                      <li key={index} className="space-y-1">
+                        <p>
+                          <span className="font-semibold text-gray-600">
+                            Item ID:
+                          </span>{" "}
+                          {material?.item?.product_id ?? "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-gray-600">
+                            Item Name:
+                          </span>{" "}
+                          {material?.item?.name ?? "N/A"}
+                        </p>
+                        {material?.item?.color ? (
+                          <p>
+                            <span className="font-semibold text-gray-600">
+                              Item Color:
+                            </span>{" "}
+                            {material?.item?.color}
+                          </p>
+                        ) : null}
+                        {material?.item?.code ? (
+                          <p>
+                            <span className="font-semibold text-gray-600">
+                              Item Code:
+                            </span>{" "}
+                            {material?.item?.code}
+                          </p>
+                        ) : null}
+                        <p>
+                          <span className="font-semibold text-gray-600">
+                            Quantity:
+                          </span>{" "}
+                          {material?.quantity}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-gray-600">
+                            UOM:
+                          </span>{" "}
+                          {material?.item?.uom}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-gray-600">
+                            Total Part Cost:
+                          </span>{" "}
+                          ₹ {material?.total_part_cost}/-
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Processes */}
+              {processes && processes.length > 0 && (
+                <div className="bg-green-50 p-6 shadow-lg rounded-lg border border-green-300">
+                  <h3 className="text-xl font-semibold mb-4 text-green-600">
+                    Processes
+                  </h3>
+                  <ul className="pl-5 list-disc space-y-2">
+                    {processes.map((process, index) => (
+                      <li key={index} className="text-gray-800">
+                        {process}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Finished Good */}
+              {finishedGood && (
+                <div className="bg-yellow-50 p-6 shadow-lg rounded-lg border border-yellow-300">
+                  <h3 className="text-xl font-semibold mb-4 text-yellow-600">
+                    Finished Good
+                  </h3>
+                  <ul className="pl-5 space-y-3">
+                    <li>
+                      <span className="font-semibold text-gray-600">
+                        Item ID:
+                      </span>{" "}
+                      {finishedGood?.item?.product_id ?? "N/A"}
+                    </li>
+                    <li>
+                      <span className="font-semibold text-gray-600">
+                        Item Name:
+                      </span>{" "}
+                      {finishedGood?.item?.name ?? "N/A"}
+                    </li>
+
+                    {finishedGood?.item?.color ? (
+                      <li>
+                        <span className="font-semibold text-gray-600">
+                          Item Color:
+                        </span>{" "}
+                        {finishedGood?.item?.color}
+                      </li>
+                    ) : null}
+                    {finishedGood?.item?.code ? (
+                      <li>
+                        <span className="font-semibold text-gray-600">
+                          Item Code:
+                        </span>{" "}
+                        {finishedGood?.item?.code}
+                      </li>
+                    ) : null}
+                    <li>
+                      <span className="font-semibold text-gray-600">
+                        Quantity:
+                      </span>{" "}
+                      {finishedGood.quantity}
+                    </li>
+                    <li>
+                      <span className="font-semibold text-gray-600">UOM:</span>{" "}
+                      {finishedGood?.item?.uom}
+                    </li>
+                    <li>
+                      <span className="font-semibold text-gray-600">
+                        Category:
+                      </span>{" "}
+                      {finishedGood?.item?.category}
+                    </li>
+                    <li>
+                      <span className="font-semibold text-gray-600">Cost:</span>{" "}
+                      ₹ {finishedGood.cost}/-
+                    </li>
+                    <li>
+                      <span className="font-semibold text-gray-600">
+                        Supporting Document:
+                      </span>{" "}
+                      {finishedGood.supporting_doc ? (
+                        <a
+                          href={finishedGood.supporting_doc}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline text-teal-600"
+                        >
+                          Open
+                        </a>
+                      ) : (
+                        "N/A"
+                      )}
+                    </li>
+                  </ul>
+                </div>
+              )}
+
+              {/* Scrap Materials */}
+              {scrapMaterials && scrapMaterials.length > 0 && (
+                <div className="bg-red-50 p-6 shadow-lg rounded-lg border border-red-300">
+                  <h3 className="text-xl font-semibold mb-4 text-red-600">
+                    Scrap Materials
+                  </h3>
+                  <ul className="pl-5 list-disc space-y-4">
+                    {scrapMaterials.map((material, index) => (
+                      <li key={index} className="space-y-1">
+                        <p>
+                          <span className="font-semibold text-gray-600">
+                            Item ID:
+                          </span>{" "}
+                          {material?.item?.product_id}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-gray-600">
+                            Item Name:
+                          </span>{" "}
+                          {material?.item?.name}
+                        </p>
+                        {material?.item?.color ? (
+                          <p>
+                            <span className="font-semibold text-gray-600">
+                              Item Color:
+                            </span>{" "}
+                            {material?.item?.color}
+                          </p>
+                        ) : null}
+                        {material?.item?.code ? (
+                          <p>
+                            <span className="font-semibold text-gray-600">
+                              Item Code:
+                            </span>{" "}
+                            {material?.item?.code}
+                          </p>
+                        ) : null}
+                        <p>
+                          <span className="font-semibold text-gray-600">
+                            Quantity:
+                          </span>{" "}
+                          {material?.quantity}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-gray-600">
+                            UOM:
+                          </span>{" "}
+                          {material?.item?.uom}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-gray-600">
+                            Total Part Cost:
+                          </span>{" "}
+                          ₹ {material?.total_part_cost}/-
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Other Charges */}
+              {otherCharges && (
+                <div className="bg-purple-50 p-6 shadow-lg rounded-lg border border-purple-300">
+                  <h3 className="text-xl font-semibold mb-4 text-purple-600">
+                    Other Charges
+                  </h3>
+                  <div className="space-y-3">
+                    <p>
+                      <span className="font-semibold text-gray-600">
+                        Labour Charges:
+                      </span>{" "}
+                      ₹ {otherCharges?.labour_charges}/-
+                    </p>
+                    <p>
+                      <span className="font-semibold text-gray-600">
+                        Machinery Charges:
+                      </span>{" "}
+                      ₹ {otherCharges?.machinery_charges}/-
+                    </p>
+                    <p>
+                      <span className="font-semibold text-gray-600">
+                        Electricity Charges:
+                      </span>{" "}
+                      ₹ {otherCharges?.electricity_charges}/-
+                    </p>
+                    <p>
+                      <span className="font-semibold text-gray-600">
+                        Other Charges:
+                      </span>{" "}
+                      ₹ {otherCharges?.other_charges}/-
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      </div>
-    </>
+    </Drawer>
   );
 };
 
