@@ -1,13 +1,13 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 // @ts-nocheck
 import { MdOutlineRefresh } from "react-icons/md";
-import { FiSearch, FiPlus, FiUsers } from "react-icons/fi";
+import { FiSearch, FiPlus, FiUsers, FiDownload } from "react-icons/fi";
 import AddParties from "../components/Drawers/Parties/AddParties";
 import PartiesTable from "../components/Table/PartiesTable";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import Pagination from "./Pagination";
 import { colors } from "../theme/colors";
+import * as XLSX from 'xlsx';
 
 const Parties = () => {
   const [showData, setshowData] = useState(false);
@@ -21,12 +21,13 @@ const Parties = () => {
   const [page, setPage] = useState(1);
   const [edittable, setEditTable] = useState(null);
   const [limit, setLimit] = useState(10);
+  const [isExporting, setIsExporting] = useState(false);
 
   const fetchPartiesData = async () => {
     try {
       setIsLoading(true);
       const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}parties/get?page=${page}&&limit={limit}`,
+        `${process.env.REACT_APP_BACKEND_URL}parties/get?page=${page}&&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -40,6 +41,97 @@ const Parties = () => {
       console.log(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+
+  const fetchAllPartiesForExport = async () => {
+    try {
+      setIsExporting(true);
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}parties/get?page=1&limit=10000`, // Get all data
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      return data?.data || [];
+    } catch (error) {
+      console.error("Error fetching parties data for export:", error);
+      return [];
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+
+  const exportToExcel = async () => {
+    try {
+      const allPartiesData = await fetchAllPartiesForExport();
+
+      if (!allPartiesData || allPartiesData.length === 0) {
+        alert("No data available to export");
+        return;
+      }
+
+
+      const excelData = allPartiesData.map((party, index) => ({
+        'Sr. No.': index + 1,
+        'Customer ID': party.cust_id || 'N/A',
+        'Date Added': party.createdAt ? new Date(party.createdAt).toLocaleDateString() : 'N/A',
+        'Consignee Name':party?.consignee_name?.[0] || "N/A",
+        'Company Name': party.company_name || 'N/A',
+        'Email': Array.isArray(party.email_id) && party.email_id.length > 0
+          ? party.email_id.join(', ')
+          : party.email_id || 'N/A',
+        'Phone Number': Array.isArray(party.contact_number) && party.contact_number.length > 0
+          ? party.contact_number.join(', ')
+          : party.contact_number || 'N/A',
+        'Type': party.type || 'N/A',
+        'Merchant Type': party.parties_type || 'N/A',
+        'Shipped To': party.shipped_to || 'N/A',
+        'Bill To': party.bill_to || 'N/A',
+        'Shipped GST To': party.shipped_gst_to || 'N/A',
+        'Bill GST To': party.bill_gst_to || 'N/A'
+      }));
+
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(excelData);
+
+
+      const colWidths = [
+        { wch: 8 }, 
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 25 },
+        { wch: 15 },
+        { wch: 12 },
+        { wch: 15 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 }
+      ];
+      ws['!cols'] = colWidths;
+
+
+      XLSX.utils.book_append_sheet(wb, ws, "Parties Data");
+
+
+      const currentDate = new Date().toISOString().split('T')[0];
+      const filename = `Parties_Data_${currentDate}.xlsx`;
+
+
+      XLSX.writeFile(wb, filename);
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      alert("Error exporting data to Excel. Please try again.");
     }
   };
 
@@ -103,6 +195,30 @@ const Parties = () => {
               >
                 <FiPlus size={16} />
                 Add New Merchant
+              </button>
+
+              {/* Excel Export Button */}
+              <button
+                onClick={exportToExcel}
+                disabled={isExporting}
+                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: colors.success[600],
+                  focusRingColor: colors.success[500],
+                }}
+                onMouseEnter={(e) => {
+                  if (!isExporting) {
+                    e.currentTarget.style.backgroundColor = colors.success[700];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isExporting) {
+                    e.currentTarget.style.backgroundColor = colors.success[600];
+                  }
+                }}
+              >
+                <FiDownload size={16} />
+                {isExporting ? 'Exporting...' : 'Export to Excel'}
               </button>
 
               <button
