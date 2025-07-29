@@ -69,7 +69,7 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
                             headers: { Authorization: `Bearer ${token}` },
                         }
                     );
-                    console.log(res)
+                    // console.log(res)
                     toast({
                         title: "Task Updated",
                         description: "The task has been successfully updated.",

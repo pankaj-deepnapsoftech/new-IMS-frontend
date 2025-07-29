@@ -150,7 +150,7 @@ const routes = [
         name: "Raw Material Approval",
         icon: <RiBillLine />,
         path: "raw-material-approval",
-        element: <RawMaterialApprovals />,
+        element: <RawMaterialApprovals />, 
       },
       {
         name: "Resources Approval",

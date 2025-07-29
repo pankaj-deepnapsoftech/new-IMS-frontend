@@ -108,8 +108,12 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
       setRole(data.userRole.role);
       setDescription(data.userRole?.description || "N/A");
       const modifiedPermissions = data.userRole?.permissions?.map(
-        (permission: any) => ({ value: permission, label: permission })
+        (permission: any) => ({
+          value: permission,
+          label: permission.charAt(0).toUpperCase() + permission.slice(1),
+        })
       );
+      
       setPermissions(modifiedPermissions);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");

@@ -124,7 +124,13 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                   <div>
                     <p className="font-semibold text-gray-600">Total Cost</p>
                     <p className="text-gray-800 text-lg font-bold">
-                      ₹ {totalBomCost?.toLocaleString() ?? 0}/-
+                      <p>
+                        {cookies?.role === "admin"
+                          ? `₹${totalBomCost?.toLocaleString() || 0}`
+                          : "₹*****"}
+                      </p>
+
+
                     </p>
                   </div>
                 </div>
@@ -180,10 +186,10 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                           {material?.item?.uom}
                         </p>
                         <p>
-                          <span className="font-semibold text-gray-600">
-                            Total Part Cost:
-                          </span>{" "}
-                          ₹ {material?.total_part_cost}/-
+                          <span className="font-semibold text-gray-600">Total Part Cost:</span>{" "}
+                          ₹ {cookies?.role === "admin"
+                            ? material?.total_part_cost ?? 0
+                            : "****"}/-
                         </p>
                       </li>
                     ))}
@@ -260,8 +266,11 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                       {finishedGood?.item?.category}
                     </li>
                     <li>
-                      <span className="font-semibold text-gray-600">Cost:</span>{" "}
-                      ₹ {finishedGood.cost}/-
+                      <li>
+                        <span className="font-semibold text-gray-600">Cost:</span>{" "}
+                        ₹ {cookies?.role === "admin" ? finishedGood.cost ?? 0 : "****"}/-
+                      </li>
+
                     </li>
                     <li>
                       <span className="font-semibold text-gray-600">
@@ -334,10 +343,8 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                           {material?.item?.uom}
                         </p>
                         <p>
-                          <span className="font-semibold text-gray-600">
-                            Total Part Cost:
-                          </span>{" "}
-                          ₹ {material?.total_part_cost}/-
+                          <span className="font-semibold text-gray-600">Total Part Cost:</span>{" "}
+                          ₹ {cookies?.role === "admin" ? material?.total_part_cost ?? 0 : "****"}/-
                         </p>
                       </li>
                     ))}
