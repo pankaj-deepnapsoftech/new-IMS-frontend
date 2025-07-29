@@ -77,7 +77,7 @@ const ProformaInvoice: React.FC = () => {
       if (!data.success) {
         throw new Error(data.message);
       }
-
+ 
       setData(data.proforma_invoices);
       setFilteredData(data.proforma_invoices);
     } catch (error: any) {

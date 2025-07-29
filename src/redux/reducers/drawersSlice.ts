@@ -46,6 +46,9 @@ const initialState = {
   isUpdateInvoiceDrawerOpened: false,
   isInvoiceDetailsDrawerOpened: false,
 
+  // Purchase Order Drawer
+  isAddPurchaseOrderDrawerOpened: false,
+
   // Process Drawer
   isAddProcessDrawerOpened: false,
   isUpdateProcessDrawerOpened: false,
@@ -291,9 +294,16 @@ const drawersSlice = createSlice({
     },
     closePaymentDetailsDrawer: (state)=>{
       state.isPaymentDetailsDrawerOpened = false;
-    }
+    },
+    // Purchase Order
+    openAddPurchaseOrderDrawer: (state) => {
+      state.isAddPurchaseOrderDrawerOpened = true;
+    },
+    closeAddPurchaseOrderDrawer: (state) => {
+      state.isAddPurchaseOrderDrawerOpened = false;
+    },
   },
 });
 
 export default drawersSlice;
-export const { openAddProductDrawer, closeAddProductDrawer, openUpdateProductDrawer, closeUpdateProductDrawer, openProductDetailsDrawer, closeProductDetailsDrawer, openAddStoreDrawer, closeAddStoreDrawer, openUpdateStoreDrawer, closeUpdateStoreDrawer, openStoreDetailsDrawer, closeStoreDetailsDrawer, openAddBuyerDrawer, closeAddBuyerDrawer, openUpdateBuyerDrawer, closeUpdateBuyerDrawer, openBuyerDetailsDrawer, closeBuyerDetailsDrawer, openAddSellerDrawer, closeAddSellerDrawer, openUpdateSellerDrawer, closeUpdateSellerDrawer, openSellerDetailsDrawer, closeSellerDetailsDrawer, openAddBomDrawer, closeAddBomDrawer, openUpdateBomDrawer, closeUpdateBomDrawer, openBomDetailsDrawer, closeBomDetailsDrawer, openAddRoleDrawer, closeAddRoleDrawer, openUpdateRoleDrawer, closeUpdateRoleDrawer, openRoleDetailsDrawer, closeRoleDetailsDrawer, openAddEmployeeDrawer, closeAddEmployeeDrawer, openEmployeeDetailsDrawer, closeEmployeeDetailsDrawer, openUpdateEmployeeDrawer, closeUpdateEmployeeDrawer, openAddProformaInvoiceDrawer, closeAddProformaInvoiceDrawer, openUpdateProformaInvoiceDrawer, closeUpdateProformaInvoiceDrawer, openProformaInvoiceDetailsDrawer, closeProformaInvoiceDetailsDrawer, openAddInvoiceDrawer, closeAddInvoiceDrawer, openUpdateInvoiceDrawer, closeUpdateInvoiceDrawer, openInvoiceDetailsDrawer, closeInvoiceDetailsDrawer, openAddProcessDrawer, closeAddProcessDrawer, openUpdateProcessDrawer, closeUpdateProcessDrawer, openProcessDetailsDrawer, closeProcessDetailsDrawer, openAddPaymentDrawer, closeAddPaymentDrawer, openPaymentDetailsDrawer, closePaymentDetailsDrawer, openUpdatePaymentDrawer, closeUpdatePaymentDrawer } = drawersSlice.actions;
+export const { openAddProductDrawer, closeAddProductDrawer, openUpdateProductDrawer, closeUpdateProductDrawer, openProductDetailsDrawer, closeProductDetailsDrawer, openAddStoreDrawer, closeAddStoreDrawer, openUpdateStoreDrawer, closeUpdateStoreDrawer, openStoreDetailsDrawer, closeStoreDetailsDrawer, openAddBuyerDrawer, closeAddBuyerDrawer, openUpdateBuyerDrawer, closeUpdateBuyerDrawer, openBuyerDetailsDrawer, closeBuyerDetailsDrawer, openAddSellerDrawer, closeAddSellerDrawer, openUpdateSellerDrawer, closeUpdateSellerDrawer, openSellerDetailsDrawer, closeSellerDetailsDrawer, openAddBomDrawer, closeAddBomDrawer, openUpdateBomDrawer, closeUpdateBomDrawer, openBomDetailsDrawer, closeBomDetailsDrawer, openAddRoleDrawer, closeAddRoleDrawer, openUpdateRoleDrawer, closeUpdateRoleDrawer, openRoleDetailsDrawer, closeRoleDetailsDrawer, openAddEmployeeDrawer, closeAddEmployeeDrawer, openEmployeeDetailsDrawer, closeEmployeeDetailsDrawer, openUpdateEmployeeDrawer, closeUpdateEmployeeDrawer, openAddProformaInvoiceDrawer, closeAddProformaInvoiceDrawer, openUpdateProformaInvoiceDrawer, closeUpdateProformaInvoiceDrawer, openProformaInvoiceDetailsDrawer, closeProformaInvoiceDetailsDrawer, openAddInvoiceDrawer, closeAddInvoiceDrawer, openUpdateInvoiceDrawer, closeUpdateInvoiceDrawer, openInvoiceDetailsDrawer, closeInvoiceDetailsDrawer, openAddProcessDrawer, closeAddProcessDrawer, openUpdateProcessDrawer, closeUpdateProcessDrawer, openProcessDetailsDrawer, closeProcessDetailsDrawer, openAddPaymentDrawer, closeAddPaymentDrawer, openPaymentDetailsDrawer, closePaymentDetailsDrawer, openUpdatePaymentDrawer, closeUpdatePaymentDrawer, openAddPurchaseOrderDrawer, closeAddPurchaseOrderDrawer } = drawersSlice.actions;

@@ -27,6 +27,8 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
   const [products, setProducts] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
   const [imagesfile, setImageFile] = useState(null);
+  const [bomFile, setBomFile] = useState(null);
+  const [bomPreview, setBomPreview] = useState(null);
 
   // console.log(editTable)
   const ImageUploader = async (formData) => {
@@ -64,6 +66,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       comment: editTable?.comment || "",
       uom: editTable?.uom || "",
       productFile: editTable?.productFile || "",
+      bompdf: editTable?.bompdf|| "",
     },
     enableReinitialize: true,
     validationSchema: SalesFormValidation,
@@ -72,7 +75,8 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       setIsSubmitting(true);
       //    console.log("form Values",value)
       try {
-        let designImageUrl = editTable?.productFile || "";
+        let productImageUrl = editTable?.productFile || "";
+        let bomImageUrl = editTable?.bompdf || "";
 
         if (imagesfile) {
           const formData = new FormData();
@@ -80,7 +84,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
           const uploadedImage = await ImageUploader(formData);
           if (!uploadedImage) {
             toast({
-              title: "Upload failed",
+              title: "Product image upload failed",
               status: "error",
               duration: 5000,
               isClosable: true,
@@ -88,13 +92,32 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
             setIsSubmitting(false);
             return;
           }
-          designImageUrl = uploadedImage;
+          productImageUrl = uploadedImage;
+        }
+
+        if (bomFile) {
+          const bomFormData = new FormData();
+          bomFormData.append("file", bomFile);
+          const uploadedBom = await ImageUploader(bomFormData);
+          if (!uploadedBom) {
+            toast({
+              title: "BOM PDF upload failed",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
+            setIsSubmitting(false);
+            return;
+          }
+          bomImageUrl = uploadedBom;
         }
 
         const payload = {
           ...value,
-          productFile: designImageUrl,
+          productFile: productImageUrl,
+          bompdf: bomImageUrl,
         };
+
 
         if (editTable?._id) {
           await axios.put(
@@ -108,8 +131,8 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
           );
           resetForm();
         } else {
-          // ➕ Create new sale
-          await axios.post(
+          
+        const res =  await axios.post(
             `${process.env.REACT_APP_BACKEND_URL}sale/create`,
             payload,
             {
@@ -118,6 +141,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
               },
             }
           );
+          console.log(res)
           resetForm();
         }
 
@@ -174,7 +198,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       });
     }
   };
-  // console.log(partiesData)
+  console.log(partiesData)
 
   useEffect(() => {
     fetchDropdownData();
@@ -232,7 +256,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                   <Users className="h-4 w-4 text-gray-500" />
-                  Party *
+                  Merchant *
                 </label>
                 <select
                   required
@@ -242,11 +266,12 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                   onBlur={handleBlur}
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                 >
-                  <option value="">Select a party</option>
+                  <option value="">Select a Merchant</option>
                   {partiesData.map((party: any) => (
                     <option key={party?._id} value={party?._id}>
-                      {party?.consignee_name}{" "}
-                      {party?.company_name ? `- (${party.company_name})` : ""}
+                      {party?.consignee_name?.length > 0
+                        ? ` Merchant Name - ${party.consignee_name}`
+                        : `Company Name - ${party.company_name}`}
                     </option>
                   ))}
                 </select>
@@ -329,6 +354,44 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                           setFieldValue("productFile", null);
                         }}
                         className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+                      >
+                        <IoClose size={16} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <FileImage className="h-4 w-4 text-gray-500" />
+                  BOM PDF
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-colors">
+                  <input
+                    type="file"
+                    name="bompdf"
+                    accept="application/pdf"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setBomFile(file);
+                        setBomPreview(file.name);
+                        setFieldValue("bompdf", file);
+                      }
+                    }}
+                    className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                  {bomPreview && (
+                    <div className="mt-4 flex items-center justify-between border px-3 py-2 rounded bg-gray-100 text-sm text-gray-700">
+                      <span>{bomPreview}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setBomFile(null);
+                          setBomPreview(null);
+                          setFieldValue("bompdf", null);
+                        }}
+                        className="p-1 bg-red-500 hover:bg-red-600 text-white rounded-full"
                       >
                         <IoClose size={16} />
                       </button>

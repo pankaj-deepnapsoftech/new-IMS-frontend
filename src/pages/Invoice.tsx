@@ -246,7 +246,7 @@ const Invoice: React.FC = () => {
                 className="shadow-lg hover:shadow-xl transition-all duration-200"
                 _hover={{ transform: "translateY(-1px)" }}
               >
-                Add New Role
+                Add New Tax Invoice
               </Button>
               <Button
                 onClick={fetchInvoiceHandler}

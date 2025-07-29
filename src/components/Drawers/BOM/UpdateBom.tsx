@@ -41,6 +41,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
   const [processes, setProcesses] = useState<string[]>([""]);
 
   const [products, setProducts] = useState<any[]>([]);
+   const [remarks, setRemarks] = useState<string>(""); 
   const [productOptions, setProductOptions] = useState<any[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
   const [updateBom] = useUpdateBOMMutation();
@@ -212,7 +213,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
       setUom(data.bom.finished_good.item.uom);
       setCategory(data.bom.finished_good.item.category);
       setComments(data.bom.finished_good.comments);
-
+      setRemarks(data?.bom?.remarks)
       setProcesses(data.bom.processes || [""]);
 
       const inputs: any = [];
@@ -365,6 +366,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
         electricity_charges: electricityCharges || 0,
         other_charges: otherCharges || 0,
       },
+      remarks:remarks,
     };
 
     try {
@@ -535,7 +537,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                               ? "*****"
                               : ""
                         }
-                        readOnly 
+                        readOnly
                         className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100"
                       />
                     </div>
@@ -1040,8 +1042,8 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                             type={cookies?.role === "admin" ? "number" : "text"}
                             value={
                               cookies?.role === "admin"
-                                ? material.unit_cost  || ""
-                                : material.unit_cost 
+                                ? material.unit_cost || ""
+                                : material.unit_cost
                                   ? "*****"
                                   : ""
                             }
@@ -1059,8 +1061,8 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                             type={cookies?.role === "admin" ? "number" : "text"}
                             value={
                               cookies?.role === "admin"
-                                ? material.total_part_cost  || ""
-                                : material.total_part_cost 
+                                ? material.total_part_cost || ""
+                                : material.total_part_cost
                                   ? "*****"
                                   : ""
                             }
@@ -1145,6 +1147,23 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="remarks"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Remarks
+                </label>
+                <textarea
+                  id="remarks"
+                  name="remarks"
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  className="w-full rounded-md border border-gray-300 shadow-sm p-2 text-sm text-gray-800 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                  placeholder="Enter remarks..."
+                  rows={4}
+                />
               </div>
 
               {/* Actions */}
