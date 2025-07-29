@@ -154,20 +154,23 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
         }
       );
       const data = await response.json();
+
       if (!data.success) {
         throw new Error(data.message);
       }
 
       const suppliers = data.agents.map((supplier: any) => ({
-        value: supplier._id,
-        label: supplier.name,
+        value: supplier.id,    // ObjectId for DB
+        label: supplier.name,  // Shown in dropdown
       }));
+
       setSupplierOptions(suppliers);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
   };
 
+  console.log(supplierOptions)
   const fetchItemsHandler = async () => {
     try {
       const response = await fetch(

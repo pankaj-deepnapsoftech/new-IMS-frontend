@@ -55,6 +55,7 @@ const AddBom: React.FC<AddBomProps> = ({
   const [productOptions, setProductOptions] = useState<
     { value: string; label: string }[] | []
   >([]);
+  const [remarks, setRemarks] = useState<string>("");
   const [finishedGoodName, setFinishedGoodName] = useState("");
   // const [category, setCategory] = useState("");
   const [labourCharges, setLabourCharges] = useState<number | undefined>();
@@ -186,6 +187,7 @@ const AddBom: React.FC<AddBomProps> = ({
         electricity_charges: electricityCharges || 0,
         other_charges: otherCharges || 0,
       },
+      remarks: remarks,
     };
 
     try {
@@ -1062,6 +1064,24 @@ const AddBom: React.FC<AddBomProps> = ({
                       />
 
                     </div>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="remarks"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Remarks
+                      </label>
+                      <textarea
+                        id="remarks"
+                        name="remarks"
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                        placeholder="Enter remarks..."
+                        rows={4}
+                        className="w-full rounded-md border border-gray-300 shadow-sm p-2 text-sm text-gray-800 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                      />
+                    </div>
+
                   </div>
 
                   {/* Submit Button */}

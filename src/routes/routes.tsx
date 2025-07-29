@@ -116,7 +116,7 @@ const routes = [
     name: "Sales Order",
     icon: <HandCoins />,
     path: "sales",
-    element: <Sales />,
+    element: <Sales />,  
     isSublink: false,
   },
 

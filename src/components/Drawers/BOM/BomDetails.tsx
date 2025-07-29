@@ -26,7 +26,7 @@ const BomDetails: React.FC<BomDetailsProps> = ({
   const [partsCount, setPartsCount] = useState<number | undefined>();
   const [totalBomCost, setTotalBomCost] = useState<number | undefined>();
   const [otherCharges, setOtherCharges] = useState<any>();
-
+  const [remarks, setRemarks] = useState<any[] | []>([]);
   const fetchBomDetails = async () => {
     if (!bomId) return;
     try {
@@ -42,7 +42,7 @@ const BomDetails: React.FC<BomDetailsProps> = ({
       );
       const data = await response.json();
       if (!data.success) throw new Error(data.message);
-
+      console.log(data)
       setFinishedGood(data.bom.finished_good);
       setRawMaterials(data.bom.raw_materials);
       setBomName(data.bom.bom_name);
@@ -51,6 +51,7 @@ const BomDetails: React.FC<BomDetailsProps> = ({
       setProcesses(data.bom.processes);
       setScrapMaterials(data.bom?.scrap_materials);
       setOtherCharges(data.bom?.other_charges);
+      setRemarks(data?.bom?.remarks);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
@@ -386,6 +387,18 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                   </div>
                 </div>
               )}
+              {remarks && (
+                <div className="bg-cyan-50 p-6 shadow-lg rounded-lg border border-cyan-300">
+                  <h3 className="text-xl font-semibold mb-4 text-cyan-600">
+                    Remarks
+                  </h3>
+                  <p className="text-sm text-gray-700 whitespace-pre-line capitalize">
+                    {remarks}
+                  </p>
+
+                </div>
+              )}
+ 
             </div>
           )}
         </div>
