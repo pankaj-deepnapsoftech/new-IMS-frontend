@@ -19,11 +19,12 @@ import { MdOutlineRefresh } from "react-icons/md";
 import { FiSearch } from "react-icons/fi";
 import AddPurchaseOrder from "../components/Drawers/Purchase Order/AddPurchaseOrder";
 import PurchaseOrderTable from "../components/Table/PurchaseOrderTable";
+import { useCookies } from "react-cookie";
 
 const PurchaseOrder: React.FC = () => {
   // const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
   // const isAllowed = isSuper || allowedroutes.includes("sale & purchase");
-  // const [cookies] = useCookies();
+  const [cookies] = useCookies();
   // const [searchKey, setSearchKey] = useState<string | undefined>();
   // const [data, setData] = useState<any[] | []>([]);
   // const [filteredData, setFilteredData] = useState<any[] | []>([]);
@@ -61,7 +62,7 @@ const PurchaseOrder: React.FC = () => {
   //   dispatch(closeUpdateProformaInvoiceDrawer());
   // };
 
-  // const fetchProformaInvoiceHandler = async () => {
+  // const fetchPruchesOrderHandler = async () => {
   //   try {
   //     const response = await fetch(
   //       process.env.REACT_APP_BACKEND_URL + "proforma-invoice/all",
