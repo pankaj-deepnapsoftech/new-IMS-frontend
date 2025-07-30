@@ -116,7 +116,7 @@ const routes = [
     name: "Sales Order",
     icon: <HandCoins />,
     path: "sales",
-    element: <Sales />,
+    element: <Sales />,  
     isSublink: false,
   },
 
@@ -198,9 +198,9 @@ const routes = [
         element: <ProformaInvoice />,
       },
       {
-        name: "Invoices",
+        name: "Tax Invoices",
         icon: <RiBillLine />,
-        path: "invoice",
+        path: " taxInvoice",
         element: <Invoice />,
       },
       {

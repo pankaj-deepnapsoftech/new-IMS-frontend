@@ -47,20 +47,20 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
         throw new Error(results?.message);
       }
 
-     
-      const finishedGoods = results.products.filter(
-        (product: any) => product.category?.toLowerCase() === "finished goods"
+    
+      const rwaMaterials = results.products.filter(
+        (product: any) => product.category?.toLowerCase() === "raw materials"
       );
 
      
-      const productOptions = finishedGoods.map((product: any) => ({
+      const productOptions = rwaMaterials.map((product: any) => ({
         value: product._id,
         label: product.name,
       }));
 
       // Set filtered data
       setProductOptions(productOptions);
-      setProducts(finishedGoods);
+      setProducts(rwaMaterials);
 
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");

@@ -57,9 +57,9 @@ const PartiesTable = ({
   //   },
   //   usePagination
   // );
-  console.log(partiesData)
   const filteredParties = partiesData.filter((party) => {
     const searchLower = searchTerm.toLowerCase();
+
 
     const matchSearch =
       (party?.consignee_name?.[0]?.toLowerCase?.() || "").includes(
@@ -79,7 +79,7 @@ const PartiesTable = ({
 
     return matchSearch && matchType && matchRole;
   });
-  
+  // console.log(filteredParties)
 
   const handleDelete = async (partyId) => {
     if (isSubmitting) return;
