@@ -61,7 +61,7 @@ interface BOMRawMaterialTableProps {
 }
 
 const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
-  products,
+  products = [],
   isLoadingProducts,
   openUpdateProductDrawerHandler,
   openProductDetailsDrawerHandler,
@@ -194,7 +194,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
   }> = useTable(
     {
       columns,
-      data: products,
+      data: products || [],
       initialState: { pageIndex: 0 },
     },
     useSortBy,
