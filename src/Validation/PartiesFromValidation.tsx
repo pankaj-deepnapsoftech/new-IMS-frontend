@@ -33,11 +33,12 @@ export const PartiesFromValidation = object({
 
   bill_to: string().required("Bill To address is required"),
 
-  shipped_gst_to: string().required("Shipped To GST is required"),
+  // shipped_gst_to: string().required("Shipped To GST is required"),
 
-  bill_gst_to: string().required("Bill To GST is required"),
+  // bill_gst_to: string().required("Bill To GST is required"),
 
   type: string().required("Type is a required field"),
 
   parties_type: string().required("Merchant Type is a required field"),
 });
+
