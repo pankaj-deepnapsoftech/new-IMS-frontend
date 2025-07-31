@@ -70,7 +70,7 @@ const AddParties = ({
       if (isSubmitting) return;
       setIsSubmitting(true);
           
-
+  
       const payload = {
         ...values,
         consignee_name: values.type === "Individual" ? consigneeNames : [],
