@@ -129,7 +129,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
         {isLoadingProduct && <Loading />}
         {!isLoadingProduct && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="font-semibold text-gray-700 mb-1">
                   Inventory Category

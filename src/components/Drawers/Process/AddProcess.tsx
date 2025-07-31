@@ -293,7 +293,7 @@ const AddProcess: React.FC<AddProcess> = ({
                   Item Information
                 </h3>
 
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   {/* Item ID */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
@@ -387,13 +387,13 @@ const AddProcess: React.FC<AddProcess> = ({
               </div>
 
               {/* Store Information */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-lg border border-gray-200 p-6 ">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                   <Store className="h-5 w-5 text-green-600" />
                   Store Information
                 </h3>
 
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   {/* FG Store */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">

@@ -50,6 +50,7 @@ import Packaging from "../pages/Packaging";
 import Vouchers from "../pages/Vouchers";
 import Integration from "../pages/Integration";
 import PurchaseOrder from "../pages/PurchaseOrder";
+import Precurement from "../pages/Precurement";
 
 const routes = [
   {
@@ -124,15 +125,8 @@ const routes = [
     name: "Precurement",
     icon: <Box />,
     path: "precurement",
-    sublink: [
-      {
-        name: "Purchase Order",
-        icon: <ScanBarcode />,
-        path: "purchase-order",
-        element: <PurchaseOrder />,
-      }
-    ],
-    isSublink: true,
+    element: <Precurement />,
+    isSublink: false,
   },
 
   {
@@ -202,6 +196,12 @@ const routes = [
         icon: <RiBillLine />,
         path: " taxInvoice",
         element: <Invoice />,
+      },
+      {
+        name: "Purchase Order",
+        icon: <ScanBarcode />,
+        path: "purchase-order",
+        element: <PurchaseOrder />,
       },
       {
         name: "Payments",
