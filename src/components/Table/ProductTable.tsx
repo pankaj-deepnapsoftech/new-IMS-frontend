@@ -223,8 +223,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         left: "100px", // Shifted to right of Product ID
                         zIndex: 3,
                         backgroundColor: colors.table.header,
-                        width: "220px",
-                        minWidth: "220px",
+                        width: "120px",
+                        minWidth: "120px",
                       }}
                     >
                       Name
@@ -340,8 +340,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                               index % 2 === 0
                                 ? colors.background.card
                                 : colors.table.stripe,
-                            width: "220px",
-                            minWidth: "220px",
+                            width: "120px",
+                            minWidth: "120px",
                           }}
                           title={row.original.name}
                         >
