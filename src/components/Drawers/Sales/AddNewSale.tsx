@@ -66,7 +66,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       comment: editTable?.comment || "",
       uom: editTable?.uom || "",
       productFile: editTable?.productFile || "",
-      bompdf: editTable?.bompdf|| "",
+      bompdf: editTable?.bompdf || "",
     },
     enableReinitialize: true,
     validationSchema: SalesFormValidation,
@@ -118,7 +118,6 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
           bompdf: bomImageUrl,
         };
 
-
         if (editTable?._id) {
           await axios.put(
             `${process.env.REACT_APP_BACKEND_URL}sale/update/${editTable._id}`,
@@ -131,8 +130,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
           );
           resetForm();
         } else {
-          
-        const res =  await axios.post(
+          const res = await axios.post(
             `${process.env.REACT_APP_BACKEND_URL}sale/create`,
             payload,
             {
@@ -141,7 +139,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
               },
             }
           );
-          console.log(res)
+          console.log(res);
           resetForm();
         }
 
@@ -198,7 +196,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       });
     }
   };
-  console.log(partiesData)
+  console.log(partiesData);
 
   useEffect(() => {
     fetchDropdownData();
@@ -226,7 +224,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
 
       {/* Drawer */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 right-0 z-50 w-full  sm:w-[55vw] md:w-[35vw] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
           show ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -253,171 +251,175 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
           <div className="flex-1 overflow-y-auto p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Party Selection */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <Users className="h-4 w-4 text-gray-500" />
-                  Merchant *
-                </label>
-                <select
-                  required
-                  name="party"
-                  value={values.party}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                >
-                  <option value="">Select a Merchant</option>
-                  {partiesData.map((party: any) => (
-                    <option key={party?._id} value={party?._id}>
-                      {party?.consignee_name?.length > 0
-                        ? ` Merchant Name - ${party.consignee_name}`
-                        : `Company Name - ${party.company_name}`}
-                    </option>
-                  ))}
-                </select>
-                {touched.party && errors.party && (
-                  <p className="text-red-500 text-sm">{errors.party}</p>
-                )}
-              </div>
-
-              {/* Product Selection */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <Package className="h-4 w-4 text-gray-500" />
-                  Product *
-                </label>
-                <select
-                  required
-                  name="product_id"
-                  value={values.product_id}
-                  onChange={(e) => {
-                    const selectedProductId = e.target.value;
-                    const selectedProduct = products.find(
-                      (prod) => prod._id === selectedProductId
-                    );
-                    setFieldValue("product_id", selectedProductId);
-                    if (selectedProduct?.uom) {
-                      setFieldValue("uom", selectedProduct.uom);
-                    } else {
-                      setFieldValue("uom", "");
-                    }
-                  }}
-                  onBlur={handleBlur}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                >
-                  <option value="">Select a product</option>
-                  {products.map((product: any) => (
-                    <option key={product?._id} value={product?._id}>
-                      {product?.name}
-                    </option>
-                  ))}
-                </select>
-                {touched.product_id && errors.product_id && (
-                  <p className="text-red-500 text-sm">{errors.product_id}</p>
-                )}
-              </div>
-
-              {/* Product Image Upload */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <FileImage className="h-4 w-4 text-gray-500" />
-                  Product Image
-                </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-colors">
-                  <input
-                    type="file"
-                    name="productFile"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        const url = URL.createObjectURL(file);
-                        setImagePreview(url);
-                        setImageFile(file);
-                        setFieldValue("productFile", file);
-                      }
-                    }}
-                    className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
-                  {imagePreview && (
-                    <div className="mt-4 relative">
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-full max-h-48 rounded-lg object-contain border border-gray-200"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setImagePreview(null);
-                          setImageFile(null);
-                          setFieldValue("productFile", null);
-                        }}
-                        className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
-                      >
-                        <IoClose size={16} />
-                      </button>
-                    </div>
+              {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4"> */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <Users className="h-4 w-4 text-gray-500" />
+                    Merchant *
+                  </label>
+                  <select
+                    required
+                    name="party"
+                    value={values.party}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                  >
+                    <option value="">Select a Merchant</option>
+                    {partiesData.map((party: any) => (
+                      <option key={party?._id} value={party?._id}>
+                        {party?.consignee_name?.length > 0
+                          ? ` Merchant Name - ${party.consignee_name}`
+                          : `Company Name - ${party.company_name}`}
+                      </option>
+                    ))}
+                  </select>
+                  {touched.party && errors.party && (
+                    <p className="text-red-500 text-sm">{errors.party}</p>
                   )}
                 </div>
-              </div>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <FileImage className="h-4 w-4 text-gray-500" />
-                  BOM PDF
-                </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-colors">
-                  <input
-                    type="file"
-                    name="bompdf"
-                    accept="application/pdf"
+
+                {/* Product Selection */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <Package className="h-4 w-4 text-gray-500" />
+                    Product *
+                  </label>
+                  <select
+                    required
+                    name="product_id"
+                    value={values.product_id}
                     onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        setBomFile(file);
-                        setBomPreview(file.name);
-                        setFieldValue("bompdf", file);
+                      const selectedProductId = e.target.value;
+                      const selectedProduct = products.find(
+                        (prod) => prod._id === selectedProductId
+                      );
+                      setFieldValue("product_id", selectedProductId);
+                      if (selectedProduct?.uom) {
+                        setFieldValue("uom", selectedProduct.uom);
+                      } else {
+                        setFieldValue("uom", "");
                       }
                     }}
-                    className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
-                  {bomPreview && (
-                    <div className="mt-4 flex items-center justify-between border px-3 py-2 rounded bg-gray-100 text-sm text-gray-700">
-                      <span>{bomPreview}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setBomFile(null);
-                          setBomPreview(null);
-                          setFieldValue("bompdf", null);
-                        }}
-                        className="p-1 bg-red-500 hover:bg-red-600 text-white rounded-full"
-                      >
-                        <IoClose size={16} />
-                      </button>
-                    </div>
+                    onBlur={handleBlur}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                  >
+                    <option value="">Select a product</option>
+                    {products.map((product: any) => (
+                      <option key={product?._id} value={product?._id}>
+                        {product?.name}
+                      </option>
+                    ))}
+                  </select>
+                  {touched.product_id && errors.product_id && (
+                    <p className="text-red-500 text-sm">{errors.product_id}</p>
                   )}
                 </div>
-              </div>
 
-              {/* UOM Field */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <Calculator className="h-4 w-4 text-gray-500" />
-                  Unit of Measurement (UOM)
-                </label>
-                <input
-                  type="text"
-                  name="uom"
-                  value={values.uom}
-                  readOnly
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-                  placeholder="Auto-filled from product selection"
-                />
-              </div>
+                {/* UOM Field */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <Calculator className="h-4 w-4 text-gray-500" />
+                    Unit of Measurement (UOM)
+                  </label>
+                  <input
+                    type="text"
+                    name="uom"
+                    value={values.uom}
+                    readOnly
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                    placeholder="Auto-filled from product selection"
+                  />
+                </div>
+              {/* </div> */}
 
-              {/* Price and Quantity Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> */}
+                {/* Product Image Upload */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <FileImage className="h-4 w-4 text-gray-500" />
+                    Product Image
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-colors">
+                    <input
+                      type="file"
+                      name="productFile"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const url = URL.createObjectURL(file);
+                          setImagePreview(url);
+                          setImageFile(file);
+                          setFieldValue("productFile", file);
+                        }
+                      }}
+                      className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                    {imagePreview && (
+                      <div className="mt-4 relative">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-full max-h-48 rounded-lg object-contain border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImagePreview(null);
+                            setImageFile(null);
+                            setFieldValue("productFile", null);
+                          }}
+                          className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+                        >
+                          <IoClose size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <FileImage className="h-4 w-4 text-gray-500" />
+                    BOM PDF
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-colors">
+                    <input
+                      type="file"
+                      name="bompdf"
+                      accept="application/pdf"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setBomFile(file);
+                          setBomPreview(file.name);
+                          setFieldValue("bompdf", file);
+                        }
+                      }}
+                      className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                    {bomPreview && (
+                      <div className="mt-4 flex items-center justify-between border px-3 py-2 rounded bg-gray-100 text-sm text-gray-700">
+                        <span>{bomPreview}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBomFile(null);
+                            setBomPreview(null);
+                            setFieldValue("bompdf", null);
+                          }}
+                          className="p-1 bg-red-500 hover:bg-red-600 text-white rounded-full"
+                        >
+                          <IoClose size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              {/* </div> */}
+
+              {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4"> */}
+                {/* Price and Quantity Row */}
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <DollarSign className="h-4 w-4 text-gray-500" />
@@ -457,41 +459,41 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                     <p className="text-red-500 text-sm">{errors.product_qty}</p>
                   )}
                 </div>
-              </div>
 
-              {/* GST Selection */}
-              <div className="space-y-3">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <Calculator className="h-4 w-4 text-gray-500" />
-                  GST Rate *
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {[18, 12, 5].map((rate) => (
-                    <label
-                      key={rate}
-                      className={`flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                        values.GST === String(rate)
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-300 hover:border-gray-400"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="GST"
-                        value={rate}
-                        checked={values.GST === String(rate)}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="sr-only"
-                      />
-                      <span className="font-medium">{rate}%</span>
-                    </label>
-                  ))}
+                {/* GST Selection */}
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <Calculator className="h-4 w-4 text-gray-500" />
+                    GST Rate *
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[18, 12, 5].map((rate) => (
+                      <label
+                        key={rate}
+                        className={`flex items-center justify-center p-2 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                          values.GST === String(rate)
+                            ? "border-blue-500 bg-blue-50 text-blue-700"
+                            : "border-gray-300 hover:border-gray-400"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="GST"
+                          value={rate}
+                          checked={values.GST === String(rate)}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          className="sr-only"
+                        />
+                        <span className="font-medium">{rate}%</span>
+                      </label>
+                    ))}
+                  </div>
+                  {touched.GST && errors.GST && (
+                    <p className="text-red-500 text-sm">{errors.GST}</p>
+                  )}
                 </div>
-                {touched.GST && errors.GST && (
-                  <p className="text-red-500 text-sm">{errors.GST}</p>
-                )}
-              </div>
+              {/* </div> */}
 
               {/* Remarks */}
               <div className="space-y-2">
