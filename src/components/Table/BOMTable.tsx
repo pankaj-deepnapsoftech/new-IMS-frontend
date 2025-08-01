@@ -10,6 +10,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import { toast } from "react-toastify";
 import Loading from "../../ui/Loading";
 import { FcApproval, FcDatabase } from "react-icons/fc";
 import {
@@ -56,6 +57,12 @@ const BOMTable: React.FC<BOMTableProps> = ({
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
   const [cookies] = useCookies()
+  
+  // Bulk selection states
+  const [selectedBoms, setSelectedBoms] = useState([]);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  
   const columns = useMemo(
     () => [
       { Header: "BOM Name", accessor: "bom_name" },
@@ -95,6 +102,52 @@ const BOMTable: React.FC<BOMTableProps> = ({
     useSortBy,
     usePagination
   );
+
+  // Bulk selection functions
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedBoms(page.map(row => row.original._id));
+    } else {
+      setSelectedBoms([]);
+    }
+  };
+
+  const handleSelectBom = (bomId, checked) => {
+    if (checked) {
+      setSelectedBoms(prev => [...prev, bomId]);
+    } else {
+      setSelectedBoms(prev => prev.filter(id => id !== bomId));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (isBulkDeleting || selectedBoms.length === 0 || !deleteBomHandler) return;
+    setIsBulkDeleting(true);
+
+    try {
+      // Call the delete handler for each selected BOM
+      const deletePromises = selectedBoms.map(bomId => 
+        deleteBomHandler(bomId)
+      );
+
+      await Promise.all(deletePromises);
+      
+      // Success feedback
+      toast.success(`Successfully deleted ${selectedBoms.length} BOM${selectedBoms.length > 1 ? 's' : ''}`);
+      
+      setSelectedBoms([]);
+      setShowBulkDeleteModal(false);
+    } catch (error) {
+      console.error("Error in bulk delete:", error);
+      toast.error("Failed to delete some BOMs. Please try again.");
+    } finally {
+      setIsBulkDeleting(false);
+    }
+  };
+
+  const isAllSelected = page.length > 0 && selectedBoms.length === page.length;
+  const isIndeterminate = selectedBoms.length > 0 && selectedBoms.length < page.length;
+
   return (
     <div className="p-6">
       {isLoadingBoms && (
@@ -159,7 +212,61 @@ const BOMTable: React.FC<BOMTableProps> = ({
                 >
                   {boms.length} BOM{boms.length !== 1 ? "s" : ""} Found
                 </h3>
+                {/* {selectedBoms.length > 0 && (
+                  <p
+                    className="text-sm mt-1"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    {selectedBoms.length} selected
+                  </p>
+                )} */}
               </div>
+
+              {/* Bulk Actions */}
+              {selectedBoms.length > 0 && (
+                <div className="flex items-center gap-3">
+                  {deleteBomHandler && (
+                    <button
+                      onClick={() => setShowBulkDeleteModal(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                      Delete Selected ({selectedBoms.length})
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setSelectedBoms([])}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    Clear Selection
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-3">
@@ -178,7 +285,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                   color: colors.text.primary,
                 }}
               >
-                {[5,10, 20, 50, 100, 100000].map((size) => (
+                {[5, 10, 20, 50, 100, 100000].map((size) => (
                   <option key={size} value={size}>
                     {size === 100000 ? "All" : size}
                   </option>
@@ -201,6 +308,24 @@ const BOMTable: React.FC<BOMTableProps> = ({
                   <tr
                     style={{ borderBottom: `1px solid ${colors.table.border}` }}
                   >
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{
+                        color: colors.table.headerText,
+                        width: "60px",
+                        minWidth: "60px",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isAllSelected}
+                        ref={(el) => {
+                          if (el) el.indeterminate = isIndeterminate;
+                        }}
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                    </th>
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -265,6 +390,26 @@ const BOMTable: React.FC<BOMTableProps> = ({
                         }}
                       >
                         <td
+                          className="px-4 py-3 text-sm whitespace-nowrap"
+                          style={{
+                            color: colors.text.secondary,
+                            width: "60px",
+                            minWidth: "60px",
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedBoms.includes(row.original._id)}
+                            onChange={(e) =>
+                              handleSelectBom(
+                                row.original._id,
+                                e.target.checked
+                              )
+                            }
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                          />
+                        </td>
+                        <td
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
                           style={{ color: colors.text.primary }}
                           title={row.original.bom_name}
@@ -289,7 +434,9 @@ const BOMTable: React.FC<BOMTableProps> = ({
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap"
                           style={{ color: colors.success[600] }}
                         >
-                          {cookies?.role === "admin" ? `₹${row.original.total_cost}` : "₹*****"}
+                          {cookies?.role === "admin"
+                            ? `₹${row.original.total_cost}`
+                            : "₹*****"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
@@ -297,8 +444,8 @@ const BOMTable: React.FC<BOMTableProps> = ({
                         >
                           {row.original.createdAt
                             ? moment(row.original.createdAt).format(
-                              "DD/MM/YYYY"
-                            )
+                                "DD/MM/YYYY"
+                              )
                             : "—"}
                         </td>
                         <td
@@ -307,8 +454,8 @@ const BOMTable: React.FC<BOMTableProps> = ({
                         >
                           {row.original.updatedAt
                             ? moment(row.original.updatedAt).format(
-                              "DD/MM/YYYY"
-                            )
+                                "DD/MM/YYYY"
+                              )
                             : "—"}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
@@ -532,7 +679,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                   className="rounded-lg p-4 mb-4"
                   style={{ backgroundColor: colors.error[50] }}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-center gap-3">
                     <svg
                       className="w-6 h-6 flex-shrink-0"
                       style={{ color: colors.error[500] }}
@@ -549,13 +696,13 @@ const BOMTable: React.FC<BOMTableProps> = ({
                     </svg>
                     <div>
                       <p
-                        className="font-medium"
+                        className="font-medium text-center"
                         style={{ color: colors.error[800] }}
                       >
                         Delete BOM
                       </p>
                       <p
-                        className="text-sm"
+                        className="text-sm text-center"
                         style={{ color: colors.error[600] }}
                       >
                         This action cannot be undone. All BOM data will be
@@ -590,6 +737,151 @@ const BOMTable: React.FC<BOMTableProps> = ({
                   }}
                 >
                   Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {showBulkDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-md mx-4 rounded-xl shadow-xl"
+            style={{ backgroundColor: colors.background.card }}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Confirm Bulk Deletion
+                </h2>
+                {!isBulkDeleting && (
+                  <button
+                    onClick={() => setShowBulkDeleteModal(false)}
+                    className="p-1 rounded-lg transition-colors hover:bg-gray-100"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      style={{ color: colors.text.secondary }}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              <div className="mb-6">
+                <div
+                  className="rounded-lg p-4 mb-4"
+                  style={{ backgroundColor: colors.error[50] }}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <svg
+                      className="w-6 h-6 flex-shrink-0"
+                      style={{ color: colors.error[500] }}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
+                    </svg>
+                    <div>
+                      <p
+                        className="font-medium text-center"
+                        style={{ color: colors.error[800] }}
+                      >
+                        Delete {selectedBoms.length} BOM
+                        {selectedBoms.length > 1 ? "s" : ""}
+                      </p>
+                      <p
+                        className="text-sm text-center"
+                        style={{ color: colors.error[600] }}
+                      >
+                        This action cannot be undone. All selected BOM data will
+                        be permanently removed from the system.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {isBulkDeleting && (
+                  <div
+                    className="rounded-lg p-4 mb-4"
+                    style={{ backgroundColor: colors.primary[50] }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="animate-spin rounded-full h-5 w-5 border-2 border-b-transparent"
+                        style={{ borderColor: colors.primary[500] }}
+                      ></div>
+                      <div>
+                        <p
+                          className="font-medium text-sm"
+                          style={{ color: colors.primary[800] }}
+                        >
+                          Deleting BOMs...
+                        </p>
+                        <p
+                          className="text-xs"
+                          style={{ color: colors.primary[600] }}
+                        >
+                          Please wait while we process your request.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowBulkDeleteModal(false)}
+                  disabled={isBulkDeleting}
+                  className="flex-1 px-4 py-2 rounded-lg border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    borderColor: colors.border.medium,
+                    color: colors.text.secondary,
+                    backgroundColor: colors.background.card,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={isBulkDeleting}
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: colors.error[500],
+                    color: colors.text.inverse,
+                  }}
+                >
+                  {isBulkDeleting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-b-transparent border-white"></div>
+                      Deleting...
+                    </>
+                  ) : (
+                    `Delete ${selectedBoms.length} BOM${
+                      selectedBoms.length > 1 ? "s" : ""
+                    }`
+                  )}
                 </button>
               </div>
             </div>

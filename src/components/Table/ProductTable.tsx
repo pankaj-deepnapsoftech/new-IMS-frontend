@@ -233,7 +233,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   )}
                   <button
                     onClick={() => setSelectedProducts([])}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white text-sm font-medium rounded-lg transition-colors"
                   >
                     <svg
                       className="w-4 h-4"
