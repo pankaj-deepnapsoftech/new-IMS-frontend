@@ -1,6 +1,6 @@
 import { background, Button } from "@chakra-ui/react";
 import { MdOutlineRefresh } from "react-icons/md";
-import { FiSearch } from "react-icons/fi";
+import { FiPlus, FiSearch } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { Flex } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +18,7 @@ import UserRoleTable from "../components/Table/UserRoleTable";
 import AddUserRole from "../components/Drawers/User Role/AddUserRole";
 import UserRoleDetails from "../components/Drawers/User Role/UserRoleDetails";
 import UpdateUserRole from "../components/Drawers/User Role/UpdateUserRole";
+import { colors } from "../theme/colors";
 
 const UserRole: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -195,30 +196,22 @@ const UserRole: React.FC = () => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button
+            <button
               onClick={openAddRoleDrawerHandler}
-              colorScheme="blue"
-              size="md"
-              leftIcon={
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-              }
-              className="shadow-lg hover:shadow-xl transition-all duration-200"
-              _hover={{ transform: "translateY(-1px)" }}
+              style={{
+                backgroundColor: colors.primary[600],
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = colors.primary[700];
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = colors.primary[600];
+              }}
+              className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
             >
+              <FiPlus size={16} />
               Add New Role
-            </Button>
+            </button>
             <Button
               onClick={fetchRolesHandler}
               leftIcon={<MdOutlineRefresh />}
