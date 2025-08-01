@@ -1,43 +1,44 @@
-import * as Yup from 'yup';
+//@ts-nocheck
+import * as Yup from "yup";
 
-const { string, array, object } = Yup;
+export const PartiesFromValidation = Yup.object({
+  type: Yup.string().required("Type is a required field"),
+  parties_type: Yup.string().required("Merchant Type is a required field"),
 
-export const PartiesFromValidation = object({
-  consignee_name: array()
-    .of(string().required("Consignee name is required"))
+  consignee_name: Yup.array()
+    .of(Yup.string().required("Consignee name is required"))
     .min(1, "At least one consignee name is required"),
 
-  // gst_add: string().required("GST address is required"),
-
-  // gst_in: array()
-  //   .of(string().required("GST IN is required"))
-  //   .min(1, "At least one GST IN is required"),
-
-  contact_number: array()
+  contact_number: Yup.array()
     .of(
-      string()
+      Yup.string()
         .matches(/^[0-9]{10}$/, "Contact number must be exactly 10 digits")
         .required("Contact number is required")
     )
     .min(1, "At least one contact number is required"),
 
-  // delivery_address: array()
-  //   .of(string().required("Delivery address is required"))
-  //   .min(1, "At least one delivery address is required"),
-
-  email_id: array()
-    .of(string().email("Invalid email").required("Email is required"))
+  email_id: Yup.array()
+    .of(Yup.string().email("Invalid email").required("Email is required"))
     .min(1, "At least one email is required"),
 
-  shipped_to: string().required("Shipped To address is required"),
+  shipped_to: Yup.string().required("Shipped To address is required"),
+  bill_to: Yup.string().required("Bill To address is required"),
 
-  bill_to: string().required("Bill To address is required"),
+  shipped_gst_to: Yup.string().when("type", {
+    is: (val) => val === "Company",
+    then: (schema) =>
+      schema
+        .required("Shipped To GST is required")
+        .matches(/^[A-Z0-9]{15}$/, "Shipped GSTIN must be exactly 15 characters, only uppercase letters and numbers"),
+    otherwise: (schema) => schema.strip(),
+  }),
 
-  shipped_gst_to: string().required("Shipped To GST is required"),
-
-  bill_gst_to: string().required("Bill To GST is required"),
-
-  type: string().required("Type is a required field"),
-
-  parties_type: string().required("Merchant Type is a required field"),
+  bill_gst_to: Yup.string().when("type", {
+    is: (val) => val === "Company",
+    then: (schema) =>
+      schema
+        .required("Bill To GST is required")
+        .matches(/^[A-Z0-9]{15}$/, "Bill GSTIN must be exactly 15 characters, only uppercase letters and numbers"),
+    otherwise: (schema) => schema.strip(),
+  }),
 });

@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import AddItems from "../../Dynamic Add Components/AddItems";
 import { colors } from "../../../theme/colors";
-import { generateProformaInvoicePDF, downloadPDF } from "../../utils/pdfGenerator";
 
 interface AddProformaInvoiceProps {
   closeDrawerHandler: () => void;
@@ -79,28 +78,6 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
 
   const [addProformaInvoice] = useCreateProformaInvoiceMutation();
 
-  const generateAndDownloadPDF = (invoiceData: any) => {
-    try {
-      // Get buyer/supplier data
-      const buyerData = buyers.find(b => b._id === buyer?.value);
-      const supplierData = suppliers.find(s => s._id === supplier?.value);
-
-      const pdfData = {
-        ...invoiceData,
-        buyer: buyerData,
-        supplier: supplierData,
-        tax: tax
-      };
-
-      const doc = generateProformaInvoicePDF(pdfData, inputs, allItems);
-      const filename = `Proforma_Invoice_${proformaInvoiceNo || 'draft'}.pdf`;
-      downloadPDF(doc, filename);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast.error('Failed to generate PDF');
-    }
-  };
-
   const addProformaInvoiceHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -129,10 +106,6 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       if (!response.success) {
         throw new Error(response.message);
       }
-
-      // Generate and download PDF after successful creation
-      generateAndDownloadPDF(data);
-
       toast.success(response.message);
       closeDrawerHandler();
       fetchProformaInvoicesHandler();
@@ -159,12 +132,11 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
         throw new Error(data.message);
       }
 
-      const buyersData = data.agents.map((buyer: any) => ({
+      const buyers = data.agents.map((buyer: any) => ({
         value: buyer._id,
         label: buyer.name,
       }));
-      setBuyerOptions(buyersData);
-      setBuyers(data.agents); // Store full buyer data
+      setBuyerOptions(buyers);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
@@ -308,6 +280,253 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
 
       <div className="mt-8 px-5">
         <form onSubmit={addProformaInvoiceHandler}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Category
+              </FormLabel>
+              <Select
+                value={category}
+                options={categoryOptions}
+                required={true}
+                onChange={(e: any) => setCategory(e)}
+                styles={{
+                  control: (provided: any) => ({
+                    ...provided,
+                    backgroundColor: "white",
+                    borderColor: "#d1d5db",
+                    color: "#374151",
+                    minHeight: "40px",
+                    "&:hover": {
+                      borderColor: "#9ca3af",
+                    },
+                  }),
+                  option: (provided: any, state: any) => ({
+                    ...provided,
+                    backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                    color: "#374151",
+                    "&:hover": {
+                      backgroundColor: "#f3f4f6",
+                    },
+                  }),
+                  placeholder: (provided: any) => ({
+                    ...provided,
+                    color: "#9ca3af",
+                  }),
+                  singleValue: (provided: any) => ({
+                    ...provided,
+                    color: "#374151",
+                  }),
+                  menu: (provided: any) => ({
+                    ...provided,
+                    zIndex: 9999,
+                    backgroundColor: "white",
+                    border: "1px solid #d1d5db",
+                  }),
+                }}
+              />
+            </FormControl>
+            {category && category.value === "sales" && (
+              <FormControl className="mt-3 mb-5" isRequired>
+                <FormLabel fontWeight="bold" color="gray.700">
+                  Buyer
+                </FormLabel>
+                <Select
+                  value={buyer}
+                  options={buyerOptions}
+                  required={true}
+                  onChange={(e: any) => setBuyer(e)}
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      backgroundColor: "white",
+                      borderColor: "#d1d5db",
+                      color: "#374151",
+                      minHeight: "40px",
+                      "&:hover": {
+                        borderColor: "#9ca3af",
+                      },
+                    }),
+                    option: (provided: any, state: any) => ({
+                      ...provided,
+                      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                      color: "#374151",
+                      "&:hover": {
+                        backgroundColor: "#f3f4f6",
+                      },
+                    }),
+                    placeholder: (provided: any) => ({
+                      ...provided,
+                      color: "#9ca3af",
+                    }),
+                    singleValue: (provided: any) => ({
+                      ...provided,
+                      color: "#374151",
+                    }),
+                    menu: (provided: any) => ({
+                      ...provided,
+                      zIndex: 9999,
+                      backgroundColor: "white",
+                      border: "1px solid #d1d5db",
+                    }),
+                  }}
+                />
+              </FormControl>
+            )}
+            {category && category.value === "purchase" && (
+              <FormControl className="mt-3 mb-5" isRequired>
+                <FormLabel fontWeight="bold" color="gray.700">
+                  Supplier
+                </FormLabel>
+                <Select
+                  value={supplier}
+                  options={supplierOptions}
+                  required={true}
+                  onChange={(e: any) => setSupplier(e)}
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      backgroundColor: "white",
+                      borderColor: "#d1d5db",
+                      color: "#374151",
+                      minHeight: "40px",
+                      "&:hover": {
+                        borderColor: "#9ca3af",
+                      },
+                    }),
+                    option: (provided: any, state: any) => ({
+                      ...provided,
+                      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                      color: "#374151",
+                      "&:hover": {
+                        backgroundColor: "#f3f4f6",
+                      },
+                    }),
+                    placeholder: (provided: any) => ({
+                      ...provided,
+                      color: "#9ca3af",
+                    }),
+                    singleValue: (provided: any) => ({
+                      ...provided,
+                      color: "#374151",
+                    }),
+                    menu: (provided: any) => ({
+                      ...provided,
+                      zIndex: 9999,
+                      backgroundColor: "white",
+                      border: "1px solid #d1d5db",
+                    }),
+                  }}
+                />
+              </FormControl>
+            )}
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Proforma Invoice No.
+              </FormLabel>
+              <Input
+                className="border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                value={proformaInvoiceNo}
+                onChange={(e) => setProformaInvoiceNo(e.target.value)}
+                type="text"
+                placeholder="Proforma Invoice No."
+                bg="white"
+                color="gray.700"
+                _placeholder={{ color: "gray.500" }}
+              />
+            </FormControl>
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Document Date
+              </FormLabel>
+              <Input
+                value={documentDate}
+                className="border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                onChange={(e) => setDocumentDate(e.target.value)}
+                type="date"
+                placeholder="Document Date"
+                bg="white"
+                color="gray.700"
+              />
+            </FormControl>
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Sales Order Date
+              </FormLabel>
+              <Input
+                value={salesOrderDate}
+                className="border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                onChange={(e) => setSalesOrderDate(e.target.value)}
+                type="date"
+                placeholder="Sales Order Date"
+                bg="white"
+                color="gray.700"
+              />
+            </FormControl>
+
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Store
+              </FormLabel>
+              <Select
+                value={store}
+                options={storeOptions}
+                required={true}
+                onChange={(e: any) => setStore(e)}
+                styles={{
+                  control: (provided: any) => ({
+                    ...provided,
+                    backgroundColor: "white",
+                    borderColor: "#d1d5db",
+                    color: "#374151",
+                    minHeight: "40px",
+                    "&:hover": {
+                      borderColor: "#9ca3af",
+                    },
+                  }),
+                  option: (provided: any, state: any) => ({
+                    ...provided,
+                    backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                    color: "#374151",
+                    "&:hover": {
+                      backgroundColor: "#f3f4f6",
+                    },
+                  }),
+                  placeholder: (provided: any) => ({
+                    ...provided,
+                    color: "#9ca3af",
+                  }),
+                  singleValue: (provided: any) => ({
+                    ...provided,
+                    color: "#374151",
+                  }),
+                  menu: (provided: any) => ({
+                    ...provided,
+                    zIndex: 9999,
+                    backgroundColor: "white",
+                    border: "1px solid #d1d5db",
+                  }),
+                }}
+              />
+            </FormControl>
+            <FormControl className="mt-3 mb-5">
+              <FormLabel fontWeight="bold" color="gray.700">
+                Note
+              </FormLabel>
+              <input
+                className="border border-gray-300 w-full px-3 py-2 rounded-md bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700 resize-none"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Write your notes..."
+              />
+            </FormControl>
+          </div>
+          <FormControl className="mt-3 mb-5" isRequired>
+            <FormLabel fontWeight="bold" color="gray.700">
+              Items
+            </FormLabel>
+            <AddItems inputs={inputs} setInputs={setInputs} />
+          </FormControl>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
@@ -320,7 +539,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
                 type="number"
                 placeholder="Subtotal"
                 bg="gray.50"
-                color="gray.700"
+                color="gray.900"
                 _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
@@ -378,7 +597,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
                 value={total}
                 isDisabled={true}
                 bg="gray.50"
-                color="gray.700"
+                color="gray.900"
               />
             </FormControl>
           </div>
@@ -398,4 +617,4 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
   );
 };
 
-export default AddProformaInvoice; 
+export default AddProformaInvoice;

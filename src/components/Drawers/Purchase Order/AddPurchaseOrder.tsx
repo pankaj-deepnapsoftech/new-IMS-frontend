@@ -71,65 +71,98 @@ const AddPurchaseOrder = ({
 }: AddPurchaseOrderProps) => {
   const [cookies] = useCookies();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [supplierOptions, setSupplierOptions] = useState<
+    { value: string; label: string }[] | []
+  >([]);
   // Color scheme
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const headingColor = useColorModeValue("gray.700", "gray.200");
   const textColor = useColorModeValue("gray.600", "gray.300");
 
-  // Validation schema
-  const validationSchema = Yup.object({
-    companyName: Yup.string().required("Company name is required"),
-    companyAddress: Yup.string().required("Company address is required"),
-    companyGST: Yup.string().required("GST details are required"),
-    poOrder: Yup.string().required("PO Order is required"),
-    supplierName: Yup.string().required("supplier name is required"),
-    supplierGST: Yup.string().required("supplier GST is required"),
-    supplierAddress: Yup.string().required("supplier address is required"),
-    panDetails: Yup.string().required("PAN details are required"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    freightCharges: Yup.string(),
-    packagingAndForwarding: Yup.string(),
-    modeOfPayment: Yup.string().required("Mode of payment is required"),
-    deliveryAddress: Yup.string().required("Delivery address is required"),
-    deliveryPeriod: Yup.string().required("Delivery period is required"),
-    billingAddress: Yup.string().required("Billing address is required"),
-    paymentTerms: Yup.string().required("Payment terms are required"),
-    remarks: Yup.string(),
-  });
+  // const validationSchema = Yup.object({
+  //   companyName: Yup.string().required("Company name is required"),
+  //   companyAddress: Yup.string().required("Company address is required"),
+  //   companyPhoneNumber: Yup.string().required("Company phone number is required"),
+  //   companyEmail: Yup.string().email("Invalid email").required("Company email is required"),
+  //   companyWebsite: Yup.string().required("Company website is required"),
+  //   companyGST: Yup.string().required("Company GST is required"),
+  //   companyPan: Yup.string().required("Company PAN is required"),
+
+  //   poOrder: Yup.string().required("PO Order is required"),
+  //   date: Yup.string().required("Date is required"),
+
+  //   supplierCode: Yup.string().required("Supplier code is required"),
+  //   supplierName: Yup.string().required("Supplier name is required"),
+  //   supplierPan: Yup.string().required("Supplier PAN is required"),
+  //   supplierEmail: Yup.string().email("Invalid email").required("Supplier email is required"),
+
+  //   supplierShippedTo: Yup.string().required("Supplier shipped to is required"),
+  //   supplierBillTo: Yup.string().required("Supplier bill to is required"),
+  //   supplierShippedGSTIN: Yup.string().required("Shipped GSTIN is required"),
+  //   supplierBillGSTIN: Yup.string().required("Bill GSTIN is required"),
+
+  //   GSTApply: Yup.string().required("GST selection is required"),
+  //   packagingAndForwarding: Yup.string().required("Packaging and forwarding is required"),
+  //   freightCharges: Yup.string(), // optional
+  //   modeOfPayment: Yup.string().required("Mode of payment is required"),
+  //   deliveryAddress: Yup.string().required("Delivery address is required"),
+  //   deliveryPeriod: Yup.string().required("Delivery period is required"),
+  //   billingAddress: Yup.string().required("Billing address is required"),
+  //   paymentTerms: Yup.string().required("Payment terms are required"),
+
+  //   additionalRemarks: Yup.string(), // optional
+  //   additionalImportant: Yup.string(), // optional
+  // });
+
 
   const formik = useFormik({
     initialValues: {
       companyName: edittable?.companyName || "",
       companyAddress: edittable?.companyAddress || "",
+      companyPhoneNumber: edittable?.companyPhoneNumber || "",
+      companyEmail: edittable?.companyEmail || "",
+      companyWebsite: edittable?.companyWebsite || "",
       companyGST: edittable?.companyGST || "",
+      companyPan: edittable?.companyPan || "",
+
       poOrder: edittable?.poOrder || "",
+      date: edittable?.date || new Date().toISOString().split("T")[0],
+
+      supplierCode: edittable?.supplierCode || "",
       supplierName: edittable?.supplierName || "",
-      supplierGST: edittable?.supplierGST || "",
-      supplierAddress: edittable?.supplierAddress || "",
-      panDetails: edittable?.panDetails || "",
-      email: edittable?.email || "",
-      freightCharges: edittable?.freightCharges || "",
+      supplierPan: edittable?.supplierPan || "",
+      supplierEmail: edittable?.supplierEmail || "",
+
+      supplierShippedTo: edittable?.supplierShippedTo || "",
+      supplierBillTo: edittable?.supplierBillTo || "",
+      supplierShippedGSTIN: edittable?.supplierShippedGSTIN || "",
+      supplierBillGSTIN: edittable?.supplierBillGSTIN || "",
+
+      GSTApply: edittable?.GSTApply || "",
+
       packagingAndForwarding: edittable?.packagingAndForwarding || "",
+      freightCharges: edittable?.freightCharges || "",
       modeOfPayment: edittable?.modeOfPayment || "",
       deliveryAddress: edittable?.deliveryAddress || "",
       deliveryPeriod: edittable?.deliveryPeriod || "",
       billingAddress: edittable?.billingAddress || "",
       paymentTerms: edittable?.paymentTerms || "",
-      remarks: edittable?.remarks || "",
+
+      additionalRemarks: edittable?.additionalRemarks || "",
+      additionalImportant: edittable?.additionalImportant || "",
     },
+
+    // validationSchema,
     enableReinitialize: true,
-    validationSchema,
     onSubmit: async (values) => {
       if (isSubmitting) return;
       setIsSubmitting(true);
 
       try {
-        let res;
 
         if (edittable?._id) {
-          res = await axios.put(
+          const res = await axios.put(
             `${process.env.REACT_APP_BACKEND_URL}purchase-order/put/${edittable._id}`,
             values,
             {
@@ -139,21 +172,18 @@ const AddPurchaseOrder = ({
             }
           );
         } else {
-          res = await axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}purchase-order/create`,
-            values,
-            {
-              headers: {
-                Authorization: `Bearer ${cookies?.access_token}`,
-              },
-            }
+          const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}purchase-order/`, values, {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          });
+    
+          toast.success(
+            res?.data?.message || "Purchase order saved successfully!"
           );
+          console.log(res)
         }
 
-        toast.success(
-          res?.data?.message || "Purchase order saved successfully!"
-        );
-        fetchPurchaseOrderData();
+      
+        // fetchPurchaseOrderData();
         formik.resetForm();
         setshowData(false);
         setEditTable(null);
@@ -165,7 +195,43 @@ const AddPurchaseOrder = ({
       }
     },
   });
+  const fetchSuppliersHandler = async () => {
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "purchase-order/suppliers",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
 
+      const data = await response.json();
+      const suppliers = data.suppliers.map((supplier: any) => ({
+        ...supplier,
+      }));
+      setSupplierOptions(suppliers);
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      console.log("Fetched suppliers:", data.suppliers);
+
+
+      // setSupplierOptions(data.suppliers); // full array with all fields
+
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    }
+  };
+
+
+
+  useEffect(() => {
+    fetchSuppliersHandler()
+  }, [])
   return (
     <>
       {/* Drawer */}
@@ -184,7 +250,7 @@ const AddPurchaseOrder = ({
             className="text-xl font-semibold"
             style={{ color: colors.text.primary }}
           >
-            Add New Proforma Invoice
+            Add New Purchase Order
           </h1>
           <button
             onClick={closeDrawerHandler}
@@ -272,7 +338,8 @@ const AddPurchaseOrder = ({
                     {/* <GridItem> */}
                     <FormControl
                       isInvalid={
-                        formik.touched.companyGST && formik.errors.companyGST
+                        formik.touched.companyWebsite &&
+                        formik.errors.companyWebsite
                       }
                     >
                       <FormLabel
@@ -284,22 +351,15 @@ const AddPurchaseOrder = ({
                         fontWeight="medium"
                       >
                         <FileSpreadsheet size={16} />
-                        Company GSTIN *
+                        Company Website *
                       </FormLabel>
                       <Input
-                        name="companyGST"
-                        value={formik.values.companyGST}
-                        onChange={(e) => {
-                          const uppercase = e.target.value
-                            .toUpperCase()
-                            .replace(/[^A-Z0-9]/g, "");
-                          formik.setFieldValue(
-                            "companyGST",
-                            uppercase.slice(0, 15)
-                          );
-                        }}
+                        name="companyWebsite"
+                        value={formik.values.companyWebsite}
+                        onChange={ formik.handleChange
+                        }
                         onBlur={formik.handleBlur}
-                        placeholder="Enter GSTIN"
+                        placeholder="Enter companyWebsite URL"
                         size="lg"
                         borderRadius="lg"
                         _focus={{
@@ -307,18 +367,97 @@ const AddPurchaseOrder = ({
                           boxShadow: "0 0 0 1px #3182CE",
                         }}
                       />
-                      {formik.touched.companyGST &&
-                        formik.errors.companyGST && (
+                      {formik.touched.companyWebsite &&
+                        formik.errors.companyWebsite && (
                           <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.companyGST}
+                            {formik.errors.companyWebsite}
                           </Text>
                         )}
                     </FormControl>
                     {/* </GridItem> */}
-                  </div>
 
-                  {/* <GridItem> */}
-                  <div className="mt-4">
+                    <FormControl
+                      isInvalid={
+                        formik.touched.companyPhoneNumber &&
+                        formik.errors.companyPhoneNumber
+                      }
+                    >
+                      <FormLabel
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        color={textColor}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        <BiUser size={16} />
+                        Phone Number *
+                      </FormLabel>
+                      <Input
+                        name="companyPhoneNumber"
+                        value={formik.values.companyPhoneNumber}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        placeholder="Enter company name"
+                        size="lg"
+                        borderRadius="lg"
+                        _focus={{
+                          borderColor: "blue.500",
+                          boxShadow: "0 0 0 1px #3182CE",
+                        }}
+                      />
+                      {formik.touched.companyPhoneNumber &&
+                        formik.errors.companyPhoneNumber && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {formik.errors.companyPhoneNumber}
+                          </Text>
+                        )}
+                    </FormControl>
+                    {/* </GridItem> */}
+
+                    {/* <GridItem> */}
+                    <FormControl
+                      isInvalid={
+                        formik.touched.companyEmail &&
+                        formik.errors.companyEmail
+                      }
+                    >
+                      <FormLabel
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        color={textColor}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        <FileSpreadsheet size={16} />
+                        Company Email *
+                      </FormLabel>
+                      <Input
+                        name="companyEmail"
+                        value={formik.values.companyEmail}
+                        onChange={
+                          formik.handleChange
+                        }
+                        onBlur={formik.handleBlur}
+                        placeholder="Enter companyEmail"
+                        size="lg"
+                        borderRadius="lg"
+                        _focus={{
+                          borderColor: "blue.500",
+                          boxShadow: "0 0 0 1px #3182CE",
+                        }}
+                      />
+                      {formik.touched.companyEmail &&
+                        formik.errors.companyEmail && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {formik.errors.companyEmail}
+                          </Text>
+                        )}
+                    </FormControl>
+                    {/* </GridItem> */}
+
+                    {/* <GridItem> */}
                     <FormControl
                       isInvalid={
                         formik.touched.companyAddress &&
@@ -353,6 +492,51 @@ const AddPurchaseOrder = ({
                         formik.errors.companyAddress && (
                           <Text color="red.500" fontSize="sm" mt={1}>
                             {formik.errors.companyAddress}
+                          </Text>
+                        )}
+                    </FormControl>
+
+                    <FormControl
+                      isInvalid={
+                        formik.touched.companyGST && formik.errors.companyGST
+                      }
+                    >
+                      <FormLabel
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        color={textColor}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        <FileSpreadsheet size={16} />
+                        Company GST *
+                      </FormLabel>
+                      <Input
+                        name="companyGST"
+                        value={formik.values.companyGST}
+                        onChange={(e) => {
+                          const uppercase = e.target.value
+                            .toUpperCase()
+                            .replace(/[^A-Z0-9]/g, "");
+                          formik.setFieldValue(
+                            "companyGST",
+                            uppercase.slice(0, 15)
+                          );
+                        }}
+                        onBlur={formik.handleBlur}
+                        placeholder="Enter GSTIN"
+                        size="lg"
+                        borderRadius="lg"
+                        _focus={{
+                          borderColor: "blue.500",
+                          boxShadow: "0 0 0 1px #3182CE",
+                        }}
+                      />
+                      {formik.touched.companyGST &&
+                        formik.errors.companyGST && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {formik.errors.companyGST}
                           </Text>
                         )}
                     </FormControl>
@@ -423,10 +607,7 @@ const AddPurchaseOrder = ({
 
                     <GridItem>
                       <FormControl
-                        isInvalid={
-                          formik.touched.supplierName &&
-                          formik.errors.supplierName
-                        }
+                        isInvalid={formik.touched.date && formik.errors.date}
                       >
                         <FormLabel
                           display="flex"
@@ -436,15 +617,15 @@ const AddPurchaseOrder = ({
                           fontSize="sm"
                           fontWeight="medium"
                         >
-                          <BiUser size={16} />
-                          Supplier Name *
+                          <BiCalendar size={16} />
+                          Order Date *
                         </FormLabel>
                         <Input
-                          name="supplierName"
-                          value={formik.values.supplierName}
+                          type="date"
+                          name="date"
+                          value={formik.values.date}
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
-                          placeholder="Enter Supplier name"
                           size="lg"
                           borderRadius="lg"
                           _focus={{
@@ -452,108 +633,149 @@ const AddPurchaseOrder = ({
                             boxShadow: "0 0 0 1px #3182CE",
                           }}
                         />
-                        {formik.touched.supplierName &&
-                          formik.errors.supplierName && (
-                            <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.supplierName}
-                            </Text>
-                          )}
+                        {formik.touched.date && formik.errors.date && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {formik.errors.date}
+                          </Text>
+                        )}
                       </FormControl>
                     </GridItem>
-
-                    <GridItem>
-                      <FormControl
-                        isInvalid={
-                          formik.touched.supplierGST &&
-                          formik.errors.supplierGST
-                        }
-                      >
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
+                    <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                      {/* Supplier Name Dropdown */}
+                      <GridItem>
+                        <FormControl
+                          isInvalid={formik.touched.supplierName && formik.errors.supplierName}
                         >
-                          <FileSpreadsheet size={16} />
-                          Supplier GSTIN *
-                        </FormLabel>
-                        <Input
-                          name="supplierGST"
-                          value={formik.values.supplierGST}
-                          onChange={(e) => {
-                            const uppercase = e.target.value
-                              .toUpperCase()
-                              .replace(/[^A-Z0-9]/g, "");
-                            formik.setFieldValue(
-                              "supplierGST",
-                              uppercase.slice(0, 15)
-                            );
-                          }}
-                          onBlur={formik.handleBlur}
-                          placeholder="Enter Supplier GSTIN"
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
-                        />
-                        {formik.touched.supplierGST &&
-                          formik.errors.supplierGST && (
-                            <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.supplierGST}
-                            </Text>
-                          )}
-                      </FormControl>
-                    </GridItem>
+                          <FormLabel
+                            display="flex"
+                            alignItems="center"
+                            gap={2}
+                            color={textColor}
+                            fontSize="sm"
+                            fontWeight="medium"
+                          >
+                            <BiUser size={16} />
+                            Supplier Name *
+                          </FormLabel>
+                          <Select
+                            placeholder="Select Supplier"
+                            name="supplierName"
+                            value={formik.values.supplierName}
+                            onChange={(e) => {
+                              const selectedName = e.target.value;
+                              formik.setFieldValue("supplierName", selectedName);
 
-                    <GridItem>
-                      <FormControl
-                        isInvalid={
-                          formik.touched.supplierAddress &&
-                          formik.errors.supplierAddress
-                        }
-                      >
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <BiMapPin size={16} />
-                          Address *
-                        </FormLabel>
+                              const matched = supplierOptions.find(
+                                (supplier) => supplier.supplierName === selectedName
+                              );
+
+                              if (matched) {
+                                formik.setValues({
+                                  ...formik.values,
+                                  ...matched, // this will auto-fill matching fields
+                                });
+                              }
+                            }}
+                            size="lg"
+                            borderRadius="lg"
+                          >
+                            {supplierOptions.map((supplier, i) => (
+                              <option key={i} value={supplier.supplierName}>
+                                {supplier.supplierName}
+                              </option>
+                            ))}
+                          </Select>
+
+                        </FormControl>
+                      </GridItem>
+
+                      {/* Supplier Code */}
+                      <GridItem>
+                        <FormLabel>Supplier Code</FormLabel>
                         <Input
-                          name="supplierAddress"
-                          value={formik.values.supplierAddress}
+                          name="supplierCode"
+                          value={formik.values.supplierCode}
                           onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="Enter supplier address"
                           size="lg"
-                          borderRadius="lg"
-                          rows={3}
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
                         />
-                        {formik.touched.supplierAddress &&
-                          formik.errors.supplierAddress && (
-                            <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.supplierAddress}
-                            </Text>
-                          )}
-                      </FormControl>
-                    </GridItem>
+                      </GridItem>
+
+                      {/* Supplier GST */}
+                      <GridItem>
+                        <FormLabel> Shipped GSTIN</FormLabel>
+                        <Input
+                          name="supplierShippedGSTIN"
+                          value={formik.values.supplierShippedGSTIN}
+                          onChange={formik.handleChange}
+                          size="lg"
+                        />
+                      </GridItem>
+                      <GridItem>
+                        <FormLabel> Bill GSTIN</FormLabel>
+                        <Input
+                          name="supplierBillGSTIN
+"
+                          value={formik.values.supplierBillGSTIN
+                          }
+                          onChange={formik.handleChange}
+                          size="lg"
+                        />
+                      </GridItem>
+                      {/* Supplier Address */}
+
+
+
+                      <GridItem>
+                        <FormLabel> ShippedTo </FormLabel>
+                        <Input
+                          name="supplierShippedTo"
+                          value={formik.values.supplierShippedTo}
+                          onChange={formik.handleChange}
+                          size="lg"
+                        />
+                      </GridItem>
+                      <GridItem>
+                        <FormLabel> Bill To</FormLabel>
+                        <Input
+                          name="supplierBillTo
+"
+                          value={formik.values.supplierBillTo
+                          }
+                          onChange={formik.handleChange}
+                          size="lg"
+                        />
+                      </GridItem>
+                      {/* Supplier Email */}
+                      {/* <GridItem>
+                        <FormLabel>Supplier Email</FormLabel>
+                        <Input
+                          name="supplierEmail"
+                          value={formik.values.supplierEmail}
+                          onChange={formik.handleChange}
+                          size="lg"
+                        />
+                      </GridItem> */}
+
+                      {/* Supplier PAN */}
+                      {/* <GridItem>
+                        <FormLabel>Supplier PAN</FormLabel>
+                        <Input
+                          name="supplierPan"
+                          value={formik.values.supplierPan}
+                          onChange={formik.handleChange}
+                          size="lg"
+                        />
+                      </GridItem> */}
+                    </Grid>
+
+
+
 
                     <GridItem>
                       <FormControl
                         isInvalid={
-                          formik.touched.panDetails && formik.errors.panDetails
+                          formik.touched.supplierPan &&
+                          formik.errors.supplierPan
                         }
                       >
                         <FormLabel
@@ -568,8 +790,8 @@ const AddPurchaseOrder = ({
                           Pan Details *
                         </FormLabel>
                         <Input
-                          name="panDetails"
-                          value={formik.values.panDetails}
+                          name="supplierPan"
+                          value={formik.values.supplierPan}
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
                           placeholder="Enter PAN details"
@@ -580,10 +802,10 @@ const AddPurchaseOrder = ({
                             boxShadow: "0 0 0 1px #3182CE",
                           }}
                         />
-                        {formik.touched.panDetails &&
-                          formik.errors.panDetails && (
+                        {formik.touched.supplierPan &&
+                          formik.errors.supplierPan && (
                             <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.panDetails}
+                              {formik.errors.supplierPan}
                             </Text>
                           )}
                       </FormControl>
@@ -591,7 +813,10 @@ const AddPurchaseOrder = ({
 
                     <GridItem>
                       <FormControl
-                        isInvalid={formik.touched.email && formik.errors.email}
+                        isInvalid={
+                          formik.touched.supplierEmail &&
+                          formik.errors.supplierEmail
+                        }
                       >
                         <FormLabel
                           display="flex"
@@ -605,12 +830,12 @@ const AddPurchaseOrder = ({
                           Email *
                         </FormLabel>
                         <Input
-                          name="email"
-                          type="email"
-                          value={formik.values.email}
+                          name="supplierEmail"
+                          type="supplierEmail"
+                          value={formik.values.supplierEmail}
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
-                          placeholder="Enter email address"
+                          placeholder="Enter supplierEmail address"
                           size="lg"
                           borderRadius="lg"
                           _focus={{
@@ -618,11 +843,12 @@ const AddPurchaseOrder = ({
                             boxShadow: "0 0 0 1px #3182CE",
                           }}
                         />
-                        {formik.touched.email && formik.errors.email && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.email}
-                          </Text>
-                        )}
+                        {formik.touched.supplierEmail &&
+                          formik.errors.supplierEmail && (
+                            <Text color="red.500" fontSize="sm" mt={1}>
+                              {formik.errors.supplierEmail}
+                            </Text>
+                          )}
                       </FormControl>
                     </GridItem>
                   </Grid>
@@ -1022,12 +1248,42 @@ const AddPurchaseOrder = ({
                           Additional Remarks
                         </FormLabel>
                         <Textarea
-                          name="remarks"
-                          value={formik.values.remarks}
+                          name="additionalRemarks"
+                          value={formik.values.additionalRemarks}
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
-                          placeholder="Enter any additional remarks or notes"
-                          size="lg"
+                          placeholder="Enter any additional remarks"
+                          size="md"
+                          borderRadius="lg"
+                          rows={3}
+                          _focus={{
+                            borderColor: "blue.500",
+                            boxShadow: "0 0 0 1px #3182CE",
+                          }}
+                        />
+                      </FormControl>
+                    </GridItem>
+
+                    <GridItem colSpan={{ base: 1, md: 3 }}>
+                      <FormControl>
+                        <FormLabel
+                          display="flex"
+                          alignItems="center"
+                          gap={2}
+                          color={textColor}
+                          fontSize="sm"
+                          fontWeight="medium"
+                        >
+                          <BiEdit size={16} />
+                          Additional Important Terms
+                        </FormLabel>
+                        <Textarea
+                          name="additionalImportant"
+                          value={formik.values.additionalImportant}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          placeholder="Enter any additional terms"
+                          size="md"
                           borderRadius="lg"
                           rows={3}
                           _focus={{

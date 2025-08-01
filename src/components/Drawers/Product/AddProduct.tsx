@@ -58,6 +58,8 @@ const AddProduct: React.FC<AddProductProps> = ({
   const [inventoryCategory, setInventoryCategory] = useState<
     { value: string; label: string } | undefined
   >();
+  // const [category, setCategory] = useState(null);
+  const [newCategory, setNewCategory] = useState("");
   const [showNewUOMInput, setShowNewUOMInput] = useState(false);
   const [newUOM, setNewUOM] = useState("");
   const [uomOptions, setUomOptions] = useState([
@@ -94,8 +96,7 @@ const AddProduct: React.FC<AddProductProps> = ({
     { value: "direct", label: "Direct" },
     { value: "indirect", label: "Indirect" },
   ];
-
-  const categoryOptions = [
+  const [categoryOptions, setCategoryOptions] = useState([
     { value: "finished goods", label: "Finished Goods" },
     { value: "raw materials", label: "Raw Materials" },
     { value: "semi finished goods", label: "Semi Finished Goods" },
@@ -103,7 +104,18 @@ const AddProduct: React.FC<AddProductProps> = ({
     { value: "bought out parts", label: "Bought Out Parts" },
     { value: "trading goods", label: "Trading Goods" },
     { value: "service", label: "Service" },
-  ];
+  ])
+  
+
+  // const categoryOptions = [
+  //   { value: "finished goods", label: "Finished Goods" },
+  //   { value: "raw materials", label: "Raw Materials" },
+  //   { value: "semi finished goods", label: "Semi Finished Goods" },
+  //   { value: "consumables", label: "Consumables" },
+  //   { value: "bought out parts", label: "Bought Out Parts" },
+  //   { value: "trading goods", label: "Trading Goods" },
+  //   { value: "service", label: "Service" },
+  // ];
 
   const itemTypeOptions = [
     { value: "buy", label: "Buy" },
@@ -151,6 +163,7 @@ const AddProduct: React.FC<AddProductProps> = ({
 
   const addProductHandler = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(category )
     try {
       const response = await addProduct({
         name,
@@ -173,7 +186,7 @@ const AddProduct: React.FC<AddProductProps> = ({
         distributor_price: distributorPrice,
         store: store?.value || undefined,
       }).unwrap();
-
+      console.log(response)
       toast.success(response.message);
       fetchProductsHandler();
       closeDrawerHandler();
@@ -445,17 +458,66 @@ const AddProduct: React.FC<AddProductProps> = ({
                 _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
+            <FormControl className="mt-3 mb-5" >
               <FormLabel fontWeight="bold" color="black">
                 Inventory Type
               </FormLabel>
+
+              {/* Dropdown */}
               <Select
                 styles={customStyles}
                 value={category}
                 options={categoryOptions}
                 onChange={(e: any) => setCategory(e)}
+                required={true}
               />
+
+              {/* Input for new category */}
+              <Input
+                mt={2}
+                placeholder="Add new Inventory Type (e.g. Packaging)"
+                color="black"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+
+              {/* Button to add category */}
+              <Button
+                mt={2}
+                size="sm"
+                colorScheme="teal"
+                onClick={() => {
+                  const trimmed = newCategory.trim().toLowerCase();
+                  if (!trimmed) {
+                    toast.warning("Please enter an inventory type.");
+                    return;
+                  }
+
+                  const exists = categoryOptions.some(
+                    (opt) => opt.value === trimmed
+                  );
+                  if (exists) {
+                    toast.warning("This inventory type already exists.");
+                    return;
+                  }
+
+                  const confirmAdd = window.confirm(
+                    `Are you sure you want to add "${trimmed}" as a new Inventory Type?`
+                  );
+                  if (!confirmAdd) return;
+                  const newOption = { value: trimmed, label: trimmed };
+                  setCategoryOptions((prev) => [...prev, newOption]); // ✅ Add to list
+                  setCategory(newOption); // ✅ Select it
+                  setNewCategory(""); // Clear input
+               
+                  toast.success(`Inventory Type "${trimmed}" added.`);
+                }}
+              >
+                Add Inventory Type
+              </Button>
             </FormControl>
+
+
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="black">
                 UOM (Unit of Measurement)

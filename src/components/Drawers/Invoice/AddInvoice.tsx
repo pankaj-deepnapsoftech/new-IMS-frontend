@@ -1,14 +1,61 @@
-import { FormControl, FormLabel, Input } from "@chakra-ui/react";
-import Drawer from "../../../ui/Drawer";
-import { BiX } from "react-icons/bi";
-import { MdAdd } from "react-icons/md";
-import React, { useEffect, useState } from "react";
-import Select from "react-select";
-import { useCreateInvoiceMutation } from "../../../redux/api/api";
+import React, { useState, useEffect } from "react";
+import {
+  BiX,
+  BiBuilding,
+  BiUser,
+  BiPhone,
+  BiMapPin,
+  BiCreditCard,
+  BiCalendar,
+  BiPackage,
+  BiEdit,
+} from "react-icons/bi";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
-import AddItems from "../../Dynamic Add Components/AddItems";
-import { colors } from "../../../theme/colors";
+import { useCreateInvoiceMutation } from "../../../redux/api/api";
+import {
+  Box,
+  Button,
+  Card,
+  CardBody,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Grid,
+  GridItem,
+  Heading,
+  HStack,
+  Input,
+  Select as ChakraSelect,
+  Textarea,
+  VStack,
+  Flex,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+
+const colors = {
+  background: { drawer: "#fff", card: "#fff" },
+  border: { light: "#e2e8f0" },
+  text: {
+    primary: "#1a202c",
+    secondary: "#4b5563",
+    muted: "#6b7280",
+    inverse: "#fff",
+  },
+  primary: { 50: "#eff6ff", 100: "#dbeafe", 500: "#3b82f6" },
+  gray: { 100: "#f3f4f6", 200: "#e5e7eb" },
+  input: {
+    background: "#fff",
+    border: "#d1d5db",
+    borderFocus: "#3b82f6",
+    borderHover: "#9ca3af",
+  },
+  shadow: {
+    xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+  },
+};
 
 interface AddInvoiceProps {
   closeDrawerHandler: () => void;
@@ -20,225 +67,269 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
   fetchInvoicesHandler,
 }) => {
   const [cookies] = useCookies();
-  const [isAdding, setIsAdding] = useState<boolean>(false);
-  const [buyer, setBuyer] = useState<
-    { value: string; label: string } | undefined
-  >();
-  const [supplier, setSupplier] = useState<
-    { value: string; label: string } | undefined
-  >();
-  const [invoiceNo, setInvoiceNo] = useState<string | undefined>();
-  const [documentDate, setDocumentDate] = useState<string | undefined>();
-  const [salesOrderDate, setSalesOrderDate] = useState<string | undefined>();
-  const [note, setNote] = useState<string | undefined>();
-  const [subtotal, setSubtotal] = useState<number | undefined>(0);
-  const [total, setTotal] = useState<number | undefined>();
-  const [items, setItems] = useState<any[] | []>([]);
-  const [allItems, setAllItems] = useState<any[] | []>([]);
-  const [itemOptions, setItemOptions] = useState<
-    { value: string; label: string }[] | []
-  >([]);
-  const [buyers, setBuyers] = useState<any[] | []>([]);
-  const [buyerOptions, setBuyerOptions] = useState<
-    { value: string; label: string }[] | []
-  >([]);
-  const [suppliers, setSuppliers] = useState<any[] | []>([]);
-  const [supplierOptions, setSupplierOptions] = useState<
-    { value: string; label: string }[] | []
-  >([]);
-  const [store, setStore] = useState<
-    { value: string; label: string } | undefined
-  >();
-  const [storeOptions, setStoreOptions] = useState<
-    { value: string; label: string }[] | []
-  >([]);
-  const [tax, setTax] = useState<
-    { value: number; label: string } | undefined
-  >();
-  const taxOptions = [
-    { value: 0.18, label: "GST 18%" },
-    { value: 0, label: "No Tax 0%" },
-  ];
-  const [category, setCategory] = useState<
-    { value: string; label: string } | undefined
-  >();
-  const categoryOptions = [
-    { value: "sale", label: "Sales" },
-    { value: "purchase", label: "Purchase" },
-  ];
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [inputs, setInputs] = useState<
-    {
-      item: { value: string; label: string };
-      quantity: number;
-      price: number;
-    }[]
-  >([{ item: { value: "", label: "" }, quantity: 0, price: 0 }]);
+  const bgColor = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const headingColor = useColorModeValue("gray.700", "gray.200");
+  const textColor = useColorModeValue("gray.600", "gray.300");
+
+  const validationSchema = Yup.object({
+    companyAddress: Yup.string().required("Company address is required"),
+    companyPanNo: Yup.string().required("Company PAN No is required"),
+    companyWebsite: Yup.string().required("Company website is required"),
+
+    sellerAddress: Yup.string().required("Seller address is required"),
+
+    consigneeShipTo: Yup.string().required("Consignee ship to is required"),
+    address: Yup.string().required("Address is required"),
+    gstin: Yup.string().required("GSTIN is required"),
+    pincode: Yup.string().required("Pincode is required"),
+    state: Yup.string().required("State is required"),
+
+    billerBillTo: Yup.string().required("Biller bill to is required"),
+    billerAddress: Yup.string().required("Biller address is required"),
+    billerGSTIN: Yup.string().required("Biller GSTIN is required"),
+    billerPincode: Yup.string().required("Biller pincode is required"),
+    billerState: Yup.string().required("Biller state is required"),
+
+    deliveryNote: Yup.string(),
+    modeTermsOfPayment: Yup.string().required(
+      "Mode/Terms of payment is required"
+    ),
+    referenceNo: Yup.string(),
+    otherReferences: Yup.string(),
+    buyersOrderNo: Yup.string().required("Buyer's order no is required"),
+    date: Yup.date().required("Date is required"),
+    dispatchDocNo: Yup.string(),
+    deliveryNoteDate: Yup.date(),
+    dispatchedThrough: Yup.string(),
+    destination: Yup.string(),
+
+    termsOfDelivery: Yup.string(),
+    remarks: Yup.string(),
+  });
 
   const [addInvoice] = useCreateInvoiceMutation();
 
-  const addInvoiceHandler = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const formik = useFormik({
+    initialValues: {
+      companyAddress: "",
+      companyPanNo: "",
+      companyWebsite: "",
 
-    const data = {
-      invoice_no: invoiceNo,
-      document_date: documentDate,
-      sales_order_date: salesOrderDate,
-      note: note,
-      tax: { tax_amount: tax?.value, tax_name: tax?.label },
-      subtotal: subtotal,
-      total: total,
-      store: store?.value,
-      items: inputs.map((item: any) => ({
-        item: item.item.value,
-        quantity: item.quantity,
-        amount: item.price,
-      })),
-      category: category?.value,
-      buyer: buyer?.value,
-      supplier: supplier?.value,
-    };
+      sellerAddress: "",
 
-    try {
-      setIsAdding(true);
-      const response = await addInvoice(data).unwrap();
-      if (!response.success) {
-        throw new Error(response.message);
-      }
-      toast.success(response.message);
-      closeDrawerHandler();
-      fetchInvoicesHandler();
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
-    } finally {
-      setIsAdding(false);
-    }
-  };
+      consigneeShipTo: "",
+      address: "",
+      gstin: "",
+      pincode: "",
+      state: "",
 
-  const fetchBuyersHandler = async () => {
-    try {
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "agent/buyers",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
+      billerBillTo: "",
+      billerAddress: "",
+      billerGSTIN: "",
+      billerPincode: "",
+      billerState: "",
+
+      deliveryNote: "",
+      modeTermsOfPayment: "",
+      referenceNo: "",
+      otherReferences: "",
+      buyersOrderNo: "",
+      date: new Date().toISOString().split("T")[0],
+      dispatchDocNo: "",
+      deliveryNoteDate: "",
+      dispatchedThrough: "",
+      destination: "",
+
+      termsOfDelivery: "",
+      remarks: "",
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      if (isSubmitting) return;
+      setIsSubmitting(true);
+
+      try {
+        const response = await addInvoice(values).unwrap();
+        if (!response.success) {
+          throw new Error(response.message);
         }
-      );
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
+        toast.success(response.message || "Invoice created successfully!");
+        fetchInvoicesHandler();
+        formik.resetForm();
+        closeDrawerHandler();
+      } catch (error: any) {
+        console.error(error);
+        toast.error(error?.message || "Something went wrong!");
+      } finally {
+        setIsSubmitting(false);
       }
+    },
+  });
 
-      const buyers = data.agents.map((buyer: any) => ({
-        value: buyer._id,
-        label: buyer.name,
-      }));
-      setBuyerOptions(buyers);
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
-    }
-  };
+  // const addInvoiceHandler = async (e: React.FormEvent) => {
+  //   e.preventDefault();
 
-  const fetchSuppliersHandler = async () => {
-    try {
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "agent/suppliers",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
-      }
+  //   const data = {
+  //     invoice_no: invoiceNo,
+  //     document_date: documentDate,
+  //     sales_order_date: salesOrderDate,
+  //     note: note,
+  //     tax: { tax_amount: tax?.value, tax_name: tax?.label },
+  //     subtotal: subtotal,
+  //     total: total,
+  //     store: store?.value,
+  //     items: inputs.map((item: any) => ({
+  //       item: item.item.value,
+  //       quantity: item.quantity,
+  //       amount: item.price,
+  //     })),
+  //     category: category?.value,
+  //     buyer: buyer?.value,
+  //     supplier: supplier?.value,
+  //   };
 
-      const suppliers = data.agents.map((supplier: any) => ({
-        value: supplier._id,
-        label: supplier.name,
-      }));
-      setSupplierOptions(suppliers);
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
-    }
-  };
+  //   try {
+  //     setIsAdding(true);
+  //     const response = await addInvoice(data).unwrap();
+  //     if (!response.success) {
+  //       throw new Error(response.message);
+  //     }
+  //     toast.success(response.message);
+  //     closeDrawerHandler();
+  //     fetchInvoicesHandler();
+  //   } catch (error: any) {
+  //     toast.error(error?.message || "Something went wrong");
+  //   } finally {
+  //     setIsAdding(false);
+  //   }
+  // };
 
-  const fetchItemsHandler = async () => {
-    try {
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "product/all",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
-        }
-      );
-      const results = await response.json();
-      if (!results.success) {
-        throw new Error(results?.message);
-      }
-      const products = results.products.map((product: any) => ({
-        value: product._id,
-        label: product.name,
-      }));
-      setItemOptions(products);
-      setAllItems(results.products);
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
-    }
-  };
+  // const fetchBuyersHandler = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       process.env.REACT_APP_BACKEND_URL + "agent/buyers",
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           Authorization: `Bearer ${cookies?.access_token}`,
+  //         },
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     if (!data.success) {
+  //       throw new Error(data.message);
+  //     }
 
-  const fetchStoresHandler = async () => {
-    try {
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "store/all",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
-      }
-      const stores = data.stores.map((store: any) => ({
-        value: store._id,
-        label: store.name,
-      }));
-      setStoreOptions(stores);
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
-    }
-  };
+  //     const buyers = data.agents.map((buyer: any) => ({
+  //       value: buyer._id,
+  //       label: buyer.name,
+  //     }));
+  //     setBuyerOptions(buyers);
+  //   } catch (error: any) {
+  //     toast.error(error?.message || "Something went wrong");
+  //   }
+  // };
 
-  useEffect(() => {
-    if (tax && subtotal) {
-      setTotal(subtotal + tax?.value * subtotal);
-    }
-  }, [tax, subtotal]);
+  // const fetchSuppliersHandler = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       process.env.REACT_APP_BACKEND_URL + "agent/suppliers",
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           Authorization: `Bearer ${cookies?.access_token}`,
+  //         },
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     if (!data.success) {
+  //       throw new Error(data.message);
+  //     }
 
-  useEffect(() => {
-    const price = inputs.reduce((acc: number, curr: any) => {
-      return acc + (curr?.price * curr?.quantity || 0);
-    }, 0);
-    setSubtotal(price);
-  }, [inputs]);
+  //     const suppliers = data.agents.map((supplier: any) => ({
+  //       value: supplier._id,
+  //       label: supplier.name,
+  //     }));
+  //     setSupplierOptions(suppliers);
+  //   } catch (error: any) {
+  //     toast.error(error?.message || "Something went wrong");
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchBuyersHandler();
-    fetchItemsHandler();
-    fetchStoresHandler();
-    fetchSuppliersHandler();
-  }, []);
+  // const fetchItemsHandler = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       process.env.REACT_APP_BACKEND_URL + "product/all",
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           Authorization: `Bearer ${cookies?.access_token}`,
+  //         },
+  //       }
+  //     );
+  //     const results = await response.json();
+  //     if (!results.success) {
+  //       throw new Error(results?.message);
+  //     }
+  //     const products = results.products.map((product: any) => ({
+  //       value: product._id,
+  //       label: product.name,
+  //     }));
+  //     setItemOptions(products);
+  //     setAllItems(results.products);
+  //   } catch (error: any) {
+  //     toast.error(error?.message || "Something went wrong");
+  //   }
+  // };
 
-  // Custom styles for react-select to match theme
+  // const fetchStoresHandler = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       process.env.REACT_APP_BACKEND_URL + "store/all",
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           Authorization: `Bearer ${cookies?.access_token}`,
+  //         },
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     if (!data.success) {
+  //       throw new Error(data.message);
+  //     }
+  //     const stores = data.stores.map((store: any) => ({
+  //       value: store._id,
+  //       label: store.name,
+  //     }));
+  //     setStoreOptions(stores);
+  //   } catch (error: any) {
+  //     toast.error(error?.message || "Something went wrong");
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (tax && subtotal) {
+  //     setTotal(subtotal + tax?.value * subtotal);
+  //   }
+  // }, [tax, subtotal]);
+
+  // useEffect(() => {
+  //   const price = inputs.reduce((acc: number, curr: any) => {
+  //     return acc + (curr?.price * curr?.quantity || 0);
+  //   }, 0);
+  //   setSubtotal(price);
+  // }, [inputs]);
+
+  // useEffect(() => {
+  //   fetchBuyersHandler();
+  //   fetchItemsHandler();
+  //   fetchStoresHandler();
+  //   fetchSuppliersHandler();
+  // }, []);
+
   const customSelectStyles = {
     control: (provided: any, state: any) => ({
       ...provided,
@@ -275,7 +366,6 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
 
   return (
     <div
-      // className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[500px] right-0 top-0  z-10"
       className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
       style={{
         backgroundColor: colors.background.drawer,
@@ -313,338 +403,936 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
 
       {/* Form */}
       <div className="p-6">
-        <form onSubmit={addInvoiceHandler} className="space-y-6">
-          {/* Category */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
+        <form onSubmit={formik.handleSubmit} className="space-y-6">
+          {/* Company Details Section */}
+          <div
+            className="p-6 rounded-xl border"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: colors.primary[50] }}
+              >
+                <BiBuilding size={20} style={{ color: colors.primary[500] }} />
+              </div>
+              <h3
+                className="text-lg font-semibold"
                 style={{ color: colors.text.primary }}
               >
-                Category
-              </FormLabel>
-              <Select
-                value={category}
-                options={categoryOptions}
-                onChange={(e: any) => setCategory(e)}
-                styles={customSelectStyles}
-                placeholder="Select category"
-              />
-            </FormControl>
-
-            {/* Buyer (for sale) */}
-            {category && category.value === "sale" && (
-              <FormControl isRequired>
-                <FormLabel
-                  className="text-sm font-medium mb-2"
-                  style={{ color: colors.text.primary }}
-                >
-                  Buyer
-                </FormLabel>
-                <Select
-                  value={buyer}
-                  options={buyerOptions}
-                  onChange={(e: any) => setBuyer(e)}
-                  styles={customSelectStyles}
-                  placeholder="Select buyer"
-                />
-              </FormControl>
-            )}
-
-            {/* Supplier (for purchase) */}
-            {category && category.value === "purchase" && (
-              <FormControl isRequired>
-                <FormLabel
-                  className="text-sm font-medium mb-2"
-                  style={{ color: colors.text.primary }}
-                >
-                  Supplier
-                </FormLabel>
-                <Select
-                  value={supplier}
-                  options={supplierOptions}
-                  onChange={(e: any) => setSupplier(e)}
-                  styles={customSelectStyles}
-                  placeholder="Select supplier"
-                />
-              </FormControl>
-            )}
-
-            {/* Invoice Number */}
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Invoice Number
-              </FormLabel>
-              <Input
-                value={invoiceNo}
-                onChange={(e) => setInvoiceNo(e.target.value)}
-                type="text"
-                placeholder="Enter invoice number"
-                className="w-full"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                  borderRadius: "8px",
-                  height: "44px",
-                }}
-                _focus={{
-                  borderColor: colors.input.borderFocus,
-                  boxShadow: `0 0 0 3px ${colors.primary[100]}`,
-                }}
-                _hover={{
-                  borderColor: colors.input.borderHover,
-                }}
-              />
-            </FormControl>
-
-            {/* Document Date */}
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Document Date
-              </FormLabel>
-              <Input
-                value={documentDate}
-                onChange={(e) => setDocumentDate(e.target.value)}
-                type="date"
-                className="w-full"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                  borderRadius: "8px",
-                  height: "44px",
-                }}
-                _focus={{
-                  borderColor: colors.input.borderFocus,
-                  boxShadow: `0 0 0 3px ${colors.primary[100]}`,
-                }}
-                _hover={{
-                  borderColor: colors.input.borderHover,
-                }}
-              />
-            </FormControl>
-
-            {/* Sales Order Date */}
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Sales Order Date
-              </FormLabel>
-              <Input
-                value={salesOrderDate}
-                onChange={(e) => setSalesOrderDate(e.target.value)}
-                type="date"
-                className="w-full"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                  borderRadius: "8px",
-                  height: "44px",
-                }}
-                _focus={{
-                  borderColor: colors.input.borderFocus,
-                  boxShadow: `0 0 0 3px ${colors.primary[100]}`,
-                }}
-                _hover={{
-                  borderColor: colors.input.borderHover,
-                }}
-              />
-            </FormControl>
-          </div>
-          {/* Store */}
-          <FormControl isRequired>
-            <FormLabel
-              className="text-sm font-medium mb-2"
-              style={{ color: colors.text.primary }}
-            >
-              Store
-            </FormLabel>
-            <Select
-              value={store}
-              options={storeOptions}
-              onChange={(e: any) => setStore(e)}
-              styles={customSelectStyles}
-              placeholder="Select store"
-            />
-          </FormControl>
-
-          {/* Note */}
-          <FormControl>
-            <FormLabel
-              className="text-sm font-medium mb-2"
-              style={{ color: colors.text.primary }}
-            >
-              Note
-            </FormLabel>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Enter any additional notes..."
-              rows={4}
-              className="w-full px-4 py-3 rounded-lg border resize-none focus:outline-none transition-all duration-200"
-              style={{
-                backgroundColor: colors.input.background,
-                borderColor: colors.input.border,
-                color: colors.text.primary,
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = colors.input.borderFocus;
-                e.target.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = colors.input.border;
-                e.target.style.boxShadow = "none";
-              }}
-            />
-          </FormControl>
-
-          {/* Items */}
-          <FormControl isRequired>
-            <FormLabel
-              className="text-sm font-medium mb-2"
-              style={{ color: colors.text.primary }}
-            >
-              Items
-            </FormLabel>
-            <div
-              className="p-4 rounded-lg border"
-              style={{
-                backgroundColor: colors.gray[50],
-                borderColor: colors.border.light,
-              }}
-            >
-              <AddItems inputs={inputs} setInputs={setInputs} />
+                Company Details
+              </h3>
             </div>
-          </FormControl>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Subtotal */}
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Subtotal
-              </FormLabel>
-              <Input
-                value={subtotal}
-                isDisabled={true}
-                type="number"
-                placeholder="Calculated automatically"
-                className="w-full"
-                style={{
-                  backgroundColor: colors.gray[100],
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                  borderRadius: "8px",
-                  height: "44px",
-                }}
-              />
-            </FormControl>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Company Address *
+                </label>
+                <input
+                  name="companyAddress"
+                  value={formik.values.companyAddress}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200 resize-none"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.companyAddress &&
+                      formik.errors.companyAddress
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter company address"
+                />
+                {formik.touched.companyAddress &&
+                  formik.errors.companyAddress && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {formik.errors.companyAddress}
+                    </p>
+                  )}
+              </div>
 
-            {/* Tax */}
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Tax
-              </FormLabel>
-              <Select
-                value={tax}
-                options={taxOptions}
-                onChange={(e: any) => setTax(e)}
-                styles={customSelectStyles}
-                placeholder="Select tax rate"
-              />
-            </FormControl>
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Company PAN No *
+                </label>
+                <input
+                  type="text"
+                  name="companyPanNo"
+                  value={formik.values.companyPanNo}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.companyPanNo && formik.errors.companyPanNo
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter company PAN number"
+                />
+                {formik.touched.companyPanNo && formik.errors.companyPanNo && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formik.errors.companyPanNo}
+                  </p>
+                )}
+              </div>
 
-            {/* Total */}
-            <FormControl isRequired>
-              <FormLabel
-                className="text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Total
-              </FormLabel>
-              <Input
-                value={total}
-                isDisabled={true}
-                type="number"
-                placeholder="Calculated automatically"
-                className="w-full"
-                style={{
-                  backgroundColor: colors.gray[100],
-                  borderColor: colors.input.border,
-                  color: colors.text.primary,
-                  borderRadius: "8px",
-                  height: "44px",
-                }}
-              />
-            </FormControl>
+              <div className="md:col-span-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Company Website *
+                </label>
+                <input
+                  type="url"
+                  name="companyWebsite"
+                  value={formik.values.companyWebsite}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.companyWebsite &&
+                      formik.errors.companyWebsite
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter company website"
+                />
+                {formik.touched.companyWebsite &&
+                  formik.errors.companyWebsite && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {formik.errors.companyWebsite}
+                    </p>
+                  )}
+              </div>
+            </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="flex gap-3 pt-4">
+          {/* Seller Details Section */}
+          <div
+            className="p-6 rounded-xl border"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: colors.primary[50] }}
+              >
+                <BiUser size={20} style={{ color: colors.primary[500] }} />
+              </div>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.text.primary }}
+              >
+                Seller Details
+              </h3>
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Seller Address *
+              </label>
+              <input
+                name="sellerAddress"
+                value={formik.values.sellerAddress}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200 resize-none"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor:
+                    formik.touched.sellerAddress && formik.errors.sellerAddress
+                      ? "#ef4444"
+                      : colors.input.border,
+                  color: colors.text.primary,
+                }}
+                placeholder="Enter seller address"
+              />
+              {formik.touched.sellerAddress && formik.errors.sellerAddress && (
+                <p className="text-red-500 text-xs mt-1">
+                  {formik.errors.sellerAddress}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Consignee Ship To Section */}
+          <div
+            className="p-6 rounded-xl border"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: colors.primary[50] }}
+              >
+                <BiMapPin size={20} style={{ color: colors.primary[500] }} />
+              </div>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.text.primary }}
+              >
+                Ship To
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Consignee Name *
+                </label>
+                <input
+                  type="text"
+                  name="consigneeShipTo"
+                  value={formik.values.consigneeShipTo}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.consigneeShipTo &&
+                      formik.errors.consigneeShipTo
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter consignee name"
+                />
+                {formik.touched.consigneeShipTo &&
+                  formik.errors.consigneeShipTo && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {formik.errors.consigneeShipTo}
+                    </p>
+                  )}
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  GSTIN *
+                </label>
+                <input
+                  type="text"
+                  name="gstin"
+                  value={formik.values.gstin}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.gstin && formik.errors.gstin
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter GSTIN"
+                />
+                {formik.touched.gstin && formik.errors.gstin && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formik.errors.gstin}
+                  </p>
+                )}
+              </div>
+
+              <div className="md:col-span-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Address *
+                </label>
+                <input
+                  name="address"
+                  value={formik.values.address}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200 resize-none"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.address && formik.errors.address
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter address"
+                />
+                {formik.touched.address && formik.errors.address && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formik.errors.address}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Pincode *
+                </label>
+                <input
+                  type="text"
+                  name="pincode"
+                  value={formik.values.pincode}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.pincode && formik.errors.pincode
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter pincode"
+                />
+                {formik.touched.pincode && formik.errors.pincode && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formik.errors.pincode}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  State *
+                </label>
+                <input
+                  type="text"
+                  name="state"
+                  value={formik.values.state}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.state && formik.errors.state
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter state"
+                />
+                {formik.touched.state && formik.errors.state && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formik.errors.state}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Biller (Bill To) Section */}
+          <div
+            className="p-6 rounded-xl border"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: colors.primary[50] }}
+              >
+                <BiCreditCard
+                  size={20}
+                  style={{ color: colors.primary[500] }}
+                />
+              </div>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.text.primary }}
+              >
+                Bill To
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Name *
+                </label>
+                <input
+                  type="text"
+                  name="billerBillTo"
+                  value={formik.values.billerBillTo}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.billerBillTo && formik.errors.billerBillTo
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter biller name"
+                />
+                {formik.touched.billerBillTo && formik.errors.billerBillTo && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formik.errors.billerBillTo}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  GSTIN *
+                </label>
+                <input
+                  type="text"
+                  name="billerGSTIN"
+                  value={formik.values.billerGSTIN}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.billerGSTIN && formik.errors.billerGSTIN
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter biller GSTIN"
+                />
+                {formik.touched.billerGSTIN && formik.errors.billerGSTIN && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formik.errors.billerGSTIN}
+                  </p>
+                )}
+              </div>
+
+              <div className="md:col-span-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Address *
+                </label>
+                <input
+                  name="billerAddress"
+                  value={formik.values.billerAddress}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200 resize-none"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.billerAddress &&
+                      formik.errors.billerAddress
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter biller address"
+                />
+                {formik.touched.billerAddress &&
+                  formik.errors.billerAddress && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {formik.errors.billerAddress}
+                    </p>
+                  )}
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Pincode *
+                </label>
+                <input
+                  type="text"
+                  name="billerPincode"
+                  value={formik.values.billerPincode}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.billerPincode &&
+                      formik.errors.billerPincode
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter biller pincode"
+                />
+                {formik.touched.billerPincode &&
+                  formik.errors.billerPincode && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {formik.errors.billerPincode}
+                    </p>
+                  )}
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  State *
+                </label>
+                <input
+                  type="text"
+                  name="billerState"
+                  value={formik.values.billerState}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.billerState && formik.errors.billerState
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter biller state"
+                />
+                {formik.touched.billerState && formik.errors.billerState && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formik.errors.billerState}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Order Details Section */}
+          <div
+            className="p-6 rounded-xl border"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: colors.primary[50] }}
+              >
+                <BiPackage size={20} style={{ color: colors.primary[500] }} />
+              </div>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.text.primary }}
+              >
+                Order Details
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Delivery Note
+                </label>
+                <input
+                  type="text"
+                  name="deliveryNote"
+                  value={formik.values.deliveryNote}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter delivery note"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Mode/Terms of Payment *
+                </label>
+                <select
+                  name="modeTermsOfPayment"
+                  value={formik.values.modeTermsOfPayment}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.modeTermsOfPayment &&
+                      formik.errors.modeTermsOfPayment
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                >
+                  <option value="">Select payment mode</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="Cheque">Cheque</option>
+                  <option value="Credit">Credit</option>
+                  <option value="UPI">UPI</option>
+                </select>
+                {formik.touched.modeTermsOfPayment &&
+                  formik.errors.modeTermsOfPayment && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {formik.errors.modeTermsOfPayment}
+                    </p>
+                  )}
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Reference No
+                </label>
+                <input
+                  type="text"
+                  name="referenceNo"
+                  value={formik.values.referenceNo}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter reference number"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Other References
+                </label>
+                <input
+                  type="text"
+                  name="otherReferences"
+                  value={formik.values.otherReferences}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter other references"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Buyer's Order No *
+                </label>
+                <input
+                  type="text"
+                  name="buyersOrderNo"
+                  value={formik.values.buyersOrderNo}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.buyersOrderNo &&
+                      formik.errors.buyersOrderNo
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter buyer's order number"
+                />
+                {formik.touched.buyersOrderNo &&
+                  formik.errors.buyersOrderNo && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {formik.errors.buyersOrderNo}
+                    </p>
+                  )}
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Date *
+                </label>
+                <input
+                  type="date"
+                  name="date"
+                  value={formik.values.date}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.date && formik.errors.date
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                />
+                {formik.touched.date && formik.errors.date && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formik.errors.date}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Dispatch Doc No
+                </label>
+                <input
+                  type="text"
+                  name="dispatchDocNo"
+                  value={formik.values.dispatchDocNo}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter dispatch document number"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Delivery Note Date
+                </label>
+                <input
+                  type="date"
+                  name="deliveryNoteDate"
+                  value={formik.values.deliveryNoteDate}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Dispatched Through
+                </label>
+                <input
+                  type="text"
+                  name="dispatchedThrough"
+                  value={formik.values.dispatchedThrough}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter dispatch method"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Destination
+                </label>
+                <input
+                  type="text"
+                  name="destination"
+                  value={formik.values.destination}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter destination"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Terms and Remarks Section */}
+          <div
+            className="p-6 rounded-xl border"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: colors.primary[50] }}
+              >
+                <BiEdit size={20} style={{ color: colors.primary[500] }} />
+              </div>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.text.primary }}
+              >
+                Terms & Remarks
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Terms of Delivery
+                </label>
+                <textarea
+                  name="termsOfDelivery"
+                  value={formik.values.termsOfDelivery}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  rows={3}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200 resize-none"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter terms of delivery"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Remarks
+                </label>
+                <textarea
+                  name="remarks"
+                  value={formik.values.remarks}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  rows={3}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200 resize-none"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter any remarks"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Submit Buttons */}
+          <div className="flex gap-4 pt-6">
             <button
               type="button"
               onClick={closeDrawerHandler}
-              className="flex-1 px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200"
+              className="flex-1 px-6 py-3 text-sm font-medium rounded-lg border transition-colors duration-200"
               style={{
-                color: colors.text.secondary,
                 backgroundColor: colors.gray[100],
-                border: `1px solid ${colors.border.light}`,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = colors.gray[200];
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = colors.gray[100];
+                borderColor: colors.border.light,
+                color: colors.text.secondary,
               }}
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={isAdding}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
+              className="flex-1 px-6 py-3 text-sm font-medium text-white rounded-lg transition-colors duration-200 disabled:opacity-50"
               style={{
-                backgroundColor: isAdding
-                  ? colors.gray[400]
-                  : colors.primary[600],
-              }}
-              onMouseEnter={(e) => {
-                if (!isAdding) {
-                  e.currentTarget.style.backgroundColor = colors.primary[700];
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isAdding) {
-                  e.currentTarget.style.backgroundColor = colors.primary[600];
-                }
+                backgroundColor: isSubmitting
+                  ? colors.primary[500]
+                  : colors.primary[500],
               }}
             >
-              {isAdding ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <MdAdd size={18} />
-                  Create Invoice
-                </>
-              )}
+              {isSubmitting ? "Creating Invoice..." : "Create Invoice"}
             </button>
           </div>
         </form>

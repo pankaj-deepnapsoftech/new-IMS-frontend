@@ -55,31 +55,29 @@ const AddParties = ({
 
   const formik = useFormik({
     initialValues: {
-      type: edittable?.type || "",
+      type: edittable?.type || "", 
       parties_type: edittable?.parties_type || "",
-      // gst_add: edittable?.gst_add || "",
       shipped_to: edittable?.shipped_to || "",
       bill_to: edittable?.bill_to || "",
       shipped_gst_to: edittable?.shipped_gst_to || "",
-      bill_gst_to: edittable?.bill_gst_to || "",
-      company_name: edittable?.company_name,
+      bill_gst_to: edittable?.bill_gst_to || "",      
+      company_name: edittable?.company_name || "",
     },
-    enableReinitialize: true,
     validationSchema: PartiesFromValidation,
     onSubmit: async (values) => {
       if (isSubmitting) return;
       setIsSubmitting(true);
-          
+
+      console.log("Submitting values:", values);
 
       const payload = {
         ...values,
         consignee_name: values.type === "Individual" ? consigneeNames : [],
-        company_name: values.type === "Company" ? values.company_name : "",
-        // gst_in: gstIns,
         contact_number: contactNumbers,
-        // delivery_address: deliveryAddresses,
         email_id: emailIds,
       };
+
+
 
       try {
         let res;
@@ -178,7 +176,7 @@ const AddParties = ({
       )}
     </div>
   );
-  
+
 
   return (
     <>
@@ -189,9 +187,8 @@ const AddParties = ({
 
       {/* Drawer */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full  bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
-          showData ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-y-0 right-0 z-50 w-full  bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${showData ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="h-full flex flex-col">
           {/* Header */}
@@ -320,13 +317,7 @@ const AddParties = ({
                       )}
                     </div>
                   )}
-                  {/* {renderFieldList(
-                    "GST IN",
-                    gstIns,
-                    setGstIns,
-                    <FileText className="h-4 w-4 text-gray-500" />
-                    )} */}
-
+              
                   <div className="space-y-6">
                     {renderFieldList(
                       "Contact Number",
@@ -336,12 +327,7 @@ const AddParties = ({
                     )}
                   </div>
 
-                  {/* {renderFieldList(
-                    "Delivery Address",
-                    deliveryAddresses,
-                    setDeliveryAddresses,
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                  )} */}
+              
                   <div className="space-y-6">
                     {renderFieldList(
                       "Email ID",
@@ -351,27 +337,7 @@ const AddParties = ({
                     )}
                   </div>
 
-                  {/* GST Address */}
-                  {/* <div className="space-y-2 md:col-span-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <MapPin className="h-4 w-4 text-gray-500" />
-                      GST Add
-                    </label>
-                    <input
-                      type="text"
-                      name="gst_add"
-                      value={formik.values.gst_add}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      placeholder="Enter GST address"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                    />
-                    {formik.touched.gst_add && formik.errors.gst_add && (
-                      <p className="text-sm text-red-600 flex items-center gap-1">
-                        {formik.errors.gst_add}
-                      </p>
-                    )}
-                  </div> */}
+            
 
                   {/* Shipped To */}
                   <div className="space-y-2">
@@ -417,38 +383,40 @@ const AddParties = ({
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <MapPin className="h-4 w-4 text-gray-500" />
-                      Shipped GSTIN
-                    </label>
-                    <input
-                      type="text"
-                      name="shipped_gst_to"
-                      value={formik.values.shipped_gst_to}
-                      onChange={(e) => {
-                        const uppercase = e.target.value
-                          .toUpperCase()
-                          .replace(/[^A-Z0-9]/g, "");
-                        formik.setFieldValue(
-                          "shipped_gst_to",
-                          uppercase.slice(0, 15)
-                        );
-                      }}
-                      onBlur={formik.handleBlur}
-                      placeholder="Enter Shipped GSTIN"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                    />
-                    {formik.touched.shipped_gst_to &&
-                      formik.errors.shipped_gst_to && (
-                        <p className="text-sm text-red-600 flex items-center gap-1">
-                          {formik.errors.shipped_gst_to}
-                        </p>
-                      )}
-                  </div>
+                  {formik.values.type === "Company"
+                   && (<div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        Shipped GSTIN
+                      </label>
+                      <input
+                        type="text"
+                        name="shipped_gst_to"
+                        value={formik.values.shipped_gst_to}
+                        onChange={(e) => {
+                          const uppercase = e.target.value
+                            .toUpperCase()
+                            .replace(/[^A-Z0-9]/g, "");
+                          formik.setFieldValue(
+                            "shipped_gst_to",
+                            uppercase.slice(0, 15)
+                          );
+                        }}
+                        onBlur={formik.handleBlur}
+                        placeholder="Enter Shipped GSTIN"
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                      />
+                      {formik.touched.shipped_gst_to &&
+                        formik.errors.shipped_gst_to && (
+                          <p className="text-sm text-red-600 flex items-center gap-1">
+                            {formik.errors.shipped_gst_to}
+                          </p>
+                        )}
+                    </div>)
+                  }
 
                   {/* Bill To */}
-                  <div className="space-y-2">
+                  {formik.values.type === "Company" && (<div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <FileText className="h-4 w-4 text-gray-500" />
                       Bill GSTIN
@@ -476,55 +444,11 @@ const AddParties = ({
                           {formik.errors.bill_gst_to}
                         </p>
                       )}
-                  </div>
+                  </div>)}
                 </div>
               </div>
 
-              {/* Additional Details Section */}
-              {/* <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                  <Users className="h-5 w-5 text-blue-600" />
-                  Additional Contact Details
-                </h3>
-
-                <div className="space-y-6">
-                  {renderFieldList(
-                    "Consignee Name",
-                    consigneeNames,
-                    setConsigneeNames,
-                    <User className="h-4 w-4 text-gray-500" />,
-                    { allowAdd: false }
-                  )} */}
-
-              {/* {renderFieldList(
-                    "GST IN",
-                    gstIns,
-                    setGstIns,
-                    <FileText className="h-4 w-4 text-gray-500" />
-                  )} */}
-
-              {/* {renderFieldList(
-                    "Contact Number",
-                    contactNumbers,
-                    setContactNumbers,
-                    <Phone className="h-4 w-4 text-gray-500" />
-                  )} */}
-
-              {/* {renderFieldList(
-                    "Delivery Address",
-                    deliveryAddresses,
-                    setDeliveryAddresses,
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                  )} */}
-
-              {/* {renderFieldList(
-                    "Email ID",
-                    emailIds,
-                    setEmailIds,
-                    <Mail className="h-4 w-4 text-gray-500" />
-                  )}
-                </div>
-              </div> */}
+             
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">

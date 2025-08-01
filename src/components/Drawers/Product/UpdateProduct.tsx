@@ -266,45 +266,46 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
     }),
   };
   return (
-  <div
-        className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
+    <div
+      className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
+      style={{
+        boxShadow:
+          "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+      }}
+    >
+      <div
+        className="flex items-center justify-between p-6 border-b"
+        style={{ borderColor: colors.border.light }}
       >
-        <div
-          className="flex items-center justify-between p-6 border-b"
-          style={{ borderColor: colors.border.light }}
+        <h1
+          className="text-xl font-semibold"
+          style={{ color: colors.text.primary }}
         >
-          <h1
-            className="text-xl font-semibold"
-            style={{ color: colors.text.primary }}
-          >
-            Update Product
-          </h1>
-          <button 
-            onClick={closeDrawerHandler}
-            className="p-2 rounded-lg transition-colors duration-200"
-            style={{
-              color: colors.text.secondary,
-              backgroundColor: colors.gray[100],
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[200];
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[100];
-            }}
-          >
-            <BiX size={20} />
-          </button>
-        </div>
+          Update Product
+        </h1>
+        <button
+          onClick={closeDrawerHandler}
+          className="p-2 rounded-lg transition-colors duration-200"
+          style={{
+            color: colors.text.secondary,
+            backgroundColor: colors.gray[100],
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[200];
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[100];
+          }}
+        >
+          <BiX size={20} />
+        </button>
+      </div>
 
-        <div className="mt-8 px-5">
-          {isLoadingProduct && <Loading />}
-          {!isLoadingProduct && (
-            <form onSubmit={updateProductHandler}>
+      <div className="mt-8 px-5">
+        {isLoadingProduct && <Loading />}
+        {!isLoadingProduct && (
+          <form onSubmit={updateProductHandler}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <FormControl isRequired>
                 <FormLabel fontWeight="bold" color="black">
                   Inventory Category
@@ -507,6 +508,8 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                   onChange={(d: any) => setStore(d)}
                 />
               </FormControl>
+            </div>
+            <div className="flex flex-col flex-1">
               <Button
                 isLoading={isUpdatingProduct}
                 type="submit"
@@ -517,10 +520,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
               >
                 Submit
               </Button>
-            </form>
-          )}
-        </div>
+            </div>
+          </form>
+        )}
       </div>
+    </div>
   );
 };
 
