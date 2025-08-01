@@ -1,13 +1,17 @@
 // @ts-nocheck
 import { MdOutlineRefresh } from "react-icons/md";
 import { FiSearch, FiPlus, FiUsers, FiDownload } from "react-icons/fi";
+import { AiFillFileExcel } from "react-icons/ai";
+import { RxCross2 } from "react-icons/rx";
 import AddParties from "../components/Drawers/Parties/AddParties";
 import PartiesTable from "../components/Table/PartiesTable";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useCookies } from "react-cookie";
 import Pagination from "./Pagination";
 import { colors } from "../theme/colors";
 import * as XLSX from 'xlsx';
+import { toast } from "react-toastify";
+import SampleCSV from "../assets/csv/parties-sample.csv"; 
 
 const Parties = () => {
   const [showData, setshowData] = useState(false);
@@ -22,6 +26,11 @@ const Parties = () => {
   const [edittable, setEditTable] = useState(null);
   const [limit, setLimit] = useState(10);
   const [isExporting, setIsExporting] = useState(false);
+
+  // Bulk upload states
+  const [showBulkUploadMenu, setShowBulkUploadMenu] = useState(false);
+  const [bulkUploading, setBulkUploading] = useState(false);
+  const fileRef = useRef(null);
 
   const fetchPartiesData = async () => {
     try {
@@ -43,7 +52,6 @@ const Parties = () => {
       setIsLoading(false);
     }
   };
-
 
   const fetchAllPartiesForExport = async () => {
     try {
@@ -67,6 +75,51 @@ const Parties = () => {
     }
   };
 
+  const bulkUploadHandler = async (e) => {
+    e.preventDefault();
+
+    const file = fileRef?.current?.files?.[0];
+    if (!file) {
+      toast.error("CSV file not selected");
+      return;
+    }
+
+    try {
+      setBulkUploading(true);
+      const formData = new FormData();
+      formData.append("excel", file);
+
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}parties/bulk`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Something went wrong");
+      }
+
+      toast.success(result.message);
+      setShowBulkUploadMenu(false);
+      fetchPartiesData(); // Refresh the data
+      
+      // Reset file input
+      if (fileRef.current) {
+        fileRef.current.value = "";
+      }
+    } catch (err) {
+      toast.error(err.message || "Something went wrong");
+    } finally {
+      setBulkUploading(false);
+    }
+  };
 
   const exportToExcel = async () => {
     try {
@@ -76,7 +129,6 @@ const Parties = () => {
         alert("No data available to export");
         return;
       }
-
 
       const excelData = allPartiesData.map((party, index) => ({
         'Sr. No.': index + 1,
@@ -98,10 +150,8 @@ const Parties = () => {
         'Bill GST To': party.bill_gst_to || 'N/A'
       }));
 
-
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(excelData);
-
 
       const colWidths = [
         { wch: 8 }, 
@@ -120,13 +170,10 @@ const Parties = () => {
       ];
       ws['!cols'] = colWidths;
 
-
       XLSX.utils.book_append_sheet(wb, ws, "Parties Data");
-
 
       const currentDate = new Date().toISOString().split('T')[0];
       const filename = `Parties_Data_${currentDate}.xlsx`;
-
 
       XLSX.writeFile(wb, filename);
     } catch (error) {
@@ -195,6 +242,25 @@ const Parties = () => {
               >
                 <FiPlus size={16} />
                 Add New Merchant
+              </button>
+
+              {/* Bulk Upload Button */}
+              <button
+                onClick={() => setShowBulkUploadMenu(true)}
+                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  backgroundColor: colors.warning[600],
+                  focusRingColor: colors.warning[500],
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.warning[700];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.warning[600];
+                }}
+              >
+                <AiFillFileExcel size={16} />
+                Bulk Upload
               </button>
 
               {/* Excel Export Button */}
@@ -348,6 +414,90 @@ const Parties = () => {
           </div>
         </div>
 
+        {/* Bulk Upload Modal */}
+        {showBulkUploadMenu && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div
+              className="rounded-xl shadow-xl max-w-md w-full p-6"
+              style={{ backgroundColor: colors.background.card }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Bulk Upload Merchants
+                </h3>
+                <button
+                  onClick={() => setShowBulkUploadMenu(false)}
+                  className="p-1 rounded-lg transition-colors"
+                  style={{ color: colors.text.secondary }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = colors.gray[100];
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  <RxCross2 size="20px" />
+                </button>
+              </div>
+
+              <form onSubmit={bulkUploadHandler}>
+                <div className="mb-4">
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.text.primary }}
+                  >
+                    Choose File (.csv or .xlsx)
+                  </label>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept=".csv, .xlsx"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                    style={{
+                      backgroundColor: colors.input.background,
+                      borderColor: colors.input.border,
+                      color: colors.text.primary,
+                    }}
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={bulkUploading}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                    style={{
+                      backgroundColor: colors.button.primary,
+                      color: colors.text.inverse,
+                    }}
+                  >
+                    {bulkUploading ? "Uploading..." : "Upload"}
+                    <AiFillFileExcel size="16px" />
+                  </button>
+
+                  <a href={SampleCSV} className="flex-1">
+                    <button
+                      type="button"
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                      style={{
+                        borderColor: colors.border.medium,
+                        color: colors.text.primary,
+                        backgroundColor: colors.background.card,
+                      }}
+                    >
+                      Sample CSV
+                      <AiFillFileExcel size="16px" />
+                    </button>
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         {/* Table Section */}
         <div
           className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
@@ -395,4 +545,4 @@ const Parties = () => {
   );
 };
 
-export default Parties;
+export default Parties; 

@@ -875,7 +875,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                       Processes
                     </h3>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {processes.map((proc, idx) => (
                       <div className="border rounded-md p-3" key={idx}>
                         <div

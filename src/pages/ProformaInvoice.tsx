@@ -27,6 +27,8 @@ const ProformaInvoice: React.FC = () => {
   const [data, setData] = useState<any[] | []>([]);
   const [filteredData, setFilteredData] = useState<any[] | []>([]);
   const [isLoadingProformaInvoices] = useState<boolean>(false);
+  const [allItems, setAllItems] = useState<any[] | []>([]); // Add this to store all items for PDF generation
+  
   const {
     isAddProformaInvoiceDrawerOpened,
     isUpdateProformaInvoiceDrawerOpened,
@@ -83,6 +85,28 @@ const ProformaInvoice: React.FC = () => {
     }
   };
 
+  // Fetch all items for PDF generation
+  const fetchItemsHandler = async () => {
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "product/all",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const results = await response.json();
+      if (!results.success) {
+        throw new Error(results?.message);
+      }
+      setAllItems(results.products);
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    }
+  };
+
   const deleteProformaInvoiceHandler = async (id: string) => {
     try {
       const response = await deleteProformaInvoice(id).unwrap();
@@ -98,6 +122,7 @@ const ProformaInvoice: React.FC = () => {
 
   useEffect(() => {
     fetchProformaInvoiceHandler();
+    fetchItemsHandler(); // Fetch items for PDF generation
   }, []);
 
   useEffect(() => {
@@ -252,6 +277,7 @@ const ProformaInvoice: React.FC = () => {
           openUpdateProformaInvoiceDrawer={
             openProformaInvoiceUpdateDrawerHandler
           }
+          // allItems={allItems} // Pass allItems to the table for PDF generation
         />
       </div>
     </div>
