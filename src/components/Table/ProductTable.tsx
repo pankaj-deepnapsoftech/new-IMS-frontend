@@ -76,7 +76,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
     previousPage,
     canNextPage,
     canPreviousPage,
-    state: { pageIndex },
+    state: { pageIndex, pageSize },
     pageCount,
     setPageSize,
   } = useTable(
@@ -159,21 +159,25 @@ const ProductTable: React.FC<ProductTableProps> = ({
               >
                 Show:
               </span>
-              <select
+              <Select
                 onChange={(e) => setPageSize(Number(e.target.value))}
-                className="px-3 py-2 text-sm rounded-lg border transition-colors"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor: colors.border.light,
-                  color: colors.text.primary,
+                value={pageSize} // this keeps the default value selected
+                size="sm"
+                width="auto"
+                borderRadius="lg"
+                borderColor={colors.border.light}
+                _focus={{
+                  borderColor: colors.primary[500],
+                  boxShadow: `0 0 0 1px ${colors.primary[500]}`,
                 }}
               >
-                {[5,10, 20, 50, 100, 100000].map((size) => (
+                {[5, 10, 20, 50, 100, 100000].map((size) => (
                   <option key={size} value={size}>
                     {size === 100000 ? "All" : size}
                   </option>
                 ))}
-              </select>
+              </Select>
+
             </div>
           </div>
 

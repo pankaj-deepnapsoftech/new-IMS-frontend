@@ -187,7 +187,7 @@ const AddParties = ({
 
       {/* Drawer */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full  bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${showData ? "translate-x-0" : "translate-x-full"
+        className={`fixed inset-y-0 right-0 z-50 w-full   bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${showData ? "translate-x-0" : "translate-x-full"
           }`}
       >
         <div className="h-full flex flex-col">
@@ -448,10 +448,8 @@ const AddParties = ({
                 </div>
               </div>
 
-             
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+        
+              <div className="absolute bottom-0 left-0 w-full bg-white px-4 py-6 border-t border-gray-200 flex flex-col sm:flex-row gap-4">
                 <button
                   type="button"
                   onClick={() => setshowData(false)}

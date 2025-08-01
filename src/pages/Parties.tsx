@@ -184,7 +184,7 @@ const Parties = () => {
 
   useEffect(() => {
     fetchPartiesData(page);
-  }, [counter, page]);
+  }, [counter, page,limit]);
 
   return (
     <div
@@ -518,6 +518,7 @@ const Parties = () => {
             isLoading={isLoading}
             fetchPartiesData={fetchPartiesData}
             setLimit={setLimit}
+            limit={limit}
           />
         </div>
 

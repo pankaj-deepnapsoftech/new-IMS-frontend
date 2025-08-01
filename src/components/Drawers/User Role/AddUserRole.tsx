@@ -35,11 +35,11 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
     { value: "parties", label: "Parties" },
     { value: "sales", label: "Sales" },
     { value: "task", label: "Task" },
-    { value: "bom", label: "bom" },
+    { value: "bom", label: "Bom" },
   ];
 
   const [addRole] = useAddRoleMutation();
-
+  
   const addRoleHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 

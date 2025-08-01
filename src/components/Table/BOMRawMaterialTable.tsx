@@ -221,6 +221,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
             <Select
               onChange={(e) => setPageSize(e.target.value)}
               width="120px"
+              value={pageSize}
               size="sm"
               style={{
                 backgroundColor: colors.input.background,
@@ -233,6 +234,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                 boxShadow: `0 0 0 3px ${colors.primary[100]}`,
               }}
             >
+              <option value={5}>5</option>
               <option value={10}>10</option>
               <option value={20}>20</option>
               <option value={50}>50</option>
