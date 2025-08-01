@@ -333,13 +333,13 @@ const PartiesTable = ({
               {filteredParties.length} Part
               {filteredParties.length !== 1 ? "ies" : "y"} Found
             </h3>
-            {selectedParties.length > 0 && (
+            {/* {selectedParties.length > 0 && (
               <p className="text-sm mt-1" style={{ color: colors.text.secondary }}>
                 {selectedParties.length} selected
               </p>
-            )}
+            )} */}
           </div>
-          
+
           {/* Bulk Actions */}
           {selectedParties.length > 0 && (
             <div className="flex items-center gap-3">
@@ -377,7 +377,7 @@ const PartiesTable = ({
               color: colors.text.primary,
             }}
           >
-            {[5,10, 20, 50, 100].map((size) => (
+            {[5, 10, 20, 50, 100].map((size) => (
               <option key={size} value={size}>
                 {size === 100 ? "All" : size}
               </option>
@@ -546,7 +546,9 @@ const PartiesTable = ({
                     <input
                       type="checkbox"
                       checked={selectedParties.includes(party._id)}
-                      onChange={(e) => handleSelectParty(party._id, e.target.checked)}
+                      onChange={(e) =>
+                        handleSelectParty(party._id, e.target.checked)
+                      }
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                     />
                   </td>
@@ -763,7 +765,7 @@ const PartiesTable = ({
                   className="rounded-lg p-4 mb-4"
                   style={{ backgroundColor: colors.error[50] }}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-center gap-3">
                     <svg
                       className="w-6 h-6 flex-shrink-0"
                       style={{ color: colors.error[500] }}
@@ -780,13 +782,13 @@ const PartiesTable = ({
                     </svg>
                     <div>
                       <p
-                        className="font-medium"
+                        className="font-medium text-center"
                         style={{ color: colors.error[800] }}
                       >
                         Delete Party
                       </p>
                       <p
-                        className="text-sm"
+                        className="text-sm text-center"
                         style={{ color: colors.error[600] }}
                       >
                         This action cannot be undone. All party data will be
@@ -848,26 +850,39 @@ const PartiesTable = ({
                   className="rounded-lg p-4 mb-4"
                   style={{ backgroundColor: colors.error[50] }}
                 >
-                  <div className="flex items-start gap-3">
-                    <BiSolidTrash
-                      size={20}
+                  <div className="flex flex-col items-center gap-3">
+                    <svg
+                      className="w-6 h-6 flex-shrink-0"
                       style={{ color: colors.error[500] }}
-                      className="mt-0.5 flex-shrink-0"
-                    />
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
+                    </svg>
                     <div>
                       <p
-                        className="font-medium text-sm"
+                        className="font-medium text-sm text-center"
                         style={{ color: colors.error[700] }}
                       >
-                        Delete {selectedParties.length} {selectedParties.length === 1 ? 'Party' : 'Parties'}
+                        Delete {selectedParties.length}{" "}
+                        {selectedParties.length === 1 ? "Party" : "Parties"}
                       </p>
                       <p
-                        className="text-sm"
+                        className="text-sm text-center"
                         style={{ color: colors.error[600] }}
                       >
-                        This action cannot be undone. All selected party data will be
-                        permanently removed.
+                        This action cannot be undone. All selected party data
+                        will be permanently removed.
                       </p>
+                    </div>
+                    <div>
+                      <p className="font-men"></p>
                     </div>
                   </div>
                 </div>
@@ -894,7 +909,11 @@ const PartiesTable = ({
                     color: colors.text.inverse,
                   }}
                 >
-                  {isBulkDeleting ? "Deleting..." : `Delete ${selectedParties.length} ${selectedParties.length === 1 ? 'Party' : 'Parties'}`}
+                  {isBulkDeleting
+                    ? "Deleting..."
+                    : `Delete ${selectedParties.length} ${
+                        selectedParties.length === 1 ? "Party" : "Parties"
+                      }`}
                 </button>
               </div>
             </div>
