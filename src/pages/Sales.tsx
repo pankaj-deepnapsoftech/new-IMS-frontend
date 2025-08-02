@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { MdOutlineRefresh } from "react-icons/md";
-import { FiSearch, FiPlus, FiShoppingCart } from "react-icons/fi";
+import { FiSearch, FiPlus, FiShoppingCart, FiDownload } from "react-icons/fi";
 import AddNewSale from "../components/Drawers/Sales/AddNewSale";
 // import UpdateSale from "../components/Drawers/Sales/UpdateSale";
 import { useState, useEffect } from "react";
@@ -11,6 +11,7 @@ import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { colors } from "../theme/colors";
+import * as XLSX from 'xlsx';
 
 const Sales = () => {
     const [page, setPage] = useState(1);
@@ -32,7 +33,8 @@ const Sales = () => {
     //     setSelectedSale(data);
     //     seteditsale(true);
     // };
-  
+    const [isExporting, setIsExporting] = useState(false);
+
 
     const fetchPurchases = async () => {
         try {
@@ -83,10 +85,107 @@ const Sales = () => {
             );
         }
     };
+    const fetchAllSalesOrderForExport = async () => {
+        try {
+            setIsExporting(true);
+            const res = await fetch(
+                `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=1&limit=10000`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${cookies?.access_token}`,
+                    },
+                }
+            );
+
+            const data = await res.json();
+            console.log(data)
+            return data?.data || [];
+        } catch (error) {
+            console.error("Error fetching parties data for export:", error);
+            return [];
+        } finally {
+            setIsExporting(false);
+        }
+    };
+    const exportToExcel = async () => {
+        try {
+            setIsExporting(true);
+            const res = await fetch(
+                `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=1&limit=10000`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${cookies?.access_token}`,
+                    },
+                }
+            );
+
+            const result = await res.json();
+            const allSalesData = result?.data || [];
+
+            if (!allSalesData.length) {
+                toast.warning("No data available to export");
+                return;
+            }
+
+            const excelData = allSalesData.map((sale, index) => ({
+                "Sr. No.": index + 1,
+                "Date": sale?.createdAt
+                    ? new Date(sale.createdAt).toLocaleDateString()
+                    : "N/A",
+                "Sale ID": sale.order_id || "N/A",
+                "Merchant Name": sale?.party?.consignee_name?.[0] || "N/A",
+                "Product": sale?.product_id?.[0]?.name || "N/A",
+                "Quantity": sale?.product_qty || 0,
+                "Price": sale?.price || 0,
+                "SubTotal": sale?.price && sale?.product_qty
+                    ? sale.price * sale.product_qty
+                    : "N/A",
+                "GST (%)": sale?.GST || 0,
+                "Total Price (Incl. GST)": sale?.total_price || 0,
+                // "Employee": sale?.user_id?.[0]?.first_name || "N/A",
+                "Status": sale?.Status ||
+                    (sale?.assinedto?.some(item => item?.isCompleted?.toLowerCase() === "pending")
+                        ? "Pending"
+                        : "Completed"),
+               
+            }));
+
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(excelData);
+
+            ws['!cols'] = [
+                { wch: 8 },
+                { wch: 25 },
+                { wch: 20 },
+                { wch: 20 },
+                { wch: 20 },
+                { wch: 15 },
+                { wch: 15 }
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws, "Sales Data");
+
+            const currentDate = new Date().toISOString().split('T')[0];
+            const filename = `Sales_Data_${currentDate}.xlsx`;
+
+            XLSX.writeFile(wb, filename);
+        } catch (error) {
+            console.error("Error exporting to Excel:", error);
+            toast.error("Error exporting sales data.");
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+
 
     useEffect(() => {
         fetchPurchases(page);
         fetchEmployees();
+        fetchAllSalesOrderForExport()
     }, [page]);
 
     useEffect(() => {
@@ -180,7 +279,28 @@ const Sales = () => {
                                 <FiPlus size={16} />
                                 Add New Sale
                             </button>
-
+                            <button
+                                onClick={exportToExcel}
+                                disabled={isExporting}
+                                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{
+                                    backgroundColor: colors.success[600],
+                                    focusRingColor: colors.success[500],
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!isExporting) {
+                                        e.currentTarget.style.backgroundColor = colors.success[700];
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!isExporting) {
+                                        e.currentTarget.style.backgroundColor = colors.success[600];
+                                    }
+                                }}
+                            >
+                                <FiDownload size={16} />
+                                {isExporting ? 'Exporting...' : 'Export to Excel'}
+                            </button>
                             <button
                                 onClick={fetchPurchases}
                                 className="flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
@@ -203,7 +323,7 @@ const Sales = () => {
                         </div>
                     </div>
 
-                   
+
                     <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
                         {/* Search Input */}
                         <div className="flex-1 max-w-md">

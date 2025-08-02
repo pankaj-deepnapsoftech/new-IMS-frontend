@@ -19,7 +19,7 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
   closeDrawerHandler,
   fetchUserRolesHandler,
   roleId,
-}) => {
+}) => {  
   const [cookies, setCookie] = useCookies();
   const [isLoadingRole, setIsLoadingRole] = useState<boolean>(false);
   const [isUpdatingRole, setIsUpdatingRole] = useState<boolean>(false);
@@ -33,12 +33,12 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
     { value: "inventory", label: "Inventory" },
     { value: "store", label: "Store" },
     { value: "approval", label: "Approval" },
-    { value: "agent", label: "Agent" },
+    { value: "agent", label: "Agent" }, 
     { value: "production", label: "Production" },
     { value: "parties", label: "Parties" },
     { value: "sales", label: "Sales" },
     { value: "task", label: "Task" },
-    { value: "bom", label: "bom" },
+    { value: "bom", label: "Bom" },
   ];
 
   const [updateRole] = useUpdateRoleMutation();

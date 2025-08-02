@@ -171,6 +171,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
               </span>
               <select
                 onChange={(e) => setPageSize(Number(e.target.value))}
+                value={pageSize}
                 className="px-3 py-2 text-sm rounded-lg border transition-colors"
                 style={{
                   backgroundColor: colors.input.background,
