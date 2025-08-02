@@ -20,6 +20,7 @@ import {
   Edit3,
   UserPlus,
 } from "lucide-react";
+import { RiContactsBook2Fill } from "react-icons/ri";
 
 const AddParties = ({
   showData,
@@ -62,6 +63,7 @@ const AddParties = ({
       shipped_gst_to: edittable?.shipped_gst_to || "",
       bill_gst_to: edittable?.bill_gst_to || "",      
       company_name: edittable?.company_name || "",
+      contact_person_name: edittable?.contact_person_name
     },
     validationSchema: PartiesFromValidation,
     onSubmit: async (values) => {
@@ -306,6 +308,23 @@ const AddParties = ({
                         )}
                     </div>
                   )}
+                  {formik.values.type === "Company" && (
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <RiContactsBook2Fill  className="h-4 w-4 text-gray-500" />
+                       Contact Person Name
+                      </label>
+                      <input
+                        type="text"
+                        name="contact_person_name"
+                        value={formik.values.contact_person_name || ""}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        placeholder="Enter company name"
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                      />
+                    </div>
+                  )}
                   {formik.values.type === "Individual" && (
                     <div className="space-y-2 md:col-span-2">
                       {renderFieldList(
@@ -360,31 +379,8 @@ const AddParties = ({
                       </p>
                     )}
                   </div>
-
-                  {/* Bill To */}
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <FileText className="h-4 w-4 text-gray-500" />
-                      Bill To
-                    </label>
-                    <input
-                      type="text"
-                      name="bill_to"
-                      value={formik.values.bill_to}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      placeholder="Enter billing address"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                    />
-                    {formik.touched.bill_to && formik.errors.bill_to && (
-                      <p className="text-sm text-red-600 flex items-center gap-1">
-                        {formik.errors.bill_to}
-                      </p>
-                    )}
-                  </div>
-
                   {formik.values.type === "Company"
-                   && (<div className="space-y-2">
+                    && (<div className="space-y-2">
                       <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                         <MapPin className="h-4 w-4 text-gray-500" />
                         Shipped GSTIN
@@ -414,6 +410,29 @@ const AddParties = ({
                         )}
                     </div>)
                   }
+                  {/* Bill To */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <FileText className="h-4 w-4 text-gray-500" />
+                      Bill To
+                    </label>
+                    <input
+                      type="text"
+                      name="bill_to"
+                      value={formik.values.bill_to}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      placeholder="Enter billing address"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                    />
+                    {formik.touched.bill_to && formik.errors.bill_to && (
+                      <p className="text-sm text-red-600 flex items-center gap-1">
+                        {formik.errors.bill_to}
+                      </p>
+                    )}
+                  </div>
+
+               
 
                   {/* Bill To */}
                   {formik.values.type === "Company" && (<div className="space-y-2">

@@ -239,6 +239,14 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
+                 Contact Person Number     
+                </th>
+
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+
                   Email
                 </th>
                 <th
@@ -368,6 +376,13 @@ const PartiesTable = ({
                     title={party.company_name}
                   >
                     {party.company_name || "N/A"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                    style={{ color: colors.text.secondary }}
+                    // title={party.company_name}
+                  >
+                    {party.contact_person_name || "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
