@@ -517,6 +517,17 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 color="white"
                 backgroundColor="#000000"
                 _hover={{ bg: "#000000" }}
+                style={{
+                  backgroundColor: colors.button.primary,
+                  color: colors.text.inverse,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.primaryHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.button.primary;
+                }}
               >
                 Submit
               </Button>

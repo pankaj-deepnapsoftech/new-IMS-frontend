@@ -82,7 +82,7 @@ const Navigation: React.FC = () => {
         className={`bg-white border-r border-gray-200 shadow-xl h-full overflow-y-auto
          lg:block lg:relative lg:translate-x-0
          ${checkMenu ? "translate-x-0" : "-translate-x-full"}
-         fixed z-30 w-80 lg:w-64 top-0 left-0 transition-transform duration-300 ease-in-out`}
+         fixed z-30 w-80 lg:w-[16.6rem] top-0 left-0 transition-transform duration-300 ease-in-out`}
       >
         {/* Logo */}
         <div className="border-b border-gray-100">

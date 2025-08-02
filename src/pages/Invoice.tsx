@@ -243,7 +243,16 @@ const Invoice: React.FC = () => {
                     />
                   </svg>
                 }
-                className="shadow-lg hover:shadow-xl transition-all duration-200"
+                style={{
+                  backgroundColor: colors.primary[600],
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary[700];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary[600];
+                }}
+                className="flex items-center px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
                 _hover={{ transform: "translateY(-1px)" }}
               >
                 Add New Tax Invoice

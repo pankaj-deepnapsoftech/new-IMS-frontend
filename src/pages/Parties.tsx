@@ -240,7 +240,7 @@ const Parties = () => {
                   e.currentTarget.style.backgroundColor = colors.primary[600];
                 }}
               >
-                <FiPlus size={16} />
+                <FiPlus size={20} />
                 Add New Merchant
               </button>
 
@@ -259,7 +259,7 @@ const Parties = () => {
                   e.currentTarget.style.backgroundColor = colors.warning[600];
                 }}
               >
-                <AiFillFileExcel size={16} />
+                <AiFillFileExcel size={20} />
                 Bulk Upload
               </button> */}
 
@@ -283,7 +283,7 @@ const Parties = () => {
                   }
                 }}
               >
-                <FiDownload size={16} />
+                <FiDownload size={20} />
                 {isExporting ? 'Exporting...' : 'Export to Excel'}
               </button>
 
@@ -303,7 +303,7 @@ const Parties = () => {
                     colors.background.card;
                 }}
               >
-                <MdOutlineRefresh size={16} />
+                <MdOutlineRefresh size={20} />
                 Refresh
               </button>
             </div>

@@ -31,6 +31,9 @@ const PartiesTable = ({
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+    const [selectedParties, setSelectedParties] = useState([]);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   // const columns = useMemo(() => [
   //     { Header: "Full name", accessor: "full_name" },
   //     { Header: "Email", accessor: "email" },
@@ -80,7 +83,6 @@ const PartiesTable = ({
 
     return matchSearch && matchType && matchRole;
   });
-  // console.log(filteredParties)
 
   const handleDelete = async (partyId) => {
     if (isSubmitting) return;
@@ -99,6 +101,7 @@ const PartiesTable = ({
 
       if (res?.ok) {
         setPartiesData((prev) => prev.filter((party) => party._id !== partyId));
+        toast.success("Party deleted successfully");
       } else {
         console.error(error?.message);
       }
@@ -106,11 +109,85 @@ const PartiesTable = ({
       setIsConfirmed(false);
     } catch (error) {
       console.error("Error deleting party:", error);
+      toast.error("Error deleting party");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedParties(filteredParties.map(party => party._id));
+    } else {
+      setSelectedParties([]);
+    }
+  };
+
+  const handleSelectParty = (partyId, checked) => {
+    if (checked) {
+      setSelectedParties(prev => [...prev, partyId]);
+    } else {
+      setSelectedParties(prev => prev.filter(id => id !== partyId));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (isBulkDeleting || selectedParties.length === 0) return;
+    setIsBulkDeleting(true);
+
+    try {
+      const deletePromises = selectedParties.map(partyId =>
+        fetch(`${process.env.REACT_APP_BACKEND_URL}parties/delete/${partyId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${cookies.access_token}`,
+          },
+        })
+      );
+
+      const results = await Promise.all(deletePromises);
+      const successCount = results.filter(res => res.ok).length;
+      
+      if (successCount > 0) {
+        setPartiesData(prev => 
+          prev.filter(party => !selectedParties.includes(party._id))
+        );
+        toast.success(`Successfully deleted ${successCount} ${successCount === 1 ? 'party' : 'parties'}`);
+      }
+
+      if (successCount < selectedParties.length) {
+        toast.error(`Failed to delete ${selectedParties.length - successCount} ${selectedParties.length - successCount === 1 ? 'party' : 'parties'}`);
+      } 
+
+      setSelectedParties([]);
+      setShowBulkDeleteModal(false);
+    } catch (error) {
+      console.error("Error in bulk delete:", error);
+      toast.error("Error deleting parties");
+    } finally {
+      setIsBulkDeleting(false);
+    }
+  };
+
+  const isAllSelected = filteredParties.length > 0 && selectedParties.length === filteredParties.length;
+  const isIndeterminate = selectedParties.length > 0 && selectedParties.length < filteredParties.length;
+
+  // if (isLoading) {
+  //   return (
+  //       <section className="h-full w-full text-white ">
+  //               <div className="flex justify-end mb-2 mt-2 bg-transparent">
+  //                   <select
+  //                       onChange={(e) => setLimit(Number(e.target.value))}
+  //                       className="border bg-transparent px-3 rounded-md py-1 focus:outline-none"
+  //                   >
+  //                       {[10, 20, 50, 100].map((size) => (
+  //                           <option className="text-white bg-[#444e5b]" key={size} value={size}>
+  //                               {size === 100 ? "All" : size}
+  //                           </option>
+  //                       ))}
+  //                   </select>
+  //               </div>
+  //           <div className="overflow-x-auto w-full">
 
 
   if (!filteredParties || filteredParties.length === 0) {
@@ -163,7 +240,32 @@ const PartiesTable = ({
               {filteredParties.length} Part
               {filteredParties.length !== 1 ? "ies" : "y"} Found
             </h3>
+            {/* {selectedParties.length > 0 && (
+              <p className="text-sm mt-1" style={{ color: colors.text.secondary }}>
+                {selectedParties.length} selected
+              </p>
+            )} */}
           </div>
+
+          {/* Bulk Actions */}
+          {selectedParties.length > 0 && (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowBulkDeleteModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                <BiSolidTrash size={16} />
+                Delete Selected ({selectedParties.length})
+              </button>
+              <button
+                onClick={() => setSelectedParties([])}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                <BiX size={16} />
+                Clear Selection
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
@@ -183,7 +285,7 @@ const PartiesTable = ({
               color: colors.text.primary,
             }}
           >
-            {[5,10, 20, 50, 100].map((size) => (
+            {[5, 10, 20, 50, 100].map((size) => (
               <option key={size} value={size}>
                 {size === 100 ? "All" : size}
               </option>
@@ -204,6 +306,20 @@ const PartiesTable = ({
           <table className="w-full">
             <thead style={{ backgroundColor: colors.table.header }}>
               <tr style={{ borderBottom: `1px solid ${colors.table.border}` }}>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isAllSelected}
+                    ref={(el) => {
+                      if (el) el.indeterminate = isIndeterminate;
+                    }}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
@@ -339,6 +455,19 @@ const PartiesTable = ({
                         : colors.table.stripe;
                   }}
                 >
+                  <td
+                    className="px-4 py-3 text-sm whitespace-nowrap"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedParties.includes(party._id)}
+                      onChange={(e) =>
+                        handleSelectParty(party._id, e.target.checked)
+                      }
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                  </td>
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
@@ -559,7 +688,7 @@ const PartiesTable = ({
                   className="rounded-lg p-4 mb-4"
                   style={{ backgroundColor: colors.error[50] }}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-center gap-3">
                     <svg
                       className="w-6 h-6 flex-shrink-0"
                       style={{ color: colors.error[500] }}
@@ -576,13 +705,13 @@ const PartiesTable = ({
                     </svg>
                     <div>
                       <p
-                        className="font-medium"
+                        className="font-medium text-center"
                         style={{ color: colors.error[800] }}
                       >
                         Delete Party
                       </p>
                       <p
-                        className="text-sm"
+                        className="text-sm text-center"
                         style={{ color: colors.error[600] }}
                       >
                         This action cannot be undone. All party data will be
@@ -615,6 +744,99 @@ const PartiesTable = ({
                   }}
                 >
                   {isSubmitting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Modal */}
+      {showBulkDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-md mx-4 rounded-xl shadow-xl"
+            style={{ backgroundColor: colors.background.card }}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Confirm Bulk Deletion
+                </h2>
+              </div>
+
+              <div className="mb-6">
+                <div
+                  className="rounded-lg p-4 mb-4"
+                  style={{ backgroundColor: colors.error[50] }}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <svg
+                      className="w-6 h-6 flex-shrink-0"
+                      style={{ color: colors.error[500] }}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
+                    </svg>
+                    <div>
+                      <p
+                        className="font-medium text-sm text-center"
+                        style={{ color: colors.error[700] }}
+                      >
+                        Delete {selectedParties.length}{" "}
+                        {selectedParties.length === 1 ? "Party" : "Parties"}
+                      </p>
+                      <p
+                        className="text-sm text-center"
+                        style={{ color: colors.error[600] }}
+                      >
+                        This action cannot be undone. All selected party data
+                        will be permanently removed.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-men"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowBulkDeleteModal(false)}
+                  className="flex-1 px-4 py-2 rounded-lg border transition-all duration-200"
+                  style={{
+                    borderColor: colors.border.medium,
+                    color: colors.text.secondary,
+                    backgroundColor: colors.background.card,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={isBulkDeleting}
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50"
+                  style={{
+                    backgroundColor: colors.error[500],
+                    color: colors.text.inverse,
+                  }}
+                >
+                  {isBulkDeleting
+                    ? "Deleting..."
+                    : `Delete ${selectedParties.length} ${
+                        selectedParties.length === 1 ? "Party" : "Parties"
+                      }`}
                 </button>
               </div>
             </div>
