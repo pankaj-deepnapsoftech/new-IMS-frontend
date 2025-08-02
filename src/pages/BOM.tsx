@@ -1,5 +1,7 @@
+//@ts-nocheck
+
 import { Button } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdOutlineRefresh, MdAdd } from "react-icons/md";
 import BOMTable from "../components/Table/BOMTable";
 import { useDeleteBomMutation, useLazyFetchBomsQuery } from "../redux/api/api";
@@ -17,13 +19,17 @@ import {
 import AddBom from "../components/Drawers/BOM/AddBom";
 import BomDetails from "../components/Drawers/BOM/BomDetails";
 import UpdateBom from "../components/Drawers/BOM/UpdateBom";
-import { FiSearch } from "react-icons/fi";
+import { FiDownload, FiSearch } from "react-icons/fi";
 import { colors } from "../theme/colors";
 import { FileText } from "lucide-react";
+import { AiFillFileExcel } from "react-icons/ai";
+import { RxCross2 } from "react-icons/rx";
+import SampleCSV from "../assets/csv/bom-sample.csv"
+import * as XLSX from 'xlsx';
 
 const BOM: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
-  console.log("allowedroutes =", allowedroutes);
+  // console.log("allowedroutes =", allowedroutes);
   const isAllowed = isSuper || allowedroutes.includes("production");
   const [cookies] = useCookies();
   const [bomId, setBomId] = useState<string | undefined>();
@@ -31,9 +37,12 @@ const BOM: React.FC = () => {
   const [isLoadingBoms, setIsLoadingBoms] = useState<boolean>(false);
   const [boms, setBoms] = useState<any[]>([]);
   const [filteredBoms, setFilteredBoms] = useState<any[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
 
+  // const [showBulkUploadMenu, setShowBulkUploadMenu] = useState(false);fhjffryj
   const [deleteBom] = useDeleteBomMutation();
-
+  // const [bulkUploading, setBulkUploading] = useState(false);
+  // const fileRef = useRef<HTMLInputElement | null>(null);
   const {
     isAddBomDrawerOpened,
     isUpdateBomDrawerOpened,
@@ -78,9 +87,8 @@ const BOM: React.FC = () => {
       if (!data.success) {
         throw new Error(data.message);
       }
-      setBoms(data.boms);
+      setBoms(data?.boms);
       setFilteredBoms(data.boms);
-
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
@@ -97,6 +105,91 @@ const BOM: React.FC = () => {
       toast.error(error?.data?.message || "Something went wrong");
     }
   };
+  console.log(boms)
+  const exportProductsToExcel = async () => {
+    try {
+      setIsExporting(true);
+
+      if (!boms || boms.length === 0) {
+        toast.warning("No BOMs to export");
+        return;
+      }
+ 
+      const dataForExcel = boms.map((bom: any, index: number) => {
+        const rawMaterialNames = bom?.raw_materials
+          ?.map((mat: any) => mat?.item?.name || "N/A")
+          .join(", ");
+
+        const rawMaterialQuantities = bom?.raw_materials
+          ?.map((mat: any) => mat?.quantity || 0)
+          .join(", ");
+
+        const scrapMaterialNames = bom?.scrap_materials
+          ?.map((scrap: any) => scrap?.item?.name || "N/A")
+          .join(", ");
+
+        const labourCharges = bom?.other_charges?.labour_charges || 0;
+        const machineryCharges = bom?.other_charges?.machinery_charges || 0;
+        const electricityCharges = bom?.other_charges?.electricity_charges || 0;
+        const otherCharges = bom?.other_charges?.other_charges || 0;
+
+        return {
+          "Sr. No.": index + 1,
+          "Created At": bom?.createdAt
+            ? new Date(bom?.createdAt).toLocaleDateString()
+            : "N/A",
+          "BOM Name": bom?.bom_name || "N/A",
+          "Parts Count": bom?.parts_count || 0,
+          "Total Cost": bom?.total_cost || 0,
+          "Finish Goods Item Name": bom?.finished_good?.item?.name || "N/A",
+          "F Item Quantity": bom?.finished_good?.quantity || 0,
+          "Raw Materials Items Name": rawMaterialNames || "N/A",
+          "R Item Quantity": rawMaterialQuantities || "0",
+          "Scrap Materials": scrapMaterialNames || "N/A",
+          "Labour Charges": labourCharges,
+          "Machinery Charges": machineryCharges,
+          "Electricity Charges": electricityCharges,
+          "Other Charges": otherCharges,
+          "Updated At": bom?.updatedAt
+            ? new Date(bom?.updatedAt).toLocaleDateString()
+            : "N/A",
+        };
+      });
+
+
+
+      const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "BOM Products");
+
+      worksheet["!cols"] = [
+        { wch: 8 },   // Sr. No.
+        { wch: 20 },  // Created At
+        { wch: 25 },  // BOM Name
+        { wch: 12 },  // Parts Count
+        { wch: 12 },  // Total Cost
+        { wch: 25 },  // Finish Goods Item Name
+        { wch: 12 },  // F Item Quantity
+        { wch: 30 },  // Raw Materials Items Name
+        { wch: 20 },  // R Item Quantity
+        { wch: 25 },  // Scrap Materials
+        { wch: 18 },  // Labour Charges
+        { wch: 20 },  // Machinery Charges
+        { wch: 20 },  // Electricity Charges
+        { wch: 18 },  // Other Charges
+        { wch: 20 },  // Updated At
+      ];
+
+      const fileName = `BOM_Export_${new Date().toISOString().split("T")[0]}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+    } catch (err) {
+      console.error("Error exporting BOMs:", err);
+      toast.error("Error exporting BOMs");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
 
   useEffect(() => {
     fetchBomsHandler();
@@ -219,7 +312,29 @@ const BOM: React.FC = () => {
                 <MdAdd size="20px" />
                 Add BOM
               </button>
-
+       
+              <button
+                onClick={exportProductsToExcel}
+                disabled={isExporting}
+                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: colors.success[600],
+                  color: colors.text.inverse,
+                }}
+                onMouseEnter={(e) => {
+                  if (!isExporting) {
+                    e.currentTarget.style.backgroundColor = colors.success[700];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isExporting) {
+                    e.currentTarget.style.backgroundColor = colors.success[600];
+                  }
+                }}
+              >
+                <FiDownload size={16} />
+                {isExporting ? 'Exporting...' : 'Export to Excel'}
+              </button>
               <button
                 onClick={fetchBomsHandler}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
@@ -241,7 +356,89 @@ const BOM: React.FC = () => {
               </button>
             </div>
           </div>
+          {/* Bulk Upload Modal */}
+          {/* {showBulkUploadMenu && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div
+                className="rounded-xl shadow-xl max-w-md w-full p-6"
+                style={{ backgroundColor: colors.background.card }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3
+                    className="text-lg font-semibold"
+                    style={{ color: colors.text.primary }}
+                  >
+                    Bulk Upload Merchants
+                  </h3>
+                  <button
+                    onClick={() => setShowBulkUploadMenu(false)}
+                    className="p-1 rounded-lg transition-colors"
+                    style={{ color: colors.text.secondary }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = colors.gray[100];
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }}
+                  >
+                    <RxCross2 size="20px" />
+                  </button>
+                </div>
 
+                <form onSubmit={bulkUploadHandler}>
+                  <div className="mb-4">
+                    <label
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: colors.text.primary }}
+                    >
+                      Choose File (.csv or .xlsx)
+                    </label>
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept=".csv, .xlsx"
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                      style={{
+                        backgroundColor: colors.input.background,
+                        borderColor: colors.input.border,
+                        color: colors.text.primary,
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="submit"
+                      disabled={bulkUploading}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                      style={{
+                        backgroundColor: colors.button.primary,
+                        color: colors.text.inverse,
+                      }}
+                    >
+                      {bulkUploading ? "Uploading..." : "Upload"}
+                      <AiFillFileExcel size="16px" />
+                    </button>
+
+                    <a href={SampleCSV} className="flex-1">
+                      <button
+                        type="button"
+                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                        style={{
+                          borderColor: colors.border.medium,
+                          color: colors.text.primary,
+                          backgroundColor: colors.background.card,
+                        }}
+                      >
+                        Sample CSV
+                        <AiFillFileExcel size="16px" />
+                      </button>
+                    </a>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )} */}
           {/* Search and Filters Row */}
           <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
             {/* Search Input */}

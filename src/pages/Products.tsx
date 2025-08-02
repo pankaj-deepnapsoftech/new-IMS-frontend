@@ -495,18 +495,15 @@ const Products: React.FC = () => {
 
               <button
                 onClick={() => setShowBulkUploadMenu(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                className="inline-flex items-center gap-2 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                 style={{
-                  backgroundColor: colors.button.secondary,
-                  color: colors.text.inverse,
+                  backgroundColor: colors.warning[600],
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    colors.button.secondaryHover;
+                  e.currentTarget.style.backgroundColor = colors.warning[700];
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    colors.button.secondary;
+                  e.currentTarget.style.backgroundColor = colors.warning[600];
                 }}
               >
                 <AiFillFileExcel size="20px" />
@@ -559,7 +556,7 @@ const Products: React.FC = () => {
                 className="block text-sm font-medium mb-2"
                 style={{ color: colors.text.primary }}
               >
-                Type 
+                Type
               </label>
               <select
                 value={productTypeFilter}
@@ -588,7 +585,6 @@ const Products: React.FC = () => {
                 <option value="trading goods">Trading Goods</option>
                 <option value="service">Service</option>
               </select>
-
             </div>
 
             {/* Store Filter */}
