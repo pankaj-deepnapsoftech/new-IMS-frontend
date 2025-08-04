@@ -146,8 +146,8 @@ const Parties = () => {
         'Merchant Type': party.parties_type || 'N/A',
         'Shipped To': party.shipped_to || 'N/A',
         'Bill To': party.bill_to || 'N/A',
-        'Shipped GST To': party.shipped_gst_to || 'N/A',
-        'Bill GST To': party.bill_gst_to || 'N/A'
+        'Shipped GSTIN': party.shipped_gst_to || 'N/A',
+        'Bill GSTIN': party.bill_gst_to || 'N/A'
       }));
 
       const wb = XLSX.utils.book_new();
@@ -244,7 +244,7 @@ const Parties = () => {
                 Add New Merchant
               </button>
 
-              {/* Bulk Upload Button */}
+              {/* Bulk Upload Button
               <button
                 onClick={() => setShowBulkUploadMenu(true)}
                 className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
@@ -261,7 +261,7 @@ const Parties = () => {
               >
                 <AiFillFileExcel size={20} />
                 Bulk Upload
-              </button>
+              </button> */}
 
               {/* Excel Export Button */}
               <button

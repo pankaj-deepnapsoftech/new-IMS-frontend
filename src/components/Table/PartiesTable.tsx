@@ -34,6 +34,7 @@ const PartiesTable = ({
     const [selectedParties, setSelectedParties] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [showCheckBox,setShowCheckBox] = useState(false)
   // const columns = useMemo(() => [
   //     { Header: "Full name", accessor: "full_name" },
   //     { Header: "Email", accessor: "email" },
@@ -310,7 +311,7 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  <input
+                { cookies?.role === "admin"  && (<input
                     type="checkbox"
                     checked={isAllSelected}
                     ref={(el) => {
@@ -318,7 +319,7 @@ const PartiesTable = ({
                     }}
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                  />
+                  />)}
                 </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
@@ -355,6 +356,14 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
+                 Contact Person Number     
+                </th>
+
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+
                   Email
                 </th>
                 <th
@@ -409,13 +418,13 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Shipped GST To
+                  Shipped GSTIN
                 </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Bill GST To
+                  Bill GSTIN
                 </th>
                 <th
                   className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
@@ -451,14 +460,14 @@ const PartiesTable = ({
                     className="px-4 py-3 text-sm whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                   >
-                    <input
+               {  cookies.role === "admin" && (    <input
                       type="checkbox"
                       checked={selectedParties.includes(party._id)}
                       onChange={(e) =>
                         handleSelectParty(party._id, e.target.checked)
                       }
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                    />
+                    />)}
                   </td>
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap"
@@ -497,6 +506,13 @@ const PartiesTable = ({
                     title={party.company_name}
                   >
                     {party.company_name || "N/A"}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                    style={{ color: colors.text.secondary }}
+                    // title={party.company_name}
+                  >
+                    {party.contact_person_name || "N/A"}
                   </td>
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
@@ -652,7 +668,7 @@ const PartiesTable = ({
       </div>
 
       {/* Enhanced Delete Modal */}
-      {showDeletePage && (
+      {showDeletePage &&  cookies?.role ===  "admin" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
             className="w-full max-w-md mx-4 rounded-xl shadow-xl"
@@ -737,7 +753,7 @@ const PartiesTable = ({
       )}
 
       {/* Bulk Delete Modal */}
-      {showBulkDeleteModal && (
+      {showBulkDeleteModal &&  cookies?.role ===  "admin"  && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
             className="w-full max-w-md mx-4 rounded-xl shadow-xl"

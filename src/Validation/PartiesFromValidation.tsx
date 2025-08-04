@@ -18,7 +18,7 @@ export const PartiesFromValidation = Yup.object({
     .min(1, "At least one contact number is required"),
 
   email_id: Yup.array()
-    .of(Yup.string().email("Invalid email").required("Email is required"))
+    .of(Yup.string().email("Invalid email"))
     .min(1, "At least one email is required"),
 
   shipped_to: Yup.string().required("Shipped To address is required"),
