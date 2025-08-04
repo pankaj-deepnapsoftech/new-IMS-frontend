@@ -146,8 +146,8 @@ const Parties = () => {
         'Merchant Type': party.parties_type || 'N/A',
         'Shipped To': party.shipped_to || 'N/A',
         'Bill To': party.bill_to || 'N/A',
-        'Shipped GST To': party.shipped_gst_to || 'N/A',
-        'Bill GST To': party.bill_gst_to || 'N/A'
+        'Shipped GSTIN': party.shipped_gst_to || 'N/A',
+        'Bill GSTIN': party.bill_gst_to || 'N/A'
       }));
 
       const wb = XLSX.utils.book_new();

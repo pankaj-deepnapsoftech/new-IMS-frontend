@@ -1,9 +1,8 @@
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import Select from "react-select";
-import { MdOutlineRefresh, MdAdd } from "react-icons/md";
+import { MdOutlineRefresh, MdAdd, MdFileDownload } from "react-icons/md";
 import { AiFillFileExcel } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
-import SampleCSV from "../assets/csv/product-sample.csv";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   useDeleteProductMutation,
@@ -40,6 +39,9 @@ const Products: React.FC = () => {
 
   // Bulk upload menu
   const [showBulkUploadMenu, setShowBulkUploadMenu] = useState<boolean>(false);
+  
+  // Export loading state
+  const [isExporting, setIsExporting] = useState<boolean>(false);
 
   // Filters
   const [productTypeFilter, setProductTypeFilter] = useState<string>("");
@@ -53,15 +55,7 @@ const Products: React.FC = () => {
   const [bulkUploading, setBulkUploading] = useState<boolean>(false);
 
   const [bulkUpload] = useProductBulKUploadMutation();
-  // const categoryOptions = [
-  //   { value: "finished goods", label: "Finished Goods" },
-  //   { value: "raw materials", label: "Raw Materials" },
-  //   { value: "semi finished goods", label: "Semi Finished Goods" },
-  //   { value: "consumables", label: "Consumables" },
-  //   { value: "bought out parts", label: "Bought Out Parts" },
-  //   { value: "trading goods", label: "Trading Goods" },
-  //   { value: "service", label: "Service" },
-  // ];
+
   const {
     isAddProductDrawerOpened,
     isUpdateProductDrawerOpened,
@@ -168,7 +162,7 @@ const Products: React.FC = () => {
 
     const file = fileRef?.current?.files?.[0];
     if (!file) {
-      toast.error("CSV file not selected");
+      toast.error("Excel/CSV file not selected");
       return;
     }
 
@@ -179,10 +173,99 @@ const Products: React.FC = () => {
 
       const response = await bulkUpload(formData).unwrap();
       toast.success(response.message);
+      setShowBulkUploadMenu(false);
+      fetchProductsHandler(); // Refresh the data
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally {
       setBulkUploading(false);
+    }
+  };
+
+  // New export function
+  const exportToExcelHandler = async () => {
+    try {
+      setIsExporting(true);
+      
+      // Build query parameters based on current filters
+      const queryParams = new URLSearchParams();
+      if (productTypeFilter) {
+        queryParams.append('category', productTypeFilter);
+      }
+      
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}product/export/excel?${queryParams.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Export failed');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Get filename from response headers or create default
+      const contentDisposition = response.headers.get('content-disposition');
+      let filename = 'direct_products.xlsx';
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+)"/);
+        if (match) {
+          filename = match[1];
+        }
+      }
+      
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Export completed successfully!');
+    } catch (error: any) {
+      toast.error(error?.message || 'Export failed');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // Function to download sample template
+  const downloadSampleTemplate = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}product/export/sample`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Download failed');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'direct_products_sample_template.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Sample template downloaded!');
+    } catch (error: any) {
+      toast.error(error?.message || 'Download failed');
     }
   };
 
@@ -235,7 +318,7 @@ const Products: React.FC = () => {
 
   useEffect(() => {
     const searchTxt = searchKey?.toLowerCase();
-    // // @ts-ignore
+    // @ts-ignore
     const results = data.filter((prod: any) => {
       const searchTxt = searchKey?.toLowerCase() || "";
 
@@ -276,9 +359,8 @@ const Products: React.FC = () => {
       return matchesCategory && matchesStore && matchesSearch;
     });
 
-
     setFilteredData(results);
-  }, [searchKey, productTypeFilter, storeFilter]);
+  }, [searchKey, productTypeFilter, storeFilter, data]);
 
   if (!isAllowed) {
     return (
@@ -341,7 +423,7 @@ const Products: React.FC = () => {
                   className="text-sm mt-1"
                   style={{ color: colors.text.secondary }}
                 >
-                  Manage your indirect products and services inventory
+                  Manage your direct products and services inventory
                 </p>
               </div>
             </div>
@@ -385,6 +467,30 @@ const Products: React.FC = () => {
               >
                 <MdOutlineRefresh size="20px" />
                 Refresh
+              </button>
+
+              {/* Export to Excel Button */}
+              <button
+                onClick={exportToExcelHandler}
+                disabled={isExporting}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                style={{
+                  backgroundColor: colors.button.secondary || '#10B981',
+                  color: colors.text.inverse,
+                }}
+                onMouseEnter={(e) => {
+                  if (!isExporting) {
+                    e.currentTarget.style.backgroundColor = '#059669';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isExporting) {
+                    e.currentTarget.style.backgroundColor = colors.button.secondary || '#10B981';
+                  }
+                }}
+              >
+                <MdFileDownload size="20px" />
+                {isExporting ? 'Exporting...' : 'Export Excel'}
               </button>
 
               <button
@@ -513,7 +619,7 @@ const Products: React.FC = () => {
                   className="text-lg font-semibold"
                   style={{ color: colors.text.primary }}
                 >
-                  Bulk Upload Products
+                  Bulk Upload Direct Products
                 </h3>
                 <button
                   onClick={() => setShowBulkUploadMenu(false)}
@@ -541,7 +647,7 @@ const Products: React.FC = () => {
                   <input
                     ref={fileRef}
                     type="file"
-                    accept=".csv, .xlsx"
+                    accept=".csv, .xlsx, .xls"
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
                     style={{
                       backgroundColor: colors.input.background,
@@ -549,6 +655,9 @@ const Products: React.FC = () => {
                       color: colors.text.primary,
                     }}
                   />
+                  <p className="text-xs mt-1" style={{ color: colors.text.secondary }}>
+                    Note: Product ID will be auto-generated. Don't include it in your file.
+                  </p>
                 </div>
 
                 <div className="flex gap-3">
@@ -565,20 +674,19 @@ const Products: React.FC = () => {
                     <AiFillFileExcel size="16px" />
                   </button>
 
-                  <a href={SampleCSV} className="flex-1">
-                    <button
-                      type="button"
-                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
-                      style={{
-                        borderColor: colors.border.medium,
-                        color: colors.text.primary,
-                        backgroundColor: colors.background.card,
-                      }}
-                    >
-                      Sample CSV
-                      <AiFillFileExcel size="16px" />
-                    </button>
-                  </a>
+                  <button
+                    type="button"
+                    onClick={downloadSampleTemplate}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                    style={{
+                      borderColor: colors.border.medium,
+                      color: colors.text.primary,
+                      backgroundColor: colors.background.card,
+                    }}
+                  >
+                    Sample Template
+                    <AiFillFileExcel size="16px" />
+                  </button>
                 </div>
               </form>
             </div>

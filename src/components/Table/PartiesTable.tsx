@@ -418,13 +418,13 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Shipped GST To
+                  Shipped GSTIN
                 </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Bill GST To
+                  Bill GSTIN
                 </th>
                 <th
                   className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
