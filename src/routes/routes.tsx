@@ -1,6 +1,14 @@
 import { FaQuoteLeft, FaRegCheckCircle } from "react-icons/fa";
 import { IoDocumentTextOutline, IoStorefrontOutline } from "react-icons/io5";
-import { MdOutlineShoppingCart, MdOutlineSpeed, MdOutlineSell, MdOutlineAttachMoney, MdOutlinePayment, MdOutlineProductionQuantityLimits, MdTask } from "react-icons/md";
+import {
+  MdOutlineShoppingCart,
+  MdOutlineSpeed,
+  MdOutlineSell,
+  MdOutlineAttachMoney,
+  MdOutlinePayment,
+  MdOutlineProductionQuantityLimits,
+  MdTask,
+} from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
 
 import { RiBillLine } from "react-icons/ri";
@@ -17,8 +25,7 @@ import Approvals from "../pages/Approvals";
 import Stores from "../pages/Stores";
 import Buyers from "../pages/Buyers";
 import Sellers from "../pages/Sellers";
-import BOM from "../pages/BOM";  
-
+import BOM from "../pages/BOM";
 
 import UserRole from "../pages/UserRoles";
 import Employees from "../pages/Emloyees";
@@ -35,7 +42,21 @@ import Dispatch from "../pages/Dispatch";
 import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
 import Task from "../pages/Task";
-import { Box, Calendar, Component, Construction, Container, HandCoins, Presentation, ScanBarcode, ShieldCheck, TicketPercent, Workflow } from "lucide-react";
+import {
+  Box,
+  Calendar,
+  Component,
+  Construction,
+  Container,
+  HandCoins,
+  Presentation,
+  ScanBarcode,
+  ShieldCheck,
+  Store,
+  TicketPercent,
+  Workflow,
+  Wrench,
+} from "lucide-react";
 import Dashboard from "../pages/Dashboard";
 import Planning from "../pages/Planning";
 import Designing from "../pages/Designing";
@@ -51,6 +72,8 @@ import Vouchers from "../pages/Vouchers";
 import Integration from "../pages/Integration";
 import PurchaseOrder from "../pages/PurchaseOrder";
 import Precurement from "../pages/Precurement";
+import Resources from "../pages/Resources";
+import ProductionStatus from "../pages/ProductionStatus";
 
 const routes = [
   {
@@ -75,12 +98,20 @@ const routes = [
     isSublink: false,
   },
   {
+    name: "Resources",
+    icon: <Wrench />,
+    path: "resources",
+    element: <Resources />,
+    isSublink: false,
+  },
+  {
     name: "Merchant",
     icon: <IoIosPeople />,
     path: "merchant",
     element: <Parties />,
     isSublink: false,
   },
+
   {
     name: "Inventory",
     icon: <MdOutlineShoppingCart />,
@@ -93,22 +124,35 @@ const routes = [
         element: <Products />,
       },
       {
-        name: "Work In Progress",
-        icon: <GiProgression />,
-        path: "wip",
-        element: <WIPProducts />,
-      },
-      {
         name: "Indirect",
         icon: <FaHandsHelping />,
         path: "indirect",
         element: <IndirectProducts />,
       },
       {
+        name: "Work In Progress",
+        icon: <GiProgression />,
+        path: "wip",
+        element: <WIPProducts />,
+      },
+      {
+        name: "Store",
+        icon: <Store />,
+        path: "store",
+        element: <Stores />,
+      },
+
+      {
         name: "Inventory Approvals",
         icon: <FaRegCheckCircle />,
         path: "approval",
         element: <InventoryApprovals />,
+      },
+      {
+        name: "Scrap Management",
+        icon: <SiScrapy />,
+        path: "scrap",
+        element: <Scrap />,
       },
     ],
     isSublink: true,
@@ -117,7 +161,7 @@ const routes = [
     name: "Sales Order",
     icon: <HandCoins />,
     path: "sales",
-    element: <Sales />,  
+    element: <Sales />,
     isSublink: false,
   },
 
@@ -125,8 +169,15 @@ const routes = [
     name: "Precurement",
     icon: <Box />,
     path: "precurement",
-    element: <Precurement />,
-    isSublink: false,
+    sublink: [
+      {
+        name: "Purchase Order",
+        icon: <ScanBarcode />,
+        path: "purchase-order",
+        element: <PurchaseOrder />,
+      },
+    ],
+    isSublink: true,
   },
 
   {
@@ -141,34 +192,16 @@ const routes = [
         element: <BOM />,
       },
       {
-        name: "Raw Material Approval",
-        icon: <RiBillLine />,
-        path: "raw-material-approval",
-        element: <RawMaterialApprovals />, 
-      },
-      {
-        name: "Resources Approval",
-        icon: <RiBillLine />,
-        path: "resources-approval",
-        element: <ResourcesApproval />,
-      },
-      {
-        name: "Production Process",
+        name: "Pre Production",
         icon: <VscServerProcess />,
-        path: "production-process",
+        path: "pre-production",
         element: <Process />,
       },
       {
-        name: "Quality",
-        icon: <ShieldCheck />,
-        path: "quality",
-        element: <Quality />,
-      },
-      {
-        name: "Packaging",
-        icon: <Box />,
-        path: "packaging",
-        element: <Packaging />,
+        name: "Production Status",
+        icon: <VscServerProcess />,
+        path: "production-status",
+        element: <ProductionStatus />,
       },
     ],
     isSublink: true,
@@ -197,68 +230,15 @@ const routes = [
         path: " taxInvoice",
         element: <Invoice />,
       },
-      {
-        name: "Purchase Order",
-        icon: <ScanBarcode />,
-        path: "purchase-order",
-        element: <PurchaseOrder />,
-      },
+
       {
         name: "Payments",
         icon: <MdOutlinePayment />,
         path: "payment",
         element: <Payment />,
       },
-      {
-        name: "Vouchers",
-        icon: <TicketPercent />,
-        path: "voucher",
-        element: <Vouchers />,
-      },
     ],
     isSublink: true,
-  },
-  {
-    name: "Integration",
-    icon: <Workflow />,
-    path: "integration",
-    element: <Integration />,
-  },
-  {
-    name: "Designing",
-    icon: <Component />,
-    path: "designing",
-    element: <Designing />,
-    isSublink: false,
-  },
-  {
-    name: "Planning",
-    icon: <Presentation />,
-    path: "planning",
-    element: <Planning />,
-    isSublink: false,
-  },
-  {
-    name: "Supplier",
-    icon: <Container />,
-    path: "supplier",
-    element: <Supplier />,
-    isSublink: false,
-  },
-  {
-    name: "Scheduling",
-    icon: <Calendar />,
-    path: "scheduling",
-    element: <Scheduling />,
-    isSublink: false,
-  },
-
-  {
-    name: "Maintenance",
-    icon: <Construction />,
-    path: "maintenance",
-    element: <Maintenance />,
-    isSublink: false,
   },
 
   {
@@ -268,21 +248,6 @@ const routes = [
     element: <Task />,
     isSublink: false,
   },
-
-  {
-    name: "Scrap Management",
-    icon: <SiScrapy />,
-    path: "scrap",
-    element: <Scrap />,
-    isSublink: false,
-  },
-  {
-    name: "Store",
-    icon: <IoStorefrontOutline />,
-    path: "store",
-    element: <Stores />,
-    isSublink: false,
-  },
   {
     name: "Admin Approval",
     icon: <FaRegCheckCircle />,
@@ -290,33 +255,6 @@ const routes = [
     element: <Approvals />,
     isSublink: false,
   },
-  // {
-  //   name: "Merchant",
-  //   path: "merchant",
-  //   icon: <TbUsersGroup />,
-  //   sublink: [
-  //     {
-  //       name: "Buyer",
-  //       icon: <MdOutlineAttachMoney />,
-  //       path: "buyer",
-  //       element: <Buyers />,
-  //     },
-  //     {
-  //       name: "Supplier",
-  //       icon: <MdOutlineSell />,
-  //       path: "supplier",
-  //       element: <Sellers />,
-  //     },
-  //   ],
-  //   isSublink: true
-  // },
-
-  // {
-  //   name: "Dispatch",
-  //   path: "dispatch",
-  //   element: <Dispatch />,
-  //   isSublink: false
-  // },
   {
     name: "User Profile",
     icon: <CgProfile />,

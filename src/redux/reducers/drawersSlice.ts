@@ -57,7 +57,11 @@ const initialState = {
   // Payment Drawer
   isAddPaymentDrawerOpened: false,
   isUpdatePaymentDrawerOpened: false,
-  isPaymentDetailsDrawerOpened: false
+  isPaymentDetailsDrawerOpened: false,
+
+  // Resources Drawer
+  isAddResourceDrawerOpened: false,
+  
 };
 
 const drawersSlice = createSlice({
@@ -302,8 +306,86 @@ const drawersSlice = createSlice({
     closeAddPurchaseOrderDrawer: (state) => {
       state.isAddPurchaseOrderDrawerOpened = false;
     },
+    // Resources Drawer
+    openAddResourceDrawer: (state) => {
+      state.isAddResourceDrawerOpened = true;
+    },
+    closeAddResourceDrawer: (state) => {
+      state.isAddResourceDrawerOpened = false;
+    }
   },
 });
 
 export default drawersSlice;
-export const { openAddProductDrawer, closeAddProductDrawer, openUpdateProductDrawer, closeUpdateProductDrawer, openProductDetailsDrawer, closeProductDetailsDrawer, openAddStoreDrawer, closeAddStoreDrawer, openUpdateStoreDrawer, closeUpdateStoreDrawer, openStoreDetailsDrawer, closeStoreDetailsDrawer, openAddBuyerDrawer, closeAddBuyerDrawer, openUpdateBuyerDrawer, closeUpdateBuyerDrawer, openBuyerDetailsDrawer, closeBuyerDetailsDrawer, openAddSellerDrawer, closeAddSellerDrawer, openUpdateSellerDrawer, closeUpdateSellerDrawer, openSellerDetailsDrawer, closeSellerDetailsDrawer, openAddBomDrawer, closeAddBomDrawer, openUpdateBomDrawer, closeUpdateBomDrawer, openBomDetailsDrawer, closeBomDetailsDrawer, openAddRoleDrawer, closeAddRoleDrawer, openUpdateRoleDrawer, closeUpdateRoleDrawer, openRoleDetailsDrawer, closeRoleDetailsDrawer, openAddEmployeeDrawer, closeAddEmployeeDrawer, openEmployeeDetailsDrawer, closeEmployeeDetailsDrawer, openUpdateEmployeeDrawer, closeUpdateEmployeeDrawer, openAddProformaInvoiceDrawer, closeAddProformaInvoiceDrawer, openUpdateProformaInvoiceDrawer, closeUpdateProformaInvoiceDrawer, openProformaInvoiceDetailsDrawer, closeProformaInvoiceDetailsDrawer, openAddInvoiceDrawer, closeAddInvoiceDrawer, openUpdateInvoiceDrawer, closeUpdateInvoiceDrawer, openInvoiceDetailsDrawer, closeInvoiceDetailsDrawer, openAddProcessDrawer, closeAddProcessDrawer, openUpdateProcessDrawer, closeUpdateProcessDrawer, openProcessDetailsDrawer, closeProcessDetailsDrawer, openAddPaymentDrawer, closeAddPaymentDrawer, openPaymentDetailsDrawer, closePaymentDetailsDrawer, openUpdatePaymentDrawer, closeUpdatePaymentDrawer, openAddPurchaseOrderDrawer, closeAddPurchaseOrderDrawer } = drawersSlice.actions;
+export const {
+  openAddProductDrawer,
+  closeAddProductDrawer,
+  openUpdateProductDrawer,
+  closeUpdateProductDrawer,
+  openProductDetailsDrawer,
+  closeProductDetailsDrawer,
+  openAddStoreDrawer,
+  closeAddStoreDrawer,
+  openUpdateStoreDrawer,
+  closeUpdateStoreDrawer,
+  openStoreDetailsDrawer,
+  closeStoreDetailsDrawer,
+  openAddBuyerDrawer,
+  closeAddBuyerDrawer,
+  openUpdateBuyerDrawer,
+  closeUpdateBuyerDrawer,
+  openBuyerDetailsDrawer,
+  closeBuyerDetailsDrawer,
+  openAddSellerDrawer,
+  closeAddSellerDrawer,
+  openUpdateSellerDrawer,
+  closeUpdateSellerDrawer,
+  openSellerDetailsDrawer,
+  closeSellerDetailsDrawer,
+  openAddBomDrawer,
+  closeAddBomDrawer,
+  openUpdateBomDrawer,
+  closeUpdateBomDrawer,
+  openBomDetailsDrawer,
+  closeBomDetailsDrawer,
+  openAddRoleDrawer,
+  closeAddRoleDrawer,
+  openUpdateRoleDrawer,
+  closeUpdateRoleDrawer,
+  openRoleDetailsDrawer,
+  closeRoleDetailsDrawer,
+  openAddEmployeeDrawer,
+  closeAddEmployeeDrawer,
+  openEmployeeDetailsDrawer,
+  closeEmployeeDetailsDrawer,
+  openUpdateEmployeeDrawer,
+  closeUpdateEmployeeDrawer,
+  openAddProformaInvoiceDrawer,
+  closeAddProformaInvoiceDrawer,
+  openUpdateProformaInvoiceDrawer,
+  closeUpdateProformaInvoiceDrawer,
+  openProformaInvoiceDetailsDrawer,
+  closeProformaInvoiceDetailsDrawer,
+  openAddInvoiceDrawer,
+  closeAddInvoiceDrawer,
+  openUpdateInvoiceDrawer,
+  closeUpdateInvoiceDrawer,
+  openInvoiceDetailsDrawer,
+  closeInvoiceDetailsDrawer,
+  openAddProcessDrawer,
+  closeAddProcessDrawer,
+  openUpdateProcessDrawer,
+  closeUpdateProcessDrawer,
+  openProcessDetailsDrawer,
+  closeProcessDetailsDrawer,
+  openAddPaymentDrawer,
+  closeAddPaymentDrawer,
+  openPaymentDetailsDrawer,
+  closePaymentDetailsDrawer,
+  openUpdatePaymentDrawer,
+  closeUpdatePaymentDrawer,
+  openAddPurchaseOrderDrawer,
+  closeAddPurchaseOrderDrawer,
+  openAddResourceDrawer,
+  closeAddResourceDrawer,
+} = drawersSlice.actions;
