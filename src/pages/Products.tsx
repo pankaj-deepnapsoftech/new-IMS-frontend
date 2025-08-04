@@ -287,7 +287,7 @@ const Products: React.FC = () => {
       </div>
     );
   }
-  console.log(data)
+  // console.log(data)
   return (
     <div
       className="min-h-screen"

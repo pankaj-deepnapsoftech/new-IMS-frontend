@@ -363,6 +363,75 @@ const AddProduct: React.FC<AddProductProps> = ({
                 _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Product/Service
+              </FormLabel>                                          
+              <Select
+                styles={customStyles}
+                value={productOrService}
+                options={productOrServiceOptions}
+                onChange={(e: any) => setProductOrService(e)}
+              />
+            </FormControl>
+            <FormControl className="mt-3 mb-5" isRequired >
+              <FormLabel fontWeight="bold" color="black">
+                Inventory Type 
+              </FormLabel>
+
+              {/* Dropdown */}
+              <Select
+                styles={customStyles}
+                value={category}
+                options={categoryOptions}
+                onChange={(e: any) => setCategory(e)}
+                required={true}
+              />
+
+              {/* Input for new category */}
+              <Input
+                mt={2}
+                placeholder="Add new Inventory Type (e.g. Packaging)"
+                color="black"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+               
+           
+              <Button
+                mt={2}
+                size="sm"
+                colorScheme="teal"
+                onClick={() => {
+                  const trimmed = newCategory.trim().toLowerCase();
+                  if (!trimmed) {
+                    toast.warning("Please enter an inventory type.");
+                    return;
+                  }
+
+                  const exists = categoryOptions.some(
+                    (opt) => opt.value === trimmed
+                  );
+                  if (exists) {
+                    toast.warning("This inventory type already exists.");
+                    return;
+                  }
+
+                  const confirmAdd = window.confirm(
+                    `Are you sure you want to add "${trimmed}" as a new Inventory Type?`
+                  );
+                  if (!confirmAdd) return;
+                  const newOption = { value: trimmed, label: trimmed };
+                  setCategoryOptions((prev) => [...prev, newOption]); 
+                  setCategory(newOption);
+                  setNewCategory(""); 
+                  toast.success(`Inventory Type "${trimmed}" added.`);
+                }}
+              >
+                Add Inventory Type 
+              </Button>
+            </FormControl>
+
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="gray.700">
                 Regular Buying Price
@@ -458,65 +527,7 @@ const AddProduct: React.FC<AddProductProps> = ({
                 _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" >
-              <FormLabel fontWeight="bold" color="black">
-                Inventory Type
-              </FormLabel>
-
-              {/* Dropdown */}
-              <Select
-                styles={customStyles}
-                value={category}
-                options={categoryOptions}
-                onChange={(e: any) => setCategory(e)}
-                required={true}
-              />
-
-              {/* Input for new category */}
-              <Input
-                mt={2}
-                placeholder="Add new Inventory Type (e.g. Packaging)"
-                color="black"
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-              />
-
-              {/* Button to add category */}
-              <Button
-                mt={2}
-                size="sm"
-                colorScheme="teal"
-                onClick={() => {
-                  const trimmed = newCategory.trim().toLowerCase();
-                  if (!trimmed) {
-                    toast.warning("Please enter an inventory type.");
-                    return;
-                  }
-
-                  const exists = categoryOptions.some(
-                    (opt) => opt.value === trimmed
-                  );
-                  if (exists) {
-                    toast.warning("This inventory type already exists.");
-                    return;
-                  }
-
-                  const confirmAdd = window.confirm(
-                    `Are you sure you want to add "${trimmed}" as a new Inventory Type?`
-                  );
-                  if (!confirmAdd) return;
-                  const newOption = { value: trimmed, label: trimmed };
-                  setCategoryOptions((prev) => [...prev, newOption]); // ✅ Add to list
-                  setCategory(newOption); // ✅ Select it
-                  setNewCategory(""); // Clear input
-               
-                  toast.success(`Inventory Type "${trimmed}" added.`);
-                }}
-              >
-                Add Inventory Type
-              </Button>
-            </FormControl>
-
+         
 
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="black">

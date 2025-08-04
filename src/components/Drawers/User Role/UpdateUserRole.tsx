@@ -39,6 +39,7 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
     { value: "sales", label: "Sales" },
     { value: "task", label: "Task" },
     { value: "bom", label: "Bom" },
+    { value: "merchant", label: "Merchant" },
   ];
 
   const [updateRole] = useUpdateRoleMutation();
