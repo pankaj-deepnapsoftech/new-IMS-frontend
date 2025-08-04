@@ -10,10 +10,14 @@ import Select from "react-select";
 import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import { colors } from "../../../theme/colors";
+import { toast } from "react-toastify";
+import { useFormik } from "formik";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 
 interface AddResourceProps {
   closeDrawerHandler: () => void;
-  fetchResourcesHandler?: () => void;
+  onResourceCreated?: (resource: any) => void;
 }
 
 const machineTypeOptions = [
@@ -21,54 +25,78 @@ const machineTypeOptions = [
   { value: "assemble_line", label: "Assemble Line" },
 ];
 
+const customStyles = {
+  control: (provided: any) => ({
+    ...provided,
+    backgroundColor: "white",
+    borderColor: "#d1d5db",
+    color: "#374151",
+    minHeight: "40px",
+    "&:hover": {
+      borderColor: "#9ca3af",
+    },
+  }),
+  option: (provided: any, state: any) => ({
+    ...provided,
+    backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+    color: "#374151",
+    "&:hover": {
+      backgroundColor: "#f3f4f6",
+    },
+  }),
+  menu: (provided: any) => ({
+    ...provided,
+    zIndex: 9999,
+    backgroundColor: "white",
+    border: "1px solid #d1d5db",
+  }),
+  placeholder: (provided: any) => ({
+    ...provided,
+    color: "#9ca3af",
+  }),
+};
+
 const AddResource = ({
-  fetchResourcesHandler,
+  onResourceCreated,
   closeDrawerHandler,
 }: AddResourceProps) => {
-  const [machineType, setMachineType] = useState<any>(null);
-  const [name, setName] = useState<string>("");
-  const [specification, setSpecification] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cookies] = useCookies();
 
-  const customStyles = {
-    control: (provided: any) => ({
-      ...provided,
-      backgroundColor: "white",
-      borderColor: "#d1d5db",
-      color: "#374151",
-      minHeight: "40px",
-      "&:hover": {
-        borderColor: "#9ca3af",
-      },
-    }),
-    option: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
-      color: "#374151",
-      "&:hover": {
-        backgroundColor: "#f3f4f6",
-      },
-    }),
-    menu: (provided: any) => ({
-      ...provided,
-      zIndex: 9999,
-      backgroundColor: "white",
-      border: "1px solid #d1d5db",
-    }),
-    placeholder: (provided: any) => ({
-      ...provided,
-      color: "#9ca3af",
-    }),
-  };
+  const formik = useFormik({
+    initialValues: {
+      type: "",
+      name: "",
+      specification: "",
+    },
+    onSubmit: async (values, { resetForm }) => {
+      if (!values.type) {
+        toast.error("Please select a machine type");
+        return;
+      }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      closeDrawerHandler();
-    }, 1000);
-  };
+      try {
+        setIsSubmitting(true);
+
+        const res = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}resources/`,
+          values,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies?.access_token}`,
+            },
+          }
+        );
+        console.log(res.data);
+        resetForm();
+        closeDrawerHandler();
+      } catch (error) {
+        toast.error("Failed to create resource");
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+  });
 
   return (
     <Drawer closeDrawerHandler={closeDrawerHandler}>
@@ -107,30 +135,39 @@ const AddResource = ({
           </button>
         </div>
 
-        <div className="mt-8 px-5 ">
-          <form onSubmit={handleSubmit}>
+        <div className="mt-8 px-5">
+          <form onSubmit={formik.handleSubmit}>
+            {/* Machine Type */}
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Machine Type
               </FormLabel>
               <Select
-                required
                 className="rounded mt-2 border"
                 options={machineTypeOptions}
                 placeholder="Select Machine Type"
-                value={machineType}
-                name="machine_type"
-                onChange={setMachineType}
+                name="type"
+                value={machineTypeOptions.find(
+                  (option) => option.value === formik.values.type
+                )}
+                onChange={(selectedOption) =>
+                  formik.setFieldValue("type", selectedOption?.value || "")
+                }
+                onBlur={formik.handleBlur}
                 styles={customStyles}
               />
             </FormControl>
+
+            {/* Name */}
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Name
               </FormLabel>
               <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                name="name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 type="text"
                 placeholder="Name"
                 bg="white"
@@ -142,13 +179,17 @@ const AddResource = ({
                 _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
+
+            {/* Specification */}
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="gray.700">
                 Specification
               </FormLabel>
               <Textarea
-                value={specification}
-                onChange={(e) => setSpecification(e.target.value)}
+                name="specification"
+                value={formik.values.specification}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 placeholder="Specification"
                 bg="white"
                 borderColor="gray.300"
@@ -160,6 +201,7 @@ const AddResource = ({
                 rows={4}
               />
             </FormControl>
+
             <Button
               isLoading={isSubmitting}
               type="submit"
