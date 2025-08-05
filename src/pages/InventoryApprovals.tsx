@@ -17,13 +17,13 @@ const InventoryApprovals: React.FC = () => {
   const [filteredData, setFilteredData] = useState<any>([]);
 
   const [isLoadingInventory, setIsLoadingInventory] = useState<boolean>(false);
-
+  const token = cookies?.access_token;
   const fetchInventoryHandler = async () => {
     try {
       setIsLoadingInventory(true);
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL +
-          "bom/unapproved/inventory/raw-materials",
+        "bom/unapproved/inventory/raw-materials",
         {
           method: "GET",
           headers: {
@@ -35,6 +35,7 @@ const InventoryApprovals: React.FC = () => {
       if (!results.success) {
         throw new Error(results?.message);
       }
+      console.log(response)
       setData(results.unapproved);
       setFilteredData(results.unapproved);
     } catch (error: any) {
@@ -48,7 +49,7 @@ const InventoryApprovals: React.FC = () => {
     try {
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL +
-          "bom/approve/inventory/raw-materials",
+        "bom/approve/inventory/raw-materials",
         {
           method: "POST",
           headers: {
@@ -72,7 +73,10 @@ const InventoryApprovals: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchInventoryHandler();
+    if (token) {
+
+      fetchInventoryHandler();
+    }
   }, []);
 
   useEffect(() => {
@@ -91,19 +95,19 @@ const InventoryApprovals: React.FC = () => {
       const role = emp?.role?.role?.toString().toLowerCase() || "";
       const createdAt = emp?.createdAt
         ? new Date(emp.createdAt)
-            .toISOString()
-            .substring(0, 10)
-            .split("-")
-            .reverse()
-            .join("")
+          .toISOString()
+          .substring(0, 10)
+          .split("-")
+          .reverse()
+          .join("")
         : "";
       const updatedAt = emp?.updatedAt
         ? new Date(emp.updatedAt)
-            .toISOString()
-            .substring(0, 10)
-            .split("-")
-            .reverse()
-            .join("")
+          .toISOString()
+          .substring(0, 10)
+          .split("-")
+          .reverse()
+          .join("")
         : "";
 
       return (

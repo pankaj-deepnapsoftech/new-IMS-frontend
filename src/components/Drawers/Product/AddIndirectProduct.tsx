@@ -61,7 +61,7 @@ const AddProduct: React.FC<AddProductProps> = ({
   // const [category, setCategory] = useState(null);
   const [newCategory, setNewCategory] = useState("");
   const [showNewUOMInput, setShowNewUOMInput] = useState(false);
-  const [newUOM, setNewUOM] = useState("");
+  const [colorName, setColorName] = useState<string | undefined>();
   const [uomOptions, setUomOptions] = useState([
     { value: "pcs", label: "pcs" },
     { value: "kgs", label: "kgs" },
@@ -92,10 +92,10 @@ const AddProduct: React.FC<AddProductProps> = ({
     { value: "container", label: "container" },
   ]);
 
-  const inventoryCategoryOptions = [
-    { value: "direct", label: "Direct" },
-    { value: "indirect", label: "Indirect" },
-  ];
+  // const inventoryCategoryOptions = [
+  //   { value: "direct", label: "Direct" },
+  //   { value: "indirect", label: "Indirect" },
+  // ];
   const [categoryOptions, setCategoryOptions] = useState([
     { value: "finished goods", label: "Finished Goods" },
     { value: "raw materials", label: "Raw Materials" },
@@ -167,7 +167,7 @@ const AddProduct: React.FC<AddProductProps> = ({
     try {
       const response = await addProduct({
         name,
-        inventory_category: inventoryCategory?.value,
+        inventory_category: "indirect",
         // product_id: id,
         uom: uom?.value,
         category: category?.value,
@@ -185,6 +185,7 @@ const AddProduct: React.FC<AddProductProps> = ({
         dealer_price: dealerPrice,
         distributor_price: distributorPrice,
         store: store?.value || undefined,
+        color_name: colorName 
       }).unwrap();
       console.log(response)
       toast.success(response.message);
@@ -290,7 +291,7 @@ const AddProduct: React.FC<AddProductProps> = ({
           className="text-xl font-semibold"
           style={{ color: colors.text.primary }}
         >
-          Add New Product
+          Add Indirect Inventory 
         </h1>
         <button
           onClick={closeDrawerHandler}
@@ -313,7 +314,7 @@ const AddProduct: React.FC<AddProductProps> = ({
       <div className="mt-8 px-5">
         <form onSubmit={addProductHandler}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormControl className="mt-3 mb-5" isRequired>
+            {/* <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Inventory Category
               </FormLabel>
@@ -324,7 +325,7 @@ const AddProduct: React.FC<AddProductProps> = ({
                 onChange={(e: any) => setInventoryCategory(e)}
                 required={true}
               />
-            </FormControl>
+            </FormControl> */}
 
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
@@ -374,64 +375,152 @@ const AddProduct: React.FC<AddProductProps> = ({
                 onChange={(e: any) => setProductOrService(e)}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired >
+            <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="black">
-                Inventory Type 
+                Inventory Type
               </FormLabel>
 
-              {/* Dropdown */}
               <Select
                 styles={customStyles}
                 value={category}
-                options={categoryOptions}
-                onChange={(e: any) => setCategory(e)}
-                required={true}
-              />
+                options={[...categoryOptions, { value: "__add_new__", label: "+ Add new Inventory Type" }]}
+                onChange={(selected: any) => {
+                  if (selected?.value === "__add_new__") {
+                    const newType = prompt("Enter new Inventory Type (e.g. Packaging):")?.trim().toLowerCase();
+                    if (!newType) {
+                      toast.warning("Inventory type cannot be empty.");
+                      return;
+                    }
 
-              {/* Input for new category */}
-              <Input
-                mt={2}
-                placeholder="Add new Inventory Type (e.g. Packaging)"
-                color="black"
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-              />
-               
-           
-              <Button
-                mt={2}
-                size="sm"
-                colorScheme="teal"
-                onClick={() => {
-                  const trimmed = newCategory.trim().toLowerCase();
-                  if (!trimmed) {
-                    toast.warning("Please enter an inventory type.");
-                    return;
+                    const exists = categoryOptions.some((opt) => opt.value === newType);
+                    if (exists) {
+                      toast.warning("This inventory type already exists.");
+                      return;
+                    }
+
+                    const confirmed = window.confirm(`Are you sure you want to add "${newType}"?`);
+                    if (!confirmed) return;
+
+                    const newOption = { value: newType, label: newType };
+                    setCategoryOptions((prev) => [...prev, newOption]);
+                    setCategory(newOption);
+                    toast.success(`Inventory Type "${newType}" added.`);
+                  } else {
+                    setCategory(selected);
                   }
-
-                  const exists = categoryOptions.some(
-                    (opt) => opt.value === trimmed
-                  );
-                  if (exists) {
-                    toast.warning("This inventory type already exists.");
-                    return;
-                  }
-
-                  const confirmAdd = window.confirm(
-                    `Are you sure you want to add "${trimmed}" as a new Inventory Type?`
-                  );
-                  if (!confirmAdd) return;
-                  const newOption = { value: trimmed, label: trimmed };
-                  setCategoryOptions((prev) => [...prev, newOption]); 
-                  setCategory(newOption);
-                  setNewCategory(""); 
-                  toast.success(`Inventory Type "${trimmed}" added.`);
                 }}
-              >
-                Add Inventory Type 
-              </Button>
+                
+              />
+            </FormControl>
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="black">
+                UOM (Unit of Measurement)
+              </FormLabel>
+
+              <Select
+                styles={customStyles}
+                value={uom}
+                options={[...uomOptions, { value: "__add_new__", label: "+ Add new UOM" }]}
+                onChange={(selected: any) => {
+                  if (selected?.value === "__add_new__") {
+                    const newUnit = prompt("Enter new UOM (e.g. bundle):")?.trim().toLowerCase();
+                    if (!newUnit) {
+                      toast.warning("UOM cannot be empty.");
+                      return;
+                    }
+
+                    const exists = uomOptions.some((opt) => opt.value === newUnit);
+                    if (exists) {
+                      toast.warning("This UOM already exists.");
+                      return;
+                    }
+
+                    const confirmed = window.confirm(`Are you sure you want to add "${newUnit}" as a new UOM?`);
+                    if (!confirmed) return;
+
+                    const newOption = { value: newUnit, label: newUnit };
+                    setUomOptions((prev) => [...prev, newOption]);
+                    setUom(newOption);
+                    toast.success(`UOM "${newUnit}" added.`);
+                  } else {
+                    setUom(selected);
+                  }
+                }}
+
+              />
+            </FormControl>
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Product Type
+              </FormLabel>
+              <Select
+                styles={customStyles}
+                value={itemType}
+                options={itemTypeOptions}
+                onChange={(e: any) => setItemType(e)}
+              />
+            </FormControl>
+            
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Product/Service
+              </FormLabel>
+              <Select
+                styles={customStyles}
+                value={productOrService}
+                options={productOrServiceOptions}
+                onChange={(e: any) => setProductOrService(e)}
+              />
             </FormControl>
 
+            <FormControl className="mt-3 mb-5" >
+              <FormLabel fontWeight="bold" color="gray.700">
+                Color Name
+              </FormLabel>
+              <Input
+                value={colorName}
+                onChange={(e) => setColorName(e.target.value)}
+                type="text"
+                placeholder="Enter product color name"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
+              />
+            </FormControl>
+
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Current Stock
+              </FormLabel>
+              <Input
+                value={currentStock}
+                onChange={(e) => setCurrentStock(e.target.value)}
+                type="number"
+                placeholder="Current Stock"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
+              />
+            </FormControl>
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Store
+              </FormLabel>
+              <Select
+                styles={customStyles}
+                value={store}
+                options={storeOptions}
+                onChange={(e: any) => setStore(e)}
+              />
+            </FormControl>
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="gray.700">
                 Regular Buying Price
@@ -529,62 +618,7 @@ const AddProduct: React.FC<AddProductProps> = ({
             </FormControl>
          
 
-            <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="black">
-                UOM (Unit of Measurement)
-              </FormLabel>
-              {/* Existing dropdown */}
-              <Select
-                styles={customStyles}
-                value={uom}
-                options={uomOptions}
-                onChange={(e: any) => setUom(e)}
-                required={true}
-              />
-
-              {/* Input to add new UOM */}
-              <Input
-                mt={2}
-                placeholder="Add new UOM (e.g. bundle)"
-                color="black"
-                value={newUOM}
-                onChange={(e) => setNewUOM(e.target.value)}
-              />
-
-              <Button
-                mt={2}
-                size="sm"
-                colorScheme="teal"
-                onClick={() => {
-                  const trimmed = newUOM.trim().toLowerCase();
-                  if (!trimmed) {
-                    toast.warning("Please enter a UOM.");
-                    return;
-                  }
-
-                  const exists = uomOptions.some(
-                    (opt) => opt.value === trimmed
-                  );
-                  if (exists) {
-                    toast.warning("UOM already exists.");
-                    return;
-                  }
-
-                  const confirmed = window.confirm(
-                    `Are you sure you want to add "${trimmed}" as a new UOM?`
-                  );
-                  if (!confirmed) return;
-
-                  const newOption = { value: trimmed, label: trimmed };
-                  setUomOptions((prev) => [...prev, newOption]);
-                  setUom(newOption);
-                  setNewUOM("");
-                  toast.success(`UOM "${trimmed}" added.`);
-                }}
-              >
-                Add UOM
-              </Button>
-            </FormControl>
+          
 
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="gray.700">
@@ -604,46 +638,7 @@ const AddProduct: React.FC<AddProductProps> = ({
                 _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Product Type
-              </FormLabel>
-              <Select
-                styles={customStyles}
-                value={itemType}
-                options={itemTypeOptions}
-                onChange={(e: any) => setItemType(e)}
-              />
-            </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Product/Service
-              </FormLabel>
-              <Select
-                styles={customStyles}
-                value={productOrService}
-                options={productOrServiceOptions}
-                onChange={(e: any) => setProductOrService(e)}
-              />
-            </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Current Stock
-              </FormLabel>
-              <Input
-                value={currentStock}
-                onChange={(e) => setCurrentStock(e.target.value)}
-                type="number"
-                placeholder="Current Stock"
-                bg="white"
-                borderColor="gray.300"
-                _focus={{
-                  borderColor: "blue.500",
-                  boxShadow: "0 0 0 1px #3182ce",
-                }}
-                _placeholder={{ color: "gray.500" }}
-              />
-            </FormControl>
+        
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="gray.700">
                 Min Stock
@@ -698,17 +693,7 @@ const AddProduct: React.FC<AddProductProps> = ({
                 _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="gray.700">
-                Store
-              </FormLabel>
-              <Select
-                styles={customStyles}
-                value={store}
-                options={storeOptions}
-                onChange={(e: any) => setStore(e)}
-              />
-            </FormControl>
+          
           </div>
           <Button
             isLoading={isAddingProduct}

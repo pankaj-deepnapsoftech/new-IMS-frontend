@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
+import { useCookies } from "react-cookie";
 
 interface ProductTableProps {
   products: Array<any>;
@@ -61,7 +62,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   );
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
-  
+
   // Bulk selection states
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
@@ -91,6 +92,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
     usePagination
   );
 
+  const [cookies] = useCookies()
   // Bulk selection functions
   const handleSelectAll = (checked) => {
     if (checked) {
@@ -114,15 +116,15 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
     try {
       // Call the delete handler for each selected product
-      const deletePromises = selectedProducts.map(productId => 
+      const deletePromises = selectedProducts.map(productId =>
         deleteProductHandler(productId)
       );
 
       await Promise.all(deletePromises);
-      
+
       // Success feedback
       toast.success(`Successfully deleted ${selectedProducts.length} product${selectedProducts.length > 1 ? 's' : ''}`);
-      
+
       setSelectedProducts([]);
       setShowBulkDeleteModal(false);
     } catch (error) {
@@ -316,7 +318,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         minWidth: "60px",
                       }}
                     >
-                      <input
+                      {cookies?.role === "admin" && (<input
                         type="checkbox"
                         checked={isAllSelected}
                         ref={(el) => {
@@ -324,7 +326,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         }}
                         onChange={(e) => handleSelectAll(e.target.checked)}
                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                      />
+                      />)}
                     </th>
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
@@ -357,7 +359,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     >
                       Name
                     </th>
-
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Product Color
+                    </th>
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -454,7 +461,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                             minWidth: "60px",
                           }}
                         >
-                          <input
+                          {cookies?.role === "admin" && (<input
                             type="checkbox"
                             checked={selectedProducts.includes(
                               row.original._id
@@ -466,7 +473,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                               )
                             }
                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                          />
+                          />)}
                         </td>
                         <td
                           className="px-4 py-3 text-sm font-mono whitespace-nowrap"
@@ -504,7 +511,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         >
                           {row.original.name || "N/A"}
                         </td>
-
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap"
+                          style={{ color: colors.text.secondary }}
+                        >
+                          {row.original.color_name || "N/A"}
+                        </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
@@ -590,8 +602,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         >
                           {row.original.createdAt
                             ? moment(row.original.createdAt).format(
-                                "DD/MM/YYYY"
-                              )
+                              "DD/MM/YYYY"
+                            )
                             : "N/A"}
                         </td>
                         <td className="px-4 py-3">
@@ -646,7 +658,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                 <MdEdit size={16} />
                               </button>
                             )}
-                            {deleteProductHandler && (
+                            {deleteProductHandler && cookies?.role === "admin" && (
                               <button
                                 onClick={() => {
                                   setdeleteId(row.original._id);
@@ -1018,8 +1030,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       Deleting...
                     </>
                   ) : (
-                    `Delete ${selectedProducts.length} Product${
-                      selectedProducts.length > 1 ? "s" : ""
+                    `Delete ${selectedProducts.length} Product${selectedProducts.length > 1 ? "s" : ""
                     }`
                   )}
                 </button>

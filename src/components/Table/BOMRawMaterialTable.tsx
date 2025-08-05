@@ -162,7 +162,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
       text: "#409503",
     },
   };
-  console.log(products)
+  // console.log(products)
   const {
     getTableProps,
     getTableBodyProps,
@@ -263,7 +263,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
               >
                 {headerGroups.map((hg: HeaderGroup<any>) => (
                   <Tr {...hg.getHeaderGroupProps()}>
-                    {hg.headers.map((column: any) => (
+                    {hg?.headers.map((column: any) => (
                       <Th
                         {...column.getHeaderProps(
                           column.getSortByToggleProps()
@@ -281,9 +281,9 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                         _hover={{ bg: colors.table.hover }}
                       >
                         <div className="flex items-center gap-2">
-                          {column.render("Header")}
-                          {column.isSorted &&
-                            (column.isSortedDesc ? (
+                          {column?.render("Header")}
+                          {column?.isSorted &&
+                            (column?.isSortedDesc ? (
                               <FaCaretDown className="text-xs" />
                             ) : (
                               <FaCaretUp className="text-xs" />
@@ -308,7 +308,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                 ))}
               </Thead>
               <Tbody {...getTableBodyProps()}>
-                {page.map((row: any, index) => {
+                {page?.map((row: any, index) => {
                   prepareRow(row);
                   const original = row.original;
 

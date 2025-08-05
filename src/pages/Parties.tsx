@@ -244,7 +244,6 @@ const Parties = () => {
                 Add New Merchant
               </button>
 
-              {/* Bulk Upload Button
               <button
                 onClick={() => setShowBulkUploadMenu(true)}
                 className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
@@ -261,7 +260,7 @@ const Parties = () => {
               >
                 <AiFillFileExcel size={20} />
                 Bulk Upload
-              </button> */}
+              </button>
 
               {/* Excel Export Button */}
               <button

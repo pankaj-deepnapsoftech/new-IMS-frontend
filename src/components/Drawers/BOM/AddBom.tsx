@@ -80,7 +80,7 @@ const AddBom: React.FC<AddBomProps> = ({
       description: "",
       quantity: "",
       uom: "",
-      category: "",
+
       assembly_phase: "",
       supplier: "",
       supporting_doc: "",
@@ -381,7 +381,6 @@ const AddBom: React.FC<AddBomProps> = ({
                     <div>Finished Goods</div>
                     <div>Quantity</div>
                     <div>UOM</div>
-                    <div>Category</div>
                     <div>Comments</div>
                     <div>Unit Cost</div>
                     <div>Cost</div>
@@ -402,21 +401,10 @@ const AddBom: React.FC<AddBomProps> = ({
                           placeholder="Select"
                           value={finishedGood}
                           onChange={onFinishedGoodChangeHandler}
+                          // isSearchable={true} // <-- Make sure this is set
                           required
                         />
 
-                        {/*                        
-                        {category === "finished goods" && finishedGoodName && (
-                          <div className="mt-2"> 
-                            <label className="text-xs font-medium text-gray-600">Name</label>
-                            <input
-                              type="text"
-                              className="w-full border border-gray-300 px-3 py-1 rounded-md text-sm text-gray-700 bg-gray-50"
-                              value={finishedGoodName}
-                              readOnly
-                            />
-                          </div>
-                        )} */}
                       </div>
 
                       {/* Quantity */}
@@ -450,7 +438,7 @@ const AddBom: React.FC<AddBomProps> = ({
                       </div>
 
                       {/* Category */}
-                      <div>
+                      {/* <div>
                         <label className="sm:hidden text-xs font-semibold text-gray-700">
                           Category
                         </label>
@@ -460,7 +448,7 @@ const AddBom: React.FC<AddBomProps> = ({
                           readOnly
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                         />
-                      </div>
+                      </div> */}
 
                       {/* Comments */}
                       <div>
@@ -487,8 +475,8 @@ const AddBom: React.FC<AddBomProps> = ({
                             cookies?.role === "admin"
                               ? unitCost || ""
                               : unitCost
-                              ? "*****"
-                              : ""
+                                ? "*****"
+                                : ""
                           }
                           readOnly
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -506,8 +494,8 @@ const AddBom: React.FC<AddBomProps> = ({
                             cookies?.role === "admin"
                               ? cost || ""
                               : cost
-                              ? "*****"
-                              : ""
+                                ? "*****"
+                                : ""
                           }
                           readOnly
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -532,7 +520,7 @@ const AddBom: React.FC<AddBomProps> = ({
                     <div>Product Name</div>
                     <div>Quantity</div>
                     <div>UOM</div>
-                    <div>Category</div>
+                    {/* <div>Category</div> */}
                     <div>Comments</div>
                     <div>Unit Cost</div>
                     <div>Total Part Cost</div>
@@ -611,7 +599,7 @@ const AddBom: React.FC<AddBomProps> = ({
                           />
                         </div>
 
-                        {/* Category */}
+                        {/* Category
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             Category
@@ -622,7 +610,7 @@ const AddBom: React.FC<AddBomProps> = ({
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />
-                        </div>
+                        </div> */}
 
                         {/* Comments */}
                         <div>
@@ -653,8 +641,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.unit_cost || ""
                                 : material.unit_cost
-                                ? "*****"
-                                : ""
+                                  ? "*****"
+                                  : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -672,8 +660,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.total_part_cost || ""
                                 : material.total_part_cost
-                                ? "*****"
-                                : ""
+                                  ? "*****"
+                                  : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -911,8 +899,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.unit_cost || ""
                                 : material.unit_cost
-                                ? "*****"
-                                : ""
+                                  ? "*****"
+                                  : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -930,8 +918,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.total_part_cost || ""
                                 : material.total_part_cost
-                                ? "*****"
-                                : ""
+                                  ? "*****"
+                                  : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -1110,8 +1098,8 @@ const AddBom: React.FC<AddBomProps> = ({
                           cookies?.role === "admin"
                             ? totalPartsCost || ""
                             : totalPartsCost
-                            ? "*****"
-                            : ""
+                              ? "*****"
+                              : ""
                         }
                         readOnly
                         className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"

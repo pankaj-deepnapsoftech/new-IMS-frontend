@@ -21,12 +21,14 @@ import {
   openProductDetailsDrawer,
   openUpdateProductDrawer,
 } from "../redux/reducers/drawersSlice";
-import AddProduct from "../components/Drawers/Product/AddProduct";
+// import AddProduct from "../components/Drawers/Product/AddIndirectProduct";
 import UpdateProduct from "../components/Drawers/Product/UpdateProduct";
 import ProductDetails from "../components/Drawers/Product/ProductDetails";
 import { FiSearch } from "react-icons/fi";
 import { colors } from "../theme/colors";
 import { Package } from "lucide-react";
+import AddProduct from "../components/Drawers/Product/AddDirectProduct";
+import * as XLSX from 'xlsx';
 
 const Products: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -429,29 +431,30 @@ const Products: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              {/* Add Product */}
               <button
                 onClick={openAddProductDrawerHandler}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-md text-sm font-medium transition-colors"
                 style={{
                   backgroundColor: colors.button.primary,
                   color: colors.text.inverse,
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    colors.button.primaryHover;
+                  e.currentTarget.style.backgroundColor = colors.button.primaryHover;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = colors.button.primary;
                 }}
               >
-                <MdAdd size="20px" />
+                <MdAdd size="16px" />
                 Add Product
               </button>
 
+              {/* Refresh */}
               <button
                 onClick={fetchProductsHandler}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium border transition-colors"
                 style={{
                   borderColor: colors.border.medium,
                   color: colors.text.primary,
@@ -461,41 +464,39 @@ const Products: React.FC = () => {
                   e.currentTarget.style.backgroundColor = colors.gray[50];
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    colors.background.card;
+                  e.currentTarget.style.backgroundColor = colors.background.card;
                 }}
               >
-                <MdOutlineRefresh size="20px" />
+                <MdOutlineRefresh size="16px" />
                 Refresh
               </button>
 
-              {/* Export to Excel Button */}
+              {/* Export Excel */}
               <button
                 onClick={exportToExcelHandler}
                 disabled={isExporting}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                 style={{
                   backgroundColor: colors.button.secondary || '#10B981',
                   color: colors.text.inverse,
                 }}
                 onMouseEnter={(e) => {
-                  if (!isExporting) {
-                    e.currentTarget.style.backgroundColor = '#059669';
-                  }
+                  if (!isExporting) e.currentTarget.style.backgroundColor = '#059669';
                 }}
                 onMouseLeave={(e) => {
-                  if (!isExporting) {
-                    e.currentTarget.style.backgroundColor = colors.button.secondary || '#10B981';
-                  }
+                  if (!isExporting)
+                    e.currentTarget.style.backgroundColor =
+                      colors.button.secondary || '#10B981';
                 }}
               >
-                <MdFileDownload size="20px" />
+                <MdFileDownload size="16px" />
                 {isExporting ? 'Exporting...' : 'Export Excel'}
               </button>
 
+              {/* Bulk Upload */}
               <button
                 onClick={() => setShowBulkUploadMenu(true)}
-                className="inline-flex items-center gap-2 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-md text-sm font-medium text-white transition-colors"
                 style={{
                   backgroundColor: colors.warning[600],
                 }}
@@ -506,10 +507,11 @@ const Products: React.FC = () => {
                   e.currentTarget.style.backgroundColor = colors.warning[600];
                 }}
               >
-                <AiFillFileExcel size="20px" />
+                <AiFillFileExcel size="16px" />
                 Bulk Upload
               </button>
             </div>
+
           </div>
 
           {/* Search and Filters Row */}
@@ -576,7 +578,7 @@ const Products: React.FC = () => {
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                <option value="">All Categories</option>
+                <option value="">All Type</option>
                 <option value="finished goods">Finished Goods</option>
                 <option value="raw materials">Raw Materials</option>
                 <option value="semi finished goods">Semi Finished Goods</option>
