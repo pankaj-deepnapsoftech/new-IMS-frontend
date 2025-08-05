@@ -1,85 +1,169 @@
-import React from "react";
+//@ts-nocheck
+import React, { useState, useEffect } from "react";
 import { colors } from "../theme/colors";
 import { FiPlus, FiSearch } from "react-icons/fi";
 import { Button } from "@chakra-ui/react";
 import { MdOutlineRefresh } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  closeAddResourceDrawer,
-  openAddResourceDrawer,
-} from "../redux/reducers/drawersSlice";
 import ResourceTable from "../components/Table/ResourceTable";
 import AddResource from "../components/Drawers/Resources/AddResource";
+import axios from "axios";
+import { useCookies } from "react-cookie";
+import { toast } from "react-toastify";
+
+interface Resource {
+  _id: string;
+  name: string;
+  type: string;
+  specification?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const Resources = () => {
-  const {
-    isAddResourceDrawerOpened,
-    // isUpdateResourceDrawerOpened,
-    // isResourceDetailsDrawerOpened,
-  } = useSelector((state: any) => state.drawers);
-  const dispatch = useDispatch();
+
+  const [cookies] = useCookies();
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
+  const [searchKey, setSearchKey] = useState("");
+  const [isLoadingResources, setIsLoadingResources] = useState(false);
+  const [isAddResourceDrawerOpened, setIsAddResourceDrawerOpened] =
+    useState(false);
+  const [editResource, setEditResource] = useState<Resource | null>(null);
 
   const openAddResourceDrawerHandler = () => {
-    dispatch(openAddResourceDrawer());
+    setEditResource(null); // Clear edit state when opening add drawer
+    setIsAddResourceDrawerOpened(true);
   };
+
   const closeAddResourceDrawerHandler = () => {
-    dispatch(closeAddResourceDrawer());
+    setIsAddResourceDrawerOpened(false);
+    setEditResource(null); // Always clear edit state when closing drawer
   };
-  //   const openUpdateResourceDrawerHandler = (id: string) => {
-  //     setResourceId(id);
-  //     dispatch(openUpdateResourceDrawer());
-  //   };
-  //   const closeUpdateResourceDrawerHandler = () => {
-  //     dispatch(closeUpdateResourceDrawer());
-  //   };
-  //   const openResourceDetailsDrawerHandler = (id: string) => {
-  //     setResourceId(id);
-  //     dispatch(openResourceDetailsDrawer());
-  //   };
-  //   const closeResourceDetailsDrawerHandler = () => {
-  //     dispatch(closeResourceDetailsDrawer());
-  //   };
 
   const fetchResourcesHandler = async () => {
-    // try {
-    //   setIsLoadingRoles(true);
-    //   const response = await fetch(process.env.REACT_APP_BACKEND_URL + "role/");
-    //   const data = await response.json();
-    //   if (!data.success) {
-    //     throw new Error(data.message);
-    //   }
-    //   setRoles(data.roles);
-    //   setFilteredRoles(data.roles);
-    // } catch (error: any) {
-    //   toast.error(error?.message || "Something went wrong");
-    // } finally {
-    //   setIsLoadingRoles(false);
-    // }
+    try {
+      setIsLoadingResources(true);
+      const res = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}resources`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      console.log(res?.data);
+      setResources(res?.data?.resources || []);
+      setFilteredResources(res?.data?.resources || []);
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    } finally {
+      setIsLoadingResources(false);
+    }
   };
+
+  const deleteResourceHandler = async (id: string) => {
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_BACKEND_URL}resources/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+
+      const updatedResources = resources.filter(
+        (resource) => resource._id !== id
+      );
+      setResources(updatedResources);
+      setFilteredResources(updatedResources);
+
+      toast.success("Resource deleted successfully");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete resource");
+    }
+  };
+
+  const handleResourceCreated = (newResource: Resource) => {
+    const updatedResources = [newResource, ...resources];
+    setResources(updatedResources);
+    setFilteredResources(updatedResources);
+  };
+  
+
+  const bulkDeleteResourcesHandler = async (ids: string[]) => {
+    try {
+      const deletePromises = ids.map((id) =>
+        axios.delete(`${process.env.REACT_APP_BACKEND_URL}resources/${id}`, {
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        })
+      );
+
+      await Promise.all(deletePromises);
+
+      const updatedResources = resources.filter(
+        (resource) => !ids.includes(resource._id)
+      );
+      setResources(updatedResources);
+      setFilteredResources(updatedResources);
+
+      toast.success(
+        `${ids.length} resource${
+          ids.length > 1 ? "s" : ""
+        } deleted successfully`
+      );
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete some resources");
+    }
+  };
+  
+  
+
+  const handleSearch = (value: string) => {
+    setSearchKey(value);
+    if (!value) {
+      setFilteredResources(resources);
+    } else {
+      const filtered = resources.filter(
+        (resource) =>
+          resource.name.toLowerCase().includes(value.toLowerCase()) ||
+          resource.type.toLowerCase().includes(value.toLowerCase()) ||
+          (resource.specification &&
+            resource.specification.toLowerCase().includes(value.toLowerCase()))
+      );
+      setFilteredResources(filtered);
+    }
+  };
+
+  const handleResourceUpdated = (updatedResource: Resource) => {
+    const updatedResources = resources.map((resource) =>
+      resource._id === updatedResource._id ? updatedResource : resource
+    );
+    setResources(updatedResources);
+    setFilteredResources(updatedResources);
+  };
+  
+
+  useEffect(() => {
+    fetchResourcesHandler();
+  }, []);
+
+  useEffect(() => {
+    handleSearch(searchKey);
+  }, [searchKey, resources]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-2 lg:p-3">
       {isAddResourceDrawerOpened && (
         <AddResource
-          fetchResourcesHandler={fetchResourcesHandler}
+          onResourceCreated={handleResourceCreated}
           closeDrawerHandler={closeAddResourceDrawerHandler}
+          editResource={editResource}
+          onResourceUpdated={handleResourceUpdated}
         />
       )}
-      {/* User Role Details */}
-      {/* {isRoleDetailsDrawerOpened && (
-        <UserRoleDetails
-          roleId={roleId}
-          closeDrawerHandler={closeRoleDetailsDrawerHandler}
-        />
-      )} */}
-      {/* Update User Role */}
-      {/* {isUpdateRoleDrawerOpened && (
-        <UpdateUserRole
-          roleId={roleId}
-          closeDrawerHandler={closeUpdateRoleDrawerHandler}
-          fetchUserRolesHandler={fetchRolesHandler}
-        />
-      )} */}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -129,13 +213,14 @@ const Resources = () => {
               Add New Resource
             </button>
             <Button
-              //   onClick={fetchRolesHandler}
+              onClick={fetchResourcesHandler}
               leftIcon={<MdOutlineRefresh />}
               variant="outline"
               colorScheme="gray"
               size="md"
               className="border-gray-300 hover:border-gray-400 transition-all duration-200"
               _hover={{ bg: "gray.50", transform: "translateY(-1px)" }}
+              isLoading={isLoadingResources}
             >
               Refresh
             </Button>
@@ -151,9 +236,9 @@ const Resources = () => {
             <input
               type="text"
               className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-              placeholder="Search roles..."
-              //   value={searchKey || ""}
-              //   onChange={(e) => setSearchKey(e.target.value)}
+              placeholder="Search resources..."
+              value={searchKey || ""}
+              onChange={(e) => setSearchKey(e.target.value)}
             />
           </div>
         </div>
@@ -161,11 +246,15 @@ const Resources = () => {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <ResourceTable
-        //   roles={filteredRoles}
-        //   isLoadingRoles={isLoadingRoles}
-        //   deleteRoleHandler={deleteRoleHandler}
-        //   openUpdateRoleDrawerHandler={openUpdateRoleDrawerHandler}
-        //   openRoleDetailsDrawerHandler={openRoleDetailsDrawerHandler}
+          resources={filteredResources}
+          isLoadingResources={isLoadingResources}
+          deleteResourceHandler={deleteResourceHandler}
+          fetchResourcesHandler={fetchResourcesHandler}
+          setEditResource={setEditResource}
+          editResource={editResource}
+          openUpdateResourceDrawerHandler={openAddResourceDrawerHandler}
+          setAddResourceDrawerOpened={setIsAddResourceDrawerOpened}
+          bulkDeleteResourcesHandler={bulkDeleteResourcesHandler}
         />
       </div>
     </div>
