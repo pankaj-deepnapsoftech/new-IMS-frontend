@@ -15,9 +15,17 @@ import { useFormik } from "formik";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 
+interface Resource {
+  _id: string;
+  type: string;
+  name: string;
+  specification?: string;
+}
+
 interface AddResourceProps {
   closeDrawerHandler: () => void;
   onResourceCreated?: (resource: any) => void;
+  editResource?: Resource | null;
 }
 
 const machineTypeOptions = [
@@ -59,16 +67,18 @@ const customStyles = {
 const AddResource = ({
   onResourceCreated,
   closeDrawerHandler,
+  editResource,
 }: AddResourceProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cookies] = useCookies();
 
   const formik = useFormik({
-    initialValues: {
+    initialValues: editResource || {
       type: "",
       name: "",
       specification: "",
     },
+    enableReinitialize: true,
     onSubmit: async (values, { resetForm }) => {
       if (!values.type) {
         toast.error("Please select a machine type");
@@ -78,20 +88,36 @@ const AddResource = ({
       try {
         setIsSubmitting(true);
 
-        const res = await axios.post(
-          `${process.env.REACT_APP_BACKEND_URL}resources/`,
-          values,
-          {
+        let res;
+        if (editResource) {
+          res = await axios.put(`/api/resources/${editResource._id}`, values, {
             headers: {
-              Authorization: `Bearer ${cookies?.access_token}`,
+              Authorization: `Bearer ${cookies.token}`,
             },
-          }
-        );
+          });
+          toast.success("Resource updated successfully");
+        } else {
+          res = await axios.post(
+            `${process.env.REACT_APP_BACKEND_URL}resources/`,
+            values,
+            {
+              headers: {
+                Authorization: `Bearer ${cookies?.access_token}`,
+              },
+            }
+          );
+          toast.success("Resource created successfully");
+        }
+
+        if (onResourceCreated) {
+          onResourceCreated(res.data.resource);
+        }
+
         console.log(res.data);
         resetForm();
         closeDrawerHandler();
       } catch (error) {
-        toast.error("Failed to create resource");
+        toast.error("Failed to create/update resource");
       } finally {
         setIsSubmitting(false);
       }
@@ -115,7 +141,7 @@ const AddResource = ({
             className="text-xl font-semibold"
             style={{ color: colors.text.primary }}
           >
-            Add New Resource
+            {editResource ? "Edit Resource" : "Add New Resource"}
           </h1>
           <button
             onClick={closeDrawerHandler}
