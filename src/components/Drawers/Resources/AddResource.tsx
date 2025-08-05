@@ -72,6 +72,7 @@ const customStyles = {
 const AddResource = ({
   onResourceCreated,
   closeDrawerHandler,
+  fetchResourcesHandler,
   editResource,
 }: AddResourceProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -107,12 +108,7 @@ const AddResource = ({
           );
           toast.success("Resource updated successfully");
 
-          if (localEditResource && onResourceUpdated) {
-            onResourceUpdated(res.data.resource);
-          } else if (onResourceCreated) {
-            onResourceCreated(res.data.resource);
-          }
-          
+          fetchResourcesHandler();
           
         } else {
           res = await axios.post(

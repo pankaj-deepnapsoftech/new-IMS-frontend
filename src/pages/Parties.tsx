@@ -228,28 +228,28 @@ const Parties = () => {
                   setshowData(!showData);
                   setEditTable(null);
                 }}
-                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+                className="inline-flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-md text-sm font-medium transition-colors"
                 style={{
-                  backgroundColor: colors.primary[600],
-                  focusRingColor: colors.primary[500],
+                  backgroundColor: colors.button.primary,
+                  color: colors.text.inverse,
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.primary[700];
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.primaryHover;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.primary[600];
+                  e.currentTarget.style.backgroundColor = colors.button.primary;
                 }}
               >
-                <FiPlus size={20} />
-                Add New Merchant
+                <FiPlus size={16} />
+                Add Merchant
               </button>
 
               <button
                 onClick={() => setShowBulkUploadMenu(true)}
-                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+                className="inline-flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-md text-sm font-medium text-white transition-colors"
                 style={{
                   backgroundColor: colors.warning[600],
-                  focusRingColor: colors.warning[500],
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = colors.warning[700];
@@ -258,7 +258,7 @@ const Parties = () => {
                   e.currentTarget.style.backgroundColor = colors.warning[600];
                 }}
               >
-                <AiFillFileExcel size={20} />
+                <AiFillFileExcel size={16} />
                 Bulk Upload
               </button>
 
@@ -266,7 +266,7 @@ const Parties = () => {
               <button
                 onClick={exportToExcel}
                 disabled={isExporting}
-                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-3 text-white py-1.5 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                 style={{
                   backgroundColor: colors.success[600],
                   focusRingColor: colors.success[500],
@@ -282,17 +282,17 @@ const Parties = () => {
                   }
                 }}
               >
-                <FiDownload size={20} />
-                {isExporting ? 'Exporting...' : 'Export to Excel'}
+                <FiDownload size={16} />
+                {isExporting ? "Exporting..." : "Export to Excel"}
               </button>
 
               <button
                 onClick={fetchPartiesData}
-                className="flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium border transition-colors"
                 style={{
-                  backgroundColor: colors.background.card,
                   borderColor: colors.border.medium,
-                  color: colors.text.secondary,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = colors.gray[50];
@@ -302,7 +302,7 @@ const Parties = () => {
                     colors.background.card;
                 }}
               >
-                <MdOutlineRefresh size={20} />
+                <MdOutlineRefresh size={16} />
                 Refresh
               </button>
             </div>

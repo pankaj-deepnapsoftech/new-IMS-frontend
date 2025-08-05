@@ -28,7 +28,7 @@ import { FiSearch } from "react-icons/fi";
 import { colors } from "../theme/colors";
 import { Package } from "lucide-react";
 import AddProduct from "../components/Drawers/Product/AddDirectProduct";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 const Products: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -41,7 +41,7 @@ const Products: React.FC = () => {
 
   // Bulk upload menu
   const [showBulkUploadMenu, setShowBulkUploadMenu] = useState<boolean>(false);
-  
+
   // Export loading state
   const [isExporting, setIsExporting] = useState<boolean>(false);
 
@@ -121,7 +121,7 @@ const Products: React.FC = () => {
       if (!results.success) {
         throw new Error(results?.message);
       }
-      console.log(results)
+      console.log(results);
       setData(results.products);
       setFilteredData(results.products);
     } catch (error: any) {
@@ -176,7 +176,7 @@ const Products: React.FC = () => {
       const response = await bulkUpload(formData).unwrap();
       toast.success(response.message);
       setShowBulkUploadMenu(false);
-      fetchProductsHandler(); // Refresh the data
+      fetchProductsHandler();
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally {
@@ -188,15 +188,17 @@ const Products: React.FC = () => {
   const exportToExcelHandler = async () => {
     try {
       setIsExporting(true);
-      
+
       // Build query parameters based on current filters
       const queryParams = new URLSearchParams();
       if (productTypeFilter) {
-        queryParams.append('category', productTypeFilter);
+        queryParams.append("category", productTypeFilter);
       }
-      
+
       const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}product/export/excel?${queryParams.toString()}`,
+        `${
+          process.env.REACT_APP_BACKEND_URL
+        }product/export/excel?${queryParams.toString()}`,
         {
           method: "GET",
           headers: {
@@ -206,33 +208,33 @@ const Products: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Export failed');
+        throw new Error("Export failed");
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      
+
       // Get filename from response headers or create default
-      const contentDisposition = response.headers.get('content-disposition');
-      let filename = 'direct_products.xlsx';
+      const contentDisposition = response.headers.get("content-disposition");
+      let filename = "direct_products.xlsx";
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="(.+)"/);
         if (match) {
           filename = match[1];
         }
       }
-      
+
       link.download = filename;
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      
-      toast.success('Export completed successfully!');
+
+      toast.success("Export completed successfully!");
     } catch (error: any) {
-      toast.error(error?.message || 'Export failed');
+      toast.error(error?.message || "Export failed");
     } finally {
       setIsExporting(false);
     }
@@ -252,22 +254,22 @@ const Products: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Download failed');
+        throw new Error("Download failed");
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = 'direct_products_sample_template.xlsx';
+      link.download = "direct_products_sample_template.xlsx";
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      
-      toast.success('Sample template downloaded!');
+
+      toast.success("Sample template downloaded!");
     } catch (error: any) {
-      toast.error(error?.message || 'Download failed');
+      toast.error(error?.message || "Download failed");
     }
   };
 
@@ -326,10 +328,12 @@ const Products: React.FC = () => {
 
       const matchesCategory =
         !productTypeFilter ||
-        (prod.category?.toLowerCase() === productTypeFilter.toLowerCase());
+        prod.category?.toLowerCase() === productTypeFilter.toLowerCase();
 
       const matchesStore =
-        !storeFilter || storeFilter.value === "" || prod?.store?._id === storeFilter?.value;
+        !storeFilter ||
+        storeFilter.value === "" ||
+        prod?.store?._id === storeFilter?.value;
 
       const matchesSearch =
         prod.name?.toLowerCase()?.includes(searchTxt) ||
@@ -441,7 +445,8 @@ const Products: React.FC = () => {
                   color: colors.text.inverse,
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.button.primaryHover;
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.primaryHover;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = colors.button.primary;
@@ -449,48 +454,6 @@ const Products: React.FC = () => {
               >
                 <MdAdd size="16px" />
                 Add Product
-              </button>
-
-              {/* Refresh */}
-              <button
-                onClick={fetchProductsHandler}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium border transition-colors"
-                style={{
-                  borderColor: colors.border.medium,
-                  color: colors.text.primary,
-                  backgroundColor: colors.background.card,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.gray[50];
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.background.card;
-                }}
-              >
-                <MdOutlineRefresh size="16px" />
-                Refresh
-              </button>
-
-              {/* Export Excel */}
-              <button
-                onClick={exportToExcelHandler}
-                disabled={isExporting}
-                className="inline-flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:opacity-50"
-                style={{
-                  backgroundColor: colors.button.secondary || '#10B981',
-                  color: colors.text.inverse,
-                }}
-                onMouseEnter={(e) => {
-                  if (!isExporting) e.currentTarget.style.backgroundColor = '#059669';
-                }}
-                onMouseLeave={(e) => {
-                  if (!isExporting)
-                    e.currentTarget.style.backgroundColor =
-                      colors.button.secondary || '#10B981';
-                }}
-              >
-                <MdFileDownload size="16px" />
-                {isExporting ? 'Exporting...' : 'Export Excel'}
               </button>
 
               {/* Bulk Upload */}
@@ -510,8 +473,51 @@ const Products: React.FC = () => {
                 <AiFillFileExcel size="16px" />
                 Bulk Upload
               </button>
-            </div>
 
+              {/* Export Excel */}
+              <button
+                onClick={exportToExcelHandler}
+                disabled={isExporting}
+                className="inline-flex items-center gap-2 px-3 text-white py-1.5 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                style={{
+                  backgroundColor: colors.success[600],
+                }}
+                onMouseEnter={(e) => {
+                  if (!isExporting) {
+                    e.currentTarget.style.backgroundColor = colors.success[700];
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isExporting) {
+                    e.currentTarget.style.backgroundColor = colors.success[600];
+                  }
+                }}
+              >
+                <MdFileDownload size="16px" />
+                {isExporting ? "Exporting..." : "Export Excel"}
+              </button>
+
+              {/* Refresh */}
+              <button
+                onClick={fetchProductsHandler}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium border transition-colors"
+                style={{
+                  borderColor: colors.border.medium,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[50];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.background.card;
+                }}
+              >
+                <MdOutlineRefresh size="16px" />
+                Refresh
+              </button>
+            </div>
           </div>
 
           {/* Search and Filters Row */}
@@ -657,8 +663,12 @@ const Products: React.FC = () => {
                       color: colors.text.primary,
                     }}
                   />
-                  <p className="text-xs mt-1" style={{ color: colors.text.secondary }}>
-                    Note: Product ID will be auto-generated. Don't include it in your file.
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Note: Product ID will be auto-generated. Don't include it in
+                    your file.
                   </p>
                 </div>
 

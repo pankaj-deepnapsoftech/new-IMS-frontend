@@ -31,9 +31,7 @@ const AddParties = ({
   fetchPartiesData,
 }) => {
   const [consigneeNames, setConsigneeNames] = useState([""]);
-  // const [gstIns, setGstIns] = useState([""]);
   const [contactNumbers, setContactNumbers] = useState([""]);
-  // const [deliveryAddresses, setDeliveryAddresses] = useState([""]);
   const [emailIds, setEmailIds] = useState([""]);
   const [cookies] = useCookies();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,20 +40,17 @@ const AddParties = ({
   useEffect(() => {
     if (edittable) {
       setConsigneeNames(edittable.consignee_name || [""]);
-      // setGstIns(edittable.gst_in || [""]);
       setContactNumbers(edittable.contact_number || [""]);
-      // setDeliveryAddresses(edittable.delivery_address || [""]);
       setEmailIds(edittable.email_id || [""]);
     } else {
       setConsigneeNames([""]);
-      // setGstIns([""]);
       setContactNumbers([""]);
-      // setDeliveryAddresses([""]);
       setEmailIds([""]);
     }
   }, [edittable]);
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
       type: edittable?.type || "",
       parties_type: edittable?.parties_type || "",
@@ -64,7 +59,7 @@ const AddParties = ({
       shipped_gst_to: edittable?.shipped_gst_to || "",
       bill_gst_to: edittable?.bill_gst_to || "",
       company_name: edittable?.company_name || "",
-      contact_person_name: edittable?.contact_person_name
+      contact_person_name: edittable?.contact_person_name,
     },
     validationSchema: PartiesFromValidation,
     onSubmit: async (values) => {
@@ -79,8 +74,6 @@ const AddParties = ({
         contact_number: contactNumbers,
         email_id: emailIds,
       };
-
-
 
       try {
         let res;
@@ -111,9 +104,7 @@ const AddParties = ({
         fetchPartiesData();
         formik.resetForm();
         setConsigneeNames([""]);
-        // setGstIns([""]);
         setContactNumbers([""]);
-        // setDeliveryAddresses([""]);
         setEmailIds([""]);
         setshowData(false);
         setEditTable(null);
@@ -187,22 +178,14 @@ const AddParties = ({
     }
   }, [formik.values.shipped_to, formik.values.shipped_gst_to, checkboxValue]);
 
-
-
   return (
     <>
-      {/* Backdrop */}
-      {/* {showData && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
-      )} */}
-
-      {/* Drawer */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full  h-full  bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${showData ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed inset-y-0 right-0 z-50 w-full h-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
+          showData ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <div className="h-full flex flex-col">
-          {/* Header */}
           <div className="px-6 py-4 flex items-center justify-between border-b">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white/20 rounded-lg border">
@@ -224,10 +207,8 @@ const AddParties = ({
             </button>
           </div>
 
-          {/* Form Content */}
           <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
             <form onSubmit={formik.handleSubmit} className="space-y-6">
-              {/* Basic Information Section */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                   <FileText className="h-5 w-5 text-blue-600" />
@@ -235,7 +216,6 @@ const AddParties = ({
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Type */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <User className="h-4 w-4 text-gray-500" />
@@ -268,7 +248,6 @@ const AddParties = ({
                     )}
                   </div>
 
-                  {/* Party Type */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <Users className="h-4 w-4 text-gray-500" />
@@ -293,7 +272,6 @@ const AddParties = ({
                       )}
                   </div>
 
-                  {/* Company Name (conditional) */}
                   {formik.values.type === "Company" && (
                     <div className="space-y-2 md:col-span-2">
                       <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
@@ -355,7 +333,6 @@ const AddParties = ({
                     )}
                   </div>
 
-
                   <div className="space-y-6">
                     {renderFieldList(
                       "Email ID",
@@ -365,9 +342,6 @@ const AddParties = ({
                     )}
                   </div>
 
-
-
-                  {/* Shipped To */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <MapPin className="h-4 w-4 text-gray-500" />
@@ -379,7 +353,6 @@ const AddParties = ({
                       value={formik.values.shipped_to}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-
                       placeholder="Enter shipping address"
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                     />
@@ -389,8 +362,8 @@ const AddParties = ({
                       </p>
                     )}
                   </div>
-                  {formik.values.type === "Company"
-                    && (<div className="space-y-2">
+                  {formik.values.type === "Company" && (
+                    <div className="space-y-2">
                       <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                         <MapPin className="h-4 w-4 text-gray-500" />
                         Shipped GSTIN
@@ -418,14 +391,10 @@ const AddParties = ({
                             {formik.errors.shipped_gst_to}
                           </p>
                         )}
-                    </div>)
-                  }
+                    </div>
+                  )}
 
-
-
-                  {/* Bill To */}
                   <div className="space-y-2">
-                    {/* Label row with checkbox aligned right */}
                     <div className="flex justify-between items-center">
                       <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                         <FileText className="h-4 w-4 text-gray-500" />
@@ -440,21 +409,29 @@ const AddParties = ({
                             const checked = e.target.checked;
                             setCheckboxValue(checked);
                             if (checked) {
-                              formik.setFieldValue("bill_to", formik.values.shipped_to || "");
-                              formik.setFieldValue("bill_gst_to", formik.values.shipped_gst_to || "");
+                              formik.setFieldValue(
+                                "bill_to",
+                                formik.values.shipped_to || ""
+                              );
+                              formik.setFieldValue(
+                                "bill_gst_to",
+                                formik.values.shipped_gst_to || ""
+                              );
                             } else {
                               formik.setFieldValue("bill_to", "");
                               formik.setFieldValue("bill_gst_to", "");
                             }
                           }}
                         />
-                        <label htmlFor="sameAsShipped" className="text-sm text-gray-700">
+                        <label
+                          htmlFor="sameAsShipped"
+                          className="text-sm text-gray-700"
+                        >
                           Same as Shipped To
                         </label>
                       </div>
                     </div>
 
-                    {/* Bill To Input */}
                     <input
                       type="text"
                       name="bill_to"
@@ -465,7 +442,6 @@ const AddParties = ({
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                     />
 
-                    {/* Error Message */}
                     {formik.touched.bill_to && formik.errors.bill_to && (
                       <p className="text-sm text-red-600 flex items-center gap-1">
                         {formik.errors.bill_to}
@@ -473,42 +449,39 @@ const AddParties = ({
                     )}
                   </div>
 
-
-
-
-                  {/* Bill To */}
-                  {formik.values.type === "Company" && (<div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <FileText className="h-4 w-4 text-gray-500" />
-                      Bill GSTIN
-                    </label>
-                    <input
-                      type="text"
-                      name="bill_gst_to"
-                      value={formik.values.bill_gst_to}
-                      onChange={(e) => {
-                        const uppercase = e.target.value
-                          .toUpperCase()
-                          .replace(/[^A-Z0-9]/g, "");
-                        formik.setFieldValue(
-                          "bill_gst_to",
-                          uppercase.slice(0, 15)
-                        );
-                      }}
-                      onBlur={formik.handleBlur}
-                      placeholder="Enter Bill GSTIN"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
-                    />
-                    {formik.touched.bill_gst_to &&
-                      formik.errors.bill_gst_to && (
-                        <p className="text-sm text-red-600 flex items-center gap-1">
-                          {formik.errors.bill_gst_to}
-                        </p>
-                      )}
-                  </div>)}
+                  {formik.values.type === "Company" && (
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <FileText className="h-4 w-4 text-gray-500" />
+                        Bill GSTIN
+                      </label>
+                      <input
+                        type="text"
+                        name="bill_gst_to"
+                        value={formik.values.bill_gst_to}
+                        onChange={(e) => {
+                          const uppercase = e.target.value
+                            .toUpperCase()
+                            .replace(/[^A-Z0-9]/g, "");
+                          formik.setFieldValue(
+                            "bill_gst_to",
+                            uppercase.slice(0, 15)
+                          );
+                        }}
+                        onBlur={formik.handleBlur}
+                        placeholder="Enter Bill GSTIN"
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                      />
+                      {formik.touched.bill_gst_to &&
+                        formik.errors.bill_gst_to && (
+                          <p className="text-sm text-red-600 flex items-center gap-1">
+                            {formik.errors.bill_gst_to}
+                          </p>
+                        )}
+                    </div>
+                  )}
                 </div>
               </div>
-
 
               <div className=" w-full bg-white px-4 py-6 border-t border-gray-200 flex flex-col sm:flex-row gap-4">
                 <button
