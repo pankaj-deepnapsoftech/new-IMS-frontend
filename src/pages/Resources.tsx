@@ -8,6 +8,7 @@ import ResourceTable from "../components/Table/ResourceTable";
 import AddResource from "../components/Drawers/Resources/AddResource";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { toast } from "react-toastify";
 
 interface Resource {
   _id: string;
@@ -62,6 +63,15 @@ const Resources = () => {
 
   const deleteResourceHandler = async (id: string) => {
     try {
+      await axios.delete(
+        `${process.env.REACT_APP_BACKEND_URL}resources/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+
       const updatedResources = resources.filter(
         (resource) => resource._id !== id
       );
@@ -73,6 +83,43 @@ const Resources = () => {
       toast.error(error?.message || "Failed to delete resource");
     }
   };
+
+  const handleResourceCreated = (newResource: Resource) => {
+    const updatedResources = [newResource, ...resources];
+    setResources(updatedResources);
+    setFilteredResources(updatedResources);
+  };
+  
+
+  const bulkDeleteResourcesHandler = async (ids: string[]) => {
+    try {
+      const deletePromises = ids.map((id) =>
+        axios.delete(`${process.env.REACT_APP_BACKEND_URL}resources/${id}`, {
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        })
+      );
+
+      await Promise.all(deletePromises);
+
+      const updatedResources = resources.filter(
+        (resource) => !ids.includes(resource._id)
+      );
+      setResources(updatedResources);
+      setFilteredResources(updatedResources);
+
+      toast.success(
+        `${ids.length} resource${
+          ids.length > 1 ? "s" : ""
+        } deleted successfully`
+      );
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete some resources");
+    }
+  };
+  
+  
 
   const handleSearch = (value: string) => {
     setSearchKey(value);
@@ -90,12 +137,14 @@ const Resources = () => {
     }
   };
 
-  const handleResourceCreated = (newResource: Resource) => {
-    // Add new resource to the top of the list
-    const updatedResources = [newResource, ...resources];
+  const handleResourceUpdated = (updatedResource: Resource) => {
+    const updatedResources = resources.map((resource) =>
+      resource._id === updatedResource._id ? updatedResource : resource
+    );
     setResources(updatedResources);
     setFilteredResources(updatedResources);
   };
+  
 
   useEffect(() => {
     fetchResourcesHandler();
@@ -112,6 +161,7 @@ const Resources = () => {
           onResourceCreated={handleResourceCreated}
           closeDrawerHandler={closeAddResourceDrawerHandler}
           editResource={editResource}
+          onResourceUpdated={handleResourceUpdated}
         />
       )}
 
@@ -204,6 +254,7 @@ const Resources = () => {
           editResource={editResource}
           openUpdateResourceDrawerHandler={openAddResourceDrawerHandler}
           setAddResourceDrawerOpened={setIsAddResourceDrawerOpened}
+          bulkDeleteResourcesHandler={bulkDeleteResourcesHandler}
         />
       </div>
     </div>

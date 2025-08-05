@@ -35,6 +35,7 @@ interface ResourceTableProps {
   editResource?: any;
   openAddResourceDrawerHandler?: () => void;
   setAddResourceDrawerOpened?: (isOpen: boolean) => void;
+  bulkDeleteResourcesHandler?: (ids: string[]) => void;
 }
 
 const ResourceTable: React.FC<ResourceTableProps> = ({
@@ -47,6 +48,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
   editResource,
   openAddResourceDrawerHandler,
   setAddResourceDrawerOpened,
+  bulkDeleteResourcesHandler,
 }) => {
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
@@ -120,26 +122,14 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
     if (
       isBulkDeleting ||
       selectedResources.length === 0 ||
-      !deleteResourceHandler
+      !bulkDeleteResourcesHandler
     )
       return;
+
     setIsBulkDeleting(true);
 
     try {
-      // Call the delete handler for each selected resource
-      const deletePromises = selectedResources.map((resourceId) =>
-        deleteResourceHandler(resourceId)
-      );
-
-      await Promise.all(deletePromises);
-
-      // Success feedback
-      toast.success(
-        `Successfully deleted ${selectedResources.length} resource${
-          selectedResources.length > 1 ? "s" : ""
-        }`
-      );
-
+      await bulkDeleteResourcesHandler(selectedResources);
       setSelectedResources([]);
       setShowBulkDeleteModal(false);
     } catch (error) {
@@ -279,6 +269,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
               <select
                 onChange={(e) => setPageSize(Number(e.target.value))}
                 className="px-3 py-2 text-sm rounded-lg border transition-colors"
+                value={pageSize}
                 style={{
                   backgroundColor: colors.input.background,
                   borderColor: colors.border.light,
