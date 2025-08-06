@@ -71,6 +71,11 @@ const AddBom: React.FC<AddBomProps> = ({
     number | undefined
   >();
   const [otherCharges, setOtherCharges] = useState<number | undefined>();
+  const [resources, setResources] = useState<any[]>([]);
+  const [resourceOptions, setResourceOptions] = useState<{ value: string; label: string }[]>([]);
+  const [selectedResources, setSelectedResources] = useState([
+    { name: null, type: null, specification: "" },
+  ]);
 
   const [addBom] = useAddBomMutation();
 
@@ -80,7 +85,6 @@ const AddBom: React.FC<AddBomProps> = ({
       description: "",
       quantity: "",
       uom: "",
-
       assembly_phase: "",
       supplier: "",
       supporting_doc: "",
@@ -193,6 +197,13 @@ const AddBom: React.FC<AddBomProps> = ({
         other_charges: otherCharges || 0,
       },
       remarks: remarks,
+      resources: selectedResources.map((r) => ({
+        resource_id: r.name?.value,
+        type: r.type?.value || r.type,
+        specification: r.specification?.value || r.specification,
+      }))
+
+
     };
 
     try {
@@ -234,6 +245,31 @@ const AddBom: React.FC<AddBomProps> = ({
     }
   };
 
+
+  const fetchResourceHandler = async () => {
+    try {
+      setIsLoadingProducts(true);
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "resources",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const results = await response.json();
+      if (!results.success) {
+        throw new Error(results?.message);
+      }
+      setResources(results.resources); // Instead of setProducts
+
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  };
   // console.log(products)
   const onFinishedGoodChangeHandler = (d: any) => {
     setFinishedGood(d);
@@ -282,6 +318,7 @@ const AddBom: React.FC<AddBomProps> = ({
 
   useEffect(() => {
     fetchProductsHandler();
+    fetchResourceHandler();
   }, []);
 
   useEffect(() => {
@@ -298,7 +335,7 @@ const AddBom: React.FC<AddBomProps> = ({
         value: prd._id,
         label: prd.name,
       }));
-
+  
     setFinishedGoodsOptions(finishedGoodsOptions);
     setRawMaterialsOptions(rawMaterialsOptions);
   }, [products]);
@@ -346,6 +383,21 @@ const AddBom: React.FC<AddBomProps> = ({
       color: colors.gray[900],
     }),
   };
+
+  useEffect(() => {
+    const resourceOptions = resources?.map((res: any) => ({
+      label: res.name,
+      value: res._id,
+      type: res.type,
+      specification: res.specification,
+    }));
+
+
+    setResourceOptions(resourceOptions);
+  }, [resources]);
+
+
+
 
   return (
     <>
@@ -777,6 +829,117 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
                 </div>
               </div>
+              <div className="bg-white border-b">
+                <div className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Resources</h3>
+                  </div>
+
+                  {/* Table Header */}
+                  <div className="hidden sm:grid grid-cols-4 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                    <div>Name</div>
+                    <div>Type</div>
+                    <div>Specification</div>
+                    <div>Action</div>
+                  </div>
+
+                  {/* Rows */}
+                  <div className="border border-t-0 border-gray-300">
+                    {selectedResources.map((resource, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-1 sm:grid-cols-4 gap-4 px-3 py-4 items-start sm:items-center bg-white border-b border-gray-200 last:border-b-0"
+                      >
+                        {/* Name Dropdown */}
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Resource Name
+                          </label>
+                          <Select
+                            options={resourceOptions}
+                            value={resource.name}
+                            placeholder="Select Resource Name"
+                            className="text-sm"
+                            onChange={(selectedOption) => {
+                              setSelectedResources((prev) => {
+                                const updated = [...prev];
+                                updated[index] = {
+                                  name: selectedOption,
+                                  type: { label: selectedOption.type, value: selectedOption.type },
+                                  specification: {
+                                    label: selectedOption.specification,
+                                    value: selectedOption.specification,
+                                  },
+                                };
+                                return updated;
+                              });
+                            }}
+                          />
+                        </div>
+
+                        {/* Type */}
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Type
+                          </label>
+                          <input
+                            value={resource.type?.value || ""}
+                            placeholder="Resource Type"
+                            disabled
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Specification */}
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Specification
+                          </label>
+                          <input
+                            value={resource.specification?.value || ""}
+                            placeholder="Resource Specification"
+                            disabled
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex sm:justify-start items-center gap-2">
+                          {selectedResources.length > 1 && (
+                            <button
+                              type="button"
+                              className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                              onClick={() => {
+                                const updated = selectedResources.filter((_, i) => i !== index);
+                                setSelectedResources(updated);
+                              }}
+                            >
+                              ✕
+                            </button>
+                          )}
+                          {index === selectedResources.length - 1 && (
+                            <button
+                              type="button"
+                              className="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
+                              onClick={() =>
+                                setSelectedResources([
+                                  ...selectedResources,
+                                  { name: null, type: null, specification: null },
+                                ])
+                              }
+                            >
+                              + Add
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+
+
 
               {/* Scrap Materials Section */}
               <div className="bg-white border-b">
@@ -788,7 +951,7 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
 
                   {/* Table Header (Desktop Only) */}
-                  <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                  <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 whitespace-nowrap to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
                     <div>Product Name</div>
                     <div>Comment</div>
                     <div>Estimated Quantity</div>
