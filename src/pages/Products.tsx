@@ -28,7 +28,7 @@ import { FiDownload, FiSearch } from "react-icons/fi";
 import { colors } from "../theme/colors";
 import { Package } from "lucide-react";
 import AddProduct from "../components/Drawers/Product/AddDirectProduct";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 const Products: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -121,7 +121,7 @@ const Products: React.FC = () => {
       if (!results.success) {
         throw new Error(results?.message);
       }
-      console.log(results)
+      console.log(results);
       setData(results.products);
       setFilteredData(results.products);
     } catch (error: any) {
@@ -176,7 +176,7 @@ const Products: React.FC = () => {
       const response = await bulkUpload(formData).unwrap();
       toast.success(response.message);
       setShowBulkUploadMenu(false);
-      fetchProductsHandler(); // Refresh the data
+      fetchProductsHandler();
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally {
@@ -192,11 +192,13 @@ const Products: React.FC = () => {
       // Build query parameters based on current filters
       const queryParams = new URLSearchParams();
       if (productTypeFilter) {
-        queryParams.append('category', productTypeFilter);
+        queryParams.append("category", productTypeFilter);
       }
 
       const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}product/export/excel?${queryParams.toString()}`,
+        `${
+          process.env.REACT_APP_BACKEND_URL
+        }product/export/excel?${queryParams.toString()}`,
         {
           method: "GET",
           headers: {
@@ -206,17 +208,17 @@ const Products: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Export failed');
+        throw new Error("Export failed");
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
 
       // Get filename from response headers or create default
-      const contentDisposition = response.headers.get('content-disposition');
-      let filename = 'direct_products.xlsx';
+      const contentDisposition = response.headers.get("content-disposition");
+      let filename = "direct_products.xlsx";
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="(.+)"/);
         if (match) {
@@ -232,7 +234,7 @@ const Products: React.FC = () => {
 
       toast.success('Export completed successfully!');
     } catch (error: any) {
-      toast.error(error?.message || 'Export failed');
+      toast.error(error?.message || "Export failed");
     } finally {
       setIsExporting(false);
     }
@@ -252,14 +254,14 @@ const Products: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Download failed');
+        throw new Error("Download failed");
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = 'direct_products_sample_template.xlsx';
+      link.download = "direct_products_sample_template.xlsx";
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -267,7 +269,7 @@ const Products: React.FC = () => {
 
       toast.success('Sample template downloaded!');
     } catch (error: any) {
-      toast.error(error?.message || 'Download failed');
+      toast.error(error?.message || "Download failed");
     }
   };
 
@@ -326,10 +328,12 @@ const Products: React.FC = () => {
 
       const matchesCategory =
         !productTypeFilter ||
-        (prod.category?.toLowerCase() === productTypeFilter.toLowerCase());
+        prod.category?.toLowerCase() === productTypeFilter.toLowerCase();
 
       const matchesStore =
-        !storeFilter || storeFilter.value === "" || prod?.store?._id === storeFilter?.value;
+        !storeFilter ||
+        storeFilter.value === "" ||
+        prod?.store?._id === storeFilter?.value;
 
       const matchesSearch =
         prod.name?.toLowerCase()?.includes(searchTxt) ||
@@ -441,7 +445,8 @@ const Products: React.FC = () => {
                   color: colors.text.inverse,
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.button.primaryHover;
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.primaryHover;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = colors.button.primary;
@@ -655,8 +660,12 @@ const Products: React.FC = () => {
                       color: colors.text.primary,
                     }}
                   />
-                  <p className="text-xs mt-1" style={{ color: colors.text.secondary }}>
-                    Note: Product ID will be auto-generated. Don't include it in your file.
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Note: Product ID will be auto-generated. Don't include it in
+                    your file.
                   </p>
                 </div>
 

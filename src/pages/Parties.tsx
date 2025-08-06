@@ -273,9 +273,9 @@ const Parties = () => {
                 onClick={fetchPartiesData}
                 className="flex items-center gap-1 px-3 py-2 rounded-md border transition-all duration-150 hover:shadow-sm focus:outline-none focus:ring-2"
                 style={{
-                  backgroundColor: colors.background.card,
                   borderColor: colors.border.medium,
-                  color: colors.text.secondary,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.gray[50])}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.background.card)}

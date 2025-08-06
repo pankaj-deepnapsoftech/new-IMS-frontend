@@ -162,6 +162,7 @@ const Resources = () => {
           closeDrawerHandler={closeAddResourceDrawerHandler}
           editResource={editResource}
           onResourceUpdated={handleResourceUpdated}
+          fetchResourcesHandler={fetchResourcesHandler}
         />
       )}
 

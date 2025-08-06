@@ -129,12 +129,20 @@ const productApi = createApi({
     }),
     productBulKUpload: builder.mutation({
       query: (data) => ({
-        url: '/bulk',
-        method: 'POST',
-        body: data
+        url: "/bulk",
+        method: "POST",
+        body: data,
       }),
-      invalidatesTags: ['Product']
-    })
+      invalidatesTags: ["Product"],
+    }),
+    productBulkUploadIndirect: builder.mutation({
+      query: (data) => ({
+        url: "/bulkindrect",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Product"],
+    }),
   }),
 });
 
@@ -637,7 +645,8 @@ export const {
   useDeleteProductMutation,
   useLazyProductDetailsQuery,
   useLazyUnapprovedProductsQuery,
-  useProductBulKUploadMutation
+  useProductBulKUploadMutation,
+  useProductBulkUploadIndirectMutation,
 } = productApi;
 
 // Store APIs
