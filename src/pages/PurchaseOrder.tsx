@@ -1,146 +1,112 @@
-// import { Button } from "@chakra-ui/react";
-// import { useEffect, useState } from "react";
-// import ProformaInvoiceTable from "../components/Table/ProformaInvoiceTable";
-// import { toast } from "react-toastify";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   closeAddPurchaseOrderDrawer,
-  // closeProformaInvoiceDetailsDrawer,
-  // closeUpdateProformaInvoiceDrawer,
   openAddPurchaseOrderDrawer,
-  // openProformaInvoiceDetailsDrawer,
-  // openUpdateProformaInvoiceDrawer,
 } from "../redux/reducers/drawersSlice";
-// import { useCookies } from "react-cookie";
 import { MdOutlineRefresh } from "react-icons/md";
-// import { useDeleteProformaInvoiceMutation } from "../redux/api/api";
-// import ProformaInvoiceDetails from "../components/Drawers/Proforma Invoice/ProformaInvoiceDetails";
-// import UpdateProformaInvoice from "../components/Drawers/Proforma Invoice/UpdateProformaInvoice";
 import { FiSearch } from "react-icons/fi";
 import AddPurchaseOrder from "../components/Drawers/Purchase Order/AddPurchaseOrder";
 import PurchaseOrderTable from "../components/Table/PurchaseOrderTable";
 import { useCookies } from "react-cookie";
+import axios from "axios";
+
+interface PurchaseOrder {
+  _id: string;
+  poOrder: string;
+  date: string;
+  itemName: string;
+  supplierName: string;
+  supplierEmail: string;
+  supplierShippedGSTIN: string;
+  supplierBillGSTIN: string;
+  supplierShippedTo: string;
+  supplierBillTo: string;
+  modeOfPayment: string;
+  GSTApply: string;
+  billingAddress: string;
+  additionalImportant?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 const PurchaseOrder: React.FC = () => {
-  // const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
-  // const isAllowed = isSuper || allowedroutes.includes("sale & purchase");
   const [cookies] = useCookies();
-  // const [searchKey, setSearchKey] = useState<string | undefined>();
-  // const [data, setData] = useState<any[] | []>([]);
-  // const [filteredData, setFilteredData] = useState<any[] | []>([]);
-  // const [isLoadingProformaInvoices] = useState<boolean>(false);
-  const {
-    isAddPurchaseOrderDrawerOpened,
-    // isUpdateProformaInvoiceDrawerOpened,
-    // isProformaInvoiceDetailsDrawerOpened,
-  } = useSelector((state: any) => state.drawers);
-  const dispatch = useDispatch();
-  // const [id, setId] = useState<string | undefined>();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [editingOrder, setEditingOrder] = useState<PurchaseOrder | null>(null);
+  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([]);
+  const [filteredPurchaseOrders, setFilteredPurchaseOrders] = useState<PurchaseOrder[]>([]);
+  const [searchKey, setSearchKey] = useState("");
 
-  // const [deleteProformaInvoice] = useDeleteProformaInvoiceMutation();
+  const { isAddPurchaseOrderDrawerOpened } = useSelector((state: any) => state.drawers);
+  const dispatch = useDispatch();
+
+  // Fetch purchase orders
+  const fetchPurchaseOrders = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}purchase-order/all`,
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      if (response.data.success) {
+        setPurchaseOrders(response.data.purchase_orders || []);
+        setFilteredPurchaseOrders(response.data.purchase_orders || []);
+      }
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPurchaseOrders();
+  }, [refreshTrigger]);
+
+  // Filter purchase orders based on search key
+  useEffect(() => {
+    const searchLower = searchKey.toLowerCase();
+    const results = purchaseOrders.filter((order: PurchaseOrder) =>
+      (
+        (order?.poOrder?.toLowerCase() || "").includes(searchLower) ||
+        (order?.supplierName?.toLowerCase() || "").includes(searchLower) ||
+        (order?.itemName?.toLowerCase() || "").includes(searchLower)
+      )
+    );
+    setFilteredPurchaseOrders(results);
+  }, [searchKey, purchaseOrders]);
+
+  // Handle delete purchase order
+  const handleDeletePurchaseOrder = (id: string) => {
+    setPurchaseOrders((prev) => prev.filter((order) => order._id !== id));
+    setFilteredPurchaseOrders((prev) => prev.filter((order) => order._id !== id));
+  };
 
   const openAddPurchaseOrderDrawerHandler = () => {
     dispatch(openAddPurchaseOrderDrawer());
   };
+
   const closeAddPurchaseOrderDrawerHandler = () => {
     dispatch(closeAddPurchaseOrderDrawer());
+    setEditingOrder(null);
   };
 
-  // const openProformaInvoiceDetailsDrawerHandler = (id: string) => {
-  //   setId(id);
-  //   dispatch(openProformaInvoiceDetailsDrawer());
-  // };
-  // const closeProformaInvoiceDetailsDrawerHandler = () => {
-  //   dispatch(closeProformaInvoiceDetailsDrawer());
-  // };
+  // Handle edit purchase order
+  const handleEditPurchaseOrder = (order: PurchaseOrder) => {
+    console.log("Edit purchase order clicked:", order);
+    setEditingOrder(order);
+    dispatch(openAddPurchaseOrderDrawer());
+  };
 
-  // const openProformaInvoiceUpdateDrawerHandler = (id: string) => {
-  //   setId(id);
-  //   dispatch(openUpdateProformaInvoiceDrawer());
-  // };
-  // const closeProformaInvoiceUpdateDrawerHandler = () => {
-  //   dispatch(closeUpdateProformaInvoiceDrawer());
-  // };
+  // Function to refresh table data
+  const refreshTableData = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
 
-  // const fetchPruchesOrderHandler = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       process.env.REACT_APP_BACKEND_URL + "proforma-invoice/all",
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: `Bearer ${cookies?.access_token}`,
-  //         },
-  //       }
-  //     );
-  //     const data = await response.json();
-  //     if (!data.success) {
-  //       throw new Error(data.message);
-  //     }
-
-  //     setData(data.proforma_invoices);
-  //     setFilteredData(data.proforma_invoices);
-  //   } catch (error: any) {
-  //     toast.error(error?.message || "Something went wrong");
-  //   }
-  // };
-
-  // const deleteProformaInvoiceHandler = async (id: string) => {
-  //   try {
-  //     const response = await deleteProformaInvoice(id).unwrap();
-  //     if (!response.success) {
-  //       throw new Error(response.message);
-  //     }
-  //     toast.success(response.message);
-  //     fetchProformaInvoiceHandler();
-  //   } catch (error: any) {
-  //     toast.error(error.message || "Something went wrong");
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchProformaInvoiceHandler();
-  // }, []);
-
-  // useEffect(() => {
-  //   const searchText = searchKey?.toLowerCase();
-  //   const results = data.filter(
-  //     (pi: any) =>
-  //       pi.creator.first_name?.toLowerCase()?.includes(searchText) ||
-  //       pi?.creator?.last_name?.toLowerCase()?.includes(searchText) ||
-  //       pi?.subtotal?.toString()?.toLowerCase()?.includes(searchText) ||
-  //       pi?.total?.toString()?.toLowerCase()?.includes(searchText) ||
-  //       pi?.supplier?.name?.toLowerCase()?.includes(searchText) ||
-  //       pi?.buyer?.name?.toLowerCase()?.includes(searchText) ||
-  //       (pi?.createdAt &&
-  //         new Date(pi?.createdAt)
-  //           ?.toISOString()
-  //           ?.substring(0, 10)
-  //           ?.split("-")
-  //           .reverse()
-  //           .join("")
-  //           ?.includes(searchText?.replaceAll("/", "") || "")) ||
-  //       (pi?.updatedAt &&
-  //         new Date(pi?.updatedAt)
-  //           ?.toISOString()
-  //           ?.substring(0, 10)
-  //           ?.split("-")
-  //           ?.reverse()
-  //           ?.join("")
-  //           ?.includes(searchText?.replaceAll("/", "") || ""))
-  //   );
-  //   setFilteredData(results);
-  // }, [searchKey]);
-
-  // if (!isAllowed) {
-  //   return (
-  //     <div className="text-center text-red-500">
-  //       You are not allowed to access this route.
-  //     </div>
-  //   );
-  // }
-
-  // console.log(filteredData)
+  // Function to handle purchase order creation/update
+  const handlePurchaseOrderDataChange = () => {
+    refreshTableData();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-2 lg:p-3">
@@ -148,21 +114,10 @@ const PurchaseOrder: React.FC = () => {
         <AddPurchaseOrder
           isOpen={isAddPurchaseOrderDrawerOpened}
           closeDrawerHandler={closeAddPurchaseOrderDrawerHandler}
+          edittable={editingOrder}
+          fetchPurchaseOrderData={handlePurchaseOrderDataChange}
         />
       )}
-      {/* {isProformaInvoiceDetailsDrawerOpened && (
-        <ProformaInvoiceDetails
-          closeDrawerHandler={closeProformaInvoiceDetailsDrawerHandler}
-          id={id}
-        />
-      )}
-      {isUpdateProformaInvoiceDrawerOpened && (
-        <UpdateProformaInvoice
-          closeDrawerHandler={closeProformaInvoiceUpdateDrawerHandler}
-          id={id}
-          fetchProformaInvoicesHandler={fetchProformaInvoiceHandler}
-        />
-      )} */}
 
       {/* Header Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
@@ -215,7 +170,7 @@ const PurchaseOrder: React.FC = () => {
             </button>
             <button
               className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-lg border border-gray-300 transition-all duration-200 hover:shadow-md flex items-center justify-center gap-2"
-              // onClick={fetchProformaInvoiceHandler}
+              onClick={refreshTableData}
             >
               <MdOutlineRefresh className="text-base" />
               Refresh
@@ -232,9 +187,9 @@ const PurchaseOrder: React.FC = () => {
             <input
               type="text"
               className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-              placeholder="Search invoices..."
-              // value={searchKey || ""}
-              // onChange={(e) => setSearchKey(e.target.value)}
+              placeholder="Search by PO Number, Supplier Name, or Item Name..."
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
             />
           </div>
         </div>
@@ -242,18 +197,12 @@ const PurchaseOrder: React.FC = () => {
 
       {/* Table Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* <ProformaInvoiceTable
-          isLoadingProformaInvoices={isLoadingProformaInvoices}
-          proformaInvoices={filteredData}
-          deleteProformaInvoiceHandler={deleteProformaInvoiceHandler}
-          openProformaInvoiceDetailsHandler={
-            openProformaInvoiceDetailsDrawerHandler
-          }
-          openUpdateProformaInvoiceDrawer={
-            openProformaInvoiceUpdateDrawerHandler
-          }
-        /> */}
-        <PurchaseOrderTable />
+        <PurchaseOrderTable
+          refreshTrigger={refreshTrigger}
+          onEdit={handleEditPurchaseOrder}
+          filteredPurchaseOrders={filteredPurchaseOrders}
+          onDelete={handleDeletePurchaseOrder} // Pass the onDelete handler
+        />
       </div>
     </div>
   );
