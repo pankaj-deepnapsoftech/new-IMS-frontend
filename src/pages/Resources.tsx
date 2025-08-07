@@ -29,7 +29,6 @@ const Resources = () => {
   const [isAddResourceDrawerOpened, setIsAddResourceDrawerOpened] =
     useState(false);
   const [editResource, setEditResource] = useState<Resource | null>(null);
-
   const openAddResourceDrawerHandler = () => {
     setEditResource(null); // Clear edit state when opening add drawer
     setIsAddResourceDrawerOpened(true);

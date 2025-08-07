@@ -139,7 +139,8 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
               },
             }
           );
-          console.log(res);
+
+          await PostDataAutoCreateBom(value.product_id, value.product_qty);
           resetForm();
         }
 
@@ -168,7 +169,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       }
     },
   });
-
+  console.log(products)
   const fetchDropdownData = async () => {
     try {
       const [partiesRes, productRes] = await Promise.all([
@@ -181,10 +182,11 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       ]);
 
       const filteredProducts = (productRes.data.products || []).filter(
-        (product: any) => product?.category == "finished goods"
+        (product: any) => product?.category === "finished goods"
       );
       setpartiesData(partiesRes?.data?.data || []);
       setProducts(filteredProducts || []);
+
     } catch (error) {
       console.log("testing data", error);
       toast({
@@ -196,7 +198,26 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       });
     }
   };
-  console.log(partiesData);
+
+
+  const PostDataAutoCreateBom = async (productId, quantity) => {
+    console.log("product Id", productId)
+    console.log("product quantity", quantity)
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}bom/autobom?product_id=${productId}&quantity=${quantity}`,
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      console.log("Auto BOM created:", res.data);
+    } catch (error) {
+      console.log("Auto BOM creation failed:", error);
+    }
+  };
+
+
+
 
   useEffect(() => {
     fetchDropdownData();

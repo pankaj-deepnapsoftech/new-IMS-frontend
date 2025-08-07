@@ -48,10 +48,11 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
       toast.error("Please provide all the required fields");
       return;
     }
-    if (permissions.length === 0) {
-      toast.error("Select atleast 1 permission");
+    if (role.toLowerCase().trim() !== "man power" && permissions.length === 0) {
+      toast.error("Select at least 1 permission");
       return;
     }
+
     const modifiedPermissions = permissions.map(
       (permission: any) => permission.value
     );
@@ -202,7 +203,7 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
                 Permissions
               </FormLabel>
               <Select
-                required
+                
                 className="rounded mt-2 border "
                 options={permissionOptions}
                 placeholder="Select"

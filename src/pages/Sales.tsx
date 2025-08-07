@@ -61,7 +61,7 @@ const Sales = () => {
             setIsLoading(false);
         }
     };
-
+    
     const fetchEmployees = async () => {
         try {
             if (!token) throw new Error("Authentication token not found");
@@ -181,11 +181,14 @@ const Sales = () => {
     };
 
 
+  
+     
 
     useEffect(() => {
         fetchPurchases(page);
         fetchEmployees();
         fetchAllSalesOrderForExport()
+        // PostDataAutoCreateBom()
     }, [page]);
 
     useEffect(() => {
