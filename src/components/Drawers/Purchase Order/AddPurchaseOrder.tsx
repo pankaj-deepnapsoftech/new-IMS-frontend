@@ -1,9 +1,7 @@
-// @ts-nocheck
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useCookies } from "react-cookie";
-import axios from "axios";
 import { toast } from "react-toastify";
 import {
   Box,
@@ -26,6 +24,14 @@ import {
   useColorModeValue,
   Flex,
   Heading,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Checkbox,
+  useDisclosure,
 } from "@chakra-ui/react";
 import {
   BiX,
@@ -36,25 +42,23 @@ import {
   BiCreditCard,
   BiCalendar,
   BiPackage,
-  // BiDollarSign,
   BiEdit,
   BiPlus,
+  BiCheckCircle,
 } from "react-icons/bi";
 import {
   Edit3,
   Plus,
-  // FileSpreadsheetText,
   Users,
   User,
   Phone,
   Mail,
   MapPin,
-  FileSp,
-  FileSpreadsheetreadsheet,
   FileSpreadsheet,
   IndianRupee,
 } from "lucide-react";
 import { colors } from "../../../theme/colors";
+import axios from "axios";
 
 interface AddPurchaseOrderProps {
   isOpen: boolean;
@@ -63,142 +67,258 @@ interface AddPurchaseOrderProps {
   fetchPurchaseOrderData?: () => void;
 }
 
-const AddPurchaseOrder = ({
+interface SupplierOption {
+  id: string;
+  supplierName: string;
+  companyName: string;
+  supplierEmail?: string;
+  supplierShippedTo?: string;
+  supplierBillTo?: string;
+  supplierShippedGSTIN?: string;
+  supplierBillGSTIN?: string;
+}
+
+interface SupplierApiResponse {
+  success: boolean;
+  message?: string;
+  suppliers: SupplierOption[];
+}
+
+interface RawMaterial {
+  _id: string;
+  name: string;
+}
+
+interface PurchaseOrderFormValues {
+  poOrder: string;
+  date: string;
+  supplierIdentifier: string;
+  supplierName: string;
+  supplierEmail: string;
+  supplierShippedTo: string;
+  supplierBillTo: string;
+  supplierShippedGSTIN: string;
+  supplierBillGSTIN: string;
+  GSTApply: string;
+  packagingAndForwarding: string;
+  freightCharges: string;
+  modeOfPayment: string;
+  deliveryPeriod: string;
+  billingAddress: string;
+  paymentTerms: string;
+  additionalRemarks: string;
+  additionalImportant: string;
+  itemName: string;
+  quantity: number;
+  isSameAddress: boolean;
+}
+
+const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
   isOpen,
   closeDrawerHandler,
   edittable,
   fetchPurchaseOrderData,
-}: AddPurchaseOrderProps) => {
+}) => {
   const [cookies] = useCookies();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [supplierOptions, setSupplierOptions] = useState<
-    { value: string; label: string }[] | []
-  >([]);
-  // Color scheme
+  const [isLoadingSuppliers, setIsLoadingSuppliers] = useState(false);
+  const [supplierOptions, setSupplierOptions] = useState<SupplierOption[]>([]);
+  const [nextPONumber, setNextPONumber] = useState("");
+  const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>([]);
+  const [selectedRawMaterial, setSelectedRawMaterial] = useState("");
+
+  const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error">("success");
+
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const headingColor = useColorModeValue("gray.700", "gray.200");
   const textColor = useColorModeValue("gray.600", "gray.300");
 
-  // const validationSchema = Yup.object({
-  //   companyName: Yup.string().required("Company name is required"),
-  //   companyAddress: Yup.string().required("Company address is required"),
-  //   companyPhoneNumber: Yup.string().required("Company phone number is required"),
-  //   companyEmail: Yup.string().email("Invalid email").required("Company email is required"),
-  //   companyWebsite: Yup.string().required("Company website is required"),
-  //   companyGST: Yup.string().required("Company GST is required"),
-  //   companyPan: Yup.string().required("Company PAN is required"),
+  const hasError = (fieldName: keyof PurchaseOrderFormValues): boolean => {
+    return !!(formik.touched[fieldName] && formik.errors[fieldName]);
+  };
 
-  //   poOrder: Yup.string().required("PO Order is required"),
-  //   date: Yup.string().required("Date is required"),
+  const getErrorMessage = (fieldName: keyof PurchaseOrderFormValues): string => {
+    return formik.errors[fieldName] ? String(formik.errors[fieldName]) : "";
+  };
 
-  //   supplierCode: Yup.string().required("Supplier code is required"),
-  //   supplierName: Yup.string().required("Supplier name is required"),
-  //   supplierPan: Yup.string().required("Supplier PAN is required"),
-  //   supplierEmail: Yup.string().email("Invalid email").required("Supplier email is required"),
+  const validationSchema = Yup.object({
+    poOrder: Yup.string().required("PO Order is required"),
+    date: Yup.string().required("Date is required"),
+    supplierIdentifier: Yup.string().required("Supplier name or company name is required"),
+    supplierName: Yup.string().required("Supplier name is required"),
+    supplierEmail: Yup.string().email("Invalid email"),
+    supplierShippedTo: Yup.string().required("Supplier shipped to is required"),
+    supplierBillTo: Yup.string().required("Supplier bill to is required"),
+    supplierShippedGSTIN: Yup.string().required("Shipped GSTIN is required"),
+    supplierBillGSTIN: Yup.string().required("Bill GSTIN is required"),
+    GSTApply: Yup.string().required("GST selection is required"),
+    packagingAndForwarding: Yup.string(),
+    freightCharges: Yup.string(),
+    modeOfPayment: Yup.string().required("Mode of payment is required"),
+    deliveryPeriod: Yup.string(),
+    billingAddress: Yup.string(),
+    paymentTerms: Yup.string(),
+    itemName: Yup.string().required("Item name is required"),
+    quantity: Yup.number()
+      .required("Quantity is required")
+      .min(1, "Quantity must be at least 1")
+      .integer("Quantity must be an integer"),
+    additionalRemarks: Yup.string(),
+    additionalImportant: Yup.string(),
+    isSameAddress: Yup.boolean(),
+  });
 
-  //   supplierShippedTo: Yup.string().required("Supplier shipped to is required"),
-  //   supplierBillTo: Yup.string().required("Supplier bill to is required"),
-  //   supplierShippedGSTIN: Yup.string().required("Shipped GSTIN is required"),
-  //   supplierBillGSTIN: Yup.string().required("Bill GSTIN is required"),
-
-  //   GSTApply: Yup.string().required("GST selection is required"),
-  //   packagingAndForwarding: Yup.string().required("Packaging and forwarding is required"),
-  //   freightCharges: Yup.string(), // optional
-  //   modeOfPayment: Yup.string().required("Mode of payment is required"),
-  //   deliveryAddress: Yup.string().required("Delivery address is required"),
-  //   deliveryPeriod: Yup.string().required("Delivery period is required"),
-  //   billingAddress: Yup.string().required("Billing address is required"),
-  //   paymentTerms: Yup.string().required("Payment terms are required"),
-
-  //   additionalRemarks: Yup.string(), // optional
-  //   additionalImportant: Yup.string(), // optional
-  // });
-
-
-  const formik = useFormik({
+  const formik = useFormik<PurchaseOrderFormValues>({
     initialValues: {
-      companyName: edittable?.companyName || "",
-      companyAddress: edittable?.companyAddress || "",
-      companyPhoneNumber: edittable?.companyPhoneNumber || "",
-      companyEmail: edittable?.companyEmail || "",
-      companyWebsite: edittable?.companyWebsite || "",
-      companyGST: edittable?.companyGST || "",
-      companyPan: edittable?.companyPan || "",
-
       poOrder: edittable?.poOrder || "",
       date: edittable?.date || new Date().toISOString().split("T")[0],
-
-      supplierCode: edittable?.supplierCode || "",
+      supplierIdentifier: edittable?.supplierName || edittable?.companyName || "",
       supplierName: edittable?.supplierName || "",
-      supplierPan: edittable?.supplierPan || "",
       supplierEmail: edittable?.supplierEmail || "",
-
       supplierShippedTo: edittable?.supplierShippedTo || "",
       supplierBillTo: edittable?.supplierBillTo || "",
       supplierShippedGSTIN: edittable?.supplierShippedGSTIN || "",
       supplierBillGSTIN: edittable?.supplierBillGSTIN || "",
-
       GSTApply: edittable?.GSTApply || "",
-
       packagingAndForwarding: edittable?.packagingAndForwarding || "",
       freightCharges: edittable?.freightCharges || "",
       modeOfPayment: edittable?.modeOfPayment || "",
-      deliveryAddress: edittable?.deliveryAddress || "",
       deliveryPeriod: edittable?.deliveryPeriod || "",
       billingAddress: edittable?.billingAddress || "",
       paymentTerms: edittable?.paymentTerms || "",
-
       additionalRemarks: edittable?.additionalRemarks || "",
       additionalImportant: edittable?.additionalImportant || "",
+      itemName: edittable?.itemName || "",
+      quantity: edittable?.quantity || 1,
+      isSameAddress: edittable?.isSameAddress || false,
     },
-
-    // validationSchema,
+    validationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
-      if (isSubmitting) return;
+      if (isSubmitting) {
+        return;
+      }
+
       setIsSubmitting(true);
 
-      try {
+      // Map supplierIdentifier to supplierName for the backend
+      const payload = {
+        ...values,
+        supplierName: values.supplierIdentifier,
+      };
 
+      try {
         if (edittable?._id) {
           const res = await axios.put(
-            `${process.env.REACT_APP_BACKEND_URL}purchase-order/put/${edittable._id}`,
-            values,
+            `${process.env.REACT_APP_BACKEND_URL}purchase-order/${edittable._id}`,
+            payload,
             {
               headers: {
                 Authorization: `Bearer ${cookies?.access_token}`,
               },
             }
           );
+          if (res.data.success) {
+            setPopupMessage("Purchase order updated successfully!");
+            setPopupType("success");
+            onModalOpen();
+            if (fetchPurchaseOrderData) {
+              fetchPurchaseOrderData();
+            }
+            setTimeout(() => {
+              closeDrawerHandler();
+            }, 2000);
+          }
         } else {
-          const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}purchase-order/`, values, {
-            headers: { Authorization: `Bearer ${cookies?.access_token}` },
-          });
-    
-          toast.success(
-            res?.data?.message || "Purchase order saved successfully!"
+          const res = await axios.post(
+            `${process.env.REACT_APP_BACKEND_URL}purchase-order/`,
+            payload,
+            {
+              headers: {
+                Authorization: `Bearer ${cookies?.access_token}`,
+              },
+            }
           );
-          console.log(res)
-        }
 
-      
-        // fetchPurchaseOrderData();
-        formik.resetForm();
-        setshowData(false);
-        setEditTable(null);
-      } catch (error) {
-        console.error(error);
-        toast.error(error?.response?.data?.message || "Something went wrong!");
+          if (res.data.success) {
+            setPopupMessage("Purchase order created successfully!");
+            setPopupType("success");
+            onModalOpen();
+            formik.resetForm();
+            if (fetchPurchaseOrderData) {
+              fetchPurchaseOrderData();
+            }
+            setTimeout(() => {
+              closeDrawerHandler();
+            }, 2000);
+          }
+        }
+      } catch (error: any) {
+        const errorMessage = error?.response?.data?.message ||
+          "Something went wrong while saving purchase order!";
+        setPopupMessage(errorMessage);
+        setPopupType("error");
+        onModalOpen();
       } finally {
         setIsSubmitting(false);
       }
     },
   });
-  const fetchSuppliersHandler = async () => {
+
+  const fetchSuppliersHandler = async (retryCount = 0) => {
+    setIsLoadingSuppliers(true);
+    try {
+      console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
+      console.log("Access Token:", cookies.access_token);
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}purchase-order/suppliers`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+
+      const data: SupplierApiResponse = await response.json();
+      console.log("Supplier API Response:", data);
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      const suppliers = data.suppliers
+        .map((supplier) => ({
+          id: supplier.id,
+          supplierName: supplier.supplierName || "",
+          companyName: supplier.companyName || "",
+          supplierEmail: supplier.supplierEmail || "",
+          supplierShippedTo: supplier.supplierShippedTo || "",
+          supplierBillTo: supplier.supplierBillTo || "",
+          supplierShippedGSTIN: supplier.supplierShippedGSTIN || "",
+          supplierBillGSTIN: supplier.supplierBillGSTIN || "",
+        }))
+        .filter((supplier) => supplier.supplierName.trim() || supplier.companyName.trim());
+      setSupplierOptions(suppliers);
+      console.log("Set Supplier Options:", suppliers);
+      if (suppliers.length === 0 && retryCount < 3) {
+        console.warn(`Retry attempt ${retryCount + 1} for fetching suppliers`);
+        setTimeout(() => fetchSuppliersHandler(retryCount + 1), 1000);
+      }
+    } catch (error: any) {
+      console.error("Error fetching suppliers:", error);
+      toast.error(error?.message || "Something went wrong");
+    } finally {
+      setIsLoadingSuppliers(false);
+    }
+  };
+
+  const fetchNextPONumber = async () => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "purchase-order/suppliers",
+        `${process.env.REACT_APP_BACKEND_URL}purchase-order/next-po-number`,
         {
           method: "GET",
           headers: {
@@ -208,35 +328,57 @@ const AddPurchaseOrder = ({
       );
 
       const data = await response.json();
-      const suppliers = data.suppliers.map((supplier: any) => ({
-        ...supplier,
-      }));
-      setSupplierOptions(suppliers);
-
-      if (!data.success) {
-        throw new Error(data.message);
+      if (data.success) {
+        setNextPONumber(data.poNumber);
+        formik.setFieldValue("poOrder", data.poNumber);
       }
-
-      console.log("Fetched suppliers:", data.suppliers);
-
-
-      // setSupplierOptions(data.suppliers); // full array with all fields
-
     } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
+      console.error("Error fetching next PO number:", error);
     }
   };
 
-
+  useEffect(() => {
+    fetchSuppliersHandler();
+    if (!edittable) {
+      fetchNextPONumber();
+    }
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}product/raw-materials`, {
+      headers: { Authorization: `Bearer ${cookies?.access_token}` },
+    }).then(res => {
+      setRawMaterials(res.data.rawMaterials || []);
+    });
+  }, []);
 
   useEffect(() => {
-    fetchSuppliersHandler()
-  }, [])
+    if (edittable && supplierOptions.length > 0) {
+      console.log("Edittable Data:", edittable);
+      console.log("Initial Formik supplierIdentifier:", formik.values.supplierIdentifier);
+      console.log("Supplier Options:", supplierOptions);
+      const isValidSupplier = supplierOptions.some(
+        (supplier) => supplier.supplierName === edittable.supplierName || supplier.companyName === edittable.supplierName
+      );
+      if (!isValidSupplier && edittable.supplierName) {
+        toast.warn("Selected supplier is not available. Please choose a new supplier.");
+        formik.setFieldValue("supplierIdentifier", "");
+        formik.setFieldValue("supplierName", "");
+      } else if (!edittable.supplierName && !edittable.companyName) {
+        formik.setFieldValue("supplierIdentifier", "");
+        formik.setFieldValue("supplierName", "");
+      }
+    }
+  }, [edittable, supplierOptions]);
+
+  useEffect(() => {
+    if (formik.values.isSameAddress) {
+      formik.setFieldValue("supplierShippedGSTIN", formik.values.supplierShippedTo);
+      formik.setFieldValue("supplierBillGSTIN", formik.values.supplierBillTo);
+    }
+  }, [formik.values.supplierShippedTo, formik.values.supplierBillTo, formik.values.isSameAddress]);
+
   return (
     <>
-      {/* Drawer */}
       <div
-        className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
+        className="absolute overflow-auto h-[100vh] w-[100vw] bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
@@ -250,7 +392,7 @@ const AddPurchaseOrder = ({
             className="text-xl font-semibold"
             style={{ color: colors.text.primary }}
           >
-            Add New Purchase Order
+            {edittable ? "Edit Purchase Order" : "Add New Purchase Order"}
           </h1>
           <button
             onClick={closeDrawerHandler}
@@ -270,283 +412,9 @@ const AddPurchaseOrder = ({
           </button>
         </div>
 
-        {/* Form Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
           <Box as="form" onSubmit={formik.handleSubmit}>
             <VStack spacing={6} align="stretch">
-              {/* Company Details Section */}
-              <Card
-                bg={bgColor}
-                border="1px"
-                borderColor={borderColor}
-                shadow="sm"
-              >
-                <CardBody p={6}>
-                  <Flex align="center" gap={3} mb={6}>
-                    <Box p={2} bg="blue.50" borderRadius="lg">
-                      <BiBuilding size={20} color="#3182CE" />
-                    </Box>
-                    <Heading size="md" color={headingColor}>
-                      Company Details
-                    </Heading>
-                  </Flex>
-
-                  {/* <Grid
-                    templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
-                    gap={6}
-                  >
-                    <GridItem colSpan={{ base: 1, md: 2 }}> */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormControl
-                      isInvalid={
-                        formik.touched.companyName && formik.errors.companyName
-                      }
-                    >
-                      <FormLabel
-                        display="flex"
-                        alignItems="center"
-                        gap={2}
-                        color={textColor}
-                        fontSize="sm"
-                        fontWeight="medium"
-                      >
-                        <BiUser size={16} />
-                        Company Name *
-                      </FormLabel>
-                      <Input
-                        name="companyName"
-                        value={formik.values.companyName}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        placeholder="Enter company name"
-                        size="lg"
-                        borderRadius="lg"
-                        _focus={{
-                          borderColor: "blue.500",
-                          boxShadow: "0 0 0 1px #3182CE",
-                        }}
-                      />
-                      {formik.touched.companyName &&
-                        formik.errors.companyName && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.companyName}
-                          </Text>
-                        )}
-                    </FormControl>
-                    {/* </GridItem> */}
-
-                    {/* <GridItem> */}
-                    <FormControl
-                      isInvalid={
-                        formik.touched.companyWebsite &&
-                        formik.errors.companyWebsite
-                      }
-                    >
-                      <FormLabel
-                        display="flex"
-                        alignItems="center"
-                        gap={2}
-                        color={textColor}
-                        fontSize="sm"
-                        fontWeight="medium"
-                      >
-                        <FileSpreadsheet size={16} />
-                        Company Website *
-                      </FormLabel>
-                      <Input
-                        name="companyWebsite"
-                        value={formik.values.companyWebsite}
-                        onChange={ formik.handleChange
-                        }
-                        onBlur={formik.handleBlur}
-                        placeholder="Enter companyWebsite URL"
-                        size="lg"
-                        borderRadius="lg"
-                        _focus={{
-                          borderColor: "blue.500",
-                          boxShadow: "0 0 0 1px #3182CE",
-                        }}
-                      />
-                      {formik.touched.companyWebsite &&
-                        formik.errors.companyWebsite && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.companyWebsite}
-                          </Text>
-                        )}
-                    </FormControl>
-                    {/* </GridItem> */}
-
-                    <FormControl
-                      isInvalid={
-                        formik.touched.companyPhoneNumber &&
-                        formik.errors.companyPhoneNumber
-                      }
-                    >
-                      <FormLabel
-                        display="flex"
-                        alignItems="center"
-                        gap={2}
-                        color={textColor}
-                        fontSize="sm"
-                        fontWeight="medium"
-                      >
-                        <BiUser size={16} />
-                        Phone Number *
-                      </FormLabel>
-                      <Input
-                        name="companyPhoneNumber"
-                        value={formik.values.companyPhoneNumber}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        placeholder="Enter company name"
-                        size="lg"
-                        borderRadius="lg"
-                        _focus={{
-                          borderColor: "blue.500",
-                          boxShadow: "0 0 0 1px #3182CE",
-                        }}
-                      />
-                      {formik.touched.companyPhoneNumber &&
-                        formik.errors.companyPhoneNumber && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.companyPhoneNumber}
-                          </Text>
-                        )}
-                    </FormControl>
-                    {/* </GridItem> */}
-
-                    {/* <GridItem> */}
-                    <FormControl
-                      isInvalid={
-                        formik.touched.companyEmail &&
-                        formik.errors.companyEmail
-                      }
-                    >
-                      <FormLabel
-                        display="flex"
-                        alignItems="center"
-                        gap={2}
-                        color={textColor}
-                        fontSize="sm"
-                        fontWeight="medium"
-                      >
-                        <FileSpreadsheet size={16} />
-                        Company Email *
-                      </FormLabel>
-                      <Input
-                        name="companyEmail"
-                        value={formik.values.companyEmail}
-                        onChange={
-                          formik.handleChange
-                        }
-                        onBlur={formik.handleBlur}
-                        placeholder="Enter companyEmail"
-                        size="lg"
-                        borderRadius="lg"
-                        _focus={{
-                          borderColor: "blue.500",
-                          boxShadow: "0 0 0 1px #3182CE",
-                        }}
-                      />
-                      {formik.touched.companyEmail &&
-                        formik.errors.companyEmail && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.companyEmail}
-                          </Text>
-                        )}
-                    </FormControl>
-                    {/* </GridItem> */}
-
-                    {/* <GridItem> */}
-                    <FormControl
-                      isInvalid={
-                        formik.touched.companyAddress &&
-                        formik.errors.companyAddress
-                      }
-                    >
-                      <FormLabel
-                        display="flex"
-                        alignItems="center"
-                        gap={2}
-                        color={textColor}
-                        fontSize="sm"
-                        fontWeight="medium"
-                      >
-                        <BiMapPin size={16} />
-                        Company Address *
-                      </FormLabel>
-                      <Input
-                        name="companyAddress"
-                        value={formik.values.companyAddress}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        placeholder="Enter company address"
-                        size="lg"
-                        borderRadius="lg"
-                        _focus={{
-                          borderColor: "blue.500",
-                          boxShadow: "0 0 0 1px #3182CE",
-                        }}
-                      />
-                      {formik.touched.companyAddress &&
-                        formik.errors.companyAddress && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.companyAddress}
-                          </Text>
-                        )}
-                    </FormControl>
-
-                    <FormControl
-                      isInvalid={
-                        formik.touched.companyGST && formik.errors.companyGST
-                      }
-                    >
-                      <FormLabel
-                        display="flex"
-                        alignItems="center"
-                        gap={2}
-                        color={textColor}
-                        fontSize="sm"
-                        fontWeight="medium"
-                      >
-                        <FileSpreadsheet size={16} />
-                        Company GST *
-                      </FormLabel>
-                      <Input
-                        name="companyGST"
-                        value={formik.values.companyGST}
-                        onChange={(e) => {
-                          const uppercase = e.target.value
-                            .toUpperCase()
-                            .replace(/[^A-Z0-9]/g, "");
-                          formik.setFieldValue(
-                            "companyGST",
-                            uppercase.slice(0, 15)
-                          );
-                        }}
-                        onBlur={formik.handleBlur}
-                        placeholder="Enter GSTIN"
-                        size="lg"
-                        borderRadius="lg"
-                        _focus={{
-                          borderColor: "blue.500",
-                          boxShadow: "0 0 0 1px #3182CE",
-                        }}
-                      />
-                      {formik.touched.companyGST &&
-                        formik.errors.companyGST && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.companyGST}
-                          </Text>
-                        )}
-                    </FormControl>
-                  </div>
-                  {/* </GridItem>
-                  </Grid> */}
-                </CardBody>
-              </Card>
-
-              {/* Purchase Order Section */}
               <Card
                 bg={bgColor}
                 border="1px"
@@ -568,11 +436,7 @@ const AddPurchaseOrder = ({
                     gap={6}
                   >
                     <GridItem>
-                      <FormControl
-                        isInvalid={
-                          formik.touched.poOrder && formik.errors.poOrder
-                        }
-                      >
+                      <FormControl isInvalid={hasError("poOrder")}>
                         <FormLabel
                           display="flex"
                           alignItems="center"
@@ -582,7 +446,7 @@ const AddPurchaseOrder = ({
                           fontWeight="medium"
                         >
                           <FileSpreadsheet size={16} />
-                          P.O. Order *
+                          P.O. Number (Auto-generated) *
                         </FormLabel>
                         <Input
                           name="poOrder"
@@ -592,23 +456,23 @@ const AddPurchaseOrder = ({
                           placeholder="Enter PO order number"
                           size="lg"
                           borderRadius="lg"
+                          isReadOnly
+                          bg="gray.50"
                           _focus={{
                             borderColor: "blue.500",
                             boxShadow: "0 0 0 1px #3182CE",
                           }}
                         />
-                        {formik.touched.poOrder && formik.errors.poOrder && (
+                        {getErrorMessage("poOrder") && (
                           <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.poOrder}
+                            {getErrorMessage("poOrder")}
                           </Text>
                         )}
                       </FormControl>
                     </GridItem>
 
                     <GridItem>
-                      <FormControl
-                        isInvalid={formik.touched.date && formik.errors.date}
-                      >
+                      <FormControl isInvalid={hasError("date")}>
                         <FormLabel
                           display="flex"
                           alignItems="center"
@@ -633,151 +497,16 @@ const AddPurchaseOrder = ({
                             boxShadow: "0 0 0 1px #3182CE",
                           }}
                         />
-                        {formik.touched.date && formik.errors.date && (
+                        {getErrorMessage("date") && (
                           <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.date}
+                            {getErrorMessage("date")}
                           </Text>
                         )}
                       </FormControl>
                     </GridItem>
-                    <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-                      {/* Supplier Name Dropdown */}
-                      <GridItem>
-                        <FormControl
-                          isInvalid={formik.touched.supplierName && formik.errors.supplierName}
-                        >
-                          <FormLabel
-                            display="flex"
-                            alignItems="center"
-                            gap={2}
-                            color={textColor}
-                            fontSize="sm"
-                            fontWeight="medium"
-                          >
-                            <BiUser size={16} />
-                            Supplier Name *
-                          </FormLabel>
-                          <Select
-                            placeholder="Select Supplier"
-                            name="supplierName"
-                            value={formik.values.supplierName}
-                            onChange={(e) => {
-                              const selectedName = e.target.value;
-                              formik.setFieldValue("supplierName", selectedName);
-
-                              const matched = supplierOptions.find(
-                                (supplier) => supplier.supplierName === selectedName
-                              );
-
-                              if (matched) {
-                                formik.setValues({
-                                  ...formik.values,
-                                  ...matched, // this will auto-fill matching fields
-                                });
-                              }
-                            }}
-                            size="lg"
-                            borderRadius="lg"
-                          >
-                            {supplierOptions.map((supplier, i) => (
-                              <option key={i} value={supplier.supplierName}>
-                                {supplier.supplierName}
-                              </option>
-                            ))}
-                          </Select>
-
-                        </FormControl>
-                      </GridItem>
-
-                      {/* Supplier Code */}
-                      <GridItem>
-                        <FormLabel>Supplier Code</FormLabel>
-                        <Input
-                          name="supplierCode"
-                          value={formik.values.supplierCode}
-                          onChange={formik.handleChange}
-                          size="lg"
-                        />
-                      </GridItem>
-
-                      {/* Supplier GST */}
-                      <GridItem>
-                        <FormLabel> Shipped GSTIN</FormLabel>
-                        <Input
-                          name="supplierShippedGSTIN"
-                          value={formik.values.supplierShippedGSTIN}
-                          onChange={formik.handleChange}
-                          size="lg"
-                        />
-                      </GridItem>
-                      <GridItem>
-                        <FormLabel> Bill GSTIN</FormLabel>
-                        <Input
-                          name="supplierBillGSTIN
-"
-                          value={formik.values.supplierBillGSTIN
-                          }
-                          onChange={formik.handleChange}
-                          size="lg"
-                        />
-                      </GridItem>
-                      {/* Supplier Address */}
-
-
-
-                      <GridItem>
-                        <FormLabel> ShippedTo </FormLabel>
-                        <Input
-                          name="supplierShippedTo"
-                          value={formik.values.supplierShippedTo}
-                          onChange={formik.handleChange}
-                          size="lg"
-                        />
-                      </GridItem>
-                      <GridItem>
-                        <FormLabel> Bill To</FormLabel>
-                        <Input
-                          name="supplierBillTo
-"
-                          value={formik.values.supplierBillTo
-                          }
-                          onChange={formik.handleChange}
-                          size="lg"
-                        />
-                      </GridItem>
-                      {/* Supplier Email */}
-                      {/* <GridItem>
-                        <FormLabel>Supplier Email</FormLabel>
-                        <Input
-                          name="supplierEmail"
-                          value={formik.values.supplierEmail}
-                          onChange={formik.handleChange}
-                          size="lg"
-                        />
-                      </GridItem> */}
-
-                      {/* Supplier PAN */}
-                      {/* <GridItem>
-                        <FormLabel>Supplier PAN</FormLabel>
-                        <Input
-                          name="supplierPan"
-                          value={formik.values.supplierPan}
-                          onChange={formik.handleChange}
-                          size="lg"
-                        />
-                      </GridItem> */}
-                    </Grid>
-
-
-
 
                     <GridItem>
-                      <FormControl
-                        isInvalid={
-                          formik.touched.supplierPan &&
-                          formik.errors.supplierPan
-                        }
-                      >
+                      <FormControl isInvalid={hasError("supplierIdentifier")}>
                         <FormLabel
                           display="flex"
                           alignItems="center"
@@ -786,15 +515,111 @@ const AddPurchaseOrder = ({
                           fontSize="sm"
                           fontWeight="medium"
                         >
-                          <BiCreditCard size={16} />
-                          Pan Details *
+                          <BiUser size={16} />
+                          Supplier Name *
                         </FormLabel>
-                        <Input
-                          name="supplierPan"
-                          value={formik.values.supplierPan}
+                        <Select
+                          placeholder={isLoadingSuppliers ? "Loading suppliers..." : "Select Supplier"}
+                          isDisabled={isLoadingSuppliers}
+                          name="supplierIdentifier"
+                          value={formik.values.supplierIdentifier}
+                          onChange={(e) => {
+                            const selectedIdentifier = e.target.value;
+                            formik.setFieldValue("supplierIdentifier", selectedIdentifier);
+                            formik.setFieldValue("supplierName", selectedIdentifier);
+                            const matched = supplierOptions.find(
+                              (supplier) =>
+                                (supplier.supplierName && supplier.supplierName === selectedIdentifier) ||
+                                (supplier.companyName && supplier.companyName === selectedIdentifier)
+                            );
+                            if (matched) {
+                              formik.setValues({
+                                ...formik.values,
+                                supplierIdentifier: matched.supplierName || matched.companyName || "",
+                                supplierName: matched.supplierName || matched.companyName || "",
+                                supplierEmail: matched.supplierEmail || "",
+                                supplierShippedTo: matched.supplierShippedTo || "",
+                                supplierBillTo: matched.supplierBillTo || "",
+                                supplierShippedGSTIN: matched.supplierShippedGSTIN || "",
+                                supplierBillGSTIN: matched.supplierBillGSTIN || "",
+                                isSameAddress: false,
+                              });
+                            }
+                          }}
+                          size="lg"
+                          borderRadius="lg"
+                        >
+                          {supplierOptions.length > 0 ? (
+                            supplierOptions.map((supplier) => {
+                              const displayText = supplier.supplierName || supplier.companyName || "Unknown Supplier";
+                              const value = supplier.supplierName || supplier.companyName || "";
+                              return (
+                                <option key={supplier.id} value={value}>
+                                  {displayText}
+                                  {supplier.supplierName && supplier.companyName && ` (${supplier.companyName})`}
+                                </option>
+                              );
+                            })
+                          ) : (
+                            <option value="" disabled>
+                              {isLoadingSuppliers ? "Loading..." : "No suppliers available"}
+                            </option>
+                          )}
+                        </Select>
+                        {getErrorMessage("supplierIdentifier") && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {getErrorMessage("supplierIdentifier")}
+                          </Text>
+                        )}
+                      </FormControl>
+                    </GridItem>
+
+                    <GridItem colSpan={2}>
+                      <FormControl isInvalid={hasError("itemName")}>
+                        <FormLabel>Item Name *</FormLabel>
+                        <Select
+                          placeholder="Select Item"
+                          name="itemName"
+                          value={formik.values.itemName}
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
-                          placeholder="Enter PAN details"
+                          size="lg"
+                          borderRadius="lg"
+                        >
+                          {rawMaterials.map((item) => (
+                            <option key={item._id} value={item.name}>
+                              {item.name}
+                            </option>
+                          ))}
+                        </Select>
+                        {getErrorMessage("itemName") && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {getErrorMessage("itemName")}
+                          </Text>
+                        )}
+                      </FormControl>
+                    </GridItem>
+
+                    <GridItem>
+                      <FormControl isInvalid={hasError("quantity")}>
+                        <FormLabel
+                          display="flex"
+                          alignItems="center"
+                          gap={2}
+                          color={textColor}
+                          fontSize="sm"
+                          fontWeight="medium"
+                        >
+                          <BiPackage size={16} />
+                          Quantity *
+                        </FormLabel>
+                        <Input
+                          type="number"
+                          name="quantity"
+                          value={formik.values.quantity}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          placeholder="Enter quantity"
                           size="lg"
                           borderRadius="lg"
                           _focus={{
@@ -802,22 +627,176 @@ const AddPurchaseOrder = ({
                             boxShadow: "0 0 0 1px #3182CE",
                           }}
                         />
-                        {formik.touched.supplierPan &&
-                          formik.errors.supplierPan && (
-                            <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.supplierPan}
-                            </Text>
-                          )}
+                        {getErrorMessage("quantity") && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {getErrorMessage("quantity")}
+                          </Text>
+                        )}
+                      </FormControl>
+                    </GridItem>
+                    <br />
+                    <GridItem>
+                      <FormControl isInvalid={hasError("supplierShippedTo")}>
+                        <FormLabel
+                          display="flex"
+                          alignItems="center"
+                          gap={2}
+                          color={textColor}
+                          fontSize="sm"
+                          fontWeight="medium"
+                        >
+                          <MapPin size={16} />
+                          Shipped To *
+                        </FormLabel>
+                        <Input
+                          name="supplierShippedTo"
+                          value={formik.values.supplierShippedTo}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          placeholder="Enter shipping address"
+                          size="lg"
+                          borderRadius="lg"
+                          _focus={{
+                            borderColor: "blue.500",
+                            boxShadow: "0 0 0 1px #3182CE",
+                          }}
+                        />
+                        {getErrorMessage("supplierShippedTo") && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {getErrorMessage("supplierShippedTo")}
+                          </Text>
+                        )}
                       </FormControl>
                     </GridItem>
 
                     <GridItem>
-                      <FormControl
-                        isInvalid={
-                          formik.touched.supplierEmail &&
-                          formik.errors.supplierEmail
-                        }
-                      >
+                      <FormControl isInvalid={hasError("supplierShippedGSTIN")}>
+                        <FormLabel
+                          display="flex"
+                          alignItems="center"
+                          gap={2}
+                          color={textColor}
+                          fontSize="sm"
+                          fontWeight="medium"
+                        >
+                          <FileSpreadsheet size={16} />
+                          Shipped GSTIN *
+                        </FormLabel>
+                        <Input
+                          name="supplierShippedGSTIN"
+                          value={formik.values.supplierShippedGSTIN}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          placeholder="Enter shipped GSTIN"
+                          size="lg"
+                          borderRadius="lg"
+                          _focus={{
+                            borderColor: "blue.500",
+                            boxShadow: "0 0 0 1px #3182CE",
+                          }}
+                          isDisabled={formik.values.isSameAddress}
+                        />
+                        {getErrorMessage("supplierShippedGSTIN") && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {getErrorMessage("supplierShippedGSTIN")}
+                          </Text>
+                        )}
+                      </FormControl>
+                    </GridItem>
+
+                    <GridItem colSpan={2}>
+                      <FormControl>
+                        <Checkbox
+                          name="isSameAddress"
+                          isChecked={formik.values.isSameAddress}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            formik.handleChange(e);
+                            if (e.target.checked) {
+                              formik.setFieldValue("supplierShippedGSTIN", formik.values.supplierShippedTo);
+                              formik.setFieldValue("supplierBillGSTIN", formik.values.supplierBillTo);
+                            } else {
+                              formik.setFieldValue("supplierShippedGSTIN", edittable?.supplierShippedGSTIN || "");
+                              formik.setFieldValue("supplierBillGSTIN", edittable?.supplierBillGSTIN || "");
+                            }
+                          }}
+                          size="lg"
+                        >
+                          Same as Shipped To and Bill To
+                        </Checkbox>
+                      </FormControl>
+                    </GridItem>
+
+                    <GridItem>
+                      <FormControl isInvalid={hasError("supplierBillTo")}>
+                        <FormLabel
+                          display="flex"
+                          alignItems="center"
+                          gap={2}
+                          color={textColor}
+                          fontSize="sm"
+                          fontWeight="medium"
+                        >
+                          <MapPin size={16} />
+                          Bill To *
+                        </FormLabel>
+                        <Input
+                          name="supplierBillTo"
+                          value={formik.values.supplierBillTo}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          placeholder="Enter billing address"
+                          size="lg"
+                          borderRadius="lg"
+                          _focus={{
+                            borderColor: "blue.500",
+                            boxShadow: "0 0 0 1px #3182CE",
+                          }}
+                        />
+                        {getErrorMessage("supplierBillTo") && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {getErrorMessage("supplierBillTo")}
+                          </Text>
+                        )}
+                      </FormControl>
+                    </GridItem>
+
+                    <GridItem>
+                      <FormControl isInvalid={hasError("supplierBillGSTIN")}>
+                        <FormLabel
+                          display="flex"
+                          alignItems="center"
+                          gap={2}
+                          color={textColor}
+                          fontSize="sm"
+                          fontWeight="medium"
+                        >
+                          <FileSpreadsheet size={16} />
+                          Bill GSTIN *
+                        </FormLabel>
+                        <Input
+                          name="supplierBillGSTIN"
+                          value={formik.values.supplierBillGSTIN}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          placeholder="Enter bill GSTIN"
+                          size="lg"
+                          borderRadius="lg"
+                          _focus={{
+                            borderColor: "blue.500",
+                            boxShadow: "0 0 0 1px #3182CE",
+                          }}
+                          isDisabled={formik.values.isSameAddress}
+                        />
+                        {getErrorMessage("supplierBillGSTIN") && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {getErrorMessage("supplierBillGSTIN")}
+                          </Text>
+                        )}
+                      </FormControl>
+                    </GridItem>
+
+                    <GridItem>
+                      <FormControl isInvalid={hasError("supplierEmail")}>
                         <FormLabel
                           display="flex"
                           alignItems="center"
@@ -827,15 +806,15 @@ const AddPurchaseOrder = ({
                           fontWeight="medium"
                         >
                           <Mail size={16} />
-                          Email *
+                          Email
                         </FormLabel>
                         <Input
                           name="supplierEmail"
-                          type="supplierEmail"
+                          type="email"
                           value={formik.values.supplierEmail}
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
-                          placeholder="Enter supplierEmail address"
+                          placeholder="Enter supplier email address"
                           size="lg"
                           borderRadius="lg"
                           _focus={{
@@ -843,19 +822,17 @@ const AddPurchaseOrder = ({
                             boxShadow: "0 0 0 1px #3182CE",
                           }}
                         />
-                        {formik.touched.supplierEmail &&
-                          formik.errors.supplierEmail && (
-                            <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.supplierEmail}
-                            </Text>
-                          )}
+                        {getErrorMessage("supplierEmail") && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {getErrorMessage("supplierEmail")}
+                          </Text>
+                        )}
                       </FormControl>
                     </GridItem>
                   </Grid>
                 </CardBody>
               </Card>
 
-              {/* Terms and Conditions Section */}
               <Card
                 bg={bgColor}
                 border="1px"
@@ -873,13 +850,7 @@ const AddPurchaseOrder = ({
                   </Flex>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* GST Info */}
-                    <FormControl
-                      className="col-span-1"
-                      isInvalid={
-                        formik.touched.GSTApply && formik.errors.GSTApply
-                      }
-                    >
+                    <FormControl isInvalid={hasError("GSTApply")}>
                       <FormLabel
                         display="flex"
                         alignItems="center"
@@ -906,21 +877,14 @@ const AddPurchaseOrder = ({
                         <option value="igst">IGST - 18%</option>
                         <option value="cgst">CGST - 9%, SGST - 9%</option>
                       </Select>
-                      {formik.touched.GSTApply && formik.errors.GSTApply && (
+                      {getErrorMessage("GSTApply") && (
                         <Text color="red.500" fontSize="sm" mt={1}>
-                          {formik.errors.GSTApply}
+                          {getErrorMessage("GSTApply")}
                         </Text>
                       )}
                     </FormControl>
 
-                    {/* Packaging and Forwarding */}
-                    <FormControl
-                      className="col-span-1"
-                      isInvalid={
-                        formik.touched.packagingAndForwarding &&
-                        formik.errors.packagingAndForwarding
-                      }
-                    >
+                    <FormControl isInvalid={hasError("modeOfPayment")}>
                       <FormLabel
                         display="flex"
                         alignItems="center"
@@ -929,11 +893,11 @@ const AddPurchaseOrder = ({
                         fontSize="sm"
                         fontWeight="medium"
                       >
-                        Packaging and Forwarding *
+                        Mode of Payment *
                       </FormLabel>
                       <Select
-                        name="packagingAndForwarding"
-                        value={formik.values.packagingAndForwarding}
+                        name="modeOfPayment"
+                        value={formik.values.modeOfPayment}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         placeholder="Select"
@@ -944,113 +908,19 @@ const AddPurchaseOrder = ({
                           boxShadow: "0 0 0 1px #805AD5",
                         }}
                       >
-                        <option value="inclusive">Inclusive</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Cheque">Cheque</option>
+                        <option value="Credit">Credit</option>
                       </Select>
-                      {formik.touched.packagingAndForwarding &&
-                        formik.errors.packagingAndForwarding && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.packagingAndForwarding}
-                          </Text>
-                        )}
+                      {getErrorMessage("modeOfPayment") && (
+                        <Text color="red.500" fontSize="sm" mt={1}>
+                          {getErrorMessage("modeOfPayment")}
+                        </Text>
+                      )}
                     </FormControl>
-                  </div>
 
-                  <div className="mt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Freight Charges */}
-                      <FormControl
-                        className="col-span-1"
-                        isInvalid={
-                          formik.touched.freightCharges &&
-                          formik.errors.freightCharges
-                        }
-                      >
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          Freight Charges, if any
-                        </FormLabel>
-                        <Input
-                          name="freightCharges"
-                          value={formik.values.freightCharges}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="Enter amount"
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "purple.500",
-                            boxShadow: "0 0 0 1px #805AD5",
-                          }}
-                        />
-                        {formik.touched.freightCharges &&
-                          formik.errors.freightCharges && (
-                            <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.freightCharges}
-                            </Text>
-                          )}
-                      </FormControl>
-
-                      {/* Mode of Payment */}
-                      <FormControl
-                        className="col-span-1"
-                        isInvalid={
-                          formik.touched.modeOfPayment &&
-                          formik.errors.modeOfPayment
-                        }
-                      >
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          Mode of Payment *
-                        </FormLabel>
-                        <Select
-                          name="modeOfPayment"
-                          value={formik.values.modeOfPayment}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="Select"
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "purple.500",
-                            boxShadow: "0 0 0 1px #805AD5",
-                          }}
-                        >
-                          <option value="Cash">Cash</option>
-                          <option value="Bank Transfer">Bank Transfer</option>
-                          <option value="Cheque">Cheque</option>
-                          <option value="Credit">Credit</option>
-                        </Select>
-                        {formik.touched.modeOfPayment &&
-                          formik.errors.modeOfPayment && (
-                            <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.modeOfPayment}
-                            </Text>
-                          )}
-                      </FormControl>
-                    </div>
-                  </div>
-
-                  {/* Delivery Address */}
-                  <div className="mt-4">
-                    <FormControl
-                      className="col-span-1 md:col-span-2"
-                      isInvalid={
-                        formik.touched.deliveryAddress &&
-                        formik.errors.deliveryAddress
-                      }
-                    >
+                    <FormControl isInvalid={hasError("billingAddress")}>
                       <FormLabel
                         display="flex"
                         alignItems="center"
@@ -1059,14 +929,14 @@ const AddPurchaseOrder = ({
                         fontSize="sm"
                         fontWeight="medium"
                       >
-                        Delivery Address *
+                        Billing Address *
                       </FormLabel>
                       <Input
-                        name="deliveryAddress"
-                        value={formik.values.deliveryAddress}
+                        name="billingAddress"
+                        value={formik.values.billingAddress}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        placeholder="Enter delivery address"
+                        placeholder="Enter billing address"
                         size="lg"
                         borderRadius="lg"
                         _focus={{
@@ -1074,18 +944,16 @@ const AddPurchaseOrder = ({
                           boxShadow: "0 0 0 1px #805AD5",
                         }}
                       />
-                      {formik.touched.deliveryAddress &&
-                        formik.errors.deliveryAddress && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {formik.errors.deliveryAddress}
-                          </Text>
-                        )}
+                      {getErrorMessage("billingAddress") && (
+                        <Text color="red.500" fontSize="sm" mt={1}>
+                          {getErrorMessage("billingAddress")}
+                        </Text>
+                      )}
                     </FormControl>
                   </div>
                 </CardBody>
               </Card>
 
-              {/* Remarks Section */}
               <Card
                 bg={bgColor}
                 border="1px"
@@ -1107,165 +975,7 @@ const AddPurchaseOrder = ({
                     gap={4}
                   >
                     <GridItem>
-                      <FormControl
-                        isInvalid={
-                          formik.touched.deliveryPeriod &&
-                          formik.errors.deliveryPeriod
-                        }
-                      >
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <BiCalendar size={16} />
-                          Delivery Period *
-                        </FormLabel>
-                        <Input
-                          name="deliveryPeriod"
-                          value={formik.values.deliveryPeriod}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="e.g., 7-10 days"
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
-                        />
-                        {formik.touched.deliveryPeriod &&
-                          formik.errors.deliveryPeriod && (
-                            <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.deliveryPeriod}
-                            </Text>
-                          )}
-                      </FormControl>
-                    </GridItem>
-
-                    <GridItem>
-                      <FormControl
-                        isInvalid={
-                          formik.touched.billingAddress &&
-                          formik.errors.billingAddress
-                        }
-                      >
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <BiMapPin size={16} />
-                          Billing Address *
-                        </FormLabel>
-                        <Input
-                          name="billingAddress"
-                          value={formik.values.billingAddress}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="Enter billing address"
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
-                        />
-                        {formik.touched.billingAddress &&
-                          formik.errors.billingAddress && (
-                            <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.billingAddress}
-                            </Text>
-                          )}
-                      </FormControl>
-                    </GridItem>
-
-                    <GridItem>
-                      <FormControl
-                        isInvalid={
-                          formik.touched.paymentTerms &&
-                          formik.errors.paymentTerms
-                        }
-                      >
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <IndianRupee size={16} />
-                          Payment Terms *
-                        </FormLabel>
-                        <Select
-                          name="paymentTerms"
-                          value={formik.values.paymentTerms}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="Select payment terms"
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
-                        >
-                          <option value="Net 30">Net 30</option>
-                          <option value="Net 60">Net 60</option>
-                          <option value="Net 90">Net 90</option>
-                          <option value="Due on Receipt">Due on Receipt</option>
-                          <option value="Advance Payment">
-                            Advance Payment
-                          </option>
-                        </Select>
-                        {formik.touched.paymentTerms &&
-                          formik.errors.paymentTerms && (
-                            <Text color="red.500" fontSize="sm" mt={1}>
-                              {formik.errors.paymentTerms}
-                            </Text>
-                          )}
-                      </FormControl>
-                    </GridItem>
-
-                    <GridItem colSpan={{ base: 1, md: 3 }}>
-                      <FormControl>
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <BiEdit size={16} />
-                          Additional Remarks
-                        </FormLabel>
-                        <Textarea
-                          name="additionalRemarks"
-                          value={formik.values.additionalRemarks}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="Enter any additional remarks"
-                          size="md"
-                          borderRadius="lg"
-                          rows={3}
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
-                        />
-                      </FormControl>
-                    </GridItem>
-
-                    <GridItem colSpan={{ base: 1, md: 3 }}>
-                      <FormControl>
+                      <FormControl isInvalid={hasError("additionalImportant")}>
                         <FormLabel
                           display="flex"
                           alignItems="center"
@@ -1286,18 +996,23 @@ const AddPurchaseOrder = ({
                           size="md"
                           borderRadius="lg"
                           rows={3}
+                          style={{ height: 'calc(3em + 4px)', width: 'calc(100% + 4px)' }}
                           _focus={{
                             borderColor: "blue.500",
                             boxShadow: "0 0 0 1px #3182CE",
                           }}
                         />
+                        {getErrorMessage("additionalImportant") && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {getErrorMessage("additionalImportant")}
+                          </Text>
+                        )}
                       </FormControl>
                     </GridItem>
                   </Grid>
                 </CardBody>
               </Card>
 
-              {/* Action Buttons */}
               <Box pt={6} borderTop="1px" borderColor={borderColor}>
                 <HStack spacing={4} justify="end">
                   <Button
@@ -1314,6 +1029,7 @@ const AddPurchaseOrder = ({
                     colorScheme="blue"
                     size="lg"
                     isLoading={isSubmitting}
+                    isDisabled={isSubmitting || !formik.isValid}
                     loadingText={edittable ? "Updating..." : "Creating..."}
                     px={8}
                     bgGradient="linear(to-r, blue.600, blue.700)"
@@ -1321,9 +1037,7 @@ const AddPurchaseOrder = ({
                       bgGradient: "linear(to-r, blue.700, blue.800)",
                     }}
                   >
-                    {edittable
-                      ? "Update Purchase Order"
-                      : "Create Purchase Order"}
+                    {edittable ? "Update Purchase Order" : "Create Purchase Order"}
                   </Button>
                 </HStack>
               </Box>
@@ -1331,6 +1045,46 @@ const AddPurchaseOrder = ({
           </Box>
         </div>
       </div>
+
+      <Modal isOpen={isModalOpen} onClose={onModalClose} isCentered>
+        <ModalOverlay />
+        <ModalContent bg={bgColor} borderColor={borderColor}>
+          <ModalHeader
+            display="flex"
+            alignItems="center"
+            gap={2}
+            color={popupType === "success" ? "green.500" : "red.500"}
+            fontSize="lg"
+            fontWeight="bold"
+          >
+            {popupType === "success" ? "Success!" : "Error!"}
+            {popupType === "success" ? (
+              <Box color="green.500">
+                <BiCheckCircle size={24} />
+              </Box>
+            ) : (
+              <Box color="red.500">
+                <BiX size={24} />
+              </Box>
+            )}
+          </ModalHeader>
+          <ModalBody>
+            <Text color={textColor} fontSize="md">
+              {popupMessage}
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme={popupType === "success" ? "green" : "red"}
+              onClick={onModalClose}
+              size="lg"
+              px={8}
+            >
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };

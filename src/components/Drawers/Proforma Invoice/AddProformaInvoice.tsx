@@ -1,5 +1,4 @@
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
-import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
@@ -20,53 +19,30 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
 }) => {
   const [cookies] = useCookies();
   const [isAdding, setIsAdding] = useState<boolean>(false);
-  const [buyer, setBuyer] = useState<
-    { value: string; label: string } | undefined
-  >();
-  const [supplier, setSupplier] = useState<
-    { value: string; label: string } | undefined
-  >();
-  const [proformaInvoiceNo, setProformaInvoiceNo] = useState<
-    string | undefined
-  >();
+  const [buyer, setBuyer] = useState<{ value: string; label: string } | undefined>();
+  const [proformaInvoiceNo, setProformaInvoiceNo] = useState<string | undefined>();
   const [documentDate, setDocumentDate] = useState<string | undefined>();
   const [salesOrderDate, setSalesOrderDate] = useState<string | undefined>();
   const [note, setNote] = useState<string | undefined>();
-  const [subtotal, setSubtotal] = useState<number | undefined>(0);
+  const [subtotal, setSubtotal] = useState<number>(0);
   const [total, setTotal] = useState<number | undefined>();
-  const [items, setItems] = useState<any[] | []>([]);
-  const [allItems, setAllItems] = useState<any[] | []>([]);
-  const [itemOptions, setItemOptions] = useState<
-    { value: string; label: string }[] | []
-  >([]);
-  const [buyers, setBuyers] = useState<any[] | []>([]);
-  const [buyerOptions, setBuyerOptions] = useState<
-    { value: string; label: string }[] | []
-  >([]);
-  const [suppliers, setSuppliers] = useState<any[] | []>([]);
-  const [supplierOptions, setSupplierOptions] = useState<
-    { value: string; label: string }[] | []
-  >([]);
-  const [store, setStore] = useState<
-    { value: string; label: string } | undefined
-  >();
-  const [storeOptions, setStoreOptions] = useState<
-    { value: string; label: string }[] | []
-  >([]);
-  const [tax, setTax] = useState<
-    { value: number; label: string } | undefined
-  >();
+  const [items, setItems] = useState<any[]>([]);
+  const [allItems, setAllItems] = useState<any[]>([]);
+  const [itemOptions, setItemOptions] = useState<{ value: string; label: string }[]>([]);
+  const [buyers, setBuyers] = useState<any[]>([]);
+  const [buyerOptions, setBuyerOptions] = useState<{ value: string; label: string }[]>([]);
+  const [isLoadingBuyers, setIsLoadingBuyers] = useState<boolean>(true);
+  const [buyerFetchError, setBuyerFetchError] = useState<string | null>(null);
+  const [store, setStore] = useState<{ value: string; label: string } | undefined>();
+  const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
+  const [tax, setTax] = useState<{ value: number; label: string } | undefined>();
+  
   const taxOptions = [
     { value: 0.18, label: "GST 18%" },
     { value: 0, label: "No Tax 0%" },
   ];
-  const [category, setCategory] = useState<
-    { value: string; label: string } | undefined
-  >();
-  const categoryOptions = [
-    { value: "sale", label: "Sales" },
-    { value: "purchase", label: "Purchase" },
-  ];
+  
+  const category = { value: "sale", label: "Sales" };
 
   const [inputs, setInputs] = useState<
     {
@@ -78,48 +54,36 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
 
   const [addProformaInvoice] = useCreateProformaInvoiceMutation();
 
-  const addProformaInvoiceHandler = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const data = {
-      proforma_invoice_no: proformaInvoiceNo,
-      document_date: documentDate,
-      sales_order_date: salesOrderDate,
-      note: note,
-      tax: { tax_amount: tax?.value, tax_name: tax?.label },
-      subtotal: subtotal,
-      total: total,
-      store: store?.value,
-      items: inputs.map((item: any) => ({
-        item: item.item.value,
-        quantity: item.quantity,
-        amount: item.price,
-      })),
-      category: category?.value,
-      buyer: buyer?.value,
-      supplier: supplier?.value,
-    };
-
+  // Fetch the next available proforma invoice number
+  const fetchNextInvoiceNumber = async () => {
     try {
-      setIsAdding(true);
-      const response = await addProformaInvoice(data).unwrap();
-      if (!response.success) {
-        throw new Error(response.message);
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}proforma-invoice/next-invoice-number`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message);
       }
-      toast.success(response.message);
-      closeDrawerHandler();
-      fetchProformaInvoicesHandler();
+      setProformaInvoiceNo(data.proforma_invoice_no);
     } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
-    } finally {
-      setIsAdding(false);
+      toast.error(error?.message || "Failed to fetch invoice number");
     }
   };
 
+  // Fetch buyers from the parties endpoint
   const fetchBuyersHandler = async () => {
     try {
+      setIsLoadingBuyers(true);
+      setBuyerFetchError(null);
+      
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "agent/buyers",
+        `${process.env.REACT_APP_BACKEND_URL}parties/get?page=1&limit=1000&selectedRole=Buyer`,
         {
           method: "GET",
           headers: {
@@ -127,54 +91,41 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
           },
         }
       );
+      
       const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch buyers");
+      }
+      
+      if (!data.data || !Array.isArray(data.data)) {
+        throw new Error("No buyers found or invalid response format");
       }
 
-      const buyers = data.agents.map((buyer: any) => ({
+      // Format buyer options for the select component
+      const formattedBuyers = data.data.map((buyer: any) => ({
         value: buyer._id,
-        label: buyer.name,
+        label: buyer.company_name || buyer.consignee_name?.[0] || "Unnamed Buyer",
+        ...buyer // Include all buyer data for potential later use
       }));
-      setBuyerOptions(buyers);
+      
+      setBuyerOptions(formattedBuyers);
+      setBuyers(data.data);
     } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
+      const errorMessage = error?.message || "Failed to fetch buyers";
+      console.error("Buyers Fetch Error:", error);
+      setBuyerFetchError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoadingBuyers(false);
     }
   };
 
-  const fetchSuppliersHandler = async () => {
-    try {
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "agent/suppliers",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
-        }
-      );
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.message);
-      }
-
-      const suppliers = data.agents.map((supplier: any) => ({
-        value: supplier.id,    // ObjectId for DB
-        label: supplier.name,  // Shown in dropdown
-      }));
-
-      setSupplierOptions(suppliers);
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
-    }
-  };
-
-  console.log(supplierOptions)
+  // Fetch all items from the products endpoint
   const fetchItemsHandler = async () => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "product/all",
+        `${process.env.REACT_APP_BACKEND_URL}product/all`,
         {
           method: "GET",
           headers: {
@@ -189,18 +140,20 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       const products = results.products.map((product: any) => ({
         value: product._id,
         label: product.name,
+        ...product // Include all product data
       }));
       setItemOptions(products);
       setAllItems(results.products);
     } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
+      toast.error(error?.message || "Failed to fetch items");
     }
   };
 
+  // Fetch all stores
   const fetchStoresHandler = async () => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "store/all",
+        `${process.env.REACT_APP_BACKEND_URL}store/all`,
         {
           method: "GET",
           headers: {
@@ -215,49 +168,107 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       const stores = data.stores.map((store: any) => ({
         value: store._id,
         label: store.name,
+        ...store // Include all store data
       }));
       setStoreOptions(stores);
     } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
+      toast.error(error?.message || "Failed to fetch stores");
     }
   };
 
-  useEffect(() => {
-    if (tax && subtotal) {
-      setTotal(subtotal + tax?.value * subtotal);
-    }
-  }, [tax, subtotal]);
+  // Handle form submission
+  const addProformaInvoiceHandler = async (e: React.FormEvent) => {
+    e.preventDefault();
 
+    if (!buyer?.value) {
+      toast.error("Please select a buyer");
+      return;
+    }
+
+    if (!documentDate) {
+      toast.error("Please select a document date");
+      return;
+    }
+
+    if (inputs.some(item => !item.item.value || item.quantity <= 0)) {
+      toast.error("Please add at least one valid item");
+      return;
+    }
+
+    const data = {
+      document_date: documentDate,
+      sales_order_date: salesOrderDate,
+      note: note,
+      tax: { 
+        tax_amount: tax?.value || 0, 
+        tax_name: tax?.label || "No Tax" 
+      },
+      subtotal: subtotal || 0,
+      total: total || 0,
+      store: store?.value,
+      items: inputs.map((item: any) => ({
+        item: item.item.value,
+        quantity: item.quantity,
+        amount: item.price,
+      })),
+      category: category.value,
+      buyer: buyer.value,
+      proforma_invoice_no: proformaInvoiceNo,
+    };
+
+    try {
+      setIsAdding(true);
+      const response = await addProformaInvoice(data).unwrap();
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+      toast.success(response.message);
+      closeDrawerHandler();
+      fetchProformaInvoicesHandler();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to create proforma invoice");
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  // Calculate total when subtotal or tax changes
   useEffect(() => {
-    const price = inputs.reduce((acc: number, curr: any) => {
+    if (subtotal !== undefined && tax?.value !== undefined) {
+      setTotal(subtotal + (subtotal * tax.value));
+    } else {
+      setTotal(subtotal);
+    }
+  }, [subtotal, tax]);
+
+  // Calculate subtotal when items change
+  useEffect(() => {
+    const calculatedSubtotal = inputs.reduce((acc, curr) => {
       return acc + (curr?.price * curr?.quantity || 0);
     }, 0);
-    setSubtotal(price);
+    setSubtotal(calculatedSubtotal);
   }, [inputs]);
 
+  // Fetch all required data on component mount
   useEffect(() => {
     fetchBuyersHandler();
     fetchItemsHandler();
     fetchStoresHandler();
-    fetchSuppliersHandler();
+    fetchNextInvoiceNumber();
   }, []);
 
   return (
     <div
-      className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
+      className="absolute overflow-auto h-[100vh] w-[100vw] bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
       style={{
-        boxShadow:
-          "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+        boxShadow: "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
       }}
     >
       <div
         className="flex items-center justify-between p-6 border-b"
         style={{ borderColor: colors.border.light }}
       >
-        <h1
-          className="text-xl font-semibold"
-          style={{ color: colors.text.primary }}
-        >
+        <h1 className="text-xl font-semibold" style={{ color: colors.text.primary }}>
           Add New Proforma Invoice
         </h1>
         <button
@@ -281,15 +292,48 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       <div className="mt-8 px-5">
         <form onSubmit={addProformaInvoiceHandler}>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {/* Category Field */}
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Category
               </FormLabel>
+              <Input
+                value={category.label}
+                isReadOnly={true}
+                className="border border-gray-300"
+                bg="gray.50"
+                color="gray.900"
+                _placeholder={{ color: "gray.500" }}
+              />
+            </FormControl>
+
+            {/* Proforma Invoice Number */}
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Proforma Invoice No.
+              </FormLabel>
+              <Input
+                value={proformaInvoiceNo || "Loading..."}
+                isReadOnly={true}
+                className="border border-gray-300"
+                bg="gray.50"
+                color="gray.900"
+                _placeholder={{ color: "gray.500" }}
+              />
+            </FormControl>
+
+            {/* Buyer Selection */}
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Buyer
+              </FormLabel>
               <Select
-                value={category}
-                options={categoryOptions}
+                value={buyer}
+                options={buyerOptions}
                 required={true}
-                onChange={(e: any) => setCategory(e)}
+                onChange={(selectedOption: any) => setBuyer(selectedOption)}
+                isLoading={isLoadingBuyers}
+                placeholder={isLoadingBuyers ? "Loading buyers..." : buyerFetchError ? "No buyers available" : "Select a buyer"}
                 styles={{
                   control: (provided: any) => ({
                     ...provided,
@@ -325,116 +369,12 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
                   }),
                 }}
               />
+              {buyerFetchError && (
+                <p className="text-sm text-red-500 mt-1">{buyerFetchError}</p>
+              )}
             </FormControl>
-            {category && category.value === "sales" && (
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="gray.700">
-                  Buyer
-                </FormLabel>
-                <Select
-                  value={buyer}
-                  options={buyerOptions}
-                  required={true}
-                  onChange={(e: any) => setBuyer(e)}
-                  styles={{
-                    control: (provided: any) => ({
-                      ...provided,
-                      backgroundColor: "white",
-                      borderColor: "#d1d5db",
-                      color: "#374151",
-                      minHeight: "40px",
-                      "&:hover": {
-                        borderColor: "#9ca3af",
-                      },
-                    }),
-                    option: (provided: any, state: any) => ({
-                      ...provided,
-                      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
-                      color: "#374151",
-                      "&:hover": {
-                        backgroundColor: "#f3f4f6",
-                      },
-                    }),
-                    placeholder: (provided: any) => ({
-                      ...provided,
-                      color: "#9ca3af",
-                    }),
-                    singleValue: (provided: any) => ({
-                      ...provided,
-                      color: "#374151",
-                    }),
-                    menu: (provided: any) => ({
-                      ...provided,
-                      zIndex: 9999,
-                      backgroundColor: "white",
-                      border: "1px solid #d1d5db",
-                    }),
-                  }}
-                />
-              </FormControl>
-            )}
-            {category && category.value === "purchase" && (
-              <FormControl className="mt-3 mb-5" isRequired>
-                <FormLabel fontWeight="bold" color="gray.700">
-                  Supplier
-                </FormLabel>
-                <Select
-                  value={supplier}
-                  options={supplierOptions}
-                  required={true}
-                  onChange={(e: any) => setSupplier(e)}
-                  styles={{
-                    control: (provided: any) => ({
-                      ...provided,
-                      backgroundColor: "white",
-                      borderColor: "#d1d5db",
-                      color: "#374151",
-                      minHeight: "40px",
-                      "&:hover": {
-                        borderColor: "#9ca3af",
-                      },
-                    }),
-                    option: (provided: any, state: any) => ({
-                      ...provided,
-                      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
-                      color: "#374151",
-                      "&:hover": {
-                        backgroundColor: "#f3f4f6",
-                      },
-                    }),
-                    placeholder: (provided: any) => ({
-                      ...provided,
-                      color: "#9ca3af",
-                    }),
-                    singleValue: (provided: any) => ({
-                      ...provided,
-                      color: "#374151",
-                    }),
-                    menu: (provided: any) => ({
-                      ...provided,
-                      zIndex: 9999,
-                      backgroundColor: "white",
-                      border: "1px solid #d1d5db",
-                    }),
-                  }}
-                />
-              </FormControl>
-            )}
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Proforma Invoice No.
-              </FormLabel>
-              <Input
-                className="border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                value={proformaInvoiceNo}
-                onChange={(e) => setProformaInvoiceNo(e.target.value)}
-                type="text"
-                placeholder="Proforma Invoice No."
-                bg="white"
-                color="gray.700"
-                _placeholder={{ color: "gray.500" }}
-              />
-            </FormControl>
+
+            {/* Document Date */}
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Document Date
@@ -449,7 +389,9 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
                 color="gray.700"
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5" isRequired>
+
+            {/* Sales Order Date */}
+            <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="gray.700">
                 Sales Order Date
               </FormLabel>
@@ -464,6 +406,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
               />
             </FormControl>
 
+            {/* Store Selection */}
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Store
@@ -472,7 +415,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
                 value={store}
                 options={storeOptions}
                 required={true}
-                onChange={(e: any) => setStore(e)}
+                onChange={(selectedOption: any) => setStore(selectedOption)}
                 styles={{
                   control: (provided: any) => ({
                     ...provided,
@@ -509,6 +452,8 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
                 }}
               />
             </FormControl>
+
+            {/* Note Field */}
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="gray.700">
                 Note
@@ -521,12 +466,21 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
               />
             </FormControl>
           </div>
+
+          {/* Items Section */}
           <FormControl className="mt-3 mb-5" isRequired>
             <FormLabel fontWeight="bold" color="gray.700">
               Items
             </FormLabel>
-            <AddItems inputs={inputs} setInputs={setInputs} />
+            <AddItems 
+              inputs={inputs} 
+              setInputs={setInputs} 
+        
+            />
           </FormControl>
+          
+
+          {/* Totals Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
@@ -543,6 +497,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
                 _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
+
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Tax
@@ -551,7 +506,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
                 required={true}
                 value={tax}
                 options={taxOptions}
-                onChange={(e: any) => setTax(e)}
+                onChange={(selectedOption: any) => setTax(selectedOption)}
                 styles={{
                   control: (provided: any) => ({
                     ...provided,
@@ -588,6 +543,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
                 }}
               />
             </FormControl>
+
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Total
@@ -601,6 +557,8 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
               />
             </FormControl>
           </div>
+
+          {/* Submit Button */}
           <Button
             isLoading={isAdding}
             type="submit"
