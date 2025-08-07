@@ -3,9 +3,11 @@
 import { Select, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { FaCaretDown, FaCaretUp, FaFilePdf } from "react-icons/fa";
 import { usePagination, useSortBy, useTable } from "react-table";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { colors } from "../../theme/colors";
+import PorformaInvoicePDF from "../PDF/PorformaInvoicePDF";
 
 interface ProformaInvoiceTableProps {
   proformaInvoices: Array<{
@@ -191,7 +193,8 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
               >
                 <Thead bg={colors.table.header}>
                   {headerGroups.map((hg, headerIndex) => {
-                    const { key, ...headerGroupProps } = hg.getHeaderGroupProps();
+                    const { key, ...headerGroupProps } =
+                      hg.getHeaderGroupProps();
                     return (
                       <Tr
                         key={key}
@@ -200,9 +203,10 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                         borderColor={colors.table.border}
                       >
                         {hg.headers.map((column: any) => {
-                          const { key: columnKey, ...columnProps } = column.getHeaderProps(
-                            column.getSortByToggleProps()
-                          );
+                          const { key: columnKey, ...columnProps } =
+                            column.getHeaderProps(
+                              column.getSortByToggleProps()
+                            );
                           return (
                             <Th
                               key={columnKey}
@@ -273,7 +277,8 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                         borderColor={colors.table.border}
                       >
                         {row.cells.map((cell: any) => {
-                          const { key: cellKey, ...cellProps } = cell.getCellProps();
+                          const { key: cellKey, ...cellProps } =
+                            cell.getCellProps();
                           return (
                             <Td
                               key={cellKey}
@@ -449,6 +454,46 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                                 </svg>
                               </button>
                             )}
+
+                            {/* PDF Download Button */}
+                            <PDFDownloadLink
+                              document={
+                                <PorformaInvoicePDF
+                                  proformaInvoice={row.original}
+                                />
+                              }
+                              fileName={`ProformaInvoice_${row.original._id}.pdf`}
+                            >
+                              {({ blob, url, loading, error }) => (
+                                <button
+                                  disabled={loading}
+                                  className="p-2 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-50"
+                                  style={{
+                                    color: colors.warning[600],
+                                    backgroundColor: colors.warning[50],
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    if (!e.currentTarget.disabled) {
+                                      e.currentTarget.style.backgroundColor =
+                                        colors.warning[100];
+                                    }
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    if (!e.currentTarget.disabled) {
+                                      e.currentTarget.style.backgroundColor =
+                                        colors.warning[50];
+                                    }
+                                  }}
+                                  title={
+                                    loading
+                                      ? "Generating PDF..."
+                                      : "Download PDF"
+                                  }
+                                >
+                                  <FaFilePdf className="w-4 h-4" />
+                                </button>
+                              )}
+                            </PDFDownloadLink>
                           </div>
                         </Td>
                       </Tr>

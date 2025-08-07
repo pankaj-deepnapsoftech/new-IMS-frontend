@@ -16,6 +16,8 @@ import {
   FaFileImage,
   FaCheckCircle,
 } from "react-icons/fa";
+import SalesOrderPDF from "../PDF/SalesOrderPDF";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 const SalesTable = ({
   filteredPurchases,
@@ -23,7 +25,7 @@ const SalesTable = ({
   isLoading,
   setEditTable,
   setShow,
-  fetchPurchases
+  fetchPurchases,
 }) => {
   const [showassign, setShowAssign] = useState(false);
   const calculateTotalPrice = (price: number, qty: number, gst: number) => {
@@ -62,7 +64,7 @@ const SalesTable = ({
     return <EmptyData />;
   }
 
-  // console.log(filteredPurchases)
+  console.log(filteredPurchases);
 
   return (
     <div className="space-y-4 bg-[#f8f9fa]">
@@ -95,19 +97,68 @@ const SalesTable = ({
                 • {new Date(purchase?.createdAt).toLocaleDateString()}
               </p>
             </div>
-            {/* <p>Design Approval:
-            </p> */}
-            <span
-              className={`inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium ${purchase?.assinedto?.[0]?.isCompleted === "Completed"
-                  ? "bg-green-100 text-green-800"
-                  : purchase?.assinedto?.[0]?.isCompleted === "UnderProcessing"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-            >
-              Design Approval: {purchase?.assinedto?.[0]?.isCompleted || "N/A"}
-            </span>
+            {/* Edit and Assign buttons moved to top right */}
+            <div className="flex gap-2">
+              <button
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                style={{
+                  borderColor: colors.border.medium,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
+                }}
+                onClick={() => {
+                  setShow(true);
+                  setEditTable(purchase);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.gray[50];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.background.card;
+                }}
+              >
+                <FaEdit size="16px" />
+                Edit
+              </button>
 
+              <button
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: colors.button.primary,
+                  color: colors.text.inverse,
+                }}
+                onClick={() => {
+                  setShowAssign(!showassign);
+                  setSelectedSale(purchase);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.primaryHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.button.primary;
+                }}
+              >
+                <FaUserPlus size="16px" />
+                Assign
+              </button>
+
+              <PDFDownloadLink
+                document={<SalesOrderPDF sale={purchase} />}
+                fileName={`SalesOrder_${purchase.order_id}.pdf`}
+              >
+                {({ loading }) =>
+                  loading ? (
+                    "Preparing PDF..."
+                  ) : (
+                    <button className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg">
+                      Download PDF
+                    </button>
+                  )
+                }
+              </PDFDownloadLink>
+            </div>
           </div>
 
           {/* Sale Details Grid */}
@@ -118,13 +169,29 @@ const SalesTable = ({
                   className="text-sm font-medium"
                   style={{ color: colors.text.secondary }}
                 >
-                  Party:
+                  Merchant:
                 </span>
                 <span
                   className="ml-2 text-sm"
                   style={{ color: colors.text.primary }}
                 >
-                  {purchase?.party?.consignee_name || "N/A"}
+                  {purchase?.party?.consignee_name?.length > 0
+                    ? purchase?.party?.consignee_name
+                    : purchase?.party?.company_name}
+                </span>
+              </div>
+              <div>
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Bill To Address:
+                </span>
+                <span
+                  className="ml-2 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {purchase?.party?.bill_to || "N/A"}
                 </span>
               </div>
               <div>
@@ -155,6 +222,9 @@ const SalesTable = ({
                   {purchase?.product_qty}
                 </span>
               </div>
+            </div>
+
+            <div className="space-y-3">
               <div>
                 <span
                   className="text-sm font-medium"
@@ -169,10 +239,7 @@ const SalesTable = ({
                   ₹{purchase?.price || "N/A"}
                 </span>
               </div>
-            </div>
-
-            <div className="space-y-3">
-              <div>
+              {/* <div>
                 <span
                   className="text-sm font-medium"
                   style={{ color: colors.text.secondary }}
@@ -185,7 +252,8 @@ const SalesTable = ({
                 >
                   ₹{purchase?.price * purchase?.product_qty}
                 </span>
-              </div>
+                
+              </div> */}
               <div>
                 <span
                   className="text-sm font-medium"
@@ -219,59 +287,43 @@ const SalesTable = ({
                   ).toFixed(2)}
                 </span>
               </div>
+              <div>
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Mode of Payment:
+                </span>
+                <span
+                  className="ml-2 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {purchase?.mode_of_payment || "N/A"}
+                </span>
+              </div>
             </div>
+          </div>
+          <div className="flex items-center gap-2 -mt-3">
+            <span
+              className="text-sm font-medium w-40"
+              style={{ color: colors.text.secondary }}
+            >
+              Terms of Delivery:
+            </span>
+            <textarea
+              className="mt-1 p-2 w-full rounded-lg border border-gray-200"
+              style={{ backgroundColor: colors.background.card }}
+              value={purchase?.comment || ""}
+              rows={2}
+            />
           </div>
 
           {/* Action Buttons */}
-          <div
-            className="flex flex-wrap gap-3 pt-4 border-t"
+          {/* <div
+            className="flex flex-wrap gap-3 pt-4 "
             style={{ borderColor: colors.border.light }}
-          >
-            <button
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
-              style={{
-                borderColor: colors.border.medium,
-                color: colors.text.primary,
-                backgroundColor: colors.background.card,
-              }}
-              onClick={() => {
-                setShow(true);
-                setEditTable(purchase);
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = colors.gray[50];
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = colors.background.card;
-              }}
-            >
-              <FaEdit size="16px" />
-              Edit
-            </button>
-
-            <button
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
-              style={{
-                backgroundColor: colors.button.primary,
-                color: colors.text.inverse,
-              }}
-              onClick={() => {
-                setShowAssign(!showassign);
-                setSelectedSale(purchase);
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  colors.button.primaryHover;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = colors.button.primary;
-              }}
-            >
-              <FaUserPlus size="16px" />
-              Assign
-            </button>
-
-            <button
+          > */}
+          {/* <button
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
               style={{
                 borderColor: colors.warning[300],
@@ -307,31 +359,52 @@ const SalesTable = ({
             >
               <FaFileImage size="16px" />
               Updated Design
-            </button>
+            </button> */}
 
-            {purchase?.boms[0]?.production_processes?.every((processGroup) =>
+          {/* {purchase?.boms[0]?.production_processes?.every((processGroup) =>
               processGroup?.processes?.every(
                 (process) => process?.done === true
               )
             ) && (
-                <button
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
-                  style={{
-                    backgroundColor: colors.success[500],
-                    color: colors.text.inverse,
-                  }}
-                  onClick={() => setIsChecked(!isChecked)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = colors.success[600];
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = colors.success[500];
-                  }}
-                >
-                  <FaCheckCircle size="16px" />
-                  Approve Sample
-                </button>
-              )}
+              <button
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: colors.success[500],
+                  color: colors.text.inverse,
+                }}
+                onClick={() => setIsChecked(!isChecked)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.success[600];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.success[500];
+                }}
+              >
+                <FaCheckCircle size="16px" />
+                Approve Sample
+              </button>
+            )} */}
+          {/* </div> */}
+
+          {/* Status Footer */}
+          <div
+            className="flex justify-between items-center pt-3 mt-3 border-t"
+            style={{ borderColor: colors.border.light }}
+          >
+            <span className="text-sm" style={{ color: colors.text.secondary }}>
+              Design Approval Status:
+            </span>
+            <span
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                purchase?.assinedto?.[0]?.isCompleted === "Completed"
+                  ? "bg-green-100 text-green-800"
+                  : purchase?.assinedto?.[0]?.isCompleted === "UnderProcessing"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+            >
+              {purchase?.assinedto?.[0]?.isCompleted || "Not Assigned"}
+            </span>
           </div>
         </div>
       ))}
