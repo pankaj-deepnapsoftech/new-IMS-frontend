@@ -75,6 +75,10 @@ const PartiesTable = ({
         searchLower
       ) ||
       (party?.type?.toLowerCase?.() || "").includes(searchLower) ||
+      (party?.cust_id?.toLowerCase?.() || "").includes(searchLower) ||
+      (party?.contact_person_name?.toLowerCase?.() || "").includes(searchLower) ||
+      (party?.shipped_gst_to?.toLowerCase?.() || "").includes(searchLower) ||
+      (party?.bill_gst_to?.toLowerCase?.() || "").includes(searchLower) ||
       (party?.company_name?.toLowerCase?.() || "").includes(searchLower);
 
     const matchType = selectedType ? party?.type === selectedType : true;
@@ -235,7 +239,7 @@ const PartiesTable = ({
         <div className="flex items-center gap-6">
           <div>
             <h3
-              className="text-lg font-semibold"
+              className="text-lg font -semibold"
               style={{ color: colors.text.primary }}
             >
               {filteredParties.length} Part

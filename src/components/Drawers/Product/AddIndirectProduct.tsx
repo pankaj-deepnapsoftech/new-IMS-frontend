@@ -313,7 +313,7 @@ const AddProduct: React.FC<AddProductProps> = ({
 
       <div className="mt-8 px-5">
         <form onSubmit={addProductHandler}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {/* <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Inventory Category
