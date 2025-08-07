@@ -35,6 +35,11 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
 
   const columns = useMemo(
     () => [
+      {
+        Header: "PO Number",
+        accessor: "proforma_invoice_no",
+      },
+
       { Header: "Created By", accessor: "creator" },
       { Header: "Created At", accessor: "createdAt" },
       { Header: "Last Updated", accessor: "updatedAt" },
@@ -160,7 +165,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                   boxShadow: `0 0 0 1px ${colors.primary[500]}`,
                 }}
               >
-                {[5,10, 20, 50, 100, 100000].map((size) => (
+                {[5, 10, 20, 50, 100, 100000].map((size) => (
                   <option key={size} value={size}>
                     {size === 100000 ? "All" : size}
                   </option>
@@ -171,7 +176,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
 
           {/* Enhanced Table */}
           <div
-            className="rounded-xl shadow-sm"
+            className="rounded-xl shadow-sm whitespace-nowrap"
             style={{
               backgroundColor: colors.background.card,
               border: `1px solid ${colors.border.light}`,
@@ -212,36 +217,36 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                               px={4}
                               py={3}
                             >
-                                <div className="flex items-center gap-1">
-                                  {column.render("Header")}
-                                  {column.isSorted && (
-                                    <span
-                                      style={{ color: colors.primary[500] }}
-                                    >
-                                      {column.isSortedDesc ? (
-                                        <FaCaretDown />
-                                      ) : (
-                                        <FaCaretUp />
-                                      )}
-                                    </span>
-                                  )}
-                                </div>
-                              </Th>
-                            );
-                          })}
-                          <Th
-                            fontSize="14px"
-                            fontWeight="600"
-                            color={colors.table.headerText}
-                            whiteSpace="nowrap"
-                            px={4}
-                            py={3}
-                          >
-                            Actions
-                          </Th>
-                        </Tr>
-                      );
-                    }
+                              <div className="flex items-center gap-1">
+                                {column.render("Header")}
+                                {column.isSorted && (
+                                  <span
+                                    style={{ color: colors.primary[500] }}
+                                  >
+                                    {column.isSortedDesc ? (
+                                      <FaCaretDown />
+                                    ) : (
+                                      <FaCaretUp />
+                                    )}
+                                  </span>
+                                )}
+                              </div>
+                            </Th>
+                          );
+                        })}
+                        <Th
+                          fontSize="14px"
+                          fontWeight="600"
+                          color={colors.table.headerText}
+                          whiteSpace="nowrap"
+                          px={4}
+                          py={3}
+                        >
+                          Actions
+                        </Th>
+                      </Tr>
+                    );
+                  }
                   )}
                 </Thead>
                 <Tbody {...getTableBodyProps()}>
@@ -261,9 +266,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                           shadow: "md",
                         }}
                         bgColor={
-                          index % 2 !== 0
-                            ? colors.table.stripe
-                            : colors.background.card
+                          index % 2 !== 0 ? colors.table.stripe : colors.background.card
                         }
                         transition="all 0.2s ease"
                         borderBottom="1px solid"
@@ -276,76 +279,70 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                               key={cellKey}
                               {...cellProps}
                               style={{
-                                position:
-                                  cell.column.id === "creator"
-                                    ? "sticky"
-                                    : undefined,
-                                left:
-                                  cell.column.id === "creator" ? 0 : undefined,
+                                position: cell.column.id === "creator" ? "sticky" : undefined,
+                                left: cell.column.id === "creator" ? 0 : undefined,
                                 backgroundColor:
                                   cell.column.id === "creator"
                                     ? dynamicBg(index)
                                     : undefined,
-                                zIndex:
-                                  cell.column.id === "creator" ? 1 : undefined,
+                                zIndex: cell.column.id === "creator" ? 1 : undefined,
                               }}
                               px={4}
                               py={3}
                             >
+                              {/* Default render if no special condition */}
                               {cell.column.id !== "createdAt" &&
                                 cell.column.id !== "updatedAt" &&
                                 cell.column.id !== "customer" &&
                                 cell.column.id !== "creator" &&
+                                cell.column.id !== "proforma_invoice_no" &&
                                 cell.render("Cell")}
 
-                              {cell.column.id === "creator" &&
-                                row.original?.creator && (
-                                  <span style={{ color: colors.text.primary }}>
-                                    {row.original?.creator?.first_name +
-                                      " " +
-                                      row.original?.creator?.last_name}
-                                  </span>
-                                )}
-                              {cell.column.id === "createdAt" &&
-                                row.original?.createdAt && (
-                                  <span
-                                    style={{ color: colors.text.secondary }}
-                                  >
-                                    {moment(row.original?.createdAt).format(
-                                      "DD/MM/YYYY"
-                                    )}
-                                  </span>
-                                )}
-                              {cell.column.id === "updatedAt" &&
-                                row.original?.updatedAt && (
-                                  <span
-                                    style={{ color: colors.text.secondary }}
-                                  >
-                                    {moment(row.original?.updatedAt).format(
-                                      "DD/MM/YYYY"
-                                    )}
-                                  </span>
-                                )}
+                              {cell.column.id === "creator" && row.original?.creator && (
+                                <span style={{ color: colors.text.primary }}>
+                                  {row.original?.creator?.first_name +
+                                    " " +
+                                    row.original?.creator?.last_name}
+                                </span>
+                              )}
+
+                              {cell.column.id === "createdAt" && row.original?.createdAt && (
+                                <span style={{ color: colors.text.secondary }}>
+                                  {moment(row.original?.createdAt).format("DD/MM/YYYY")}
+                                </span>
+                              )}
+
+                              {cell.column.id === "updatedAt" && row.original?.updatedAt && (
+                                <span style={{ color: colors.text.secondary }}>
+                                  {moment(row.original?.updatedAt).format("DD/MM/YYYY")}
+                                </span>
+                              )}
+
                               {cell.column.id === "customer" &&
-                                (row.original?.buyer ||
-                                  row.original?.supplier) && (
+                                (row.original?.buyer || row.original?.supplier) && (
                                   <span style={{ color: colors.text.primary }}>
                                     {row.original?.buyer
                                       ? row.original.buyer.name
                                       : row.original.supplier.name}
                                   </span>
                                 )}
+
+                              {cell.column.id === "proforma_invoice_no" &&
+                                row.original?.proforma_invoice_no && (
+                                  <span style={{ color: colors.text.primary }}>
+                                    {row.original.proforma_invoice_no}
+                                  </span>
+                                )}
                             </Td>
                           );
                         })}
+
                         <Td px={4} py={3}>
                           <div className="flex items-center gap-2">
                             {openProformaInvoiceDetailsHandler && (
                               <button
                                 onClick={() =>
-                                  openProformaInvoiceDetailsHandler(
-                                    row.original._id
-                                  )
+                                  openProformaInvoiceDetailsHandler(row.original._id)
                                 }
                                 className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
                                 style={{
@@ -386,9 +383,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                             {openUpdateProformaInvoiceDrawer && (
                               <button
                                 onClick={() =>
-                                  openUpdateProformaInvoiceDrawer(
-                                    row.original._id
-                                  )
+                                  openUpdateProformaInvoiceDrawer(row.original._id)
                                 }
                                 className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
                                 style={{
@@ -432,12 +427,10 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                                   backgroundColor: colors.error[50],
                                 }}
                                 onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    colors.error[100];
+                                  e.currentTarget.style.backgroundColor = colors.error[100];
                                 }}
                                 onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    colors.error[50];
+                                  e.currentTarget.style.backgroundColor = colors.error[50];
                                 }}
                                 title="Delete Invoice"
                               >
@@ -462,6 +455,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                     );
                   })}
                 </Tbody>
+
               </Table>
             </div>
           </div>

@@ -342,11 +342,13 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     if (!edittable) {
       fetchNextPONumber();
     }
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}product/raw-materials`, {
+    const res = axios.get(`${process.env.REACT_APP_BACKEND_URL}product/raw-materials`, {
       headers: { Authorization: `Bearer ${cookies?.access_token}` },
     }).then(res => {
       setRawMaterials(res.data.rawMaterials || []);
     });
+
+    console.log("res")
   }, []);
 
   useEffect(() => {
