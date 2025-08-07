@@ -24,9 +24,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderBottom: "1px solid #000",
   },
-  headerRowNoBorder: {
-    flexDirection: "row",
-  },
   companySection: {
     width: "40%",
     padding: 8,
@@ -41,7 +38,21 @@ const styles = StyleSheet.create({
     width: "30%",
     padding: 8,
   },
-  modeSection: {
+  merchantSection: {
+    width: "40%",
+    padding: 8,
+    borderRight: "1px solid #000",
+  },
+  paymentSection: {
+    width: "30%",
+    padding: 8,
+    borderRight: "1px solid #000",
+  },
+  emptySection: {
+    width: "30%",
+    padding: 8,
+  },
+  billToSection: {
     width: "40%",
     padding: 8,
     borderRight: "1px solid #000",
@@ -50,25 +61,19 @@ const styles = StyleSheet.create({
     width: "60%",
     padding: 8,
   },
-  merchantSection: {
-    width: "40%",
-    padding: 8,
-    borderRight: "1px solid #000",
-    minHeight: 40,
-  },
-  billToSection: {
-    width: "100%",
-    padding: 8,
-    minHeight: 60,
-  },
   sectionLabel: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: "bold",
-    marginBottom: 3,
+    marginBottom: 4,
+    color: "#333",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   sectionValue: {
-    fontSize: 9,
-    lineHeight: 1.2,
+    fontSize: 11,
+    lineHeight: 1.3,
+    color: "#000",
+    fontWeight: "normal",
   },
   table: {
     width: "100%",
@@ -82,80 +87,104 @@ const styles = StyleSheet.create({
   tableHeader: {
     backgroundColor: "#f0f0f0",
     fontWeight: "bold",
+    fontSize: 10,
   },
   col1: {
-    width: "8%",
-    padding: 6,
+    width: "10%",
+    padding: 8,
     borderRight: "1px solid #000",
     textAlign: "center",
-    fontSize: 9,
+    fontSize: 10,
   },
   col2: {
     width: "42%",
     padding: 6,
     borderRight: "1px solid #000",
     textAlign: "left",
-    fontSize: 9,
+    fontSize: 10,
   },
   col3: {
-    width: "12%",
+    width: "11%",
     padding: 6,
     borderRight: "1px solid #000",
     textAlign: "center",
-    fontSize: 9,
+    fontSize: 10,
   },
   col4: {
     width: "12%",
     padding: 6,
     borderRight: "1px solid #000",
     textAlign: "center",
-    fontSize: 9,
+    fontSize: 10,
   },
   col5: {
-    width: "13%",
+    width: "12%",
     padding: 6,
     borderRight: "1px solid #000",
     textAlign: "center",
-    fontSize: 9,
+    fontSize: 10,
   },
   col6: {
     width: "13%",
     padding: 6,
     textAlign: "center",
-    fontSize: 9,
+    fontSize: 10,
   },
   totalRow: {
     fontWeight: "bold",
     backgroundColor: "#f8f8f8",
+    fontSize: 11,
   },
   amountInWords: {
-    padding: 8,
+    padding: 10,
     border: "1px solid #000",
-    minHeight: 40,
+    minHeight: 50,
     marginTop: 15,
   },
+  amountLabel: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: "#333",
+    textTransform: "uppercase",
+  },
+  amountValue: {
+    fontSize: 10,
+    lineHeight: 1.4,
+    color: "#000",
+    fontWeight: "normal",
+  },
   bankDetails: {
-    padding: 8,
-    marginTop: 10,
-    lineHeight: 1.3,
-    fontSize: 9,
+    lineHeight: 1.4,
+    fontSize: 10,
+  },
+  bankLabel: {
+    fontSize: 11,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: "#333",
+    textTransform: "uppercase",
   },
   signatureContainer: {
     marginTop: 15,
     flexDirection: "row",
     justifyContent: "flex-end",
   },
+  bankDetailsAboveSignature: {
+    width: "55%",
+  },
   signatureBox: {
     width: "40%",
     border: "1px solid #000",
-    padding: 8,
+    padding: 10,
     minHeight: 80,
     textAlign: "center",
   },
-  bankDetailsAboveSignature: {
-    width: "55%",
-    padding: 8,
-    marginRight: 10,
+  signatureLabel: {
+    fontSize: 11,
+    fontWeight: "bold",
+    color: "#333",
+    textTransform: "uppercase",
   },
 });
 
@@ -191,6 +220,7 @@ const SalesOrderPDF = ({ sale }: any) => {
 
         {/* Header Section */}
         <View style={styles.headerSection}>
+          {/* Row 1: Company, Order No, Date */}
           <View style={styles.headerRow}>
             <View style={styles.companySection}>
               <Text style={styles.sectionLabel}>Company Name</Text>
@@ -208,8 +238,9 @@ const SalesOrderPDF = ({ sale }: any) => {
             </View>
           </View>
 
+          {/* Row 2: Merchant, Payment, Empty */}
           <View style={styles.headerRow}>
-            <View style={styles.companySection}>
+            <View style={styles.merchantSection}>
               <Text style={styles.sectionLabel}>Merchant Name</Text>
               <Text style={styles.sectionValue}>
                 {sale?.party?.consignee_name?.[0]?.length > 0
@@ -217,22 +248,24 @@ const SalesOrderPDF = ({ sale }: any) => {
                   : sale?.party?.company_name}
               </Text>
             </View>
-            <View style={styles.orderDetailsSection}>
+            <View style={styles.paymentSection}>
               <Text style={styles.sectionLabel}>Mode of Payment</Text>
               <Text style={styles.sectionValue}>
                 {sale.mode_of_payment || "N/A"}
               </Text>
             </View>
+            <View style={styles.emptySection}></View>
           </View>
 
+          {/* Row 3: Bill To, Terms of Delivery */}
           <View style={styles.headerRow}>
-            <View style={styles.companySection}>
+            <View style={styles.billToSection}>
               <Text style={styles.sectionLabel}>Bill To Address</Text>
               <Text style={styles.sectionValue}>
                 {sale.party?.bill_to || "N/A"}
               </Text>
             </View>
-            <View style={styles.orderDetailsSection}>
+            <View style={styles.termsSection}>
               <Text style={styles.sectionLabel}>Terms of Delivery</Text>
               <Text style={styles.sectionValue}>{sale.comment || "N/A"}</Text>
             </View>
@@ -286,25 +319,27 @@ const SalesOrderPDF = ({ sale }: any) => {
 
         {/* Amount in Words */}
         <View style={styles.amountInWords}>
-          <Text style={styles.sectionLabel}>Amount in Words:</Text>
-          <Text style={styles.sectionValue}>
+          <Text style={styles.amountLabel}>Amount in Words:</Text>
+          <Text style={styles.amountValue}>
             {toWords.convert(Number(total), { currency: true })}
           </Text>
         </View>
 
-        {/* Signature Section with Bank Details Above */}
+        {/* Company Bank Details and Signature */}
         <View style={styles.signatureContainer}>
           <View style={styles.bankDetailsAboveSignature}>
-            <Text style={styles.sectionLabel}>Company Bank Details:</Text>
+            <Text style={styles.bankLabel}>Company Bank Details:</Text>
             <Text style={styles.bankDetails}>
               Bank Name: HDFC Bank{"\n"}
               Account No.: 123456789123456{"\n"}
-              IFSC Code: F4H5EDD8
+              IFSC Code: F4H5ED08
             </Text>
           </View>
           <View style={styles.signatureBox}>
-            <Text style={styles.sectionLabel}>Authorized Signature</Text>
-            <Text style={{ marginTop: 40 }}>_________________________</Text>
+            <Text style={styles.signatureLabel}>Authorized Signature</Text>
+            <Text style={{ marginTop: 40, fontSize: 10 }}>
+              _________________________
+            </Text>
           </View>
         </View>
       </Page>
