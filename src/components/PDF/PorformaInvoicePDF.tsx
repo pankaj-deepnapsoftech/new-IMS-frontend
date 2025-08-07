@@ -114,39 +114,46 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     fontWeight: "bold",
   },
-  colUnitQty: {
-    width: "15%",
+  colSno: {
+    width: "10%",
     padding: 8,
     borderRight: "1px solid #000",
     textAlign: "center",
-    fontSize: 9,
+  },
+  colName: {
+    width: "25%",
+    padding: 6,
+    borderRight: "1px solid #000",
+    textAlign: "center",
+  },
+  colUnitQty: {
+    width: "15%",
+    padding: 6,
+    borderRight: "1px solid #000",
+    textAlign: "center",
   },
   colUnitType: {
-    width: "15%",
+    width: "20%",
     padding: 6,
     borderRight: "1px solid #000",
     textAlign: "center",
-    fontSize: 9,
   },
   colPrice: {
-    width: "15%",
+    width: "18%",
     padding: 6,
     borderRight: "1px solid #000",
     textAlign: "center",
-    fontSize: 9,
+  },
+  colTax: {
+    width: "12%",
+    padding: 6,
+    borderRight: "1px solid #000",
+    textAlign: "center",
   },
   colAmount: {
-    width: "15%",
+    width: "13%",
     padding: 6,
     textAlign: "center",
-    fontSize: 9,
-  },
-  colDescription: {
-    width: "40%",
-    padding: 6,
-    borderRight: "1px solid #000",
-    textAlign: "left",
-    fontSize: 9,
   },
   totalWordsSection: {
     padding: 8,
@@ -336,35 +343,43 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
         {/* Product Table */}
         <View style={styles.table}>
           <View style={[styles.tableRow, styles.tableHeader]}>
-            <Text style={styles.colUnitQty}>Unit Quantity</Text>
-            <Text style={styles.colUnitType}>Unit Type</Text>
+            <Text style={styles.colSno}>S. No.</Text>
+            <Text style={styles.colName}>Name</Text>
+            <Text style={styles.colUnitQty}>Quantity</Text>
+            <Text style={styles.colUnitType}>Type</Text>
             <Text style={styles.colPrice}>Price</Text>
+            <Text style={styles.colTax}>GST</Text>
             <Text style={styles.colAmount}>Amount</Text>
-            <Text style={styles.colDescription}>Description</Text>
           </View>
 
           <View style={styles.tableRow}>
+            <Text style={styles.colSno}>{proformaInvoice?.unitSno || "1"}</Text>
+            <Text style={styles.colName}>
+              {proformaInvoice?.unitName || "1"}
+            </Text>
             <Text style={styles.colUnitQty}>
-              {proformaInvoice?.unitQuantity || "1"}
+              {proformaInvoice?.unitQuantity || "10"}
             </Text>
             <Text style={styles.colUnitType}>
               {proformaInvoice?.unitType || "Piece"}
             </Text>
             <Text style={styles.colPrice}>₹{(subtotal || 0).toFixed(2)}</Text>
-            <Text style={styles.colAmount}>₹{(subtotal || 0).toFixed(2)}</Text>
-            <Text style={styles.colDescription}>
-              {proformaInvoice?.description || "N/A"}
+            <Text style={styles.colTax}>
+              {proformaInvoice?.unitTax || "18%"}
             </Text>
+            <Text style={styles.colAmount}>₹{(subtotal || 0).toFixed(2)}</Text>
           </View>
 
           {/* Empty rows for spacing */}
           {[...Array(3)].map((_, i) => (
             <View key={i} style={styles.tableRow}>
+              <Text style={styles.colSno}></Text>
+              <Text style={styles.colName}></Text>
               <Text style={styles.colUnitQty}></Text>
               <Text style={styles.colUnitType}></Text>
               <Text style={styles.colPrice}></Text>
+              <Text style={styles.colTax}></Text>
               <Text style={styles.colAmount}></Text>
-              <Text style={styles.colDescription}></Text>
             </View>
           ))}
         </View>
