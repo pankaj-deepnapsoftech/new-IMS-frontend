@@ -24,7 +24,7 @@ import {
 // import AddProduct from "../components/Drawers/Product/AddIndirectProduct";
 import UpdateProduct from "../components/Drawers/Product/UpdateProduct";
 import ProductDetails from "../components/Drawers/Product/ProductDetails";
-import { FiSearch } from "react-icons/fi";
+import { FiDownload, FiSearch } from "react-icons/fi";
 import { colors } from "../theme/colors";
 import { Package } from "lucide-react";
 import AddProduct from "../components/Drawers/Product/AddDirectProduct";
@@ -232,7 +232,7 @@ const Products: React.FC = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      toast.success("Export completed successfully!");
+      toast.success('Export completed successfully!');
     } catch (error: any) {
       toast.error(error?.message || "Export failed");
     } finally {
@@ -267,7 +267,7 @@ const Products: React.FC = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      toast.success("Sample template downloaded!");
+      toast.success('Sample template downloaded!');
     } catch (error: any) {
       toast.error(error?.message || "Download failed");
     }
@@ -293,8 +293,8 @@ const Products: React.FC = () => {
       backgroundColor: state.isSelected
         ? colors.primary[500]
         : state.isFocused
-        ? colors.primary[50]
-        : colors.input.background,
+          ? colors.primary[50]
+          : colors.input.background,
       color: state.isSelected ? colors.text.inverse : colors.text.primary,
       padding: "12px",
     }),
@@ -413,20 +413,20 @@ const Products: React.FC = () => {
             borderColor: colors.border.light,
           }}
         >
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2.5 rounded-lg shadow">
                 <Package className="text-white" />
               </div>
               <div>
                 <h1
-                  className="text-2xl lg:text-3xl font-bold"
+                  className="text-xl lg:text-2xl font-semibold"
                   style={{ color: colors.text.primary }}
                 >
                   Direct Products
                 </h1>
                 <p
-                  className="text-sm mt-1"
+                  className="text-xs mt-0.5"
                   style={{ color: colors.text.secondary }}
                 >
                   Manage your direct products and services inventory
@@ -435,11 +435,11 @@ const Products: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5">
               {/* Add Product */}
               <button
                 onClick={openAddProductDrawerHandler}
-                className="inline-flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-md text-sm font-medium transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors"
                 style={{
                   backgroundColor: colors.button.primary,
                   color: colors.text.inverse,
@@ -456,10 +456,32 @@ const Products: React.FC = () => {
                 Add Product
               </button>
 
+              {/* Refresh */}
+
+
+              {/* Export Excel */}
+              <button
+                onClick={exportToExcelHandler}
+                disabled={isExporting}
+                className="flex items-center gap-1 px-3 py-2 text-white font-medium rounded-md transition-all duration-150 hover:shadow focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: colors.success[600],
+                }}
+                onMouseEnter={(e) => {
+                  if (!isExporting) e.currentTarget.style.backgroundColor = colors.success[700];
+                }}
+                onMouseLeave={(e) => {
+                  if (!isExporting) e.currentTarget.style.backgroundColor = colors.success[600];
+                }}
+              >
+                <FiDownload size={16} /> 
+                {isExporting ? 'Exporting...' : 'Export Excel'}
+              </button>
+
               {/* Bulk Upload */}
               <button
                 onClick={() => setShowBulkUploadMenu(true)}
-                className="inline-flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-md text-sm font-medium text-white transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-2 whitespace-nowrap rounded-md text-sm font-medium text-white transition-colors"
                 style={{
                   backgroundColor: colors.warning[600],
                 }}
@@ -473,34 +495,9 @@ const Products: React.FC = () => {
                 <AiFillFileExcel size="16px" />
                 Bulk Upload
               </button>
-
-              {/* Export Excel */}
-              <button
-                onClick={exportToExcelHandler}
-                disabled={isExporting}
-                className="inline-flex items-center gap-2 px-3 text-white py-1.5 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:opacity-50"
-                style={{
-                  backgroundColor: colors.success[600],
-                }}
-                onMouseEnter={(e) => {
-                  if (!isExporting) {
-                    e.currentTarget.style.backgroundColor = colors.success[700];
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isExporting) {
-                    e.currentTarget.style.backgroundColor = colors.success[600];
-                  }
-                }}
-              >
-                <MdFileDownload size="16px" />
-                {isExporting ? "Exporting..." : "Export Excel"}
-              </button>
-
-              {/* Refresh */}
               <button
                 onClick={fetchProductsHandler}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium border transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium border transition-colors"
                 style={{
                   borderColor: colors.border.medium,
                   color: colors.text.primary,
@@ -510,8 +507,7 @@ const Products: React.FC = () => {
                   e.currentTarget.style.backgroundColor = colors.gray[50];
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    colors.background.card;
+                  e.currentTarget.style.backgroundColor = colors.background.card;
                 }}
               >
                 <MdOutlineRefresh size="16px" />
@@ -519,6 +515,7 @@ const Products: React.FC = () => {
               </button>
             </div>
           </div>
+
 
           {/* Search and Filters Row */}
           <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
