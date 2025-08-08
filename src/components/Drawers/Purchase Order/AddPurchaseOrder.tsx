@@ -100,10 +100,7 @@ interface PurchaseOrderFormValues {
   supplierShippedGSTIN: string;
   supplierBillGSTIN: string;
   GSTApply: string;
-  // packagingAndForwarding: string;
-  // freightCharges: string;
   modeOfPayment: string;
-  // deliveryPeriod: string;
   billingAddress: string;
   paymentTerms: string;
   additionalRemarks: string;
@@ -141,7 +138,9 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
   };
 
   const getErrorMessage = (fieldName: keyof PurchaseOrderFormValues): string => {
-    return formik.errors[fieldName] ? String(formik.errors[fieldName]) : "";
+    return formik.touched[fieldName] && formik.errors[fieldName]
+      ? String(formik.errors[fieldName])
+      : "";
   };
 
   const validationSchema = Yup.object({
@@ -155,10 +154,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     supplierShippedGSTIN: Yup.string().required("Shipped GSTIN is required"),
     supplierBillGSTIN: Yup.string().required("Bill GSTIN is required"),
     GSTApply: Yup.string().required("GST selection is required"),
-    // packagingAndForwarding: Yup.string(),
-    // freightCharges: Yup.string(),
     modeOfPayment: Yup.string().required("Mode of payment is required"),
-    // deliveryPeriod: Yup.string(),
     billingAddress: Yup.string(),
     paymentTerms: Yup.string(),
     itemName: Yup.string().required("Item name is required"),
@@ -173,7 +169,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
 
   const formik = useFormik<PurchaseOrderFormValues>({
     initialValues: {
-      poOrder: edittable?.poOrder || "",
+      poOrder: edittable?.poOrder || nextPONumber || "",
       date: edittable?.date || new Date().toISOString().split("T")[0],
       supplierIdentifier: edittable?.supplierName || edittable?.companyName || "",
       supplierName: edittable?.supplierName || "",
@@ -183,10 +179,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
       supplierShippedGSTIN: edittable?.supplierShippedGSTIN || "",
       supplierBillGSTIN: edittable?.supplierBillGSTIN || "",
       GSTApply: edittable?.GSTApply || "",
-      // packagingAndForwarding: edittable?.packagingAndForwarding || "",
-      // freightCharges: edittable?.freightCharges || "",
       modeOfPayment: edittable?.modeOfPayment || "",
-      // deliveryPeriod: edittable?.deliveryPeriod || "",
       billingAddress: edittable?.billingAddress || "",
       paymentTerms: edittable?.paymentTerms || "",
       additionalRemarks: edittable?.additionalRemarks || "",
@@ -197,6 +190,9 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     },
     validationSchema,
     enableReinitialize: true,
+    validateOnMount: false, // Prevent validation on initial render
+    validateOnChange: true, // Validate on field change
+    validateOnBlur: true, // Validate on field blur
     onSubmit: async (values) => {
       if (isSubmitting) {
         return;
@@ -204,7 +200,6 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
 
       setIsSubmitting(true);
 
-      // Map supplierIdentifier to supplierName for the backend
       const payload = {
         ...values,
         supplierName: values.supplierIdentifier,
@@ -257,7 +252,8 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
           }
         }
       } catch (error: any) {
-        const errorMessage = error?.response?.data?.message ||
+        const errorMessage =
+          error?.response?.data?.message ||
           "Something went wrong while saving purchase order!";
         setPopupMessage(errorMessage);
         setPopupType("error");
@@ -271,8 +267,6 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
   const fetchSuppliersHandler = async (retryCount = 0) => {
     setIsLoadingSuppliers(true);
     try {
-      console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
-      console.log("Access Token:", cookies.access_token);
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}purchase-order/suppliers`,
         {
@@ -284,7 +278,6 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
       );
 
       const data: SupplierApiResponse = await response.json();
-      console.log("Supplier API Response:", data);
       if (!data.success) {
         throw new Error(data.message);
       }
@@ -302,13 +295,10 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
         }))
         .filter((supplier) => supplier.supplierName.trim() || supplier.companyName.trim());
       setSupplierOptions(suppliers);
-      console.log("Set Supplier Options:", suppliers);
       if (suppliers.length === 0 && retryCount < 3) {
-        console.warn(`Retry attempt ${retryCount + 1} for fetching suppliers`);
         setTimeout(() => fetchSuppliersHandler(retryCount + 1), 1000);
       }
     } catch (error: any) {
-      console.error("Error fetching suppliers:", error);
       toast.error(error?.message || "Something went wrong");
     } finally {
       setIsLoadingSuppliers(false);
@@ -338,26 +328,31 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
   };
 
   useEffect(() => {
-    fetchSuppliersHandler();
-    if (!edittable) {
-      fetchNextPONumber();
-    }
-    const res = axios.get(`${process.env.REACT_APP_BACKEND_URL}product/raw-materials`, {
-      headers: { Authorization: `Bearer ${cookies?.access_token}` },
-    }).then(res => {
-      setRawMaterials(res.data.rawMaterials || []);
-    });
-
-    console.log("res")
+    const fetchData = async () => {
+      await fetchNextPONumber(); // Fetch PO number first
+      await fetchSuppliersHandler(); // Then fetch suppliers
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}product/raw-materials`,
+          {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          }
+        );
+        setRawMaterials(res.data.rawMaterials || []);
+      } catch (error) {
+        console.error("Error fetching raw materials:", error);
+      }
+    };
+    fetchData();
+    formik.setTouched({}, false); // Reset touched state on mount
   }, []);
 
   useEffect(() => {
     if (edittable && supplierOptions.length > 0) {
-      console.log("Edittable Data:", edittable);
-      console.log("Initial Formik supplierIdentifier:", formik.values.supplierIdentifier);
-      console.log("Supplier Options:", supplierOptions);
       const isValidSupplier = supplierOptions.some(
-        (supplier) => supplier.supplierName === edittable.supplierName || supplier.companyName === edittable.supplierName
+        (supplier) =>
+          supplier.supplierName === edittable.supplierName ||
+          supplier.companyName === edittable.supplierName
       );
       if (!isValidSupplier && edittable.supplierName) {
         toast.warn("Selected supplier is not available. Please choose a new supplier.");
@@ -376,6 +371,22 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
       formik.setFieldValue("supplierBillGSTIN", formik.values.supplierBillTo);
     }
   }, [formik.values.supplierShippedTo, formik.values.supplierBillTo, formik.values.isSameAddress]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors = await formik.validateForm();
+    if (Object.keys(errors).length > 0) {
+      formik.setTouched(
+        Object.keys(errors).reduce(
+          (acc, key) => ({ ...acc, [key]: true }),
+          {}
+        ),
+        false
+      );
+      return;
+    }
+    formik.handleSubmit();
+  };
 
   return (
     <>
@@ -415,7 +426,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-          <Box as="form" onSubmit={formik.handleSubmit}>
+          <Box as="form" onSubmit={handleSubmit}>
             <VStack spacing={6} align="stretch">
               <Card
                 bg={bgColor}
@@ -1031,7 +1042,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                     colorScheme="blue"
                     size="lg"
                     isLoading={isSubmitting}
-                    isDisabled={isSubmitting || !formik.isValid}
+                    isDisabled={isSubmitting}
                     loadingText={edittable ? "Updating..." : "Creating..."}
                     px={8}
                     bgGradient="linear(to-r, blue.600, blue.700)"
