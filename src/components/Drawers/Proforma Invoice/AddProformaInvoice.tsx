@@ -111,9 +111,14 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
           ...buyer
         }));
 
-      
       setBuyerOptions(formattedBuyers);
-      setBuyers(data.data);
+      setBuyers(formattedBuyers);
+
+      // If you want the first buyer to be pre-selected:
+      // if (formattedBuyers.length > 0) {
+      //   setBuyer(formattedBuyers[0]); // default to first buyer in the list
+      // }
+
     } catch (error: any) {
       const errorMessage = error?.message || "Failed to fetch buyers";
       console.error("Buyers Fetch Error:", error);
@@ -235,6 +240,8 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       toast.success(response.message);
       closeDrawerHandler();
       fetchProformaInvoicesHandler();
+      console.log(response);
+      
     } catch (error: any) {
       toast.error(error?.message || "Failed to create proforma invoice");
     } finally {
@@ -318,19 +325,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
             </FormControl>
 
             {/* Proforma Invoice Number */}
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Proforma Invoice No.
-              </FormLabel>
-              <Input
-                value={proformaInvoiceNo || "Loading..."}
-                isReadOnly={true}
-                className="border border-gray-300"
-                bg="gray.50"
-                color="gray.900"
-                _placeholder={{ color: "gray.500" }}
-              />
-            </FormControl>
+      
 
             {/* Buyer Selection */}
             <FormControl className="mt-3 mb-5" isRequired>

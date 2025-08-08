@@ -322,12 +322,15 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                                   {moment(row.original?.updatedAt).format("DD/MM/YYYY")}
                                 </span>
                               )}
-
                               {cell.column.id === "customer" &&
                                 (row.original?.buyer || row.original?.supplier) && (
                                   <span style={{ color: colors.text.primary }}>
                                     {row.original?.buyer
-                                      ? row.original.buyer.name
+                                      ? row.original.buyer.consignee_name && String(row.original.buyer.consignee_name).trim() !== ""
+                                        ? String(row.original.buyer.consignee_name)
+                                        : row.original.buyer.company_name && String(row.original.buyer.company_name).trim() !== ""
+                                          ? String(row.original.buyer.company_name)
+                                          : row.original.buyer.name
                                       : row.original.supplier.name}
                                   </span>
                                 )}
