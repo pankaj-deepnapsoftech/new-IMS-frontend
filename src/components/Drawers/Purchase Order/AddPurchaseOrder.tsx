@@ -448,7 +448,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                     templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
                     gap={6}
                   >
-                    <GridItem>
+                    {/* <GridItem>
                       <FormControl isInvalid={hasError("poOrder")}>
                         <FormLabel
                           display="flex"
@@ -482,7 +482,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                           </Text>
                         )}
                       </FormControl>
-                    </GridItem>
+                    </GridItem> */}
 
                     <GridItem>
                       <FormControl isInvalid={hasError("date")}>
