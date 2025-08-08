@@ -72,7 +72,7 @@ const InventoryApprovals: React.FC = () => {
       toast.error(err?.message || "Something went wrong");
     }
   };
-
+ 
 
   useEffect(() => {
     if (token) {
@@ -137,7 +137,7 @@ const InventoryApprovals: React.FC = () => {
   return (
     <div
       className="min-h-screen"
-      style={{ backgroundColor: colors.background.page }}
+      style={{ backgroundColor: colors.background.page }} 
     >
       <div className="p-2 lg:p-3">
         {/* Header Section */}
