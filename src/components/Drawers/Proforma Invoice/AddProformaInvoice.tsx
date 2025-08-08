@@ -93,7 +93,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       );
       
       const data = await response.json();
-      
+       console.log(data)
       if (!response.ok) {
         throw new Error(data.message || "Failed to fetch buyers");
       }
@@ -103,14 +103,22 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       }
 
       // Format buyer options for the select component
-      const formattedBuyers = data.data.map((buyer: any) => ({
-        value: buyer._id,
-        label: buyer.company_name || buyer.consignee_name?.[0] || "Unnamed Buyer",
-        ...buyer // Include all buyer data for potential later use
-      }));
-      
+      const formattedBuyers = data.data
+        .filter((buyer: any) => buyer.parties_type === "Buyer") // Only include buyers
+        .map((buyer: any) => ({
+          value: buyer._id,
+          label: buyer.company_name || buyer.consignee_name?.[0] || "Unnamed Buyer",
+          ...buyer
+        }));
+
       setBuyerOptions(formattedBuyers);
-      setBuyers(data.data);
+      setBuyers(formattedBuyers);
+
+      if (formattedBuyers.length === 1) {
+        setBuyer(formattedBuyers[0]);
+      }
+
+
     } catch (error: any) {
       const errorMessage = error?.message || "Failed to fetch buyers";
       console.error("Buyers Fetch Error:", error);
@@ -137,18 +145,25 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       if (!results.success) {
         throw new Error(results?.message);
       }
-      const products = results.products.map((product: any) => ({
-        value: product._id,
-        label: product.name,
-        ...product // Include all product data
-      }));
-      setItemOptions(products);
-      setAllItems(results.products);
+
+    
+      const finishedGoods = results.products
+        .filter((product: any) => product.category?.toLowerCase() === "finished goods")
+        .map((product: any) => ({
+          value: product._id,
+          label: product.name,
+          ...product
+        }));
+
+      setItemOptions(finishedGoods);
+      setAllItems(finishedGoods); // use only filtered products
+
     } catch (error: any) {
       toast.error(error?.message || "Failed to fetch items");
     }
   };
 
+  console.log(buyer)
   // Fetch all stores
   const fetchStoresHandler = async () => {
     try {
@@ -225,6 +240,8 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       toast.success(response.message);
       closeDrawerHandler();
       fetchProformaInvoicesHandler();
+      console.log(response);
+      
     } catch (error: any) {
       toast.error(error?.message || "Failed to create proforma invoice");
     } finally {
@@ -308,19 +325,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
             </FormControl>
 
             {/* Proforma Invoice Number */}
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Proforma Invoice No.
-              </FormLabel>
-              <Input
-                value={proformaInvoiceNo || "Loading..."}
-                isReadOnly={true}
-                className="border border-gray-300"
-                bg="gray.50"
-                color="gray.900"
-                _placeholder={{ color: "gray.500" }}
-              />
-            </FormControl>
+      
 
             {/* Buyer Selection */}
             <FormControl className="mt-3 mb-5" isRequired>

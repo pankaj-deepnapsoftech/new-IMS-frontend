@@ -172,7 +172,7 @@ const ProformaInvoice: React.FC = () => {
           closeDrawerHandler={closeAddProformaInvoiceDrawerHandler}
           fetchProformaInvoicesHandler={fetchProformaInvoiceHandler}
         />
-      )}
+      )} 
       {isProformaInvoiceDetailsDrawerOpened && (
         <ProformaInvoiceDetails
           closeDrawerHandler={closeProformaInvoiceDetailsDrawerHandler}
