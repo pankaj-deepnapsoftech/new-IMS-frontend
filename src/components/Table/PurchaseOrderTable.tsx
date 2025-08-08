@@ -11,6 +11,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PurchaseOrderPDF from "../PDF/PurchaseOrderPDF";
+import { FaFilePdf } from "react-icons/fa";
 
 interface PurchaseOrder {
   _id: string;
@@ -733,24 +734,24 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                             }.pdf`}
                             className="p-2 rounded-lg transition-all duration-200 hover:shadow-md inline-flex items-center"
                             style={{
-                              color: colors.success[600],
-                              backgroundColor: colors.success[50],
+                              color: colors.warning[600],
+                              backgroundColor: colors.warning[50],
                               textDecoration: "none",
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.backgroundColor =
-                                colors.success[100];
+                                colors.warning[100];
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.backgroundColor =
-                                colors.success[50];
+                                colors.warning[50];
                             }}
                           >
                             {({ loading }) =>
                               loading ? (
                                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-500"></div>
                               ) : (
-                                <MdPictureAsPdf size={16} />
+                                <FaFilePdf className="w-4 h-4" />
                               )
                             }
                           </PDFDownloadLink>

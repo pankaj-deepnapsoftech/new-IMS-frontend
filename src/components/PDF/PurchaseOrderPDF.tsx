@@ -45,25 +45,25 @@ const styles = StyleSheet.create({
     width: "33.33%",
     padding: 8,
     borderRight: "1px solid #000",
-    minHeight: 60,
+    minHeight: 30,
   },
   gstinSection: {
-    width: "33.33%",
+    width: "50%",
     padding: 8,
     borderRight: "1px solid #000",
-    minHeight: 60,
+    minHeight: 30,
   },
   panSection: {
-    width: "33.34%",
+    width: "50%",
     padding: 8,
-    minHeight: 60,
+    minHeight: 30,
   },
-  emailSection: {
-    width: "100%",
-    padding: 8,
-    borderTop: "1px solid #000",
-    minHeight: 40,
-  },
+  // emailSection: {
+  //   width: "100%",
+  //   padding: 8,
+  //   borderTop: "1px solid #000",
+  //   minHeight: 40,
+  // },
   subjectSection: {
     width: "100%",
     padding: 8,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 10,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: 5,
     color: "#333",
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     lineHeight: 1.3,
     color: "#000",
     fontWeight: "normal",
+    marginBottom: 5,
   },
   table: {
     width: "100%",
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   colSno: {
-    width: "8%",
+    width: "9%",
     padding: 8,
     borderRight: "1px solid #000",
     textAlign: "center",
@@ -119,14 +120,14 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   colItemCode: {
-    width: "12%",
+    width: "14%",
     padding: 6,
     borderRight: "1px solid #000",
     textAlign: "center",
     fontSize: 10,
   },
   colHsnCode: {
-    width: "12%",
+    width: "14%",
     padding: 6,
     borderRight: "1px solid #000",
     textAlign: "center",
@@ -140,6 +141,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   colRate: {
+    width: "11%",
+    padding: 6,
+    borderRight: "1px solid #000",
+    textAlign: "center",
+    fontSize: 10,
+  },
+  colTax: {
     width: "12%",
     padding: 6,
     borderRight: "1px solid #000",
@@ -147,7 +155,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   colAmount: {
-    width: "14%",
+    width: "10%",
     padding: 6,
     textAlign: "center",
     fontSize: 10,
@@ -243,9 +251,8 @@ const toWords = new ToWords({
 });
 
 const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
-  // Calculate totals based on actual data or use defaults
-  const itemRate = 100; // This should come from item data
-  const quantity = 10; // This should come from quantity data
+  const itemRate = 100;
+  const quantity = 10;
   const baseAmount = itemRate * quantity;
   const cgstRate = 9; // 9% CGST
   const sgstRate = 9; // 9% SGST
@@ -262,83 +269,94 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
 
         {/* Header Section */}
         <View style={styles.headerSection}>
-          {/* Row 1: Company Details, P.O. No, Date */}
           <View style={styles.headerRow}>
-            <View style={styles.companySection}>
-              <Text style={styles.sectionLabel}>Company Name</Text>
-              <Text style={styles.sectionValue}>
-                Deepnap Softech{"\n"}
-                123 Business Street{"\n"}
-                City, State - 123456{"\n"}
-                Phone: +91-9876543210{"\n"}
-                Email: info@deepnapsoftech.com{"\n"}
-                Website: www.deepnapsoftech.com
-              </Text>
-            </View>
-            <View style={styles.purchaseOrderSection}>
+            <View style={styles.supplierSection}>
               <Text style={styles.sectionLabel}>P.O. No:</Text>
               <Text style={styles.sectionValue}>
                 {purchaseOrder?.poOrder || "PO001"}
               </Text>
             </View>
-            <View style={styles.dateSection}>
+            {/* <View style={styles.gstinSection}></View> */}
+            <View style={styles.panSection}>
               <Text style={styles.sectionLabel}>Date:</Text>
               <Text style={styles.sectionValue}>
                 {purchaseOrder?.date
                   ? new Date(purchaseOrder.date).toLocaleDateString()
                   : new Date().toLocaleDateString()}
               </Text>
+            </View>
+          </View>
+
+          {/* Row 1: Company Details, P.O. No, Date */}
+          <View style={styles.headerRow}>
+            <View style={styles.companySection}>
+              <Text style={styles.sectionLabel}>Company Name:</Text>
+              <Text style={styles.sectionValue}>Deepnap Softech</Text>
+              <Text style={styles.sectionLabel}>Address:</Text>
+              <Text style={styles.sectionValue}>
+                123 Street, Sector 28, Faridabad, Haryana - 1210002
+              </Text>
+              <Text style={styles.sectionLabel}>Phone No.:</Text>
+              <Text style={styles.sectionValue}>+91-1234567890</Text>
               <Text style={styles.sectionLabel}>Our GSTIN:</Text>
               <Text style={styles.sectionValue}>
                 {purchaseOrder?.supplierShippedGSTIN || "N/A"}
               </Text>
-              <Text style={styles.sectionLabel}>Supplier GSTIN:</Text>
-              <Text style={styles.sectionValue}>
-                {purchaseOrder?.supplierBillGSTIN || "N/A"}
-              </Text>
               <Text style={styles.sectionLabel}>Our PAN No.:</Text>
               <Text style={styles.sectionValue}>ABCDE1234F</Text>
-              <Text style={styles.sectionLabel}>Supplier PAN No.:</Text>
-              <Text style={styles.sectionValue}>FGHIJ5678K</Text>
+              <Text style={styles.sectionLabel}>Email:</Text>
+              <Text style={styles.sectionValue}>info@deepnapsoftech.com</Text>
             </View>
+
+            <View style={styles.companySection}>
+              <Text style={styles.sectionLabel}>Supplier Name:</Text>
+              <Text style={styles.sectionValue}>
+                {purchaseOrder?.supplier?.company_name || 
+                 purchaseOrder?.supplier?.consignee_name?.[0] || 
+                 purchaseOrder?.supplierName || "Supplier Name"}
+              </Text>
+              <Text style={styles.sectionLabel}>Supplier Address:</Text>
+              <Text style={styles.sectionValue}>
+                {purchaseOrder?.supplier?.address?.[0] || 
+                 purchaseOrder?.supplierShippedTo || "Supplier Address"}
+              </Text>
+              <Text style={styles.sectionLabel}>Supplier Code:</Text>
+              <Text style={styles.sectionValue}>
+                {purchaseOrder?.supplier?.cust_id || "SUP001"}
+              </Text>
+              <Text style={styles.sectionLabel}>Supplier GSTIN:</Text>
+              <Text style={styles.sectionValue}>
+                {purchaseOrder?.supplier?.gst_number?.[0] || 
+                 purchaseOrder?.supplierBillGSTIN || "N/A"}
+              </Text>
+              <Text style={styles.sectionLabel}>Supplier PAN No.:</Text>
+              <Text style={styles.sectionValue}>
+                {purchaseOrder?.supplier?.pan_number || "FGHIJ5678K"}
+              </Text>
+              <Text style={styles.sectionLabel}>Supplier Email:</Text>
+              <Text style={styles.sectionValue}>
+                {purchaseOrder?.supplier?.email_id?.[0] || 
+                 purchaseOrder?.supplierEmail || "supplier@email.com"}
+              </Text>
+            </View>
+            {/* <View style={styles.dateSection}>
+              
+
+              
+            </View> */}
           </View>
 
           {/* Row 2: Supplier Details */}
-          <View style={styles.headerRow}>
-            <View style={styles.supplierSection}>
-              <Text style={styles.sectionLabel}>Supplier Code:</Text>
-              <Text style={styles.sectionValue}>SUP001</Text>
-            </View>
-            <View style={styles.gstinSection}>
-              <Text style={styles.sectionLabel}>Supplier Name:</Text>
-              <Text style={styles.sectionValue}>
-                {purchaseOrder?.supplierName || "Supplier Name"}
-              </Text>
-            </View>
-            <View style={styles.panSection}>
-              <Text style={styles.sectionLabel}>Supplier Address:</Text>
-              <Text style={styles.sectionValue}>
-                {purchaseOrder?.supplierShippedTo || "Supplier Address"}
-              </Text>
-            </View>
-          </View>
 
           {/* Row 3: Email */}
-          <View style={styles.emailSection}>
-            <Text style={styles.sectionLabel}>Supplier Email:</Text>
-            <Text style={styles.sectionValue}>
-              {purchaseOrder?.supplierEmail || "supplier@email.com"}
-            </Text>
-          </View>
+          {/* <View style={styles.emailSection}></View> */}
 
           {/* Row 4: Subject */}
           <View style={styles.subjectSection}>
-            <Text style={styles.sectionLabel}>Subject:</Text>
+            <Text style={styles.sectionLabel}>
+              Subject: Purchasing of Items
+            </Text>
             <Text style={styles.sectionValue}>Dear Sir,</Text>
-          </View>
-
-          {/* Row 5: Terms */}
-          <View style={styles.termsSection}>
             <Text style={styles.sectionValue}>
               We are pleased to place an order for the below mentioned goods as
               per the terms & conditions enclosed.
@@ -361,10 +379,17 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
           <View style={styles.tableRow}>
             <Text style={styles.colSno}>1</Text>
             <Text style={styles.colItem}>
-              {purchaseOrder?.itemName || "Sample Item"}
+              {purchaseOrder?.product?.name || 
+               purchaseOrder?.itemName || "Sample Item"}
             </Text>
-            <Text style={styles.colItemCode}>ITM001</Text>
-            <Text style={styles.colHsnCode}>1234</Text>
+            <Text style={styles.colItemCode}>
+              {purchaseOrder?.product?.product_id || 
+               purchaseOrder?.product?.item_code || "ITM001"}
+            </Text>
+            <Text style={styles.colHsnCode}>
+              {purchaseOrder?.product?.hsn_code || 
+               purchaseOrder?.product?.hsn || "1234"}
+            </Text>
             <Text style={styles.colQty}>{quantity}</Text>
             <Text style={styles.colRate}>₹{itemRate.toFixed(2)}</Text>
             <Text style={styles.colAmount}>₹{baseAmount.toFixed(2)}</Text>
@@ -433,8 +458,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
           </Text>
         </View>
 
-        {/* Terms & Conditions */}
-        <View style={styles.termsConditionsSection}>
+        {/* <View style={styles.termsConditionsSection}>
           <Text style={styles.termsTitle}>TERMS & CONDITIONS</Text>
           <Text style={styles.termsList}>
             1) GST @ 9% and SGST @ 9%{"\n"}
@@ -443,7 +467,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             4) Mode of Payment: {purchaseOrder?.modeOfPayment || "Net Banking"}
             {"\n"}
             5) Delivery Add{"\n"}
-            6) Delivery Period{"\n"}
+            6) Delivery Period{"\n"}  
             7) Billing Address:{" "}
             {purchaseOrder?.billingAddress || "Same as above"}
             {"\n"}
@@ -452,7 +476,6 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
           </Text>
         </View>
 
-        {/* Remarks */}
         <View style={styles.remarksSection}>
           <Text style={styles.remarksTitle}>REMARK:</Text>
           <Text style={styles.remarksText}>
@@ -462,7 +485,6 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
           </Text>
         </View>
 
-        {/* Important */}
         <View style={styles.importantSection}>
           <Text style={styles.importantTitle}>IMPORTANT:</Text>
           <Text style={styles.importantText}>
@@ -477,7 +499,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             6) Please Deposit CGST/SGST and send us documentary evidence to
             enable us to process your payment.
           </Text>
-        </View>
+        </View> */}
       </Page>
     </Document>
   );

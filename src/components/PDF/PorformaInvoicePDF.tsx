@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     minHeight: 40,
   },
   termsPaymentSection: {
-    width: "33.33%",
+    width: "25%",
     padding: 8,
     minHeight: 40,
   },
@@ -218,18 +218,18 @@ const toWords = new ToWords({
 
 const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
   const subtotal = proformaInvoice?.subtotal || 0;
-  const cgst = (subtotal * 9) / 100; // Assuming 9% CGST
-  const sgst = (subtotal * 9) / 100; // Assuming 9% SGST
+  const cgst = (subtotal * 9) / 100;
+  const sgst = (subtotal * 9) / 100;
   const total = subtotal + cgst + sgst;
 
+
+  console.log(proformaInvoice);
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <Text style={styles.title}>PROFORMA INVOICE</Text>
 
-        {/* Header Section */}
         <View style={styles.headerSection}>
-          {/* Row 1: Seller, Invoice No, Issue Date */}
           <View style={styles.headerRow}>
             <View style={styles.sellerSection}>
               <Text style={styles.sectionLabel}>Seller</Text>
@@ -238,39 +238,42 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
             <View style={styles.invoiceNoSection}>
               <Text style={styles.sectionLabel}>Invoice No.</Text>
               <Text style={styles.sectionValue}>
-                {proformaInvoice?.invoiceNo || "N/A"}
+                {proformaInvoice?.proforma_invoice_no || "N/A"}
               </Text>
             </View>
             <View style={styles.issueDateSection}>
               <Text style={styles.sectionLabel}>Issue Date:</Text>
               <Text style={styles.sectionValue}>
-                {proformaInvoice?.created_on
-                  ? new Date(proformaInvoice.created_on).toLocaleDateString()
+                {proformaInvoice?.sales_order_date
+                  ? new Date(
+                      proformaInvoice.sales_order_date
+                    ).toLocaleDateString()
                   : "N/A"}
               </Text>
             </View>
           </View>
 
-          {/* Row 2: Buyer Reference No, Due Date */}
           <View style={styles.headerRow}>
             <View style={styles.buyerSection}>
               <Text style={styles.sectionLabel}>Buyer</Text>
               <Text style={styles.sectionValue}>
-                {proformaInvoice?.customer || "N/A"}
+                {proformaInvoice?.buyer?.company_name ||
+                  proformaInvoice?.buyer?.consignee_name?.[0] ||
+                  proformaInvoice?.buyer?.name ||
+                  proformaInvoice?.customer ||
+                  "N/A"}
               </Text>
             </View>
             <View style={styles.buyerRefSection}>
               <Text style={styles.sectionLabel}>Buyer Reference No.</Text>
               <Text style={styles.sectionValue}>
-                {proformaInvoice?.buyerRefNo || "N/A"}
+                {proformaInvoice?.buyer?.cust_id || "N/A"}
               </Text>
             </View>
-            <View style={styles.dueDateSection}>
-              <Text style={styles.sectionLabel}>Due Date:</Text>
+            <View style={styles.termsPaymentSection}>
+              <Text style={styles.sectionLabel}>Method of Payment</Text>
               <Text style={styles.sectionValue}>
-                {proformaInvoice?.dueDate
-                  ? new Date(proformaInvoice.dueDate).toLocaleDateString()
-                  : "N/A"}
+                {proformaInvoice?.tax?.tax_name || "N/A"}
               </Text>
             </View>
           </View>
@@ -288,7 +291,7 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
           </View> */}
 
           {/* Row 4: Method of Dispatch, Type of Shipment, Terms/Method of Payment */}
-          <View style={styles.headerRow}>
+          {/* <View style={styles.headerRow}>
             <View style={styles.methodDispatchSection}>
               <Text style={styles.sectionLabel}>Method of Dispatch</Text>
               <Text style={styles.sectionValue}>
@@ -300,13 +303,13 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
               <Text style={styles.sectionValue}>
                 {proformaInvoice?.typeOfShipment || "N/A"}
               </Text>
-            </View>
-            {/* <View style={styles.termsPaymentSection}>
+            </View> 
+             <View style={styles.termsPaymentSection}>
               <Text style={styles.sectionLabel}>Terms/Method of Payment</Text>
               <Text style={styles.sectionValue}>
                 {proformaInvoice?.termsPayment || "N/A"}
               </Text>
-            </View> */}
+            </View> 
             <View style={styles.deliveryDateSection}>
               <Text style={styles.sectionLabel}>Delivery Date</Text>
               <Text style={styles.sectionValue}>
@@ -315,10 +318,10 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
                   : "N/A"}
               </Text>
             </View>
-          </View>
+          </View> */}
 
           {/* Row 5: Port of Loading, Port of Discharge */}
-          <View style={styles.headerRow}>
+          {/* <View style={styles.headerRow}>
             <View style={styles.portLoadingSection}>
               <Text style={styles.sectionLabel}>Port of Loading</Text>
               <Text style={styles.sectionValue}>
@@ -331,13 +334,15 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
                 {proformaInvoice?.portOfDischarge || "N/A"}
               </Text>
             </View>
-            <View style={styles.termsPaymentSection}>
-              <Text style={styles.sectionLabel}>Terms/Method of Payment</Text>
+            <View style={styles.dueDateSection}>
+              <Text style={styles.sectionLabel}>Due Date:</Text>
               <Text style={styles.sectionValue}>
-                {proformaInvoice?.termsPayment || "N/A"}
+                {proformaInvoice?.dueDate
+                  ? new Date(proformaInvoice.dueDate).toLocaleDateString()
+                  : "N/A"}
               </Text>
             </View>
-          </View>
+          </View> */}
         </View>
 
         {/* Product Table */}
@@ -352,23 +357,31 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
             <Text style={styles.colAmount}>Amount</Text>
           </View>
 
-          <View style={styles.tableRow}>
-            <Text style={styles.colSno}>{proformaInvoice?.unitSno || "1"}</Text>
-            <Text style={styles.colName}>
-              {proformaInvoice?.unitName || "1"}
-            </Text>
-            <Text style={styles.colUnitQty}>
-              {proformaInvoice?.unitQuantity || "10"}
-            </Text>
-            <Text style={styles.colUnitType}>
-              {proformaInvoice?.unitType || "Piece"}
-            </Text>
-            <Text style={styles.colPrice}>₹{(subtotal || 0).toFixed(2)}</Text>
-            <Text style={styles.colTax}>
-              {proformaInvoice?.unitTax || "18%"}
-            </Text>
-            <Text style={styles.colAmount}>₹{(subtotal || 0).toFixed(2)}</Text>
-          </View>
+          {proformaInvoice?.items?.map((item: any, index: number) => (
+            <View key={index} style={styles.tableRow}>
+              <Text style={styles.colSno}>{index + 1}</Text>
+              <Text style={styles.colName}>{item?.name || "N/A"}</Text>
+              <Text style={styles.colUnitQty}>{item?.quantity || "0"}</Text>
+              <Text style={styles.colUnitType}>{"Piece"}</Text>
+              <Text style={styles.colPrice}>
+                ₹{(item?.amount || 0).toFixed(2)}
+              </Text>
+              <Text style={styles.colTax}>
+                {proformaInvoice?.tax?.tax_name || "18%"}
+              </Text>
+              <Text style={styles.colAmount}>₹{total.toFixed(2)}</Text>
+            </View>
+          )) || (
+            <View style={styles.tableRow}>
+              <Text style={styles.colSno}>1</Text>
+              <Text style={styles.colName}>No items found</Text>
+              <Text style={styles.colUnitQty}>0</Text>
+              <Text style={styles.colUnitType}>Piece</Text>
+              <Text style={styles.colPrice}>₹0.00</Text>
+              <Text style={styles.colTax}>0%</Text>
+              <Text style={styles.colAmount}>₹0.00</Text>
+            </View>
+          )}
 
           {/* Empty rows for spacing */}
           {[...Array(3)].map((_, i) => (
@@ -397,7 +410,7 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
           <View style={styles.additionalInfoSection}>
             <Text style={styles.sectionLabel}>Additional Info</Text>
             <Text style={styles.sectionValue}>
-              {proformaInvoice?.additionalInfo || "N/A"}
+              {proformaInvoice?.note || "N/A"}
             </Text>
           </View>
           <View style={styles.amountDetailsSection}>

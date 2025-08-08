@@ -67,13 +67,10 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
 
       setProductOptions(productOptions);
       setProducts(finishedGoods);
-
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
   };
-
-
 
   const onChangeHandler = (ind: number, name: string, value: any) => {
     const inputsArr = [...inputs];
@@ -117,7 +114,8 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
 
   useEffect(() => {
     fetchItemsHandler();
-  }, [])
+  }, []);
+
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
@@ -127,8 +125,8 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#d3d3d3" : "#FFF", // dark gray on focus, light gray default
-      color: "#000", // text color
+      backgroundColor: state.isFocused ? "#d3d3d3" : "#FFF",
+      color: "#000",
     }),
     multiValue: (provided: any) => ({
       ...provided,
@@ -137,17 +135,18 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
     }),
     menu: (provided: any) => ({
       ...provided,
-      zIndex: 9999, // ensures dropdown doesn't get hidden
+      zIndex: 9999,
     }),
     placeholder: (provided: any) => ({
       ...provided,
-      color: "#000", // light gray placeholder
+      color: "#000",
     }),
     singleValue: (provided: any) => ({
       ...provided,
       color: "#100", // ensures selected value is white
     }),
   };
+
   return (
     <div>
       <div>
@@ -179,7 +178,7 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
               <FormLabel color="black">Quantity</FormLabel>
               <Input
                 className="text-gray-600"
-                value={input.quantity}
+                value={input.quantity === 0 ? "" : input.quantity} 
                 onChange={(e) => onChangeHandler(ind, "quantity", e.target.value)}
                 type="number"
                 isDisabled={!input.item?.value}
@@ -190,7 +189,7 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
               <FormLabel color="black">Price</FormLabel>
               <Input
                 className="text-gray-600"
-                value={input.price}
+                value={input.price === 0 ? "" : input.price} 
                 onChange={(e) => onChangeHandler(ind, "price", e.target.value)}
                 type="number"
                 isDisabled={!input.item?.value}
