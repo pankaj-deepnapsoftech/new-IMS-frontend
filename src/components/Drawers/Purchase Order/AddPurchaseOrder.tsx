@@ -100,10 +100,10 @@ interface PurchaseOrderFormValues {
   supplierShippedGSTIN: string;
   supplierBillGSTIN: string;
   GSTApply: string;
-  packagingAndForwarding: string;
-  freightCharges: string;
+  // packagingAndForwarding: string;
+  // freightCharges: string;
   modeOfPayment: string;
-  deliveryPeriod: string;
+  // deliveryPeriod: string;
   billingAddress: string;
   paymentTerms: string;
   additionalRemarks: string;
@@ -155,10 +155,10 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     supplierShippedGSTIN: Yup.string().required("Shipped GSTIN is required"),
     supplierBillGSTIN: Yup.string().required("Bill GSTIN is required"),
     GSTApply: Yup.string().required("GST selection is required"),
-    packagingAndForwarding: Yup.string(),
-    freightCharges: Yup.string(),
+    // packagingAndForwarding: Yup.string(),
+    // freightCharges: Yup.string(),
     modeOfPayment: Yup.string().required("Mode of payment is required"),
-    deliveryPeriod: Yup.string(),
+    // deliveryPeriod: Yup.string(),
     billingAddress: Yup.string(),
     paymentTerms: Yup.string(),
     itemName: Yup.string().required("Item name is required"),
@@ -183,10 +183,10 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
       supplierShippedGSTIN: edittable?.supplierShippedGSTIN || "",
       supplierBillGSTIN: edittable?.supplierBillGSTIN || "",
       GSTApply: edittable?.GSTApply || "",
-      packagingAndForwarding: edittable?.packagingAndForwarding || "",
-      freightCharges: edittable?.freightCharges || "",
+      // packagingAndForwarding: edittable?.packagingAndForwarding || "",
+      // freightCharges: edittable?.freightCharges || "",
       modeOfPayment: edittable?.modeOfPayment || "",
-      deliveryPeriod: edittable?.deliveryPeriod || "",
+      // deliveryPeriod: edittable?.deliveryPeriod || "",
       billingAddress: edittable?.billingAddress || "",
       paymentTerms: edittable?.paymentTerms || "",
       additionalRemarks: edittable?.additionalRemarks || "",
@@ -435,7 +435,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                     templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
                     gap={6}
                   >
-                    <GridItem>
+                    {/* <GridItem>
                       <FormControl isInvalid={hasError("poOrder")}>
                         <FormLabel
                           display="flex"
@@ -469,7 +469,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                           </Text>
                         )}
                       </FormControl>
-                    </GridItem>
+                    </GridItem> */}
 
                     <GridItem>
                       <FormControl isInvalid={hasError("date")}>
