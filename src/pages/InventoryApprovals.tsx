@@ -45,34 +45,33 @@ const InventoryApprovals: React.FC = () => {
     }
   };
 
- const approveRmHandler = async (id: string) => {
-  try {
-    const response = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}bom/approve/inventory/raw-materials`,
-      {
-        method: "POST", // 👈 Specify HTTP method
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ _id: id }),
+  const approveRmHandler = async (id: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}bom/approve/inventory/raw-materials`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ _id: id }),
+        }
+      );
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message);
       }
-    );
 
-    const data = await response.json();
+      toast.success("Raw material approved successfully!");
 
-    if (!data.success) {
-      throw new Error(data.message || "Failed to approve raw material.");
+      // ✅ Re-fetch the list to get updated statuses
+      fetchInventoryHandler();
+    } catch (err: any) {
+      toast.error(err?.message || "Something went wrong");
     }
-
-    toast.success("Raw material approved successfully!");
-
-    // ✅ Re-fetch the list to get updated statuses
-    fetchInventoryHandler();
-  } catch (err: any) {
-    toast.error(err?.message || "Something went wrong");
-  }
-};
-
+  };
 
 
   useEffect(() => {
