@@ -62,7 +62,7 @@ const SalesTable = ({
     return <EmptyData />;
   }
 
-  // console.log(filteredPurchases)
+  console.log(filteredPurchases)
 
   return (
     <div className="space-y-4 bg-[#f8f9fa]">

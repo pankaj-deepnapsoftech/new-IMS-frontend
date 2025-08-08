@@ -46,7 +46,7 @@ const Process: React.FC = () => {
       if (!data.success) {
         throw new Error(data.message);
       }
-
+console.log("dataprodcut", data)
       setData(data.production_processes);
       setFilteredData(data.production_processes);
     } catch (error: any) {
@@ -128,6 +128,7 @@ const Process: React.FC = () => {
             ?.join("")
             ?.includes(searchText?.replaceAll("/", "") || ""))
     );
+    console.log("search results", results);
     setFilteredData(results);
   }, [searchKey]);
 
@@ -289,7 +290,7 @@ const Process: React.FC = () => {
         >
           <ProcessTable
             isLoadingProcess={isLoading}
-            process={filteredData}
+            proces={filteredData}
             deleteProcessHandler={deleteProcessHandler}
             openUpdateProcessDrawerHandler={openUpdateProcessDrawerHandler}
           />

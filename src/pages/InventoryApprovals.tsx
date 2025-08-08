@@ -23,7 +23,7 @@ const InventoryApprovals: React.FC = () => {
       setIsLoadingInventory(true);
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL +
-          "bom/unapproved/inventory/raw-materials",
+        "bom/all/inventory/raw-materials",
         {
           method: "GET",
           headers: {
@@ -35,6 +35,7 @@ const InventoryApprovals: React.FC = () => {
       if (!results.success) {
         throw new Error(results?.message);
       }
+      console.log("Inventory Data:", results);
       setData(results.unapproved);
       setFilteredData(results.unapproved);
     } catch (error: any) {
@@ -47,29 +48,31 @@ const InventoryApprovals: React.FC = () => {
   const approveRmHandler = async (id: string) => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL +
-          "bom/approve/inventory/raw-materials",
+        `${process.env.REACT_APP_BACKEND_URL}bom/approve/inventory/raw-materials`,
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${cookies?.access_token}`,
-            "content-type": `application/json`,
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            _id: id,
-          }),
+          body: JSON.stringify({ _id: id }),
         }
       );
+
       const data = await response.json();
       if (!data.success) {
         throw new Error(data.message);
       }
+
+      toast.success("Raw material approved successfully!");
+
+      // ✅ Re-fetch the list to get updated statuses
       fetchInventoryHandler();
-      toast.success(data.message);
     } catch (err: any) {
       toast.error(err?.message || "Something went wrong");
     }
   };
+
 
   useEffect(() => {
     fetchInventoryHandler();
@@ -91,19 +94,19 @@ const InventoryApprovals: React.FC = () => {
       const role = emp?.role?.role?.toString().toLowerCase() || "";
       const createdAt = emp?.createdAt
         ? new Date(emp.createdAt)
-            .toISOString()
-            .substring(0, 10)
-            .split("-")
-            .reverse()
-            .join("")
+          .toISOString()
+          .substring(0, 10)
+          .split("-")
+          .reverse()
+          .join("")
         : "";
       const updatedAt = emp?.updatedAt
         ? new Date(emp.updatedAt)
-            .toISOString()
-            .substring(0, 10)
-            .split("-")
-            .reverse()
-            .join("")
+          .toISOString()
+          .substring(0, 10)
+          .split("-")
+          .reverse()
+          .join("")
         : "";
 
       return (
@@ -241,6 +244,7 @@ const InventoryApprovals: React.FC = () => {
             isLoadingProducts={isLoadingInventory}
             approveProductHandler={approveRmHandler}
           />
+
         </div>
       </div>
     </div>
