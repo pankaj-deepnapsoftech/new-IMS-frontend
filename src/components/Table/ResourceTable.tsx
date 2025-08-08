@@ -61,6 +61,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
   const [cookies] = useCookies();
   const columns = useMemo(
     () => [
+      { Header: "CustomId", accessor: "customid" },
       { Header: "Name", accessor: "name" },
       { Header: "Type", accessor: "type" },
       { Header: "Specification", accessor: "specification" },
@@ -323,6 +324,12 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
+                      Custom Id
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
                       Name
                     </th>
                     <th
@@ -408,6 +415,13 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                             />
                           </td>
                         )}
+                        <td
+                          className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
+                          style={{ color: colors.text.primary }}
+                          title={row.original?.customId}
+                        >
+                          {row.original?.customId || "—"}
+                        </td>
                         <td
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
                           style={{ color: colors.text.primary }}

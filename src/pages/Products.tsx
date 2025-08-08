@@ -266,7 +266,6 @@ const Products: React.FC = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-
       toast.success('Sample template downloaded!');
     } catch (error: any) {
       toast.error(error?.message || "Download failed");

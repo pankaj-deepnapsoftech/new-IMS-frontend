@@ -42,6 +42,7 @@ const AddBom: React.FC<AddBomProps> = ({
   const [rawMaterialsOptions, setRawMaterialsOptions] = useState<
     { value: string; label: string }[]
   >([]);
+  const [manPowerOptions, setManPowerOptions] = useState<{ value: string; label: string }[]>([]);
 
   const [finishedGood, setFinishedGood] = useState<
     { value: string; label: string } | undefined
@@ -70,8 +71,11 @@ const AddBom: React.FC<AddBomProps> = ({
   const [electricityCharges, setElectricityCharges] = useState<
     number | undefined
   >();
+  const [selectedManPower, setSelectedManPower] = useState<any | null>(null);
+  const [manPowerList, setManPowerList] = useState<any[]>([]);
   const [otherCharges, setOtherCharges] = useState<number | undefined>();
   const [resources, setResources] = useState<any[]>([]);
+  const [empData, setEmpData] = useState<any[]>([]);
   const [resourceOptions, setResourceOptions] = useState<{ value: string; label: string }[]>([]);
   const [selectedResources, setSelectedResources] = useState([
     { name: null, type: null, specification: "" },
@@ -124,6 +128,25 @@ const AddBom: React.FC<AddBomProps> = ({
     { value: "inch", label: "inch" },
     { value: "mtr", label: "mtr" },
   ];
+  const [manpower, setManpower] = useState([{ user: null }]);
+
+  const handleAddManpower = () => {
+    setManpower([...manpower, { user: null }]);
+  };
+
+  const handleRemoveManpower = (index) => {
+    const updated = [...manpower];
+    updated.splice(index, 1);
+    setManpower(updated);
+  };
+
+  const handleManpowerChange = (index, key, value) => {
+    const updated = [...manpower];
+    updated[index][key] = value;
+    setManpower(updated);
+  };
+
+
 
   const addBomHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -196,6 +219,8 @@ const AddBom: React.FC<AddBomProps> = ({
         electricity_charges: electricityCharges || 0,
         other_charges: otherCharges || 0,
       },
+      manpower: manpower.map(mp => ({ user: mp.user })),
+
       remarks: remarks,
       resources: selectedResources.map((r) => ({
         resource_id: r.name?.value,
@@ -262,7 +287,36 @@ const AddBom: React.FC<AddBomProps> = ({
       if (!results.success) {
         throw new Error(results?.message);
       }
-      setResources(results.resources); // Instead of setProducts
+      setResources(results.resources);  
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  };  
+                                                                           
+  const fetchEmployeeHandler = async () => {
+    try {
+      setIsLoadingProducts(true);
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "auth/all",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const results = await response.json();
+      if (!results.success) {
+        throw new Error(results?.message);
+      }
+      const manPowerUsers = results?.users?.filter(
+        (user: any) =>
+          user.role?.role?.toLowerCase().includes("man power")
+      );
+
+      setEmpData(manPowerUsers);
 
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
@@ -270,10 +324,9 @@ const AddBom: React.FC<AddBomProps> = ({
       setIsLoadingProducts(false);
     }
   };
-  // console.log(products)
+
   const onFinishedGoodChangeHandler = (d: any) => {
     setFinishedGood(d);
-
     const product: any = products.find((prd: any) => prd._id === d.value);
 
     if (product) {
@@ -319,6 +372,7 @@ const AddBom: React.FC<AddBomProps> = ({
   useEffect(() => {
     fetchProductsHandler();
     fetchResourceHandler();
+    fetchEmployeeHandler();
   }, []);
 
   useEffect(() => {
@@ -396,6 +450,20 @@ const AddBom: React.FC<AddBomProps> = ({
     setResourceOptions(resourceOptions);
   }, [resources]);
 
+  useEffect(() => {
+    if (!empData || empData.length === 0) return;
+
+    const filtered = empData.filter((emp) =>
+      emp.role?.role?.toLowerCase().includes("man power")
+    );
+
+    const options = filtered.map((emp) => ({
+      value: emp._id,
+      label: `${emp.first_name} ${emp.last_name}`,
+    }));
+
+    setManPowerOptions(options);
+  }, [empData]);
 
 
 
@@ -934,6 +1002,56 @@ const AddBom: React.FC<AddBomProps> = ({
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Manpower Section */}
+              <div className="bg-white border-b">
+                <div className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Manpower</h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    {manpower.map((entry, index) => (
+                      <div key={index} className="flex gap-4 items-center">
+                        {/* Dropdown for Man Power Employee */}
+                        <Select
+                          styles={customStyles}
+                          options={manPowerOptions}
+                          placeholder="Select Employee"
+                          value={manPowerOptions.find(opt => opt.value === entry.user)}
+                          onChange={(option) =>
+                            handleManpowerChange(index, 'user', option?.value)
+                          }
+                          className="flex-1"
+                        />
+
+                        {/* Remove Button */}
+                        {manpower.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveManpower(index)}
+                            className="text-red-600 hover:text-red-800"
+                            title="Remove"
+                          >
+                            ❌
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Add Button */}
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={handleAddManpower}
+                      className="px-3 py-1 flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded"
+                    >
+                      <Plus size={16} /> Add Manpower
+                    </button>
                   </div>
                 </div>
               </div>
