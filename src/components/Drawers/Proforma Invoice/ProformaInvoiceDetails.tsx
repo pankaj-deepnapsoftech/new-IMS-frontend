@@ -31,6 +31,8 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   const [store, setStore] = useState<string | undefined>();
   const [tax, setTax] = useState<any | undefined>();
   const [creator, setCreator] = useState<any | undefined>();
+  const [buyerData, setBuyerData] = useState<any | undefined>();
+
   const taxOptions = [
     { value: 0.18, label: "GST 18%" },
     { value: 0, label: "No Tax 0%" },
@@ -61,7 +63,16 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
       setItems(data.proforma_invoice.items);
       setStore(data.proforma_invoice.store.name);
       setCategory(data.proforma_invoice.category);
-      setBuyer(data.proforma_invoice?.buyer?.name);
+      const buyerData = data.proforma_invoice?.buyer;
+      setBuyerData(buyerData);
+      setBuyer(
+        buyerData?.company_name ||
+        buyerData?.consignee_name?.[0] ||
+        buyerData?.name ||
+        "Unnamed Buyer"
+      );
+
+
       setSupplier(data.proforma_invoice?.supplier?.name);
       setCreator(data.proforma_invoice.creator);
     } catch (error: any) {
@@ -128,14 +139,28 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                 <h3 className="font-semibold text-gray-700 mb-2">Category</h3>
                 <p className="text-gray-600">{category?.toUpperCase()}</p>
               </div>
-
-              {buyer && (
+              {buyerData && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Buyer</h3>
-                  <p className="text-gray-600">{buyer}</p>
+                  <h3 className="font-semibold text-gray-700 mb-2">Buyer Details</h3>
+                  <p className="text-gray-600 font-medium">
+                    {buyerData.company_name ||
+                      buyerData.consignee_name?.[0] ||
+                      buyerData.name}
+                  </p>
+                  {buyerData.address && (
+                    <p className="text-gray-600">{buyerData.address}</p>
+                  )}
+                  {buyerData.gst_number && (
+                    <p className="text-gray-600">GST: {buyerData.gst_number}</p>
+                  )}
+                  {buyerData.phone && (
+                    <p className="text-gray-600">Phone: {buyerData.phone}</p>
+                  )}
                 </div>
               )}
 
+
+{/* 
               {supplier && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <h3 className="font-semibold text-gray-700 mb-2">
@@ -143,7 +168,7 @@ const ProformaInvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                   </h3>
                   <p className="text-gray-600">{supplier}</p>
                 </div>
-              )}
+              )} */}
 
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <h3 className="font-semibold text-gray-700 mb-2">

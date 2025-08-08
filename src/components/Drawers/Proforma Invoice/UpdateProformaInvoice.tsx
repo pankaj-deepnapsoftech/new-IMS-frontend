@@ -141,10 +141,13 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
       }
 
       if (data.proforma_invoice.buyer?._id) {
+        const b = data.proforma_invoice.buyer;
         setBuyer({
-          value: data.proforma_invoice.buyer._id,
-          label: data.proforma_invoice.buyer.name,
+          value: b._id,
+          label: b.company_name || b.consignee_name?.[0] || b.name || "Unnamed Buyer",
         });
+      
+
       } else if (data.proforma_invoice.supplier?._id) {
         setSupplier({
           value: data.proforma_invoice.supplier._id,
@@ -220,7 +223,11 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
         }));
 
       setBuyerOptions(formattedBuyers);
-      setBuyers(data.data);
+      setBuyers(formattedBuyers);
+
+      if (formattedBuyers.length === 1) {
+        setBuyer(formattedBuyers[0]);
+      }
     } catch (error: any) {
       const errorMessage = error?.message || "Failed to fetch buyers";
       console.error("Buyers Fetch Error:", error);
@@ -230,7 +237,7 @@ const UpdateProformaInvoice: React.FC<UpdateProformaInvoiceProps> = ({
       setIsLoadingBuyers(false);
     }
   };
-
+console.log(buyer)
 
   const fetchSuppliersHandler = async () => {
     try {

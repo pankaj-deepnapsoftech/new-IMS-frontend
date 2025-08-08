@@ -114,10 +114,10 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       setBuyerOptions(formattedBuyers);
       setBuyers(formattedBuyers);
 
-      // If you want the first buyer to be pre-selected:
-      // if (formattedBuyers.length > 0) {
-      //   setBuyer(formattedBuyers[0]); // default to first buyer in the list
-      // }
+      if (formattedBuyers.length === 1) {
+        setBuyer(formattedBuyers[0]);
+      }
+
 
     } catch (error: any) {
       const errorMessage = error?.message || "Failed to fetch buyers";
@@ -163,7 +163,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
     }
   };
 
-
+  console.log(buyer)
   // Fetch all stores
   const fetchStoresHandler = async () => {
     try {
