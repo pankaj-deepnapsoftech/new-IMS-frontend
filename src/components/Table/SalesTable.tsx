@@ -303,7 +303,7 @@ const SalesTable = ({
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 -mt-3">
+          {/* <div className="flex items-center gap-2 -mt-3">
             <span
               className="text-sm font-medium w-40"
               style={{ color: colors.text.secondary }}
@@ -316,7 +316,7 @@ const SalesTable = ({
               value={purchase?.comment || ""}
               rows={2}
             />
-          </div>
+          </div> */}
 
           {/* Action Buttons */}
           {/* <div

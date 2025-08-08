@@ -311,23 +311,32 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             <View style={styles.companySection}>
               <Text style={styles.sectionLabel}>Supplier Name:</Text>
               <Text style={styles.sectionValue}>
-                {purchaseOrder?.supplierName || "Supplier Name"}
+                {purchaseOrder?.supplier?.company_name || 
+                 purchaseOrder?.supplier?.consignee_name?.[0] || 
+                 purchaseOrder?.supplierName || "Supplier Name"}
               </Text>
               <Text style={styles.sectionLabel}>Supplier Address:</Text>
               <Text style={styles.sectionValue}>
-                {purchaseOrder?.supplierShippedTo || "Supplier Address"}
+                {purchaseOrder?.supplier?.address?.[0] || 
+                 purchaseOrder?.supplierShippedTo || "Supplier Address"}
               </Text>
               <Text style={styles.sectionLabel}>Supplier Code:</Text>
-              <Text style={styles.sectionValue}>SUP001</Text>
+              <Text style={styles.sectionValue}>
+                {purchaseOrder?.supplier?.cust_id || "SUP001"}
+              </Text>
               <Text style={styles.sectionLabel}>Supplier GSTIN:</Text>
               <Text style={styles.sectionValue}>
-                {purchaseOrder?.supplierBillGSTIN || "N/A"}
+                {purchaseOrder?.supplier?.gst_number?.[0] || 
+                 purchaseOrder?.supplierBillGSTIN || "N/A"}
               </Text>
               <Text style={styles.sectionLabel}>Supplier PAN No.:</Text>
-              <Text style={styles.sectionValue}>FGHIJ5678K</Text>
+              <Text style={styles.sectionValue}>
+                {purchaseOrder?.supplier?.pan_number || "FGHIJ5678K"}
+              </Text>
               <Text style={styles.sectionLabel}>Supplier Email:</Text>
               <Text style={styles.sectionValue}>
-                {purchaseOrder?.supplierEmail || "supplier@email.com"}
+                {purchaseOrder?.supplier?.email_id?.[0] || 
+                 purchaseOrder?.supplierEmail || "supplier@email.com"}
               </Text>
             </View>
             {/* <View style={styles.dateSection}>
@@ -370,10 +379,17 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
           <View style={styles.tableRow}>
             <Text style={styles.colSno}>1</Text>
             <Text style={styles.colItem}>
-              {purchaseOrder?.itemName || "Sample Item"}
+              {purchaseOrder?.product?.name || 
+               purchaseOrder?.itemName || "Sample Item"}
             </Text>
-            <Text style={styles.colItemCode}>ITM001</Text>
-            <Text style={styles.colHsnCode}>1234</Text>
+            <Text style={styles.colItemCode}>
+              {purchaseOrder?.product?.product_id || 
+               purchaseOrder?.product?.item_code || "ITM001"}
+            </Text>
+            <Text style={styles.colHsnCode}>
+              {purchaseOrder?.product?.hsn_code || 
+               purchaseOrder?.product?.hsn || "1234"}
+            </Text>
             <Text style={styles.colQty}>{quantity}</Text>
             <Text style={styles.colRate}>₹{itemRate.toFixed(2)}</Text>
             <Text style={styles.colAmount}>₹{baseAmount.toFixed(2)}</Text>
