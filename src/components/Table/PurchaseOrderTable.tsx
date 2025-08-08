@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { MdDeleteOutline, MdEdit, MdOutlineVisibility, MdPictureAsPdf } from "react-icons/md";
+import {
+  MdDeleteOutline,
+  MdEdit,
+  MdOutlineVisibility,
+  MdPictureAsPdf,
+} from "react-icons/md";
 import { colors } from "../../theme/colors";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { toast } from "react-toastify";
-import jsPDF from "jspdf";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PurchaseOrderPDF from "../PDF/PurchaseOrderPDF";
 
 interface PurchaseOrder {
   _id: string;
@@ -53,7 +59,10 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
     const intervalId = setInterval(() => {
       if (onRefresh) {
         onRefresh();
-        console.log("Auto-refresh triggered at", new Date().toLocaleTimeString());
+        console.log(
+          "Auto-refresh triggered at",
+          new Date().toLocaleTimeString()
+        );
       }
     }, 30000);
 
@@ -84,7 +93,9 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
           onDelete(id);
         }
       } else {
-        throw new Error(response.data.message || "Failed to delete purchase order");
+        throw new Error(
+          response.data.message || "Failed to delete purchase order"
+        );
       }
     } catch (error: any) {
       console.error("Error deleting purchase order:", error);
@@ -106,44 +117,7 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
     setViewOrder(null);
   };
 
-  // Handle PDF download
-  const handleDownloadPDF = (order: PurchaseOrder) => {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("Purchase Order Details", 20, 20);
-
-    doc.setFontSize(12);
-    let yPosition = 30;
-
-    const fields = [
-      { label: "P.O. Number", value: order.poOrder || "N/A" },
-      { label: "Order Date", value: order.date ? new Date(order.date).toLocaleDateString() : "N/A" },
-      { label: "Item Name", value: order.itemName || "N/A" },
-      { label: "Supplier Name", value: order.supplierName || "N/A" },
-      { label: "Supplier Email", value: order.supplierEmail || "N/A" },
-      { label: "Shipped GSTIN", value: order.supplierShippedGSTIN || "N/A" },
-      { label: "Bill GSTIN", value: order.supplierBillGSTIN || "N/A" },
-      { label: "Shipped To", value: order.supplierShippedTo || "N/A" },
-      { label: "Bill To", value: order.supplierBillTo || "N/A" },
-      { label: "Mode of Payment", value: order.modeOfPayment || "N/A" },
-      { label: "GST Apply", value: order.GSTApply || "N/A" },
-      { label: "Billing Address", value: order.billingAddress || "N/A" },
-      { label: "Additional Information", value: order.additionalImportant || "N/A" },
-      { label: "Created At", value: order.createdAt ? new Date(order.createdAt).toLocaleString() : "N/A" },
-      { label: "Updated At", value: order.updatedAt ? new Date(order.updatedAt).toLocaleString() : "N/A" },
-    ];
-
-    fields.forEach((field) => {
-      doc.text(`${field.label}: ${field.value}`, 20, yPosition);
-      yPosition += 10;
-      if (yPosition > 270) {
-        doc.addPage();
-        yPosition = 20;
-      }
-    });
-
-    doc.save(`purchase_order_${order.poOrder || order._id}.pdf`);
-  };
+  // Handle PDF download - Removed as we'll use PDFDownloadLink component instead
 
   // Sort purchase orders by createdAt in descending order
   const sortedPurchaseOrders = [...filteredPurchaseOrders].sort((a, b) => {
@@ -201,128 +175,227 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
             className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-lg"
             style={{ border: `1px solid ${colors.border.light}` }}
           >
-            <h2 className="text-xl font-bold mb-4" style={{ color: colors.text.primary }}>
+            <h2
+              className="text-xl font-bold mb-4"
+              style={{ color: colors.text.primary }}
+            >
               Purchase Order Details
             </h2>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   P.O. Number
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.poOrder || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Order Date
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
-                  {viewOrder.date ? new Date(viewOrder.date).toLocaleDateString() : "N/A"}
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.date
+                    ? new Date(viewOrder.date).toLocaleDateString()
+                    : "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Item Name
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.itemName || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Supplier Name
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.supplierName || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Supplier Email
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.supplierEmail || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Shipped GSTIN
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.supplierShippedGSTIN || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Bill GSTIN
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.supplierBillGSTIN || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Shipped To
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.supplierShippedTo || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Bill To
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.supplierBillTo || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Mode of Payment
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.modeOfPayment || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   GST Apply
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.GSTApply || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Billing Address
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.billingAddress || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Additional Information
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
                   {viewOrder.additionalImportant || "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Created At
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
-                  {viewOrder.createdAt ? new Date(viewOrder.createdAt).toLocaleString() : "N/A"}
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.createdAt
+                    ? new Date(viewOrder.createdAt).toLocaleString()
+                    : "N/A"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium" style={{ color: colors.text.secondary }}>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
                   Updated At
                 </label>
-                <p className="mt-1 text-sm" style={{ color: colors.text.primary }}>
-                  {viewOrder.updatedAt ? new Date(viewOrder.updatedAt).toLocaleString() : "N/A"}
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.updatedAt
+                    ? new Date(viewOrder.updatedAt).toLocaleString()
+                    : "N/A"}
                 </p>
               </div>
             </div>
@@ -459,211 +532,232 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                   </td>
                 </tr>
               ) : (
-                sortedPurchaseOrders.slice(0, limit).map((order: PurchaseOrder, index: number) => (
-                  <tr
-                    key={order._id || index}
-                    className="transition-colors hover:shadow-sm"
-                    style={{
-                      backgroundColor:
-                        index % 2 === 0
-                          ? colors.background.card
-                          : colors.table.stripe,
-                      borderBottom: `1px solid ${colors.table.border}`,
-                      opacity: deletingId === order._id ? 0.5 : 1,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (deletingId !== order._id) {
-                        e.currentTarget.style.backgroundColor = colors.table.hover;
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (deletingId !== order._id) {
-                        e.currentTarget.style.backgroundColor =
+                sortedPurchaseOrders
+                  .slice(0, limit)
+                  .map((order: PurchaseOrder, index: number) => (
+                    <tr
+                      key={order._id || index}
+                      className="transition-colors hover:shadow-sm"
+                      style={{
+                        backgroundColor:
                           index % 2 === 0
                             ? colors.background.card
-                            : colors.table.stripe;
-                      }
-                    }}
-                  >
-                    <td
-                      className="px-4 py-3 text-sm whitespace-nowrap"
-                      style={{ color: colors.text.secondary }}
+                            : colors.table.stripe,
+                        borderBottom: `1px solid ${colors.table.border}`,
+                        opacity: deletingId === order._id ? 0.5 : 1,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (deletingId !== order._id) {
+                          e.currentTarget.style.backgroundColor =
+                            colors.table.hover;
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (deletingId !== order._id) {
+                          e.currentTarget.style.backgroundColor =
+                            index % 2 === 0
+                              ? colors.background.card
+                              : colors.table.stripe;
+                        }
+                      }}
                     >
-                      {order.poOrder || "N/A"}
-                    </td>
-                    <td
-                      className="px-4 py-3 text-sm whitespace-nowrap"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      {order.date
-                        ? new Date(order.date).toLocaleDateString()
-                        : "N/A"}
-                    </td>
-                    <td
-                      className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
-                      style={{ color: colors.text.primary }}
-                      title={order.itemName || "N/A"}
-                    >
-                      {order.itemName || "N/A"}
-                    </td>
-                    <td
-                      className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
-                      style={{ color: colors.text.primary }}
-                      title={order.supplierName || "N/A"}
-                    >
-                      {order.supplierName || "N/A"}
-                    </td>
-                    <td
-                      className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
-                      style={{ color: colors.text.secondary }}
-                      title={order.supplierEmail || "N/A"}
-                    >
-                      {order.supplierEmail || "N/A"}
-                    </td>
-                    <td
-                      className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
-                      style={{ color: colors.text.secondary }}
-                      title={order.supplierShippedGSTIN || "N/A"}
-                    >
-                      {order.supplierShippedGSTIN || "N/A"}
-                    </td>
-                    <td
-                      className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
-                      style={{ color: colors.text.secondary }}
-                      title={order.supplierBillGSTIN || "N/A"}
-                    >
-                      {order.supplierBillGSTIN || "N/A"}
-                    </td>
-                    <td
-                      className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
-                      style={{ color: colors.text.secondary }}
-                      title={order.supplierShippedTo || "N/A"}
-                    >
-                      {order.supplierShippedTo || "N/A"}
-                    </td>
-                    <td
-                      className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
-                      style={{ color: colors.text.secondary }}
-                      title={order.supplierBillTo || "N/A"}
-                    >
-                      {order.supplierBillTo || "N/A"}
-                    </td>
-                    <td className="px-4 py-3 text-sm whitespace-nowrap">
-                      <span
-                        className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
-                        style={{
-                          backgroundColor: colors.primary[100],
-                          color: colors.primary[700],
-                        }}
+                      <td
+                        className="px-4 py-3 text-sm whitespace-nowrap"
+                        style={{ color: colors.text.secondary }}
                       >
-                        {order.modeOfPayment || "N/A"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm whitespace-nowrap">
-                      <span
-                        className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
-                        style={{
-                          backgroundColor: colors.success[100],
-                          color: colors.success[700],
-                        }}
+                        {order.poOrder || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm whitespace-nowrap"
+                        style={{ color: colors.text.secondary }}
                       >
-                        {order.GSTApply || "N/A"}
-                      </span>
-                    </td>
-                    <td
-                      className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
-                      style={{ color: colors.text.secondary }}
-                      title={order.billingAddress || "N/A"}
-                    >
-                      {order.billingAddress || "N/A"}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => handleView(order)}
-                          className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                        {order.date
+                          ? new Date(order.date).toLocaleDateString()
+                          : "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
+                        style={{ color: colors.text.primary }}
+                        title={order.itemName || "N/A"}
+                      >
+                        {order.itemName || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
+                        style={{ color: colors.text.primary }}
+                        title={order.supplierName || "N/A"}
+                      >
+                        {order.supplierName || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                        style={{ color: colors.text.secondary }}
+                        title={order.supplierEmail || "N/A"}
+                      >
+                        {order.supplierEmail || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                        style={{ color: colors.text.secondary }}
+                        title={order.supplierShippedGSTIN || "N/A"}
+                      >
+                        {order.supplierShippedGSTIN || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                        style={{ color: colors.text.secondary }}
+                        title={order.supplierBillGSTIN || "N/A"}
+                      >
+                        {order.supplierBillGSTIN || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                        style={{ color: colors.text.secondary }}
+                        title={order.supplierShippedTo || "N/A"}
+                      >
+                        {order.supplierShippedTo || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                        style={{ color: colors.text.secondary }}
+                        title={order.supplierBillTo || "N/A"}
+                      >
+                        {order.supplierBillTo || "N/A"}
+                      </td>
+                      <td className="px-4 py-3 text-sm whitespace-nowrap">
+                        <span
+                          className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
                           style={{
-                            color: colors.primary[600],
-                            backgroundColor: colors.primary[50],
+                            backgroundColor: colors.primary[100],
+                            color: colors.primary[700],
                           }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = colors.primary[100];
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = colors.primary[50];
-                          }}
-                          title="View purchase order"
-                          disabled={deletingId === order._id}
                         >
-                          <MdOutlineVisibility size={16} />
-                        </button>
-                        <button
-                          onClick={() => {
-                            console.log("Edit order:", order._id);
-                            if (onEdit) {
-                              onEdit(order);
+                          {order.modeOfPayment || "N/A"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm whitespace-nowrap">
+                        <span
+                          className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
+                          style={{
+                            backgroundColor: colors.success[100],
+                            color: colors.success[700],
+                          }}
+                        >
+                          {order.GSTApply || "N/A"}
+                        </span>
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                        style={{ color: colors.text.secondary }}
+                        title={order.billingAddress || "N/A"}
+                      >
+                        {order.billingAddress || "N/A"}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleView(order)}
+                            className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                            style={{
+                              color: colors.primary[600],
+                              backgroundColor: colors.primary[50],
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.primary[100];
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.primary[50];
+                            }}
+                            title="View purchase order"
+                            disabled={deletingId === order._id}
+                          >
+                            <MdOutlineVisibility size={16} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              console.log("Edit order:", order._id);
+                              if (onEdit) {
+                                onEdit(order);
+                              }
+                            }}
+                            className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                            style={{
+                              color: colors.primary[600],
+                              backgroundColor: colors.primary[50],
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.primary[100];
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.primary[50];
+                            }}
+                            title="Edit purchase order"
+                            disabled={deletingId === order._id}
+                          >
+                            <MdEdit size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(order._id)}
+                            className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                            style={{
+                              color: colors.error[600],
+                              backgroundColor: colors.error[50],
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.error[100];
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.error[50];
+                            }}
+                            title="Delete purchase order"
+                            disabled={deletingId === order._id}
+                          >
+                            {deletingId === order._id ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
+                            ) : (
+                              <MdDeleteOutline size={16} />
+                            )}
+                          </button>
+                          <PDFDownloadLink
+                            document={
+                              <PurchaseOrderPDF purchaseOrder={order} />
                             }
-                          }}
-                          className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                          style={{
-                            color: colors.primary[600],
-                            backgroundColor: colors.primary[50],
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = colors.primary[100];
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = colors.primary[50];
-                          }}
-                          title="Edit purchase order"
-                          disabled={deletingId === order._id}
-                        >
-                          <MdEdit size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(order._id)}
-                          className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                          style={{
-                            color: colors.error[600],
-                            backgroundColor: colors.error[50],
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = colors.error[100];
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = colors.error[50];
-                          }}
-                          title="Delete purchase order"
-                          disabled={deletingId === order._id}
-                        >
-                          {deletingId === order._id ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
-                          ) : (
-                            <MdDeleteOutline size={16} />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => handleDownloadPDF(order)}
-                          className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                          style={{
-                            color: colors.success[600],
-                            backgroundColor: colors.success[50],
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = colors.success[100];
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = colors.success[50];
-                          }}
-                          title="Download PDF"
-                          disabled={deletingId === order._id}
-                        >
-                          <MdPictureAsPdf size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                            fileName={`purchase_order_${
+                              order.poOrder || order._id
+                            }.pdf`}
+                            className="p-2 rounded-lg transition-all duration-200 hover:shadow-md inline-flex items-center"
+                            style={{
+                              color: colors.success[600],
+                              backgroundColor: colors.success[50],
+                              textDecoration: "none",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.success[100];
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.success[50];
+                            }}
+                          >
+                            {({ loading }) =>
+                              loading ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-500"></div>
+                              ) : (
+                                <MdPictureAsPdf size={16} />
+                              )
+                            }
+                          </PDFDownloadLink>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
               )}
             </tbody>
           </table>
