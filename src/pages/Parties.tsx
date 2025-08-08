@@ -11,7 +11,7 @@ import Pagination from "./Pagination";
 import { colors } from "../theme/colors";
 import * as XLSX from 'xlsx';
 import { toast } from "react-toastify";
-import SampleCSV from "../assets/csv/parties-sample.csv"; 
+import SampleCSV from "../assets/csv/parties-sample.csv";
 
 const Parties = () => {
   const [showData, setshowData] = useState(false);
@@ -109,7 +109,7 @@ const Parties = () => {
       toast.success(result.message);
       setShowBulkUploadMenu(false);
       fetchPartiesData(); // Refresh the data
-      
+
       // Reset file input
       if (fileRef.current) {
         fileRef.current.value = "";
@@ -134,7 +134,7 @@ const Parties = () => {
         'Sr. No.': index + 1,
         'Customer ID': party.cust_id || 'N/A',
         'Date Added': party.createdAt ? new Date(party.createdAt).toLocaleDateString() : 'N/A',
-        'Consignee Name':party?.consignee_name?.[0] || "N/A",
+        'Consignee Name': party?.consignee_name?.[0] || "N/A",
         'Company Name': party.company_name || 'N/A',
         'Email': Array.isArray(party.email_id) && party.email_id.length > 0
           ? party.email_id.join(', ')
@@ -154,7 +154,7 @@ const Parties = () => {
       const ws = XLSX.utils.json_to_sheet(excelData);
 
       const colWidths = [
-        { wch: 8 }, 
+        { wch: 8 },
         { wch: 12 },
         { wch: 12 },
         { wch: 20 },
@@ -184,7 +184,7 @@ const Parties = () => {
 
   useEffect(() => {
     fetchPartiesData(page);
-  }, [counter, page,limit]);
+  }, [counter, page, limit]);
 
   return (
     <div
@@ -200,48 +200,39 @@ const Parties = () => {
             borderColor: colors.border.light,
           }}
         >
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
-                <FiUsers className="text-white" size={24} />
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            {/* Title and Icon */}
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 rounded-lg shadow">
+                <FiUsers className="text-white" size={22} />
               </div>
               <div>
-                <h1
-                  className="text-2xl md:text-3xl font-bold"
-                  style={{ color: colors.text.primary }}
-                >
+                <h1 className="text-2xl font-semibold" style={{ color: colors.text.primary }}>
                   Merchant Management
                 </h1>
-                <p
-                  className="text-sm mt-1"
-                  style={{ color: colors.text.secondary }}
-                >
+                <p className="text-sm" style={{ color: colors.text.secondary }}>
                   Manage your buyers and sellers
                 </p>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            {/* Buttons */}
+            <div className="flex flex-wrap sm:flex-nowrap gap-2 text-sm">
+              {/* Add Merchant */}
               <button
                 onClick={() => {
                   setshowData(!showData);
                   setEditTable(null);
                 }}
-                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+                className="flex items-center gap-1 px-3 py-2 text-white font-medium rounded-md transition-all duration-150 hover:shadow focus:outline-none focus:ring-2"
                 style={{
                   backgroundColor: colors.primary[600],
-                  focusRingColor: colors.primary[500],
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.primary[700];
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.primary[600];
-                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.primary[700])}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.primary[600])}
               >
-                <FiPlus size={20} />
-                Add New Merchant
+                <FiPlus size={16} />
+                Add Merchant
               </button>
 
               <button
@@ -266,47 +257,54 @@ const Parties = () => {
               <button
                 onClick={exportToExcel}
                 disabled={isExporting}
-                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-1 px-3 py-2 text-white font-medium rounded-md transition-all duration-150 hover:shadow focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   backgroundColor: colors.success[600],
-                  focusRingColor: colors.success[500],
                 }}
                 onMouseEnter={(e) => {
-                  if (!isExporting) {
-                    e.currentTarget.style.backgroundColor = colors.success[700];
-                  }
+                  if (!isExporting) e.currentTarget.style.backgroundColor = colors.success[700];
                 }}
                 onMouseLeave={(e) => {
-                  if (!isExporting) {
-                    e.currentTarget.style.backgroundColor = colors.success[600];
-                  }
+                  if (!isExporting) e.currentTarget.style.backgroundColor = colors.success[600];
                 }}
               >
-                <FiDownload size={20} />
-                {isExporting ? 'Exporting...' : 'Export to Excel'}
+                <FiDownload size={16} />
+                {isExporting ? 'Exporting...' : 'Export Excel'}
+              </button>
+              {/* Bulk Upload */}
+              <button
+                onClick={() => setShowBulkUploadMenu(true)}
+                className="flex items-center gap-1 px-3 py-2 text-white font-medium rounded-md transition-all duration-150 hover:shadow focus:outline-none focus:ring-2"
+                style={{
+                  backgroundColor: colors.warning[600],
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.warning[700])}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.warning[600])}
+              >
+                <AiFillFileExcel size={16} />
+                Bulk Upload
               </button>
 
+
+
+              {/* Refresh */}
               <button
                 onClick={fetchPartiesData}
-                className="flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                className="flex items-center gap-1 px-3 py-2 rounded-md border transition-all duration-150 hover:shadow-sm focus:outline-none focus:ring-2"
                 style={{
-                  backgroundColor: colors.background.card,
                   borderColor: colors.border.medium,
-                  color: colors.text.secondary,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.card,
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.gray[50];
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    colors.background.card;
-                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.gray[50])}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.background.card)}
               >
-                <MdOutlineRefresh size={20} />
+                <MdOutlineRefresh size={16} />
                 Refresh
               </button>
             </div>
           </div>
+
 
           {/* Search and Filters Row */}
           <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">

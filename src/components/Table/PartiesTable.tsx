@@ -31,10 +31,10 @@ const PartiesTable = ({
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-    const [selectedParties, setSelectedParties] = useState([]);
+  const [selectedParties, setSelectedParties] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
-  const [showCheckBox,setShowCheckBox] = useState(false)
+  const [showCheckBox, setShowCheckBox] = useState(false)
   // const columns = useMemo(() => [
   //     { Header: "Full name", accessor: "full_name" },
   //     { Header: "Email", accessor: "email" },
@@ -75,6 +75,10 @@ const PartiesTable = ({
         searchLower
       ) ||
       (party?.type?.toLowerCase?.() || "").includes(searchLower) ||
+      (party?.cust_id?.toLowerCase?.() || "").includes(searchLower) ||
+      (party?.contact_person_name?.toLowerCase?.() || "").includes(searchLower) ||
+      (party?.shipped_gst_to?.toLowerCase?.() || "").includes(searchLower) ||
+      (party?.bill_gst_to?.toLowerCase?.() || "").includes(searchLower) ||
       (party?.company_name?.toLowerCase?.() || "").includes(searchLower);
 
     const matchType = selectedType ? party?.type === selectedType : true;
@@ -148,9 +152,9 @@ const PartiesTable = ({
 
       const results = await Promise.all(deletePromises);
       const successCount = results.filter(res => res.ok).length;
-      
+
       if (successCount > 0) {
-        setPartiesData(prev => 
+        setPartiesData(prev =>
           prev.filter(party => !selectedParties.includes(party._id))
         );
         toast.success(`Successfully deleted ${successCount} ${successCount === 1 ? 'party' : 'parties'}`);
@@ -158,7 +162,7 @@ const PartiesTable = ({
 
       if (successCount < selectedParties.length) {
         toast.error(`Failed to delete ${selectedParties.length - successCount} ${selectedParties.length - successCount === 1 ? 'party' : 'parties'}`);
-      } 
+      }
 
       setSelectedParties([]);
       setShowBulkDeleteModal(false);
@@ -235,7 +239,7 @@ const PartiesTable = ({
         <div className="flex items-center gap-6">
           <div>
             <h3
-              className="text-lg font-semibold"
+              className="text-lg font -semibold"
               style={{ color: colors.text.primary }}
             >
               {filteredParties.length} Part
@@ -311,7 +315,7 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                { cookies?.role === "admin"  && (<input
+                  {cookies?.role === "admin" && (<input
                     type="checkbox"
                     checked={isAllSelected}
                     ref={(el) => {
@@ -356,7 +360,7 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                 Contact Person Number     
+                  Contact Person Number
                 </th>
 
                 <th
@@ -460,7 +464,7 @@ const PartiesTable = ({
                     className="px-4 py-3 text-sm whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                   >
-               {  cookies.role === "admin" && (    <input
+                    {cookies.role === "admin" && (<input
                       type="checkbox"
                       checked={selectedParties.includes(party._id)}
                       onChange={(e) =>
@@ -510,7 +514,7 @@ const PartiesTable = ({
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
                     style={{ color: colors.text.secondary }}
-                    // title={party.company_name}
+                  // title={party.company_name}
                   >
                     {party.contact_person_name || "N/A"}
                   </td>
@@ -528,7 +532,7 @@ const PartiesTable = ({
                     style={{ color: colors.text.secondary }}
                   >
                     {Array.isArray(party.contact_number) &&
-                    party.contact_number.length > 0
+                      party.contact_number.length > 0
                       ? party.contact_number.join(", ")
                       : "N/A"}
                   </td>
@@ -540,14 +544,14 @@ const PartiesTable = ({
                           party.type === "Customer"
                             ? colors.success[100]
                             : party.type === "Supplier"
-                            ? colors.primary[100]
-                            : colors.gray[100],
+                              ? colors.primary[100]
+                              : colors.gray[100],
                         color:
                           party.type === "Customer"
                             ? colors.success[700]
                             : party.type === "Supplier"
-                            ? colors.primary[700]
-                            : colors.gray[700],
+                              ? colors.primary[700]
+                              : colors.gray[700],
                       }}
                     >
                       {party.type || "N/A"}
@@ -636,7 +640,7 @@ const PartiesTable = ({
                       >
                         <MdEdit size={16} />
                       </button>
-                      <button
+                      {cookies?.role === "admin" && (<button
                         onClick={() => {
                           setshowDeletePage(true);
                           setDeleteId(party._id);
@@ -657,7 +661,7 @@ const PartiesTable = ({
                         title="Delete party"
                       >
                         <MdDeleteOutline size={16} />
-                      </button>
+                      </button>)}
                     </div>
                   </td>
                 </tr>
@@ -668,7 +672,7 @@ const PartiesTable = ({
       </div>
 
       {/* Enhanced Delete Modal */}
-      {showDeletePage &&  cookies?.role ===  "admin" && (
+      {showDeletePage && cookies?.role === "admin" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
             className="w-full max-w-md mx-4 rounded-xl shadow-xl"
@@ -753,7 +757,7 @@ const PartiesTable = ({
       )}
 
       {/* Bulk Delete Modal */}
-      {showBulkDeleteModal &&  cookies?.role ===  "admin"  && (
+      {showBulkDeleteModal && cookies?.role === "admin" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
             className="w-full max-w-md mx-4 rounded-xl shadow-xl"
@@ -835,9 +839,8 @@ const PartiesTable = ({
                 >
                   {isBulkDeleting
                     ? "Deleting..."
-                    : `Delete ${selectedParties.length} ${
-                        selectedParties.length === 1 ? "Party" : "Parties"
-                      }`}
+                    : `Delete ${selectedParties.length} ${selectedParties.length === 1 ? "Party" : "Parties"
+                    }`}
                 </button>
               </div>
             </div>

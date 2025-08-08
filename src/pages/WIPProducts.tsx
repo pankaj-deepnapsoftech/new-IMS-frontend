@@ -16,7 +16,7 @@ import {
   openProductDetailsDrawer,
   openUpdateProductDrawer,
 } from "../redux/reducers/drawersSlice";
-import AddProduct from "../components/Drawers/Product/AddProduct";
+import AddProduct from "../components/Drawers/Product/AddIndirectProduct";
 import UpdateProduct from "../components/Drawers/Product/UpdateProduct";
 import ProductDetails from "../components/Drawers/Product/ProductDetails";
 import WIPProductTable from "../components/Table/WIPProductTable";

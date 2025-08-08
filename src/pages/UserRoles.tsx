@@ -143,11 +143,11 @@ const UserRole: React.FC = () => {
     <div className="min-h-screen bg-gray-50 p-2 lg:p-3">
       {/* Add User Role */}
       {isAddRoleDrawerOpened && (
-        <AddUserRole
+        <AddUserRole  
           fetchUserRolesHandler={fetchRolesHandler}
           closeDrawerHandler={closeAddRoleDrawerHandler}
         />
-      )}
+      )} 
       {/* User Role Details */}
       {isRoleDetailsDrawerOpened && (
         <UserRoleDetails

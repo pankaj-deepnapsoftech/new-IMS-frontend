@@ -112,7 +112,6 @@ const routes = [
     element: <Parties />,
     isSublink: false,
   },
-
   {
     name: "Inventory",
     icon: <MdOutlineShoppingCart />,
@@ -122,7 +121,7 @@ const routes = [
         name: "Direct",
         icon: <SlDirection />,
         path: "direct",
-        element: <Products />,
+        element: <Products />,  
       },
       {
         name: "Indirect",

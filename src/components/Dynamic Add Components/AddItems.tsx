@@ -7,8 +7,8 @@ import { toast } from "react-toastify";
 import Select from 'react-select';
 
 interface AddItemsProps {
-  inputs: { item: { value: string, label: string }, quantity: number, price: number }[] | [],
-  setInputs: (input: any) => void
+  inputs: { item: { value: string, label: string }, quantity: number, price: number }[] | [];
+  setInputs: (input: any) => void;
 }
 
 const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
@@ -47,26 +47,21 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
         throw new Error(results?.message);
       }
 
-    
-      const rwaMaterials = results.products.filter(
-        (product: any) => product.category?.toLowerCase() === "raw materials"
+      const finishedGoods = results.products.filter(
+        (product: any) => product.category?.toLowerCase() === "finished goods"
       );
 
-     
-      const productOptions = rwaMaterials.map((product: any) => ({
+      const productOptions = finishedGoods.map((product: any) => ({
         value: product._id,
         label: product.name,
       }));
 
-      // Set filtered data
       setProductOptions(productOptions);
-      setProducts(rwaMaterials);
-
+      setProducts(finishedGoods);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
   };
-
 
   const onChangeHandler = (ind: number, name: string, value: any) => {
     const inputsArr = [...inputs];
@@ -74,21 +69,20 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
     if (name === 'quantity' && inputsArr[ind].item) {
       const product = products.find(prod => prod._id === inputsArr[ind].item.value);
       inputsArr[ind]["price"] = (+value || 0) * (+product.price || 0);
-      inputsArr[ind]["quantity"] = +value;
-    }
-    else if (name === 'price') {
-      inputsArr[ind]["price"] = +value;
-    }
-    else {
+      inputsArr[ind]["quantity"] = +value || 0; // Ensure quantity is a number, default to 0 if empty
+    } else if (name === 'price') {
+      inputsArr[ind]["price"] = +value || 0; // Ensure price is a number, default to 0 if empty
+    } else {
       inputsArr[ind]["item"] = value;
     }
 
     setInputs(inputsArr);
-  }
+  };
 
   useEffect(() => {
     fetchItemsHandler();
-  }, [])
+  }, []);
+
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
@@ -98,8 +92,8 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#d3d3d3" : "#FFF", // dark gray on focus, light gray default
-      color: "#000", // text color
+      backgroundColor: state.isFocused ? "#d3d3d3" : "#FFF",
+      color: "#000",
     }),
     multiValue: (provided: any) => ({
       ...provided,
@@ -108,17 +102,18 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
     }),
     menu: (provided: any) => ({
       ...provided,
-      zIndex: 9999, // ensures dropdown doesn't get hidden
+      zIndex: 9999,
     }),
     placeholder: (provided: any) => ({
       ...provided,
-      color: "#000", // light gray placeholder
+      color: "#000",
     }),
     singleValue: (provided: any) => ({
       ...provided,
-      color: "#000", // ensures selected value is white
+      color: "#000",
     }),
   };
+
   return (
     <div>
       <div>
@@ -126,13 +121,18 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
           <div key={ind} className="grid grid-cols-3 gap-x-1 gap-y-2">
             <FormControl>
               <FormLabel color="black">Product</FormLabel>
-              <Select styles={customStyles} onChange={(d: any) => onChangeHandler(ind, "item", d)} value={input.item} options={productOptions} />
+              <Select
+                styles={customStyles}
+                onChange={(d: any) => onChangeHandler(ind, "item", d)}
+                value={input.item}
+                options={productOptions}
+              />
             </FormControl>
             <FormControl>
               <FormLabel color="black">Quantity</FormLabel>
               <Input
                 className="text-gray-600"
-                value={input.quantity}
+                value={input.quantity === 0 ? "" : input.quantity} 
                 onChange={(e) => onChangeHandler(ind, "quantity", e.target.value)}
                 type="number"
                 isDisabled={!input.item?.value}
@@ -142,13 +142,12 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
               <FormLabel color="black">Price</FormLabel>
               <Input
                 className="text-gray-600"
-                value={input.price}
+                value={input.price === 0 ? "" : input.price} 
                 onChange={(e) => onChangeHandler(ind, "price", e.target.value)}
                 type="number"
                 isDisabled={!input.item?.value}
               />
             </FormControl>
-
           </div>
         ))}
       </div>
@@ -165,7 +164,7 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
         )}
         <Button
           onClick={addInputHandler}
-          leftIcon={<IoIosAdd className=" hover:text-black" />}
+          leftIcon={<IoIosAdd className="hover:text-black" />}
           variant="outline"
           color="gray.400"
           _hover={{ color: "black", bg: "white" }}

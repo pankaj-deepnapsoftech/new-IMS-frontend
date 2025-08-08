@@ -15,6 +15,7 @@ import moment from "moment";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
 import { useCookies } from "react-cookie";
+import { SquarePen } from "lucide-react";
 
 interface ResourceTableProps {
   resources: Array<{
@@ -30,6 +31,11 @@ interface ResourceTableProps {
   openResourceDetailsDrawerHandler?: (id: string) => void;
   deleteResourceHandler?: (id: string) => void;
   fetchResourcesHandler?: () => void;
+  setEditResource?: (resource: any) => void;
+  editResource?: any;
+  openAddResourceDrawerHandler?: () => void;
+  setAddResourceDrawerOpened?: (isOpen: boolean) => void;
+  bulkDeleteResourcesHandler?: (ids: string[]) => void;
 }
 
 const ResourceTable: React.FC<ResourceTableProps> = ({
@@ -38,6 +44,11 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
   openUpdateResourceDrawerHandler,
   openResourceDetailsDrawerHandler,
   deleteResourceHandler,
+  setEditResource,
+  editResource,
+  openAddResourceDrawerHandler,
+  setAddResourceDrawerOpened,
+  bulkDeleteResourcesHandler,
 }) => {
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
@@ -50,6 +61,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
   const [cookies] = useCookies();
   const columns = useMemo(
     () => [
+      { Header: "CustomId", accessor: "customid" },
       { Header: "Name", accessor: "name" },
       { Header: "Type", accessor: "type" },
       { Header: "Specification", accessor: "specification" },
@@ -59,7 +71,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
     []
   );
 
- console.log("resource data", resources);
+  console.log("resource data", resources);
 
   const {
     getTableProps,
@@ -111,26 +123,14 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
     if (
       isBulkDeleting ||
       selectedResources.length === 0 ||
-      !deleteResourceHandler
+      !bulkDeleteResourcesHandler
     )
       return;
+
     setIsBulkDeleting(true);
 
     try {
-      // Call the delete handler for each selected resource
-      const deletePromises = selectedResources.map((resourceId) =>
-        deleteResourceHandler(resourceId)
-      );
-
-      await Promise.all(deletePromises);
-
-      // Success feedback
-      toast.success(
-        `Successfully deleted ${selectedResources.length} resource${
-          selectedResources.length > 1 ? "s" : ""
-        }`
-      );
-
+      await bulkDeleteResourcesHandler(selectedResources);
       setSelectedResources([]);
       setShowBulkDeleteModal(false);
     } catch (error) {
@@ -211,14 +211,6 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                   {resources.length} Resource{resources.length !== 1 ? "s" : ""}{" "}
                   Found
                 </h3>
-                {selectedResources.length > 0 && (
-                  <p
-                    className="text-sm mt-1"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    {selectedResources.length} selected
-                  </p>
-                )}
               </div>
 
               {/* Bulk Actions */}
@@ -278,6 +270,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
               <select
                 onChange={(e) => setPageSize(Number(e.target.value))}
                 className="px-3 py-2 text-sm rounded-lg border transition-colors"
+                value={pageSize}
                 style={{
                   backgroundColor: colors.input.background,
                   borderColor: colors.border.light,
@@ -307,26 +300,32 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                   <tr
                     style={{ borderBottom: `1px solid ${colors.table.border}` }}
                   >
-                    { cookies?.role === "admin"  && (
+                    {cookies?.role === "admin" && (
+                      <th
+                        className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                        style={{
+                          color: colors.table.headerText,
+                          width: "60px",
+                          minWidth: "60px",
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isAllSelected}
+                          ref={(el) => {
+                            if (el) el.indeterminate = isIndeterminate;
+                          }}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                      </th>
+                    )}
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{
-                        color: colors.table.headerText,
-                        width: "60px",
-                        minWidth: "60px",
-                      }}
+                      style={{ color: colors.table.headerText }}
                     >
-                      <input
-                        type="checkbox"
-                        checked={isAllSelected}
-                        ref={(el) => {
-                          if (el) el.indeterminate = isIndeterminate;
-                        }}
-                        onChange={(e) => handleSelectAll(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                      />
+                      Custom Id
                     </th>
-                    )}
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -357,13 +356,13 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                     >
                       Last Updated
                     </th>
-                    { cookies?.role === "admin"  && (
-                    <th
-                      className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
-                      style={{ color: colors.table.headerText }}
-                    >
-                      Actions
-                    </th>
+                    {cookies?.role === "admin" && (
+                      <th
+                        className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
+                        style={{ color: colors.table.headerText }}
+                      >
+                        Actions
+                      </th>
                     )}
                   </tr>
                 </thead>
@@ -392,30 +391,37 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                               : colors.table.stripe;
                         }}
                       >
-                        { cookies?.role === "admin"  && (
-                        <td
-                          className="px-4 py-3 text-sm whitespace-nowrap"
-                          style={{
-                            color: colors.text.secondary,
-                            width: "60px",
-                            minWidth: "60px",
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedResources.includes(
-                              row.original._id
-                            )}
-                            onChange={(e) =>
-                              handleSelectResource(
-                                row.original._id,
-                                e.target.checked
-                              )
-                            }
-                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                          />
-                        </td>
+                        {cookies?.role === "admin" && (
+                          <td
+                            className="px-4 py-3 text-sm whitespace-nowrap"
+                            style={{
+                              color: colors.text.secondary,
+                              width: "60px",
+                              minWidth: "60px",
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedResources.includes(
+                                row.original._id
+                              )}
+                              onChange={(e) =>
+                                handleSelectResource(
+                                  row.original._id,
+                                  e.target.checked
+                                )
+                              }
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                            />
+                          </td>
                         )}
+                        <td
+                          className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
+                          style={{ color: colors.text.primary }}
+                          title={row.original?.customId}
+                        >
+                          {row.original?.customId || "—"}
+                        </td>
                         <td
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
                           style={{ color: colors.text.primary }}
@@ -469,41 +475,39 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                               )
                             : "—"}
                         </td>
-                        { cookies?.role === "admin"  && (
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <div className="flex items-center justify-center gap-2">
-                            {openResourceDetailsDrawerHandler && (
+                        {cookies?.role === "admin" && (
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="flex items-center justify-center gap-2">
+                              {openResourceDetailsDrawerHandler && (
+                                <button
+                                  onClick={() =>
+                                    openResourceDetailsDrawerHandler(
+                                      row.original._id
+                                    )
+                                  }
+                                  className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                  style={{
+                                    color: colors.secondary[600],
+                                    backgroundColor: colors.secondary[50],
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.secondary[100];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.secondary[50];
+                                  }}
+                                  title="View resource details"
+                                >
+                                  <MdOutlineVisibility size={16} />
+                                </button>
+                              )}
                               <button
-                                onClick={() =>
-                                  openResourceDetailsDrawerHandler(
-                                    row.original._id
-                                  )
-                                }
-                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                                style={{
-                                  color: colors.secondary[600],
-                                  backgroundColor: colors.secondary[50],
+                                onClick={() => {
+                                  setEditResource(row.original);
+                                  setAddResourceDrawerOpened(true);
                                 }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    colors.secondary[100];
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    colors.secondary[50];
-                                }}
-                                title="View resource details"
-                              >
-                                <MdOutlineVisibility size={16} />
-                              </button>
-                            )}
-                            {openUpdateResourceDrawerHandler && (
-                              <button
-                                onClick={() =>
-                                  openUpdateResourceDrawerHandler(
-                                    row.original._id
-                                  )
-                                }
                                 className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
                                 style={{
                                   color: colors.primary[600],
@@ -521,33 +525,32 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                               >
                                 <MdEdit size={16} />
                               </button>
-                            )}
-                            {deleteResourceHandler && (
-                              <button
-                                onClick={() => {
-                                  setdeleteId(row.original._id);
-                                  setshowDeletePage(true);
-                                }}
-                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                                style={{
-                                  color: colors.error[600],
-                                  backgroundColor: colors.error[50],
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    colors.error[100];
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    colors.error[50];
-                                }}
-                                title="Delete resource"
-                              >
-                                <MdDeleteOutline size={16} />
-                              </button>
-                            )}
-                          </div>
-                        </td>
+                              {deleteResourceHandler && (
+                                <button
+                                  onClick={() => {
+                                    setdeleteId(row.original._id);
+                                    setshowDeletePage(true);
+                                  }}
+                                  className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                  style={{
+                                    color: colors.error[600],
+                                    backgroundColor: colors.error[50],
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.error[100];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.error[50];
+                                  }}
+                                  title="Delete resource"
+                                >
+                                  <MdDeleteOutline size={16} />
+                                </button>
+                              )}
+                            </div>
+                          </td>
                         )}
                       </tr>
                     );

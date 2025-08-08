@@ -3,9 +3,11 @@
 import { Select, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { FaCaretDown, FaCaretUp, FaFilePdf } from "react-icons/fa";
 import { usePagination, useSortBy, useTable } from "react-table";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { colors } from "../../theme/colors";
+import PorformaInvoicePDF from "../PDF/PorformaInvoicePDF";
 
 interface ProformaInvoiceTableProps {
   proformaInvoices: Array<{
@@ -35,6 +37,11 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
 
   const columns = useMemo(
     () => [
+      {
+        Header: "PI Number",
+        accessor: "proforma_invoice_no",
+      },
+
       { Header: "Created By", accessor: "creator" },
       { Header: "Created At", accessor: "createdAt" },
       { Header: "Last Updated", accessor: "updatedAt" },
@@ -160,7 +167,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                   boxShadow: `0 0 0 1px ${colors.primary[500]}`,
                 }}
               >
-                {[5,10, 20, 50, 100, 100000].map((size) => (
+                {[5, 10, 20, 50, 100, 100000].map((size) => (
                   <option key={size} value={size}>
                     {size === 100000 ? "All" : size}
                   </option>
@@ -171,7 +178,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
 
           {/* Enhanced Table */}
           <div
-            className="rounded-xl shadow-sm"
+            className="rounded-xl shadow-sm whitespace-nowrap"
             style={{
               backgroundColor: colors.background.card,
               border: `1px solid ${colors.border.light}`,
@@ -186,7 +193,8 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
               >
                 <Thead bg={colors.table.header}>
                   {headerGroups.map((hg, headerIndex) => {
-                    const { key, ...headerGroupProps } = hg.getHeaderGroupProps();
+                    const { key, ...headerGroupProps } =
+                      hg.getHeaderGroupProps();
                     return (
                       <Tr
                         key={key}
@@ -195,9 +203,10 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                         borderColor={colors.table.border}
                       >
                         {hg.headers.map((column: any) => {
-                          const { key: columnKey, ...columnProps } = column.getHeaderProps(
-                            column.getSortByToggleProps()
-                          );
+                          const { key: columnKey, ...columnProps } =
+                            column.getHeaderProps(
+                              column.getSortByToggleProps()
+                            );
                           return (
                             <Th
                               key={columnKey}
@@ -212,36 +221,36 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                               px={4}
                               py={3}
                             >
-                                <div className="flex items-center gap-1">
-                                  {column.render("Header")}
-                                  {column.isSorted && (
-                                    <span
-                                      style={{ color: colors.primary[500] }}
-                                    >
-                                      {column.isSortedDesc ? (
-                                        <FaCaretDown />
-                                      ) : (
-                                        <FaCaretUp />
-                                      )}
-                                    </span>
-                                  )}
-                                </div>
-                              </Th>
-                            );
-                          })}
-                          <Th
-                            fontSize="14px"
-                            fontWeight="600"
-                            color={colors.table.headerText}
-                            whiteSpace="nowrap"
-                            px={4}
-                            py={3}
-                          >
-                            Actions
-                          </Th>
-                        </Tr>
-                      );
-                    }
+                              <div className="flex items-center gap-1">
+                                {column.render("Header")}
+                                {column.isSorted && (
+                                  <span
+                                    style={{ color: colors.primary[500] }}
+                                  >
+                                    {column.isSortedDesc ? (
+                                      <FaCaretDown />
+                                    ) : (
+                                      <FaCaretUp />
+                                    )}
+                                  </span>
+                                )}
+                              </div>
+                            </Th>
+                          );
+                        })}
+                        <Th
+                          fontSize="14px"
+                          fontWeight="600"
+                          color={colors.table.headerText}
+                          whiteSpace="nowrap"
+                          px={4}
+                          py={3}
+                        >
+                          Actions
+                        </Th>
+                      </Tr>
+                    );
+                  }
                   )}
                 </Thead>
                 <Tbody {...getTableBodyProps()}>
@@ -270,7 +279,8 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                         borderColor={colors.table.border}
                       >
                         {row.cells.map((cell: any) => {
-                          const { key: cellKey, ...cellProps } = cell.getCellProps();
+                          const { key: cellKey, ...cellProps } =
+                            cell.getCellProps();
                           return (
                             <Td
                               key={cellKey}
@@ -292,10 +302,12 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                               px={4}
                               py={3}
                             >
+                              {/* Default render if no special condition */}
                               {cell.column.id !== "createdAt" &&
                                 cell.column.id !== "updatedAt" &&
                                 cell.column.id !== "customer" &&
                                 cell.column.id !== "creator" &&
+                                cell.column.id !== "proforma_invoice_no" &&
                                 cell.render("Cell")}
 
                               {cell.column.id === "creator" &&
@@ -306,6 +318,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                                       row.original?.creator?.last_name}
                                   </span>
                                 )}
+
                               {cell.column.id === "createdAt" &&
                                 row.original?.createdAt && (
                                   <span
@@ -316,6 +329,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                                     )}
                                   </span>
                                 )}
+
                               {cell.column.id === "updatedAt" &&
                                 row.original?.updatedAt && (
                                   <span
@@ -331,13 +345,35 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                                   row.original?.supplier) && (
                                   <span style={{ color: colors.text.primary }}>
                                     {row.original?.buyer
-                                      ? row.original.buyer.name
+                                      ? row.original.buyer.consignee_name &&
+                                        String(
+                                          row.original.buyer.consignee_name
+                                        ).trim() !== ""
+                                        ? String(
+                                            row.original.buyer.consignee_name
+                                          )
+                                        : row.original.buyer.company_name &&
+                                          String(
+                                            row.original.buyer.company_name
+                                          ).trim() !== ""
+                                        ? String(
+                                            row.original.buyer.company_name
+                                          )
+                                        : row.original.buyer.name
                                       : row.original.supplier.name}
+                                  </span>
+                                )}
+
+                              {cell.column.id === "proforma_invoice_no" &&
+                                row.original?.proforma_invoice_no && (
+                                  <span style={{ color: colors.text.primary }}>
+                                    {row.original.proforma_invoice_no}
                                   </span>
                                 )}
                             </Td>
                           );
                         })}
+
                         <Td px={4} py={3}>
                           <div className="flex items-center gap-2">
                             {openProformaInvoiceDetailsHandler && (
@@ -456,12 +492,53 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                                 </svg>
                               </button>
                             )}
+
+                            {/* PDF Download Button */}
+                            <PDFDownloadLink
+                              document={
+                                <PorformaInvoicePDF
+                                  proformaInvoice={row.original}
+                                />
+                              }
+                              fileName={`ProformaInvoice_${row.original._id}.pdf`}
+                            >
+                              {({ blob, url, loading, error }) => (
+                                <button
+                                  disabled={loading}
+                                  className="p-2 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-50"
+                                  style={{
+                                    color: colors.warning[600],
+                                    backgroundColor: colors.warning[50],
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    if (!e.currentTarget.disabled) {
+                                      e.currentTarget.style.backgroundColor =
+                                        colors.warning[100];
+                                    }
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    if (!e.currentTarget.disabled) {
+                                      e.currentTarget.style.backgroundColor =
+                                        colors.warning[50];
+                                    }
+                                  }}
+                                  title={
+                                    loading
+                                      ? "Generating PDF..."
+                                      : "Download PDF"
+                                  }
+                                >
+                                  <FaFilePdf className="w-4 h-4" />
+                                </button>
+                              )}
+                            </PDFDownloadLink>
                           </div>
                         </Td>
                       </Tr>
                     );
                   })}
                 </Tbody>
+
               </Table>
             </div>
           </div>

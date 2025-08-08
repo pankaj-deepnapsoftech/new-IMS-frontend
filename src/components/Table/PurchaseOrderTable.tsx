@@ -1,371 +1,134 @@
-// import React from "react";
-// import { Badge } from "@chakra-ui/react";
-
-import { MdDeleteOutline, MdEdit } from "react-icons/md";
+import React, { useState, useEffect } from "react";
+import {
+  MdDeleteOutline,
+  MdEdit,
+  MdOutlineVisibility,
+  MdPictureAsPdf,
+} from "react-icons/md";
 import { colors } from "../../theme/colors";
+import { useCookies } from "react-cookie";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PurchaseOrderPDF from "../PDF/PurchaseOrderPDF";
 
-// const colors = {
-//   table: { header: "#f7fafc", stripe: "#f9fafb" },
-//   background: { card: "#fff" },
-//   border: { light: "#e2e8f0" },
-//   primary: { 500: "#3182ce" },
-//   gray: { 50: "#f9fafb", 100: "#f3f4f6", 200: "#e5e7eb", 400: "#9ca3af" },
-//   text: {
-//     primary: "#1a202c",
-//     secondary: "#4b5563",
-//     muted: "#6b7280",
-//     inverse: "#fff",
-//   },
-// };
+interface PurchaseOrder {
+  _id: string;
+  poOrder: string;
+  date: string;
+  itemName: string;
+  supplierName: string;
+  supplierEmail: string;
+  supplierShippedGSTIN: string;
+  supplierBillGSTIN: string;
+  supplierShippedTo: string;
+  supplierBillTo: string;
+  modeOfPayment: string;
+  GSTApply: string;
+  billingAddress: string;
+  additionalImportant?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
-// const dummyPurchaseOrders = [
-//   {
-//     id: "1",
-//     companyName: "Acme Corp",
-//     companyAddress: "123 Main St, Mumbai",
-//     companyGST: "27AAEPM1234C1ZV",
-//     poOrder: "PO-00123",
-//     supplierName: "John Doe",
-//     supplierGST: "27AAEPM5678C1ZV",
-//     supplierAddress: "456 Market Rd, Pune",
-//     panDetails: "AAEPM1234C",
-//     email: "john@acme.com",
-//     freightCharges: "5000",
-//     packagingAndForwarding: "Inclusive",
-//     modeOfPayment: "Bank Transfer",
-//     deliveryAddress: "789 Delivery Lane, Nashik",
-//     deliveryPeriod: "7-10 days",
-//     billingAddress: "Acme Billing, Mumbai",
-//     paymentTerms: "Net 30",
-//     remarks: "Urgent delivery required.",
-//     status: "Approved",
-//     createdAt: "2025-07-28",
-//   },
-//   {
-//     id: "2",
-//     companyName: "Globex Ltd",
-//     companyAddress: "22 Industrial Area, Delhi",
-//     companyGST: "07AAEPM4321B1ZV",
-//     poOrder: "PO-00124",
-//     supplierName: "Jane Smith",
-//     supplierGST: "07AAEPM8765B1ZV",
-//     supplierAddress: "88 Supplier Park, Delhi",
-//     panDetails: "AAEPM4321B",
-//     email: "jane@globex.com",
-//     freightCharges: "0",
-//     packagingAndForwarding: "Exclusive",
-//     modeOfPayment: "Cheque",
-//     deliveryAddress: "22 Delivery St, Delhi",
-//     deliveryPeriod: "5 days",
-//     billingAddress: "Globex Billing, Delhi",
-//     paymentTerms: "Advance Payment",
-//     remarks: "Handle with care.",
-//     status: "Pending",
-//     createdAt: "2025-07-27",
-//   },
-//   {
-//     id: "3",
-//     companyName: "Initech",
-//     companyAddress: "Plot 9, IT Park, Bangalore",
-//     companyGST: "29AAEPM9999C1ZV",
-//     poOrder: "PO-00125",
-//     supplierName: "Alice Lee",
-//     supplierGST: "29AAEPM8888C1ZV",
-//     supplierAddress: "Tech Supplier, Bangalore",
-//     panDetails: "AAEPM9999C",
-//     email: "alice@initech.com",
-//     freightCharges: "2000",
-//     packagingAndForwarding: "Inclusive",
-//     modeOfPayment: "Credit",
-//     deliveryAddress: "Initech Delivery, Bangalore",
-//     deliveryPeriod: "15 days",
-//     billingAddress: "Initech Billing, Bangalore",
-//     paymentTerms: "Net 60",
-//     remarks: "",
-//     status: "Draft",
-//     createdAt: "2025-07-26",
-//   },
-// ];
+interface PurchaseOrderTableProps {
+  refreshTrigger?: number;
+  onEdit?: (order: PurchaseOrder) => void;
+  filteredPurchaseOrders: PurchaseOrder[];
+  onDelete?: (id: string) => void;
+  onRefresh?: () => void;
+}
 
-// const PurchaseOrderTable = () => {
-//   return (
-//     <div className="p-6">
-//       {/* Header with count and page size selector */}
-//       <div className="flex items-center justify-between mb-4">
-//         <div className="flex items-center gap-6">
-//           <div>
-//             <h3
-//               className="text-lg font-semibold"
-//               style={{ color: colors.text.primary }}
-//             >
-//               {dummyPurchaseOrders.length} Purchase Order
-//               {dummyPurchaseOrders.length !== 1 ? "s" : ""} Found
-//             </h3>
-//           </div>
-//         </div>
-//         <div className="flex items-center gap-3">
-//           <span
-//             className="text-sm font-medium"
-//             style={{ color: colors.text.secondary }}
-//           >
-//             Show:
-//           </span>
-//           <select
-//             className="px-3 py-2 text-sm rounded-lg border transition-colors"
-//             style={{
-//               backgroundColor: colors.background.card,
-//               borderColor: colors.border.light,
-//               color: colors.text.primary,
-//             }}
-//             defaultValue={10}
-//           >
-//             {[5, 10, 20, 50, 100].map((size) => (
-//               <option key={size} value={size}>
-//                 {size === 100 ? "All" : size}
-//               </option>
-//             ))}
-//           </select>
-//         </div>
-//       </div>
+const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
+  refreshTrigger,
+  onEdit,
+  filteredPurchaseOrders,
+  onDelete,
+  onRefresh,
+}) => {
+  const [cookies] = useCookies();
+  const [loading, setLoading] = useState(true);
+  const [limit, setLimit] = useState(10);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [viewOrder, setViewOrder] = useState<PurchaseOrder | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
-//       {/* Enhanced Table */}
-//       <div
-//         className="rounded-xl shadow-sm overflow-hidden"
-//         style={{
-//           backgroundColor: colors.background.card,
-//           border: `1px solid ${colors.border.light}`,
-//         }}
-//       >
-//         <div className="overflow-x-auto">
-//           <table className="w-full min-w-[1200px] text-xs md:text-sm">
-//             <thead style={{ backgroundColor: colors.table.header }}>
-//               <tr>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   PO Number
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Company Name
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Company Address
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Company GST
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Supplier Name
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Supplier GST
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Supplier Address
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   PAN Details
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Email
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Freight Charges
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Packaging & Forwarding
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Mode of Payment
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Delivery Address
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Delivery Period
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Billing Address
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Payment Terms
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Remarks
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Status
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Created At
-//                 </th>
-//                 <th className="px-4 py-3 text-left font-semibold text-gray-700">
-//                   Actions
-//                 </th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {dummyPurchaseOrders.map((order, index) => (
-//                 <tr
-//                   key={order.id}
-//                   className={
-//                     index % 2 === 0
-//                       ? "bg-[#ffffff40] hover:bg-[#ffffff78]"
-//                       : "bg-[#ffffff1f] hover:bg-[#ffffff78]"
-//                   }
-//                 >
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]">{order.poOrder}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]">{order.companyName}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">{order.companyAddress}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]">{order.companyGST}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]">{order.supplierName}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]">{order.supplierGST}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">{order.supplierAddress}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px]">{order.panDetails}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]">{order.email}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]">{order.freightCharges}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]">{order.packagingAndForwarding}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[140px]">{order.modeOfPayment}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">{order.deliveryAddress}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]">{order.deliveryPeriod}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">{order.billingAddress}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[140px]">{order.paymentTerms}</td>
-//                   <td className="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">{order.remarks}</td>
-//                   <td className="px-4 py-3">
-//                     <Badge
-//                       colorScheme={
-//                         order.status === "Approved"
-//                           ? "green"
-//                           : order.status === "Pending"
-//                           ? "yellow"
-//                           : "gray"
-//                       }
-//                     >
-//                       {order.status}
-//                     </Badge>
-//                   </td>
-//                   <td className="px-4 py-3">{order.createdAt}</td>
-//                   <td className="px-4 py-3">
-//                     <div className="flex gap-2">
-//                       <button className="text-blue-600 hover:underline text-xs md:text-sm">
-//                         View
-//                       </button>
-//                       <button className="text-yellow-600 hover:underline text-xs md:text-sm">
-//                         Edit
-//                       </button>
-//                       <button className="text-red-600 hover:underline text-xs md:text-sm">
-//                         Delete
-//                       </button>
-//                     </div>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+  // Auto-refresh setup
+  useEffect(() => {
+    setLoading(false);
+    const intervalId = setInterval(() => {
+      if (onRefresh) {
+        onRefresh();
+        console.log(
+          "Auto-refresh triggered at",
+          new Date().toLocaleTimeString()
+        );
+      }
+    }, 30000);
 
-// export default PurchaseOrderTable;
+    return () => clearInterval(intervalId);
+  }, [onRefresh]);
 
-const PurchaseOrderTable = (
-  {
-    // setLimit,
-  }
-) => {
-  const dummyPurchaseOrders = [
-    {
-      id: "1",
-      companyName: "Acme Corp",
-      companyAddress: "123 Main St, Mumbai",
-      companyGST: "27AAEPM1234C1ZV",
-      poOrder: "PO-00123",
-      supplierName: "John Doe",
-      supplierGST: "27AAEPM5678C1ZV",
-      supplierAddress: "456 Market Rd, Pune",
-      panDetails: "AAEPM1234C",
-      email: "john@acme.com",
-      freightCharges: "5000",
-      packagingAndForwarding: "Inclusive",
-      modeOfPayment: "Bank Transfer",
-      deliveryAddress: "789 Delivery Lane, Nashik",
-      deliveryPeriod: "7-10 days",
-      billingAddress: "Acme Billing, Mumbai",
-      paymentTerms: "Net 30",
-      remarks: "Urgent delivery required.",
-      status: "Approved",
-      createdAt: "2025-07-28",
-    },
-    {
-      id: "2",
-      companyName: "Globex Ltd",
-      companyAddress: "22 Industrial Area, Delhi",
-      companyGST: "07AAEPM4321B1ZV",
-      poOrder: "PO-00124",
-      supplierName: "Jane Smith",
-      supplierGST: "07AAEPM8765B1ZV",
-      supplierAddress: "88 Supplier Park, Delhi",
-      panDetails: "AAEPM4321B",
-      email: "jane@globex.com",
-      freightCharges: "0",
-      packagingAndForwarding: "Exclusive",
-      modeOfPayment: "Cheque",
-      deliveryAddress: "22 Delivery St, Delhi",
-      deliveryPeriod: "5 days",
-      billingAddress: "Globex Billing, Delhi",
-      paymentTerms: "Advance Payment",
-      remarks: "Handle with care.",
-      status: "Pending",
-      createdAt: "2025-07-27",
-    },
-    {
-      id: "3",
-      companyName: "Initech",
-      companyAddress: "Plot 9, IT Park, Bangalore",
-      companyGST: "29AAEPM9999C1ZV",
-      poOrder: "PO-00125",
-      supplierName: "Alice Lee",
-      supplierGST: "29AAEPM8888C1ZV",
-      supplierAddress: "Tech Supplier, Bangalore",
-      panDetails: "AAEPM9999C",
-      email: "alice@initech.com",
-      freightCharges: "2000",
-      packagingAndForwarding: "Inclusive",
-      modeOfPayment: "Credit",
-      deliveryAddress: "Initech Delivery, Bangalore",
-      deliveryPeriod: "15 days",
-      billingAddress: "Initech Billing, Bangalore",
-      paymentTerms: "Net 60",
-      remarks: "",
-      status: "Draft",
-      createdAt: "2025-07-26",
-    },
-  ];
+  // Handle delete purchase order
+  const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this purchase order?"
+    );
+    if (!confirmDelete) {
+      return;
+    }
 
-  // const filteredPurchaseOrder = partiesData.filter((party) => {
-  //   const searchLower = searchTerm.toLowerCase();
+    setDeletingId(id);
+    try {
+      const response = await axios.delete(
+        `${process.env.REACT_APP_BACKEND_URL}purchase-order/${id}`,
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
 
-  //   const matchSearch =
-  //     (party?.consignee_name?.[0]?.toLowerCase?.() || "").includes(
-  //       searchLower
-  //     ) ||
-  //     (party?.email_id?.[0]?.toLowerCase?.() || "").includes(searchLower) ||
-  //     (party?.contact_number?.[0]?.toLowerCase?.() || "").includes(
-  //       searchLower
-  //     ) ||
-  //     (party?.type?.toLowerCase?.() || "").includes(searchLower) ||
-  //     (party?.company_name?.toLowerCase?.() || "").includes(searchLower);
+      if (response.data.success) {
+        toast.success("Purchase order deleted successfully!");
+        if (onDelete) {
+          onDelete(id);
+        }
+      } else {
+        throw new Error(
+          response.data.message || "Failed to delete purchase order"
+        );
+      }
+    } catch (error: any) {
+      console.error("Error deleting purchase order:", error);
+      toast.error(error.message || "Failed to delete purchase order");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
-  //   const matchType = selectedType ? party?.type === selectedType : true;
-  //   const matchRole = selectedRole
-  //     ? party?.parties_type === selectedRole
-  //     : true;
+  // Handle view purchase order
+  const handleView = (order: PurchaseOrder) => {
+    setViewOrder(order);
+    setIsViewModalOpen(true);
+  };
 
-  //   return matchSearch && matchType && matchRole;
-  // });
+  // Close view modal
+  const closeViewModal = () => {
+    setIsViewModalOpen(false);
+    setViewOrder(null);
+  };
+
+  // Handle PDF download - Removed as we'll use PDFDownloadLink component instead
+
+  // Sort purchase orders by createdAt in descending order
+  const sortedPurchaseOrders = [...filteredPurchaseOrders].sort((a, b) => {
+    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return dateB - dateA;
+  });
 
   return (
     <div className="p-6">
+      {/* Header with count */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-6">
           <div>
@@ -373,12 +136,13 @@ const PurchaseOrderTable = (
               className="text-lg font-semibold"
               style={{ color: colors.text.primary }}
             >
-              {/* {filteredParties.length} Part
-                  {filteredParties.length !== 1 ? "ies" : "y"} Found */}
+              {filteredPurchaseOrders.length} Purchase Order
+              {filteredPurchaseOrders.length !== 1 ? "s" : ""} Found
             </h3>
           </div>
         </div>
 
+        {/* Limit Selector */}
         <div className="flex items-center gap-3">
           <span
             className="text-sm font-medium"
@@ -387,7 +151,7 @@ const PurchaseOrderTable = (
             Show:
           </span>
           <select
-            // onChange={(e) => setLimit(Number(e.target.value))}
+            onChange={(e) => setLimit(Number(e.target.value))}
             className="px-3 py-2 text-sm rounded-lg border transition-colors"
             style={{
               backgroundColor: colors.input.background,
@@ -404,6 +168,260 @@ const PurchaseOrderTable = (
         </div>
       </div>
 
+      {/* View Modal */}
+      {isViewModalOpen && viewOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-lg"
+            style={{ border: `1px solid ${colors.border.light}` }}
+          >
+            <h2
+              className="text-xl font-bold mb-4"
+              style={{ color: colors.text.primary }}
+            >
+              Purchase Order Details
+            </h2>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  P.O. Number
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.poOrder || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Order Date
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.date
+                    ? new Date(viewOrder.date).toLocaleDateString()
+                    : "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Item Name
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.itemName || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Supplier Name
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.supplierName || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Supplier Email
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.supplierEmail || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Shipped GSTIN
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.supplierShippedGSTIN || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Bill GSTIN
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.supplierBillGSTIN || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Shipped To
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.supplierShippedTo || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Bill To
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.supplierBillTo || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Mode of Payment
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.modeOfPayment || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  GST Apply
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.GSTApply || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Billing Address
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.billingAddress || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Additional Information
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.additionalImportant || "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Created At
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.createdAt
+                    ? new Date(viewOrder.createdAt).toLocaleString()
+                    : "N/A"}
+                </p>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Updated At
+                </label>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: colors.text.primary }}
+                >
+                  {viewOrder.updatedAt
+                    ? new Date(viewOrder.updatedAt).toLocaleString()
+                    : "N/A"}
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={closeViewModal}
+                className="px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-md"
+                style={{
+                  backgroundColor: colors.primary[50],
+                  color: colors.primary[600],
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary[100];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary[50];
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Table */}
       <div
         className="rounded-xl shadow-sm overflow-hidden"
         style={{
@@ -425,18 +443,17 @@ const PurchaseOrderTable = (
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Date Added
+                  Order Date
                 </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                  style={{
-                    color: colors.table.headerText,
-                    // position: "sticky",
-                    // top: 0,
-                    // left: 0,
-                    // zIndex: 3,
-                    // backgroundColor: colors.table.header,
-                  }}
+                  style={{ color: colors.table.headerText }}
+                >
+                  Item Name
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
                 >
                   Supplier Name
                 </th>
@@ -444,31 +461,19 @@ const PurchaseOrderTable = (
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Supplier GSTIN
+                  Supplier Email
                 </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Email
+                  Shipped GSTIN
                 </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Phone No.
-                </th>
-                <th
-                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                  style={{ color: colors.table.headerText }}
-                >
-                  Type
-                </th>
-                <th
-                  className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                  style={{ color: colors.table.headerText }}
-                >
-                  Merchant Type
+                  Bill GSTIN
                 </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
@@ -486,13 +491,19 @@ const PurchaseOrderTable = (
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Shipped GST To
+                  Mode of Payment
                 </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  Bill GST To
+                  GST Apply
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-medium whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  Billing Address
                 </th>
                 <th
                   className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
@@ -502,283 +513,256 @@ const PurchaseOrderTable = (
                 </th>
               </tr>
             </thead>
-            {/* <tbody>
-              {dummyPurchaseOrders.map((party, index) => (
-                <tr
-                  key={party._id || index}
-                  className="transition-colors hover:shadow-sm"
-                  style={{
-                    backgroundColor:
-                      index % 2 === 0
-                        ? colors.background.card
-                        : colors.table.stripe,
-                    borderBottom: `1px solid ${colors.table.border}`,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = colors.table.hover;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      index % 2 === 0
-                        ? colors.background.card
-                        : colors.table.stripe;
-                  }}
-                >
-                  <td
-                    className="px-4 py-3 text-sm whitespace-nowrap"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    {party.cust_id}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm whitespace-nowrap"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    {party.createdAt
-                      ? new Date(party.createdAt).toLocaleDateString()
-                      : "N/A"}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
-                    style={{
-                      color: colors.text.primary,
-                      position: "sticky",
-                      left: 0,
-                      backgroundColor:
-                        index % 2 === 0
-                          ? colors.background.card
-                          : colors.table.stripe,
-                      zIndex: 1,
-                    }}
-                    title={party?.consignee_name?.[0] || "N/A"}
-                  >
-                    {party?.consignee_name?.[0] || "N/A"}
-                  </td>
-
-                  <td
-                    className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
-                    style={{ color: colors.text.secondary }}
-                    title={party.company_name}
-                  >
-                    {party.company_name || "N/A"}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
-                    style={{ color: colors.text.secondary }}
-                    title={party.email_id}
-                  >
-                    {Array.isArray(party.email_id) && party.email_id.length > 0
-                      ? party.email_id.join(", ")
-                      : "N/A"}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm whitespace-nowrap"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    {Array.isArray(party.contact_number) &&
-                    party.contact_number.length > 0
-                      ? party.contact_number.join(", ")
-                      : "N/A"}
-                  </td>
-                  <td className="px-4 py-3 text-sm whitespace-nowrap">
-                    <span
-                      className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
-                      style={{
-                        backgroundColor:
-                          party.type === "Customer"
-                            ? colors.success[100]
-                            : party.type === "Supplier"
-                            ? colors.primary[100]
-                            : colors.gray[100],
-                        color:
-                          party.type === "Customer"
-                            ? colors.success[700]
-                            : party.type === "Supplier"
-                            ? colors.primary[700]
-                            : colors.gray[700],
-                      }}
-                    >
-                      {party.type || "N/A"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm whitespace-nowrap">
-                    <span
-                      className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
-                      style={{
-                        backgroundColor: colors.secondary[100],
-                        color: colors.secondary[700],
-                      }}
-                    >
-                      {party.parties_type || "N/A"}
-                    </span>
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
-                    style={{ color: colors.text.secondary }}
-                    title={party.shipped_to}
-                  >
-                    {party.shipped_to || "N/A"}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
-                    style={{ color: colors.text.secondary }}
-                    title={party.bill_to}
-                  >
-                    {party.bill_to || "N/A"}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
-                    style={{ color: colors.text.secondary }}
-                    title={party.shipped_gst_to}
-                  >
-                    {party.shipped_gst_to || "N/A"}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
-                    style={{ color: colors.text.secondary }}
-                    title={party.bill_gst_to}
-                  >
-                    {party.bill_gst_to || "N/A"}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="flex items-center justify-center gap-2">
-                      <button
-                        onClick={() => {
-                          // setEditTable(party);
-                          // setshowData(true);
-                        }}
-                        className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                        style={{
-                          color: colors.primary[600],
-                          backgroundColor: colors.primary[50],
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.primary[100];
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.primary[50];
-                        }}
-                        title="Edit party"
-                      >
-                        <MdEdit size={16} />
-                      </button>
-                      <button
-                        onClick={() => {
-                          // setshowDeletePage(true);
-                          // setDeleteId(party._id);
-                        }}
-                        className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                        style={{
-                          color: colors.error[600],
-                          backgroundColor: colors.error[50],
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.error[100];
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.error[50];
-                        }}
-                        title="Delete party"
-                      >
-                        <MdDeleteOutline size={16} />
-                      </button>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={13} className="px-4 py-8 text-center">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                      <span className="ml-2">Loading...</span>
                     </div>
                   </td>
                 </tr>
-              ))}
-            </tbody> */}
+              ) : sortedPurchaseOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={13} className="px-4 py-8 text-center">
+                    <span style={{ color: colors.text.secondary }}>
+                      No purchase orders found
+                    </span>
+                  </td>
+                </tr>
+              ) : (
+                sortedPurchaseOrders
+                  .slice(0, limit)
+                  .map((order: PurchaseOrder, index: number) => (
+                    <tr
+                      key={order._id || index}
+                      className="transition-colors hover:shadow-sm"
+                      style={{
+                        backgroundColor:
+                          index % 2 === 0
+                            ? colors.background.card
+                            : colors.table.stripe,
+                        borderBottom: `1px solid ${colors.table.border}`,
+                        opacity: deletingId === order._id ? 0.5 : 1,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (deletingId !== order._id) {
+                          e.currentTarget.style.backgroundColor =
+                            colors.table.hover;
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (deletingId !== order._id) {
+                          e.currentTarget.style.backgroundColor =
+                            index % 2 === 0
+                              ? colors.background.card
+                              : colors.table.stripe;
+                        }
+                      }}
+                    >
+                      <td
+                        className="px-4 py-3 text-sm whitespace-nowrap"
+                        style={{ color: colors.text.secondary }}
+                      >
+                        {order.poOrder || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm whitespace-nowrap"
+                        style={{ color: colors.text.secondary }}
+                      >
+                        {order.date
+                          ? new Date(order.date).toLocaleDateString()
+                          : "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
+                        style={{ color: colors.text.primary }}
+                        title={order.itemName || "N/A"}
+                      >
+                        {order.itemName || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
+                        style={{ color: colors.text.primary }}
+                        title={order.supplierName || "N/A"}
+                      >
+                        {order.supplierName || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                        style={{ color: colors.text.secondary }}
+                        title={order.supplierEmail || "N/A"}
+                      >
+                        {order.supplierEmail || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                        style={{ color: colors.text.secondary }}
+                        title={order.supplierShippedGSTIN || "N/A"}
+                      >
+                        {order.supplierShippedGSTIN || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
+                        style={{ color: colors.text.secondary }}
+                        title={order.supplierBillGSTIN || "N/A"}
+                      >
+                        {order.supplierBillGSTIN || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                        style={{ color: colors.text.secondary }}
+                        title={order.supplierShippedTo || "N/A"}
+                      >
+                        {order.supplierShippedTo || "N/A"}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                        style={{ color: colors.text.secondary }}
+                        title={order.supplierBillTo || "N/A"}
+                      >
+                        {order.supplierBillTo || "N/A"}
+                      </td>
+                      <td className="px-4 py-3 text-sm whitespace-nowrap">
+                        <span
+                          className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
+                          style={{
+                            backgroundColor: colors.primary[100],
+                            color: colors.primary[700],
+                          }}
+                        >
+                          {order.modeOfPayment || "N/A"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm whitespace-nowrap">
+                        <span
+                          className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
+                          style={{
+                            backgroundColor: colors.success[100],
+                            color: colors.success[700],
+                          }}
+                        >
+                          {order.GSTApply || "N/A"}
+                        </span>
+                      </td>
+                      <td
+                        className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
+                        style={{ color: colors.text.secondary }}
+                        title={order.billingAddress || "N/A"}
+                      >
+                        {order.billingAddress || "N/A"}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleView(order)}
+                            className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                            style={{
+                              color: colors.primary[600],
+                              backgroundColor: colors.primary[50],
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.primary[100];
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.primary[50];
+                            }}
+                            title="View purchase order"
+                            disabled={deletingId === order._id}
+                          >
+                            <MdOutlineVisibility size={16} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              console.log("Edit order:", order._id);
+                              if (onEdit) {
+                                onEdit(order);
+                              }
+                            }}
+                            className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                            style={{
+                              color: colors.primary[600],
+                              backgroundColor: colors.primary[50],
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.primary[100];
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.primary[50];
+                            }}
+                            title="Edit purchase order"
+                            disabled={deletingId === order._id}
+                          >
+                            <MdEdit size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(order._id)}
+                            className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                            style={{
+                              color: colors.error[600],
+                              backgroundColor: colors.error[50],
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.error[100];
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.error[50];
+                            }}
+                            title="Delete purchase order"
+                            disabled={deletingId === order._id}
+                          >
+                            {deletingId === order._id ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
+                            ) : (
+                              <MdDeleteOutline size={16} />
+                            )}
+                          </button>
+                          <PDFDownloadLink
+                            document={
+                              <PurchaseOrderPDF purchaseOrder={order} />
+                            }
+                            fileName={`purchase_order_${
+                              order.poOrder || order._id
+                            }.pdf`}
+                            className="p-2 rounded-lg transition-all duration-200 hover:shadow-md inline-flex items-center"
+                            style={{
+                              color: colors.success[600],
+                              backgroundColor: colors.success[50],
+                              textDecoration: "none",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.success[100];
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.success[50];
+                            }}
+                          >
+                            {({ loading }) =>
+                              loading ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-500"></div>
+                              ) : (
+                                <MdPictureAsPdf size={16} />
+                              )
+                            }
+                          </PDFDownloadLink>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+              )}
+            </tbody>
           </table>
         </div>
       </div>
-
-      {/* Enhanced Delete Modal */}
-      {/* {showDeletePage && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-              <div
-                className="w-full max-w-md mx-4 rounded-xl shadow-xl"
-                style={{ backgroundColor: colors.background.card }}
-              >
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2
-                      className="text-lg font-semibold"
-                      style={{ color: colors.text.primary }}
-                    >
-                      Confirm Deletion
-                    </h2>
-                  </div>
-    
-                  <div className="mb-6">
-                    <div
-                      className="rounded-lg p-4 mb-4"
-                      style={{ backgroundColor: colors.error[50] }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <svg
-                          className="w-6 h-6 flex-shrink-0"
-                          style={{ color: colors.error[500] }}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
-                          />
-                        </svg>
-                        <div>
-                          <p
-                            className="font-medium"
-                            style={{ color: colors.error[800] }}
-                          >
-                            Delete Party
-                          </p>
-                          <p
-                            className="text-sm"
-                            style={{ color: colors.error[600] }}
-                          >
-                            This action cannot be undone. All party data will be
-                            permanently removed.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-    
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setshowDeletePage(false)}
-                      className="flex-1 px-4 py-2 rounded-lg border transition-all duration-200"
-                      style={{
-                        borderColor: colors.border.medium,
-                        color: colors.text.secondary,
-                        backgroundColor: colors.background.card,
-                      }}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => handleDelete(deleteId)}
-                      disabled={isSubmitting}
-                      className="flex-1 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50"
-                      style={{
-                        backgroundColor: colors.error[500],
-                        color: colors.text.inverse,
-                      }}
-                    >
-                      {isSubmitting ? "Deleting..." : "Delete"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )} */}
     </div>
   );
 };

@@ -42,6 +42,7 @@ const AddBom: React.FC<AddBomProps> = ({
   const [rawMaterialsOptions, setRawMaterialsOptions] = useState<
     { value: string; label: string }[]
   >([]);
+  const [manPowerOptions, setManPowerOptions] = useState<{ value: string; label: string }[]>([]);
 
   const [finishedGood, setFinishedGood] = useState<
     { value: string; label: string } | undefined
@@ -70,7 +71,15 @@ const AddBom: React.FC<AddBomProps> = ({
   const [electricityCharges, setElectricityCharges] = useState<
     number | undefined
   >();
+  const [selectedManPower, setSelectedManPower] = useState<any | null>(null);
+  const [manPowerList, setManPowerList] = useState<any[]>([]);
   const [otherCharges, setOtherCharges] = useState<number | undefined>();
+  const [resources, setResources] = useState<any[]>([]);
+  const [empData, setEmpData] = useState<any[]>([]);
+  const [resourceOptions, setResourceOptions] = useState<{ value: string; label: string }[]>([]);
+  const [selectedResources, setSelectedResources] = useState([
+    { name: null, type: null, specification: "" },
+  ]);
 
   const [addBom] = useAddBomMutation();
 
@@ -80,7 +89,6 @@ const AddBom: React.FC<AddBomProps> = ({
       description: "",
       quantity: "",
       uom: "",
-      category: "",
       assembly_phase: "",
       supplier: "",
       supporting_doc: "",
@@ -120,6 +128,25 @@ const AddBom: React.FC<AddBomProps> = ({
     { value: "inch", label: "inch" },
     { value: "mtr", label: "mtr" },
   ];
+  const [manpower, setManpower] = useState([{ user: null }]);
+
+  const handleAddManpower = () => {
+    setManpower([...manpower, { user: null }]);
+  };
+
+  const handleRemoveManpower = (index) => {
+    const updated = [...manpower];
+    updated.splice(index, 1);
+    setManpower(updated);
+  };
+
+  const handleManpowerChange = (index, key, value) => {
+    const updated = [...manpower];
+    updated[index][key] = value;
+    setManpower(updated);
+  };
+
+
 
   const addBomHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,7 +219,16 @@ const AddBom: React.FC<AddBomProps> = ({
         electricity_charges: electricityCharges || 0,
         other_charges: otherCharges || 0,
       },
+      manpower: manpower.map(mp => ({ user: mp.user })),
+
       remarks: remarks,
+      resources: selectedResources.map((r) => ({
+        resource_id: r.name?.value,
+        type: r.type?.value || r.type,
+        specification: r.specification?.value || r.specification,
+      }))
+
+
     };
 
     try {
@@ -234,10 +270,63 @@ const AddBom: React.FC<AddBomProps> = ({
     }
   };
 
-  // console.log(products)
+
+  const fetchResourceHandler = async () => {
+    try {
+      setIsLoadingProducts(true);
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "resources",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const results = await response.json();
+      if (!results.success) {
+        throw new Error(results?.message);
+      }
+      setResources(results.resources);  
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  };  
+                                                                           
+  const fetchEmployeeHandler = async () => {
+    try {
+      setIsLoadingProducts(true);
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "auth/all",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const results = await response.json();
+      if (!results.success) {
+        throw new Error(results?.message);
+      }
+      const manPowerUsers = results?.users?.filter(
+        (user: any) =>
+          user.role?.role?.toLowerCase().includes("man power")
+      );
+
+      setEmpData(manPowerUsers);
+
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  };
+
   const onFinishedGoodChangeHandler = (d: any) => {
     setFinishedGood(d);
-
     const product: any = products.find((prd: any) => prd._id === d.value);
 
     if (product) {
@@ -282,6 +371,8 @@ const AddBom: React.FC<AddBomProps> = ({
 
   useEffect(() => {
     fetchProductsHandler();
+    fetchResourceHandler();
+    fetchEmployeeHandler();
   }, []);
 
   useEffect(() => {
@@ -298,7 +389,7 @@ const AddBom: React.FC<AddBomProps> = ({
         value: prd._id,
         label: prd.name,
       }));
-
+  
     setFinishedGoodsOptions(finishedGoodsOptions);
     setRawMaterialsOptions(rawMaterialsOptions);
   }, [products]);
@@ -347,6 +438,35 @@ const AddBom: React.FC<AddBomProps> = ({
     }),
   };
 
+  useEffect(() => {
+    const resourceOptions = resources?.map((res: any) => ({
+      label: res.name,
+      value: res._id,
+      type: res.type,
+      specification: res.specification,
+    }));
+
+
+    setResourceOptions(resourceOptions);
+  }, [resources]);
+
+  useEffect(() => {
+    if (!empData || empData.length === 0) return;
+
+    const filtered = empData.filter((emp) =>
+      emp.role?.role?.toLowerCase().includes("man power")
+    );
+
+    const options = filtered.map((emp) => ({
+      value: emp._id,
+      label: `${emp.first_name} ${emp.last_name}`,
+    }));
+
+    setManPowerOptions(options);
+  }, [empData]);
+
+
+
   return (
     <>
       {/* Backdrop */}
@@ -381,7 +501,6 @@ const AddBom: React.FC<AddBomProps> = ({
                     <div>Finished Goods</div>
                     <div>Quantity</div>
                     <div>UOM</div>
-                    <div>Category</div>
                     <div>Comments</div>
                     <div>Unit Cost</div>
                     <div>Cost</div>
@@ -402,21 +521,10 @@ const AddBom: React.FC<AddBomProps> = ({
                           placeholder="Select"
                           value={finishedGood}
                           onChange={onFinishedGoodChangeHandler}
+                          // isSearchable={true} // <-- Make sure this is set
                           required
                         />
 
-                        {/*                        
-                        {category === "finished goods" && finishedGoodName && (
-                          <div className="mt-2"> 
-                            <label className="text-xs font-medium text-gray-600">Name</label>
-                            <input
-                              type="text"
-                              className="w-full border border-gray-300 px-3 py-1 rounded-md text-sm text-gray-700 bg-gray-50"
-                              value={finishedGoodName}
-                              readOnly
-                            />
-                          </div>
-                        )} */}
                       </div>
 
                       {/* Quantity */}
@@ -450,7 +558,7 @@ const AddBom: React.FC<AddBomProps> = ({
                       </div>
 
                       {/* Category */}
-                      <div>
+                      {/* <div>
                         <label className="sm:hidden text-xs font-semibold text-gray-700">
                           Category
                         </label>
@@ -460,7 +568,7 @@ const AddBom: React.FC<AddBomProps> = ({
                           readOnly
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                         />
-                      </div>
+                      </div> */}
 
                       {/* Comments */}
                       <div>
@@ -487,8 +595,8 @@ const AddBom: React.FC<AddBomProps> = ({
                             cookies?.role === "admin"
                               ? unitCost || ""
                               : unitCost
-                              ? "*****"
-                              : ""
+                                ? "*****"
+                                : ""
                           }
                           readOnly
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -506,8 +614,8 @@ const AddBom: React.FC<AddBomProps> = ({
                             cookies?.role === "admin"
                               ? cost || ""
                               : cost
-                              ? "*****"
-                              : ""
+                                ? "*****"
+                                : ""
                           }
                           readOnly
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -532,7 +640,7 @@ const AddBom: React.FC<AddBomProps> = ({
                     <div>Product Name</div>
                     <div>Quantity</div>
                     <div>UOM</div>
-                    <div>Category</div>
+                    {/* <div>Category</div> */}
                     <div>Comments</div>
                     <div>Unit Cost</div>
                     <div>Total Part Cost</div>
@@ -611,7 +719,7 @@ const AddBom: React.FC<AddBomProps> = ({
                           />
                         </div>
 
-                        {/* Category */}
+                        {/* Category
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             Category
@@ -622,7 +730,7 @@ const AddBom: React.FC<AddBomProps> = ({
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />
-                        </div>
+                        </div> */}
 
                         {/* Comments */}
                         <div>
@@ -653,8 +761,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.unit_cost || ""
                                 : material.unit_cost
-                                ? "*****"
-                                : ""
+                                  ? "*****"
+                                  : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -672,8 +780,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.total_part_cost || ""
                                 : material.total_part_cost
-                                ? "*****"
-                                : ""
+                                  ? "*****"
+                                  : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -789,6 +897,167 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
                 </div>
               </div>
+              <div className="bg-white border-b">
+                <div className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Resources</h3>
+                  </div>
+
+                  {/* Table Header */}
+                  <div className="hidden sm:grid grid-cols-4 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                    <div>Name</div>
+                    <div>Type</div>
+                    <div>Specification</div>
+                    <div>Action</div>
+                  </div>
+
+                  {/* Rows */}
+                  <div className="border border-t-0 border-gray-300">
+                    {selectedResources.map((resource, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-1 sm:grid-cols-4 gap-4 px-3 py-4 items-start sm:items-center bg-white border-b border-gray-200 last:border-b-0"
+                      >
+                        {/* Name Dropdown */}
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Resource Name
+                          </label>
+                          <Select
+                            options={resourceOptions}
+                            value={resource.name}
+                            placeholder="Select Resource Name"
+                            className="text-sm"
+                            onChange={(selectedOption) => {
+                              setSelectedResources((prev) => {
+                                const updated = [...prev];
+                                updated[index] = {
+                                  name: selectedOption,
+                                  type: { label: selectedOption.type, value: selectedOption.type },
+                                  specification: {
+                                    label: selectedOption.specification,
+                                    value: selectedOption.specification,
+                                  },
+                                };
+                                return updated;
+                              });
+                            }}
+                          />
+                        </div>
+
+                        {/* Type */}
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Type
+                          </label>
+                          <input
+                            value={resource.type?.value || ""}
+                            placeholder="Resource Type"
+                            disabled
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Specification */}
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Specification
+                          </label>
+                          <input
+                            value={resource.specification?.value || ""}
+                            placeholder="Resource Specification"
+                            disabled
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex sm:justify-start items-center gap-2">
+                          {selectedResources.length > 1 && (
+                            <button
+                              type="button"
+                              className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                              onClick={() => {
+                                const updated = selectedResources.filter((_, i) => i !== index);
+                                setSelectedResources(updated);
+                              }}
+                            >
+                              ✕
+                            </button>
+                          )}
+                          {index === selectedResources.length - 1 && (
+                            <button
+                              type="button"
+                              className="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
+                              onClick={() =>
+                                setSelectedResources([
+                                  ...selectedResources,
+                                  { name: null, type: null, specification: null },
+                                ])
+                              }
+                            >
+                              + Add
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Manpower Section */}
+              <div className="bg-white border-b">
+                <div className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Manpower</h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    {manpower.map((entry, index) => (
+                      <div key={index} className="flex gap-4 items-center">
+                        {/* Dropdown for Man Power Employee */}
+                        <Select
+                          styles={customStyles}
+                          options={manPowerOptions}
+                          placeholder="Select Employee"
+                          value={manPowerOptions.find(opt => opt.value === entry.user)}
+                          onChange={(option) =>
+                            handleManpowerChange(index, 'user', option?.value)
+                          }
+                          className="flex-1"
+                        />
+
+                        {/* Remove Button */}
+                        {manpower.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveManpower(index)}
+                            className="text-red-600 hover:text-red-800"
+                            title="Remove"
+                          >
+                            ❌
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Add Button */}
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={handleAddManpower}
+                      className="px-3 py-1 flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded"
+                    >
+                      <Plus size={16} /> Add Manpower
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+
+
 
               {/* Scrap Materials Section */}
               <div className="bg-white border-b">
@@ -800,7 +1069,7 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
 
                   {/* Table Header (Desktop Only) */}
-                  <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                  <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 whitespace-nowrap to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
                     <div>Product Name</div>
                     <div>Comment</div>
                     <div>Estimated Quantity</div>
@@ -911,8 +1180,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.unit_cost || ""
                                 : material.unit_cost
-                                ? "*****"
-                                : ""
+                                  ? "*****"
+                                  : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -930,8 +1199,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.total_part_cost || ""
                                 : material.total_part_cost
-                                ? "*****"
-                                : ""
+                                  ? "*****"
+                                  : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -1110,8 +1379,8 @@ const AddBom: React.FC<AddBomProps> = ({
                           cookies?.role === "admin"
                             ? totalPartsCost || ""
                             : totalPartsCost
-                            ? "*****"
-                            : ""
+                              ? "*****"
+                              : ""
                         }
                         readOnly
                         className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"

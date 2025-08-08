@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from "react";
 import { colors } from "../theme/colors";
 import { FiPlus, FiSearch } from "react-icons/fi";
-import { Button, useToast } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import { MdOutlineRefresh } from "react-icons/md";
 import ResourceTable from "../components/Table/ResourceTable";
 import AddResource from "../components/Drawers/Resources/AddResource";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { toast } from "react-toastify";
 
 interface Resource {
   _id: string;
@@ -19,7 +20,6 @@ interface Resource {
 }
 
 const Resources = () => {
-  const toast = useToast();
 
   const [cookies] = useCookies();
   const [resources, setResources] = useState<Resource[]>([]);
@@ -28,35 +28,33 @@ const Resources = () => {
   const [isLoadingResources, setIsLoadingResources] = useState(false);
   const [isAddResourceDrawerOpened, setIsAddResourceDrawerOpened] =
     useState(false);
-
+  const [editResource, setEditResource] = useState<Resource | null>(null);
   const openAddResourceDrawerHandler = () => {
+    setEditResource(null); // Clear edit state when opening add drawer
     setIsAddResourceDrawerOpened(true);
   };
 
   const closeAddResourceDrawerHandler = () => {
     setIsAddResourceDrawerOpened(false);
+    setEditResource(null); // Always clear edit state when closing drawer
   };
 
   const fetchResourcesHandler = async () => {
     try {
       setIsLoadingResources(true);
-     const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}resources`, {
-       headers: {
-         Authorization: `Bearer ${cookies?.access_token}`,
-       }
-     });
-      console.log(res?.data)
+      const res = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}resources`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      console.log(res?.data);
       setResources(res?.data?.resources || []);
       setFilteredResources(res?.data?.resources || []);
-
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error?.message || "Something went wrong",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast.error(error?.message || "Something went wrong");
     } finally {
       setIsLoadingResources(false);
     }
@@ -64,29 +62,63 @@ const Resources = () => {
 
   const deleteResourceHandler = async (id: string) => {
     try {
+      await axios.delete(
+        `${process.env.REACT_APP_BACKEND_URL}resources/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+
       const updatedResources = resources.filter(
         (resource) => resource._id !== id
       );
       setResources(updatedResources);
       setFilteredResources(updatedResources);
 
-      toast({
-        title: "Success",
-        description: "Resource deleted successfully",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast.success("Resource deleted successfully");
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to delete resource",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast.error(error?.message || "Failed to delete resource");
     }
   };
+
+  const handleResourceCreated = (newResource: Resource) => {
+    const updatedResources = [newResource, ...resources];
+    setResources(updatedResources);
+    setFilteredResources(updatedResources);
+  };
+  
+
+  const bulkDeleteResourcesHandler = async (ids: string[]) => {
+    try {
+      const deletePromises = ids.map((id) =>
+        axios.delete(`${process.env.REACT_APP_BACKEND_URL}resources/${id}`, {
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        })
+      );
+
+      await Promise.all(deletePromises);
+
+      const updatedResources = resources.filter(
+        (resource) => !ids.includes(resource._id)
+      );
+      setResources(updatedResources);
+      setFilteredResources(updatedResources);
+
+      toast.success(
+        `${ids.length} resource${
+          ids.length > 1 ? "s" : ""
+        } deleted successfully`
+      );
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete some resources");
+    }
+  };
+  
+  
 
   const handleSearch = (value: string) => {
     setSearchKey(value);
@@ -104,11 +136,14 @@ const Resources = () => {
     }
   };
 
-  const handleResourceCreated = (newResource: Resource) => {
-    const updatedResources = [...resources, newResource];
+  const handleResourceUpdated = (updatedResource: Resource) => {
+    const updatedResources = resources.map((resource) =>
+      resource._id === updatedResource._id ? updatedResource : resource
+    );
     setResources(updatedResources);
     setFilteredResources(updatedResources);
   };
+  
 
   useEffect(() => {
     fetchResourcesHandler();
@@ -124,6 +159,9 @@ const Resources = () => {
         <AddResource
           onResourceCreated={handleResourceCreated}
           closeDrawerHandler={closeAddResourceDrawerHandler}
+          editResource={editResource}
+          onResourceUpdated={handleResourceUpdated}
+          fetchResourcesHandler={fetchResourcesHandler}
         />
       )}
 
@@ -212,6 +250,11 @@ const Resources = () => {
           isLoadingResources={isLoadingResources}
           deleteResourceHandler={deleteResourceHandler}
           fetchResourcesHandler={fetchResourcesHandler}
+          setEditResource={setEditResource}
+          editResource={editResource}
+          openUpdateResourceDrawerHandler={openAddResourceDrawerHandler}
+          setAddResourceDrawerOpened={setIsAddResourceDrawerOpened}
+          bulkDeleteResourcesHandler={bulkDeleteResourcesHandler}
         />
       </div>
     </div>
