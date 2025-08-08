@@ -72,7 +72,7 @@ const InventoryApprovals: React.FC = () => {
       toast.error(err?.message || "Something went wrong");
     }
   };
- 
+   
 
   useEffect(() => {
     if (token) {
