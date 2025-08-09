@@ -108,6 +108,8 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
           bompdf: bomImageUrl,
         };
 
+        console.log(payload)
+
         if (editTable?._id) {
           await axios.put(
             `${process.env.REACT_APP_BACKEND_URL}sale/update/${editTable._id}`,
@@ -150,7 +152,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       }
     },
   });
-  console.log(products)
+  // console.log(products)
   const fetchDropdownData = async () => {
     try {
       const [partiesRes, productRes] = await Promise.all([
@@ -185,7 +187,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
           headers: { Authorization: `Bearer ${cookies?.access_token}` },
         }
       );
-      console.log("Auto BOM created:", res.data);
+      console.log("Auto BOM created:", res?.data);
     } catch (error) {
       console.log("Auto BOM creation failed:", error);
     }
@@ -220,9 +222,8 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
 
       {/* Drawer */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full  sm:w-[55vw] md:w-[35vw] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
-          show ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-y-0 right-0 z-50 w-full  sm:w-[55vw] md:w-[35vw] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${show ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="h-full flex flex-col">
           {/* Header */}
@@ -466,11 +467,10 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                   {[18, 12, 5].map((rate) => (
                     <label
                       key={rate}
-                      className={`flex items-center justify-center p-2 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                        values.GST === String(rate)
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-300 hover:border-gray-400"
-                      }`}
+                      className={`flex items-center justify-center p-2 border-2 rounded-lg cursor-pointer transition-all duration-200 ${values.GST === String(rate)
+                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                        : "border-gray-300 hover:border-gray-400"
+                        }`}
                     >
                       <input
                         type="radio"
@@ -506,12 +506,13 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                 >
                   <option value="">Select Payment Mode</option>
-                  <option value="Cash">Cash</option>
-                  <option value="Cheque">Cheque</option>
+                  <option value="cash">Cash</option>
+                  <option value="cheque">Cheque</option>
                   <option value="NEFT/RTGS">NEFT/RTGS</option>
                   <option value="UPI">UPI</option>
                   <option value="Credit Card">Credit Card</option>
                   <option value="Debit Card">Debit Card</option>
+
                 </select>
                 {touched.mode_of_payment && errors.mode_of_payment && (
                   <p className="text-red-500 text-sm">
@@ -552,11 +553,10 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                 type="submit"
                 disabled={isSubmitting}
                 onClick={handleSubmit}
-                className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
-                  isSubmitting
-                    ? "bg-gray-400 text-white cursor-not-allowed"
-                    : "bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md"
-                }`}
+                className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${isSubmitting
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md"
+                  }`}
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-2">
