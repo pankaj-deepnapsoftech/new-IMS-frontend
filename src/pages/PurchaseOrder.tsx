@@ -42,6 +42,8 @@ interface InventoryShortage {
   price_change?: number;
   price_change_percentage?: number;
   updated_at: string;
+  priceUpdateTimeout?: NodeJS.Timeout;
+  stockUpdateTimeout?: NodeJS.Timeout;
 }
 
 interface ProductInventory {
@@ -392,7 +394,7 @@ const PurchaseOrder: React.FC = () => {
     setUpdateInventoryForm(updatedForm);
   };
 
-  // Handle price updates in Update Inventory form
+  // Handle price updates in Update Inventory form (local only - no API call)
   const handleUpdateInventoryPriceChange = (index: number, newPrice: number) => {
     const updatedForm = [...updateInventoryForm];
     const item = updatedForm[index];
@@ -406,51 +408,60 @@ const PurchaseOrder: React.FC = () => {
     setUpdateInventoryForm(updatedForm);
   };
 
-  // Handle stock updates in shortages table
+  // Handle stock updates in shortages table with debouncing
   const handleStockUpdate = async (index: number, newStock: number) => {
     const updatedShortages = [...inventoryShortages];
     const item = updatedShortages[index];
     
+    // Update UI immediately for better user experience
     updatedShortages[index] = {
       ...item,
       current_stock: newStock
     };
     setInventoryShortages(updatedShortages);
 
-    // Update the stock in the backend
-    try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}product/update-inventory`,
-        {
-          productId: item.item,
-          newStock: newStock
-        },
-        {
-          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+    // Debounce the API call - only update backend after user stops typing for 1 second
+    clearTimeout(item.stockUpdateTimeout);
+    
+    const timeoutId = setTimeout(async () => {
+      try {
+        const response = await axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
+          {
+            productId: item.item,
+            newStock: newStock
+          },
+          {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          }
+        );
+        
+        if (response.data.success) {
+          toast.success(`Stock updated for ${item.item_name}`);
+          // Refresh all data to sync across components
+          await Promise.all([
+            fetchInventoryShortages(),
+            fetchProducts(),
+            fetchUpdateInventoryForm()
+          ]);
+        } else {
+          toast.error("Failed to update stock in backend");
         }
-      );
-      
-      if (response.data.success) {
-        toast.success(`Stock updated for ${item.item_name}`);
-        // Refresh all data to sync across components
-        await Promise.all([
-          fetchInventoryShortages(),
-          fetchProducts(),
-          fetchUpdateInventoryForm()
-        ]);
-      } else {
-        toast.error("Failed to update stock in backend");
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message || "Failed to update stock");
       }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to update stock");
-    }
+    }, 1000); // 1 second delay
+
+    // Store the timeout ID in the item for cleanup
+    updatedShortages[index].stockUpdateTimeout = timeoutId;
   };
 
-  // Handle price updates in shortages table
+  // Handle price updates in shortages table with debouncing
   const handlePriceUpdate = async (index: number, newPrice: number) => {
     const updatedShortages = [...inventoryShortages];
     const item = updatedShortages[index];
     
+    // Update UI immediately for better user experience
     updatedShortages[index] = {
       ...item,
       updated_price: newPrice,
@@ -459,33 +470,40 @@ const PurchaseOrder: React.FC = () => {
     };
     setInventoryShortages(updatedShortages);
 
-    // Update the price in the backend
-    try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
-        {
-          productId: item.item,
-          newPrice: newPrice
-        },
-        {
-          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+    // Debounce the API call - only update backend after user stops typing for 1 second
+    clearTimeout(item.priceUpdateTimeout);
+    
+    const timeoutId = setTimeout(async () => {
+      try {
+        const response = await axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
+          {
+            productId: item.item,
+            newPrice: newPrice
+          },
+          {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          }
+        );
+        
+        if (response.data.success) {
+          toast.success(`Price updated for ${item.item_name}`);
+          // Refresh all data to sync across components
+          await Promise.all([
+            fetchInventoryShortages(),
+            fetchProducts(),
+            fetchUpdateInventoryForm()
+          ]);
+        } else {
+          toast.error("Failed to update price in backend");
         }
-      );
-      
-      if (response.data.success) {
-        toast.success(`Price updated for ${item.item_name}`);
-        // Refresh all data to sync across components
-        await Promise.all([
-          fetchInventoryShortages(),
-          fetchProducts(),
-          fetchUpdateInventoryForm()
-        ]);
-      } else {
-        toast.error("Failed to update price in backend");
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message || "Failed to update price");
       }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to update price");
-    }
+    }, 1000); // 1 second delay
+
+    // Store the timeout ID in the item for cleanup
+    updatedShortages[index].priceUpdateTimeout = timeoutId;
   };
 
   // Submit update inventory form
@@ -503,6 +521,21 @@ const PurchaseOrder: React.FC = () => {
   useEffect(() => {
     fetchPurchaseOrders();
   }, [refreshTrigger]);
+
+  // Cleanup timeouts when component unmounts
+  useEffect(() => {
+    return () => {
+      // Clear all pending timeouts
+      inventoryShortages.forEach(item => {
+        if (item.priceUpdateTimeout) {
+          clearTimeout(item.priceUpdateTimeout);
+        }
+        if (item.stockUpdateTimeout) {
+          clearTimeout(item.stockUpdateTimeout);
+        }
+      });
+    };
+  }, [inventoryShortages]);
 
   // Filter purchase orders based on search key
   useEffect(() => {
@@ -760,97 +793,117 @@ const PurchaseOrder: React.FC = () => {
                              ) : (
                  <div className="space-y-4">
                    {/* Price Impact Summary */}
-                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                     <h3 className="text-lg font-semibold text-blue-900 mb-2">Price Impact Summary</h3>
-                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                       <div>
-                         <span className="text-blue-700 font-medium">Total Items:</span>
-                         <span className="ml-2 text-blue-900">{inventoryShortages.length}</span>
-                       </div>
-                       <div>
-                         <span className="text-blue-700 font-medium">Price Changes:</span>
-                         <span className="ml-2 text-blue-900">
-                           {inventoryShortages.filter(item => item.updated_price && item.updated_price !== item.current_price).length}
-                         </span>
-                       </div>
-                       <div>
-                         <span className="text-blue-700 font-medium">Total Impact:</span>
-                         <span className={`ml-2 font-semibold ${
-                           inventoryShortages.reduce((total, item) => {
-                             const change = item.price_change || 0;
-                             return total + (change * item.shortage_quantity);
-                           }, 0) > 0 ? 'text-red-600' : 'text-green-600'
-                         }`}>
-                           ₹{inventoryShortages.reduce((total, item) => {
-                             const change = item.price_change || 0;
-                             return total + (change * item.shortage_quantity);
-                           }, 0).toFixed(2)}
-                         </span>
-                       </div>
-                     </div>
-                   </div>
+                                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h3 className="text-lg font-semibold text-blue-900 mb-2">Price Impact Summary</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <span className="text-blue-700 font-medium">Total Items:</span>
+                          <span className="ml-2 text-blue-900">{inventoryShortages.length}</span>
+                        </div>
+                        <div>
+                          <span className="text-blue-700 font-medium">Price Changes:</span>
+                          <span className="ml-2 text-blue-900">
+                            {inventoryShortages.filter(item => item.updated_price && item.updated_price !== item.current_price).length}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-blue-700 font-medium">Total Impact:</span>
+                          <span className={`ml-2 font-semibold ${
+                            inventoryShortages.reduce((total, item) => {
+                              const change = item.price_change || 0;
+                              return total + (change * item.shortage_quantity);
+                            }, 0) > 0 ? 'text-red-600' : 'text-green-600'
+                          }`}>
+                            ₹{inventoryShortages.reduce((total, item) => {
+                              const change = item.price_change || 0;
+                              return total + (change * item.shortage_quantity);
+                            }, 0).toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-blue-700 text-xs mt-3">
+                        💡 <strong>Tip:</strong> Price and stock updates are automatically saved 1 second after you stop typing. 
+                        Look for the yellow indicator dot when updates are pending.
+                      </p>
+                    </div>
                    
                    <div className="overflow-x-auto">
                      <table className="min-w-full divide-y divide-gray-200">
                                          <thead className="bg-gray-50">
-                                               <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shortage Quantity</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated Price</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price Change</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
-                        </tr>
+                       <tr>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BOM Name</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shortage Quantity</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated Price</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price Change</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
+                       </tr>
                      </thead>
                      <tbody className="bg-white divide-y divide-gray-200">
-                                               {inventoryShortages.map((item, idx) => (
-                          <tr key={idx} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.item_name || "-"}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <input
-                                type="number"
-                                value={item.current_stock}
-                                onChange={(e) => handleStockUpdate(idx, Number(e.target.value))}
-                                className={`w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                  item.current_stock < 0 ? "text-red-600 font-semibold" : "text-gray-900"
-                                }`}
-                                min="-999999"
-                                step="1"
-                              />
+                       {inventoryShortages.map((item, idx) => (
+                         <tr key={idx} className="hover:bg-gray-50">
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.bom_name || "-"}</td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.item_name || "-"}</td>
+                                                       <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="relative">
+                                <input
+                                  type="number"
+                                  value={item.current_stock}
+                                  onChange={(e) => handleStockUpdate(idx, Number(e.target.value))}
+                                  className={`w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                    item.current_stock < 0 ? "text-red-600 font-semibold" : "text-gray-900"
+                                  } ${
+                                    item.stockUpdateTimeout ? 'border-yellow-400 bg-yellow-50' : ''
+                                  }`}
+                                  min="-999999"
+                                  step="1"
+                                />
+                                {item.stockUpdateTimeout && (
+                                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                                )}
+                              </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">{item.shortage_quantity}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{item.current_price}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <input
-                                type="number"
-                                value={item.updated_price || item.current_price}
-                                onChange={(e) => handlePriceUpdate(idx, Number(e.target.value))}
-                                className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                placeholder={item.current_price.toString()}
-                                min="0"
-                                step="0.01"
-                              />
+                           <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">{item.shortage_quantity}</td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{item.current_price}</td>
+                                                       <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="relative">
+                                <input
+                                  type="number"
+                                  value={item.updated_price || item.current_price}
+                                  onChange={(e) => handlePriceUpdate(idx, Number(e.target.value))}
+                                  className={`w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                    item.priceUpdateTimeout ? 'border-yellow-400 bg-yellow-50' : ''
+                                  }`}
+                                  placeholder={item.current_price.toString()}
+                                  min="0"
+                                  step="0.01"
+                                />
+                                {item.priceUpdateTimeout && (
+                                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                                )}
+                              </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm">
-                              {item.updated_price && item.updated_price !== item.current_price ? (
-                                <div className="flex flex-col">
-                                  <span className={`font-semibold ${item.updated_price > item.current_price ? 'text-red-600' : 'text-green-600'}`}>
-                                    ₹{Math.abs(item.updated_price - item.current_price).toFixed(2)}
-                                  </span>
-                                  <span className={`text-xs ${item.updated_price > item.current_price ? 'text-red-500' : 'text-green-500'}`}>
-                                    {((item.updated_price - item.current_price) / item.current_price * 100).toFixed(1)}%
-                                  </span>
-                                </div>
-                              ) : (
-                                <span className="text-gray-400">-</span>
-                              )}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {new Date(item.updated_at).toLocaleDateString()}
-                            </td>
-                          </tr>
-                        ))}
+                           <td className="px-6 py-4 whitespace-nowrap text-sm">
+                             {item.updated_price && item.updated_price !== item.current_price ? (
+                               <div className="flex flex-col">
+                                 <span className={`font-semibold ${item.updated_price > item.current_price ? 'text-red-600' : 'text-green-600'}`}>
+                                   ₹{Math.abs(item.updated_price - item.current_price).toFixed(2)}
+                                 </span>
+                                 <span className={`text-xs ${item.updated_price > item.current_price ? 'text-red-500' : 'text-green-500'}`}>
+                                   {((item.updated_price - item.current_price) / item.current_price * 100).toFixed(1)}%
+                                 </span>
+                               </div>
+                             ) : (
+                               <span className="text-gray-400">-</span>
+                             )}
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                             {new Date(item.updated_at).toLocaleDateString()}
+                           </td>
+                         </tr>
+                       ))}
                                           </tbody>
                    </table>
                    </div>
@@ -963,13 +1016,17 @@ const PurchaseOrder: React.FC = () => {
                      </div>
                    </div>
 
-                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                     <h3 className="text-lg font-semibold text-blue-900 mb-2">Instructions</h3>
-                     <p className="text-blue-800 text-sm">
-                       Update prices, fill in Buy Quantity and Price Difference for items with shortages. 
-                       This form will help you plan your inventory purchases.
-                     </p>
-                   </div>
+                                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h3 className="text-lg font-semibold text-blue-900 mb-2">Instructions</h3>
+                      <p className="text-blue-800 text-sm">
+                        Update prices, fill in Buy Quantity and Price Difference for items with shortages. 
+                        This form will help you plan your inventory purchases.
+                      </p>
+                      <p className="text-blue-700 text-xs mt-2">
+                        💡 <strong>Tip:</strong> Price and stock updates are automatically saved 1 second after you stop typing. 
+                        Look for the yellow indicator dot when updates are pending.
+                      </p>
+                    </div>
                   
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
