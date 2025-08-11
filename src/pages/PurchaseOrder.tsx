@@ -37,13 +37,12 @@ interface InventoryShortage {
   item: string;
   shortage_quantity: number;
   current_stock: number;
+  original_stock: number;
   current_price: number;
   updated_price?: number;
   price_change?: number;
   price_change_percentage?: number;
   updated_at: string;
-  priceUpdateTimeout?: NodeJS.Timeout;
-  stockUpdateTimeout?: NodeJS.Timeout;
 }
 
 interface ProductInventory {
@@ -213,19 +212,25 @@ const PurchaseOrder: React.FC = () => {
       if (shortagesResponse.data.success) {
         const allShortages = shortagesResponse.data.shortages || [];
         
-        // Filter shortages to only include raw materials
-        const rawMaterialShortages = allShortages.filter((shortage: any) => {
-          // Check if the shortage item is in our raw materials list
-          return rawMaterials.some((rawMaterial: any) => 
-            rawMaterial.name.toLowerCase() === shortage.item_name?.toLowerCase() ||
-            rawMaterial._id === shortage.item
-          );
-        });
+                 // Filter shortages to only include raw materials
+         const rawMaterialShortages = allShortages.filter((shortage: any) => {
+           // Check if the shortage item is in our raw materials list
+           return rawMaterials.some((rawMaterial: any) => 
+             rawMaterial.name.toLowerCase() === shortage.item_name?.toLowerCase() ||
+             rawMaterial._id === shortage.item
+           );
+         });
 
-        console.log("Total shortages:", allShortages.length);
-        console.log("Raw material shortages:", rawMaterialShortages.length);
-        
-        setInventoryShortages(rawMaterialShortages);
+         console.log("Total shortages:", allShortages.length);
+         console.log("Raw material shortages:", rawMaterialShortages.length);
+         
+         // Add original_stock field to track changes
+         const shortagesWithOriginalStock = rawMaterialShortages.map((shortage: any) => ({
+           ...shortage,
+           original_stock: shortage.current_stock
+         }));
+         
+         setInventoryShortages(shortagesWithOriginalStock);
       } else {
         toast.error(shortagesResponse.data.message || "Failed to fetch inventory shortages");
       }
@@ -408,8 +413,8 @@ const PurchaseOrder: React.FC = () => {
     setUpdateInventoryForm(updatedForm);
   };
 
-  // Handle stock updates in shortages table with debouncing
-  const handleStockUpdate = async (index: number, newStock: number) => {
+  // Handle stock updates in shortages table (local only - no automatic API call)
+  const handleStockUpdate = (index: number, newStock: number) => {
     const updatedShortages = [...inventoryShortages];
     const item = updatedShortages[index];
     
@@ -419,45 +424,10 @@ const PurchaseOrder: React.FC = () => {
       current_stock: newStock
     };
     setInventoryShortages(updatedShortages);
-
-    // Debounce the API call - only update backend after user stops typing for 1 second
-    clearTimeout(item.stockUpdateTimeout);
-    
-    const timeoutId = setTimeout(async () => {
-      try {
-        const response = await axios.put(
-          `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
-          {
-            productId: item.item,
-            newStock: newStock
-          },
-          {
-            headers: { Authorization: `Bearer ${cookies?.access_token}` },
-          }
-        );
-        
-        if (response.data.success) {
-          toast.success(`Stock updated for ${item.item_name}`);
-          // Refresh all data to sync across components
-          await Promise.all([
-            fetchInventoryShortages(),
-            fetchProducts(),
-            fetchUpdateInventoryForm()
-          ]);
-        } else {
-          toast.error("Failed to update stock in backend");
-        }
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message || "Failed to update stock");
-      }
-    }, 1000); // 1 second delay
-
-    // Store the timeout ID in the item for cleanup
-    updatedShortages[index].stockUpdateTimeout = timeoutId;
   };
 
-  // Handle price updates in shortages table with debouncing
-  const handlePriceUpdate = async (index: number, newPrice: number) => {
+  // Handle price updates in shortages table (local only - no automatic API call)
+  const handlePriceUpdate = (index: number, newPrice: number) => {
     const updatedShortages = [...inventoryShortages];
     const item = updatedShortages[index];
     
@@ -469,41 +439,6 @@ const PurchaseOrder: React.FC = () => {
       price_change_percentage: ((newPrice - item.current_price) / item.current_price) * 100
     };
     setInventoryShortages(updatedShortages);
-
-    // Debounce the API call - only update backend after user stops typing for 1 second
-    clearTimeout(item.priceUpdateTimeout);
-    
-    const timeoutId = setTimeout(async () => {
-      try {
-        const response = await axios.put(
-          `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
-          {
-            productId: item.item,
-            newPrice: newPrice
-          },
-          {
-            headers: { Authorization: `Bearer ${cookies?.access_token}` },
-          }
-        );
-        
-        if (response.data.success) {
-          toast.success(`Price updated for ${item.item_name}`);
-          // Refresh all data to sync across components
-          await Promise.all([
-            fetchInventoryShortages(),
-            fetchProducts(),
-            fetchUpdateInventoryForm()
-          ]);
-        } else {
-          toast.error("Failed to update price in backend");
-        }
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message || "Failed to update price");
-      }
-    }, 1000); // 1 second delay
-
-    // Store the timeout ID in the item for cleanup
-    updatedShortages[index].priceUpdateTimeout = timeoutId;
   };
 
   // Submit update inventory form
@@ -518,24 +453,74 @@ const PurchaseOrder: React.FC = () => {
     }
   };
 
+  // Submit all changes in Raw Material Shortages modal
+  const submitRawMaterialChanges = async () => {
+    try {
+      // Find items that have been modified
+      const modifiedItems = inventoryShortages.filter(item => 
+        (item.updated_price && item.updated_price !== item.current_price) ||
+        (item.current_stock !== item.original_stock)
+      );
+
+      if (modifiedItems.length === 0) {
+        toast.info("No changes to save");
+        return;
+      }
+
+      // Update prices
+      const priceUpdates = modifiedItems
+        .filter(item => item.updated_price && item.updated_price !== item.current_price)
+        .map(item => 
+          axios.put(
+            `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
+            {
+              productId: item.item,
+              newPrice: item.updated_price
+            },
+            {
+              headers: { Authorization: `Bearer ${cookies?.access_token}` },
+            }
+          )
+        );
+
+      // Update stocks
+      const stockUpdates = modifiedItems
+        .filter(item => item.current_stock !== item.original_stock)
+        .map(item => 
+          axios.put(
+            `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
+            {
+              productId: item.item,
+              newStock: item.current_stock
+            },
+            {
+              headers: { Authorization: `Bearer ${cookies?.access_token}` },
+            }
+          )
+        );
+
+      // Execute all updates
+      await Promise.all([...priceUpdates, ...stockUpdates]);
+
+      toast.success(`Successfully updated ${modifiedItems.length} items`);
+      
+      // Refresh all data to sync across components
+      await Promise.all([
+        fetchInventoryShortages(),
+        fetchProducts(),
+        fetchUpdateInventoryForm()
+      ]);
+
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to save changes");
+    }
+  };
+
   useEffect(() => {
     fetchPurchaseOrders();
   }, [refreshTrigger]);
 
-  // Cleanup timeouts when component unmounts
-  useEffect(() => {
-    return () => {
-      // Clear all pending timeouts
-      inventoryShortages.forEach(item => {
-        if (item.priceUpdateTimeout) {
-          clearTimeout(item.priceUpdateTimeout);
-        }
-        if (item.stockUpdateTimeout) {
-          clearTimeout(item.stockUpdateTimeout);
-        }
-      });
-    };
-  }, [inventoryShortages]);
+
 
   // Filter purchase orders based on search key
   useEffect(() => {
@@ -822,8 +807,7 @@ const PurchaseOrder: React.FC = () => {
                         </div>
                       </div>
                       <p className="text-blue-700 text-xs mt-3">
-                        💡 <strong>Tip:</strong> Price and stock updates are automatically saved 1 second after you stop typing. 
-                        Look for the yellow indicator dot when updates are pending.
+                        💡 <strong>Tip:</strong> Make your changes to prices and stock levels, then click "Save Changes" to update the backend.
                       </p>
                     </div>
                    
@@ -847,43 +831,29 @@ const PurchaseOrder: React.FC = () => {
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.bom_name || "-"}</td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.item_name || "-"}</td>
                                                        <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="relative">
-                                <input
-                                  type="number"
-                                  value={item.current_stock}
-                                  onChange={(e) => handleStockUpdate(idx, Number(e.target.value))}
-                                  className={`w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                    item.current_stock < 0 ? "text-red-600 font-semibold" : "text-gray-900"
-                                  } ${
-                                    item.stockUpdateTimeout ? 'border-yellow-400 bg-yellow-50' : ''
-                                  }`}
-                                  min="-999999"
-                                  step="1"
-                                />
-                                {item.stockUpdateTimeout && (
-                                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                                )}
-                              </div>
+                              <input
+                                type="number"
+                                value={item.current_stock}
+                                onChange={(e) => handleStockUpdate(idx, Number(e.target.value))}
+                                className={`w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                  item.current_stock < 0 ? "text-red-600 font-semibold" : "text-gray-900"
+                                }`}
+                                min="-999999"
+                                step="1"
+                              />
                             </td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">{item.shortage_quantity}</td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{item.current_price}</td>
                                                        <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="relative">
-                                <input
-                                  type="number"
-                                  value={item.updated_price || item.current_price}
-                                  onChange={(e) => handlePriceUpdate(idx, Number(e.target.value))}
-                                  className={`w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                    item.priceUpdateTimeout ? 'border-yellow-400 bg-yellow-50' : ''
-                                  }`}
-                                  placeholder={item.current_price.toString()}
-                                  min="0"
-                                  step="0.01"
-                                />
-                                {item.priceUpdateTimeout && (
-                                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                                )}
-                              </div>
+                              <input
+                                type="number"
+                                value={item.updated_price || item.current_price}
+                                onChange={(e) => handlePriceUpdate(idx, Number(e.target.value))}
+                                className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder={item.current_price.toString()}
+                                min="0"
+                                step="0.01"
+                              />
                             </td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm">
                              {item.updated_price && item.updated_price !== item.current_price ? (
@@ -906,6 +876,22 @@ const PurchaseOrder: React.FC = () => {
                        ))}
                                           </tbody>
                    </table>
+                   </div>
+                   
+                   {/* Submit Button */}
+                   <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-6">
+                     <button
+                       onClick={() => setShowInventoryShortagesModal(false)}
+                       className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium"
+                     >
+                       Cancel
+                     </button>
+                     <button
+                       onClick={submitRawMaterialChanges}
+                       className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium"
+                     >
+                       Save Changes
+                     </button>
                    </div>
                  </div>
                )}
