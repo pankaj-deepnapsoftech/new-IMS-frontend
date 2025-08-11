@@ -27,7 +27,7 @@ export const SalesFormValidation = Yup.object({
 
  mode_of_payment: Yup.string()
   .oneOf(
-    ["cash", "cheque", "NEFT/RTGS", "UPI", "Credit Card", "Debit Card"],
+    ["Cash", "Cheque", "NEFT/RTGS", "UPI", "Credit Card", "Debit Card"],
     "Select a valid mode of payment"
   )
   .required("Mode of payment is required"),
