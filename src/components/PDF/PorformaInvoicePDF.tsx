@@ -206,7 +206,7 @@ const toWords = new ToWords({
     currencyOptions: {
       name: "Rupee",
       plural: "Rupees",
-      symbol: "₹",
+      symbol: "",
       fractionalUnit: {
         name: "Paisa",
         plural: "Paise",
@@ -364,12 +364,12 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
               <Text style={styles.colUnitQty}>{item?.quantity || "0"}</Text>
               <Text style={styles.colUnitType}>{"Piece"}</Text>
               <Text style={styles.colPrice}>
-                ₹{(item?.amount || 0).toFixed(2)}
+                {(item?.amount || 0).toFixed(2)}
               </Text>
               <Text style={styles.colTax}>
                 {proformaInvoice?.tax?.tax_name || "18%"}
               </Text>
-              <Text style={styles.colAmount}>₹{total.toFixed(2)}</Text>
+              <Text style={styles.colAmount}>{total.toFixed(2)}</Text>
             </View>
           )) || (
             <View style={styles.tableRow}>
@@ -377,9 +377,9 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
               <Text style={styles.colName}>No items found</Text>
               <Text style={styles.colUnitQty}>0</Text>
               <Text style={styles.colUnitType}>Piece</Text>
-              <Text style={styles.colPrice}>₹0.00</Text>
+              <Text style={styles.colPrice}>0.00</Text>
               <Text style={styles.colTax}>0%</Text>
-              <Text style={styles.colAmount}>₹0.00</Text>
+              <Text style={styles.colAmount}>0.00</Text>
             </View>
           )}
 
@@ -416,22 +416,22 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
           <View style={styles.amountDetailsSection}>
             <View style={styles.amountRow}>
               <Text style={styles.sectionLabel}>Net Amount:</Text>
-              <Text style={styles.sectionValue}>₹{subtotal.toFixed(2)}</Text>
+              <Text style={styles.sectionValue}>{subtotal.toFixed(2)}</Text>
             </View>
             <View style={styles.amountRow}>
               <Text style={styles.sectionLabel}>CGST</Text>
-              <Text style={styles.sectionValue}>₹{cgst.toFixed(2)}</Text>
+              <Text style={styles.sectionValue}>{cgst.toFixed(2)}</Text>
             </View>
             <View style={styles.amountRow}>
               <Text style={styles.sectionLabel}>SGST</Text>
-              <Text style={styles.sectionValue}>₹{sgst.toFixed(2)}</Text>
+              <Text style={styles.sectionValue}>{sgst.toFixed(2)}</Text>
             </View>
             <View style={styles.amountRow}>
               <Text style={[styles.sectionLabel, { fontWeight: "bold" }]}>
                 Total Amount:
               </Text>
               <Text style={[styles.sectionValue, { fontWeight: "bold" }]}>
-                ₹{total.toFixed(2)}
+                {total.toFixed(2)}
               </Text>
             </View>
           </View>
