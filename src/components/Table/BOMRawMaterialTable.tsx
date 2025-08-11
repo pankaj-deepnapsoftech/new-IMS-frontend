@@ -13,7 +13,7 @@ import {
   Toast,
 } from "@chakra-ui/react";
 import moment from "moment";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   FaCaretDown,
   FaCaretUp,
@@ -40,7 +40,13 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 
 
-
+const statusColorMap = {
+  "production started": "bg-green-100 text-green-800",
+  "request for allow inventory": "bg-yellow-100 text-yellow-800",
+  "raw material approval pending": "bg-red-100 text-red-800",
+  "inventory in transit": "bg-orange-100 text-orange-800",
+  "Inventory Allocated": "bg-purple-100 text-purple-800",
+};
 
 interface BOMRawMaterialTableProps {
   products: Array<{
@@ -161,10 +167,6 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
         accessor: "price",
       },
       {
-        Header: "Status",
-        accessor: "status",
-      },
-      {
         Header: "Current stock",
         accessor: "current_stock",
       },
@@ -188,12 +190,16 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
         Header: "Last Updated",
         accessor: "updatedAt",
       },
+      {
+        Header: "Status",
+        accessor: "status",
+      },
     ],
     []
   );
   const [cookies] = useCookies();
-
-//  console.log(`process.env.REACT_APP_BACKEND_URL: ${process.env.REACT_APP_BACKEND_URL}`);
+  const [isApproved, setIsApproved] = useState(false);
+  //  console.log(`process.env.REACT_APP_BACKEND_URL: ${process.env.REACT_APP_BACKEND_URL}`);
   const handleOutAllottedInventory = async (process_id) => {
     console.log("process_id", process_id);
 
@@ -415,8 +421,6 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                         } else if (colId === "price") {
                           displayValue = `₹${original.price || 0}`;
 
-                        } else if (colId === "status") {
-                          displayValue = original.bom_status || "N/A";
                         } else if (colId === "createdAt") {
                           displayValue = original.createdAt
                             ? moment(original.createdAt).format("DD/MM/YYYY")
@@ -446,6 +450,19 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                             </div>
                           ) : (
                             "N/A"
+                          );
+                        } else if (colId === "status") {
+                          const status = original.bom_status || "N/A";
+
+                          const statusClass =
+                            statusColorMap[status] || "bg-gray-200 text-gray-800";
+
+                          displayValue = (
+                            <span
+                              className={`px-2 py-1 rounded-full text-sm font-medium ${statusClass}`}
+                            >
+                              {status}
+                            </span>
                           );
                         } else {
                           displayValue = cell.render("Cell");
@@ -510,20 +527,42 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                           )}
 
                           {/* Approve Inventory Button */}
-                          {original.bom_status === "raw material approval pending" && (
-                            <Button
-                              size="sm"
-                              style={{
-                                backgroundColor: colors.success[500],
-                                color: colors.text.inverse,
-                              }}
-                              _hover={{ bg: colors.success[600] }}
-                              onClick={() => approveProductHandler(original._id)}
-                              leftIcon={<FaCheckCircle />}
-                            >
-                              Approve
-                            </Button>
-                          )}
+
+                          <Button
+                            size="sm"
+                            style={{
+                              backgroundColor: isApproved || original.bom_status !== "raw material approval pending"
+                                ? colors.success[700] // Dark green if approved
+                                : colors.success[500], // Normal green if pending
+                              color: colors.text.inverse,
+                              cursor:
+                                isApproved || original.bom_status !== "raw material approval pending"
+                                  ? "not-allowed"
+                                  : "pointer",
+                            }}
+                            _hover={{
+                              bg:
+                                isApproved || original.bom_status !== "raw material approval pending"
+                                  ? colors.success[700]
+                                  : colors.success[600],
+                            }}
+                            onClick={() => {
+                              approveProductHandler(original._id);
+                              setIsApproved(true);
+                            }}
+                            leftIcon={<FaCheckCircle />}
+                            disabled={
+                              isApproved || original.bom_status !== "raw material approval pending"
+                            }
+                          >
+                            {isApproved || original.bom_status !== "raw material approval pending"
+                              ? "Approved"
+                              : "Approve"}
+                          </Button>
+
+
+
+
 
                           {/* Out Allotted Inventory Button */}
                           {original.bom_status === "request for allow inventory" && (

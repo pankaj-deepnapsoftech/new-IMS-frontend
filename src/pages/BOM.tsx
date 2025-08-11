@@ -24,8 +24,8 @@ import { colors } from "../theme/colors";
 import { FileText } from "lucide-react";
 import { AiFillFileExcel } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
-import SampleCSV from "../assets/csv/bom-sample.csv"
-import * as XLSX from 'xlsx';
+import SampleCSV from "../assets/csv/bom-sample.csv";
+import * as XLSX from "xlsx";
 
 const BOM: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
@@ -105,7 +105,7 @@ const BOM: React.FC = () => {
       toast.error(error?.data?.message || "Something went wrong");
     }
   };
-  console.log(boms)
+  console.log(boms);
   const exportProductsToExcel = async () => {
     try {
       setIsExporting(true);
@@ -114,7 +114,7 @@ const BOM: React.FC = () => {
         toast.warning("No BOMs to export");
         return;
       }
- 
+
       const dataForExcel = boms.map((bom: any, index: number) => {
         const rawMaterialNames = bom?.raw_materials
           ?.map((mat: any) => mat?.item?.name || "N/A")
@@ -156,31 +156,31 @@ const BOM: React.FC = () => {
         };
       });
 
-
-
       const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "BOM Products");
 
       worksheet["!cols"] = [
-        { wch: 8 },   // Sr. No.
-        { wch: 20 },  // Created At
-        { wch: 25 },  // BOM Name
-        { wch: 12 },  // Parts Count
-        { wch: 12 },  // Total Cost
-        { wch: 25 },  // Finish Goods Item Name
-        { wch: 12 },  // F Item Quantity
-        { wch: 30 },  // Raw Materials Items Name
-        { wch: 20 },  // R Item Quantity
-        { wch: 25 },  // Scrap Materials
-        { wch: 18 },  // Labour Charges
-        { wch: 20 },  // Machinery Charges
-        { wch: 20 },  // Electricity Charges
-        { wch: 18 },  // Other Charges
-        { wch: 20 },  // Updated At
+        { wch: 8 }, // Sr. No.
+        { wch: 20 }, // Created At
+        { wch: 25 }, // BOM Name
+        { wch: 12 }, // Parts Count
+        { wch: 12 }, // Total Cost
+        { wch: 25 }, // Finish Goods Item Name
+        { wch: 12 }, // F Item Quantity
+        { wch: 30 }, // Raw Materials Items Name
+        { wch: 20 }, // R Item Quantity
+        { wch: 25 }, // Scrap Materials
+        { wch: 18 }, // Labour Charges
+        { wch: 20 }, // Machinery Charges
+        { wch: 20 }, // Electricity Charges
+        { wch: 18 }, // Other Charges
+        { wch: 20 }, // Updated At
       ];
 
-      const fileName = `BOM_Export_${new Date().toISOString().split("T")[0]}.xlsx`;
+      const fileName = `BOM_Export_${
+        new Date().toISOString().split("T")[0]
+      }.xlsx`;
       XLSX.writeFile(workbook, fileName);
     } catch (err) {
       console.error("Error exporting BOMs:", err);
@@ -190,7 +190,6 @@ const BOM: React.FC = () => {
     }
   };
 
-
   useEffect(() => {
     fetchBomsHandler();
   }, []);
@@ -199,6 +198,7 @@ const BOM: React.FC = () => {
     const searchTxt = searchKey?.toLowerCase();
     const results = boms.filter(
       (bom: any) =>
+        bom._id?.toLowerCase()?.includes(searchTxt) ||
         bom.bom_name?.toLowerCase()?.includes(searchTxt) ||
         bom.parts_count?.toString()?.toLowerCase()?.includes(searchTxt) ||
         bom.total_cost?.toString()?.toLowerCase()?.includes(searchTxt) ||
@@ -312,7 +312,7 @@ const BOM: React.FC = () => {
                 <MdAdd size="20px" />
                 Add BOM
               </button>
-       
+
               <button
                 onClick={exportProductsToExcel}
                 disabled={isExporting}
@@ -333,7 +333,7 @@ const BOM: React.FC = () => {
                 }}
               >
                 <FiDownload size={16} />
-                {isExporting ? 'Exporting...' : 'Export to Excel'}
+                {isExporting ? "Exporting..." : "Export to Excel"}
               </button>
               <button
                 onClick={fetchBomsHandler}
@@ -387,7 +387,7 @@ const BOM: React.FC = () => {
                     e.currentTarget.style.borderColor = colors.input.border;
                     e.currentTarget.style.boxShadow = "none";
                   }}
-                  placeholder="Search by BOM name, parts, cost..."
+                  placeholder="Search by BOM ID, name, parts, cost..."
                   value={searchKey || ""}
                   onChange={(e) => setSearchKey(e.target.value)}
                 />

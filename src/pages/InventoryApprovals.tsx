@@ -66,7 +66,7 @@ const InventoryApprovals: React.FC = () => {
 
       toast.success("Raw material approved successfully!");
 
-      // ✅ Re-fetch the list to get updated statuses
+ 
       fetchInventoryHandler();
     } catch (err: any) {
       toast.error(err?.message || "Something went wrong");

@@ -299,6 +299,7 @@ const Process: React.FC = () => {
             proces={filteredData}
             deleteProcessHandler={deleteProcessHandler}
             openUpdateProcessDrawerHandler={openUpdateProcessDrawerHandler}
+            fetchProcessHandler={fetchProcessHandler}
           />
         </div>
       </div>

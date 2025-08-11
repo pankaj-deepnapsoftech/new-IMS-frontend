@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { FaCaretDown, FaCaretUp, FaFilePdf } from "react-icons/fa";
 import {
   MdDeleteOutline,
   MdEdit,
@@ -20,9 +20,11 @@ import {
   MdOutlineVisibility,
 } from "react-icons/md";
 import { usePagination, useSortBy, useTable } from "react-table";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
+import InvoicePDF from "../PDF/InvoicePDF";
 
 interface InvoiceTableProps {
   invoices: Array<{
@@ -152,7 +154,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   fontSize: "14px",
                 }}
               >
-                {[5,10, 20, 50, 100].map((size) => (
+                {[5, 10, 20, 50, 100].map((size) => (
                   <option key={size} value={size}>
                     {size}
                   </option>
@@ -338,6 +340,38 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                               </button>
                             </Tooltip>
                           )}
+
+                          {/* PDF Download Button */}
+                          <Tooltip label="Download Invoice PDF" placement="top">
+                            <PDFDownloadLink
+                              document={<InvoicePDF invoice={row.original} />}
+                              fileName={`Invoice-${row.original.invoice_no}.pdf`}
+                              style={{ textDecoration: "none" }}
+                            >
+                              {({ loading }) => (
+                                <button
+                                  disabled={loading}
+                                  className="p-1 rounded-md transition-all duration-200 hover:scale-110 disabled:opacity-50"
+                                  style={{
+                                    color: colors.success[600],
+                                    backgroundColor: colors.success[50],
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    if (!loading) {
+                                      e.currentTarget.style.backgroundColor =
+                                        colors.success[100];
+                                    }
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.success[50];
+                                  }}
+                                >
+                                  <FaFilePdf size={16} />
+                                </button>
+                              )}
+                            </PDFDownloadLink>
+                          </Tooltip>
 
                           {openUpdateInvoiceDrawer && (
                             <Tooltip label="Edit Invoice" placement="top">
