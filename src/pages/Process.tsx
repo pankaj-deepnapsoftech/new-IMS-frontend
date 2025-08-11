@@ -293,6 +293,7 @@ console.log("dataprodcut", data)
             proces={filteredData}
             deleteProcessHandler={deleteProcessHandler}
             openUpdateProcessDrawerHandler={openUpdateProcessDrawerHandler}
+            fetchProcessHandler={fetchProcessHandler}
           />
         </div>
       </div>

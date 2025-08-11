@@ -223,7 +223,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
               </div>
 
               {/* Bulk Actions */}
-              {selectedBoms.length > 0 && (
+              {selectedBoms.length > 0 &&  (
                 <div className="flex items-center gap-3">
                   {deleteBomHandler && (
                     <button
@@ -309,7 +309,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                   <tr
                     style={{ borderBottom: `1px solid ${colors.table.border}` }}
                   >
-                    <th
+                   { cookies?.role === "admin" &&  <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{
                         color: colors.table.headerText,
@@ -326,7 +326,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                         onChange={(e) => handleSelectAll(e.target.checked)}
                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                       />
-                    </th>
+                    </th>}
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -390,7 +390,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                               : colors.table.stripe;
                         }}
                       >
-                        <td
+                 {   cookies?.role === "admin" &&   <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{
                             color: colors.text.secondary,
@@ -409,7 +409,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                             }
                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                           />
-                        </td>
+                        </td>}
                         <td
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
                           style={{ color: colors.text.primary }}
@@ -436,7 +436,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                           style={{ color: colors.success[600] }}
                         >
                           {cookies?.role === "admin"
-                            ? `₹${row.original.total_cost}`
+                            ? `₹${row.original.total_cost}` 
                             : "₹*****"}
                         </td>
                         <td
@@ -507,7 +507,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                                 <MdEdit size={16} />
                               </button>
                             )}
-                            {deleteBomHandler && (
+                            {deleteBomHandler &&  cookies?.role === "admin" && (
                               <button
                                 onClick={() => {
                                   setdeleteId(row.original._id);

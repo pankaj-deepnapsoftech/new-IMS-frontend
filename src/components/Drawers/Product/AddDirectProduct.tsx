@@ -62,6 +62,8 @@
    const [newCategory, setNewCategory] = useState("");
    const [showNewUOMInput, setShowNewUOMInput] = useState(false);
    const [colorName, setColorName] = useState<string | undefined>();
+   const [showNewInput, setShowNewInput] = useState(false);
+   const [newInventoryType, setNewInventoryType] = useState("");
    const [uomOptions, setUomOptions] = useState([
      { value: "pcs", label: "pcs" },
      { value: "kgs", label: "kgs" },
@@ -221,6 +223,28 @@
      }
    };
  
+   const handleAddNewType = () => {
+     const newType = newInventoryType.trim().toLowerCase();
+
+     if (!newType) {
+       toast.warning("Inventory type cannot be empty.");
+       return;
+     }
+
+     const exists = categoryOptions.some((opt) => opt.value === newType);
+     if (exists) {
+       toast.warning("This inventory type already exists.");
+       return;
+     }
+
+     const newOption = { value: newType, label: newType };
+     setCategoryOptions((prev) => [...prev, newOption]);
+     setCategory(newOption);
+     setNewInventoryType("");
+     setShowNewInput(false);
+     toast.success(`Inventory Type "${newType}" added.`);
+   };
+
    useEffect(() => {
      fetchAllStores();
    }, []);
@@ -337,31 +361,42 @@
                  options={[...categoryOptions, { value: "__add_new__", label: "+ Add new Inventory Type" }]}
                  onChange={(selected: any) => {
                    if (selected?.value === "__add_new__") {
-                     const newType = prompt("Enter new Inventory Type (e.g. Packaging):")?.trim().toLowerCase();
-                     if (!newType) {
-                       toast.warning("Inventory type cannot be empty.");
-                       return;
-                     }
-
-                     const exists = categoryOptions.some((opt) => opt.value === newType);
-                     if (exists) {
-                       toast.warning("This inventory type already exists.");
-                       return;
-                     }
-
-                     const confirmed = window.confirm(`Are you sure you want to add "${newType}"?`);
-                     if (!confirmed) return;
-
-                     const newOption = { value: newType, label: newType };
-                     setCategoryOptions((prev) => [...prev, newOption]);
-                     setCategory(newOption);
-                     toast.success(`Inventory Type "${newType}" added.`);
+                     setShowNewInput(true);
                    } else {
                      setCategory(selected);
+                     setShowNewInput(false);
+                     setNewInventoryType("");
                    }
                  }}
-
                />
+                
+               {showNewInput && (
+                 <div className="mt-1 gap-2">
+                   <Input
+                     placeholder="Enter new inventory type"
+                     value={newInventoryType}
+                     onChange={(e) => setNewInventoryType(e.target.value)}
+                     aria-label="New inventory type input"
+                   />
+                   <div className="flex gap-2 mt-4 justify-end">
+                     <Button
+                       colorScheme="blue"
+                       onClick={handleAddNewType}
+                       aria-label="Add new inventory type"
+                     >
+                       Add
+                     </Button>
+                     <Button
+                       variant="outline"
+                       onClick={() => setShowNewInput(false)}
+                       aria-label="Cancel adding inventory type"
+                     >
+                       Cancel
+                     </Button>
+                   </div>
+                 </div>
+               )}
+
              </FormControl>
              <FormControl className="mt-3 mb-5" isRequired>
                <FormLabel fontWeight="bold" color="gray.700">

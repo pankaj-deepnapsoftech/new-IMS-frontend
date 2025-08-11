@@ -17,6 +17,19 @@ import { colors } from "../../theme/colors";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 
+
+const statusColorMap = {
+  "production started": "bg-green-100 text-green-800",
+  "request for allow inventory": "bg-yellow-100 text-yellow-800",
+  "raw material approval pending": "bg-red-100 text-red-800",
+  "inventory in transit": "bg-orange-100 text-orange-800", // adjusted for better contrast
+  "Inventory Allocated": "bg-purple-100 text-purple-800",
+};
+
+
+const defaultStatusClass = "bg-gray-100 text-gray-700";
+
+
 interface ProcessTableProps {
   proces: Array<{
     creator: any;
@@ -32,7 +45,7 @@ interface ProcessTableProps {
   openUpdateProcessDrawerHandler?: (id: string) => void;
   openProcessDetailsDrawerHandler?: (id: string) => void;
   deleteProcessHandler?: (id: string) => void;
-
+  fetchProcessHandler?: (id: string) => void;
 }
 
 
@@ -73,6 +86,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   openUpdateProcessDrawerHandler,
   openProcessDetailsDrawerHandler,
   deleteProcessHandler,
+  fetchProcessHandler
 }) => {
 
   const [showDeletePage, setshowDeletePage] = useState(false);
@@ -118,7 +132,8 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
           }
         }
       )
-      console.log(cookies?.access_token);
+      fetchProcessHandler();
+      // console.log(cookies?.access_token);
     } catch (error) {
       console.error("Error requesting for allocated inventory:", error);
       toast.error("Failed to request for allocated inventory. Please try again.");
@@ -135,6 +150,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
       { Header: "Scrap Store", accessor: "scrap_store" },
       { Header: "Created On", accessor: "createdAt" },
       { Header: "Last Updated", accessor: "updatedAt" },
+      { Header: "Button", accessor: "button" },
     ],
     []
   );
@@ -190,7 +206,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   // Bulk selection functions
 
 
-   
+
 
 
 
@@ -199,7 +215,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
       setSelectedProcesses(page.map((row) => row.original._id));
     } else {
       setSelectedProcesses([]);
-    }     
+    }
   };
 
   const handleSelectProcess = (processId, checked) => {
@@ -244,7 +260,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   };
 
 
-
+  console.log(page)
 
   const isAllSelected =
     page.length > 0 && selectedProcesses.length === page.length;
@@ -454,12 +470,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                     >
                       Created By
                     </th>
-                    <th
-                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{ color: colors.table.headerText }}
-                    >
-                      Status
-                    </th>
+
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -496,13 +507,28 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                     >
                       Last Updated
                     </th>
-                  {   <th
+
+                    {/* Table Header */}
+                    <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
-                      button
-                    </th>}
+                      {page.some(row => row.original.status === "Inventory Allocated")
+                        ? "Request Allow"
+                        : page.some(row => row.original.status === "inventory in transit")
+                          ? "Inventory Received"
+                          : ""}
+                    </th>
 
+
+
+
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Status
+                    </th>
                     <th
                       className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -583,22 +609,9 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                               }`.trim() || "N/A"
                             : "N/A"}
                         </td>
-                        <td className="px-4 py-3 text-sm whitespace-nowrap">
-                          {row.original.status && (
-                            <span
-                              className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
-                              style={
-                                statusStyles[row.original.status] || {
-                                  backgroundColor: colors.gray[100],
-                                  color: colors.gray[700],
-                                }
-                              }
-                            >
-                              {row.original.status.charAt(0).toUpperCase() +
-                                row.original.status.slice(1)}
-                            </span>
-                          )}
-                        </td>
+
+
+
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
@@ -650,9 +663,9 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                           {row.original.status === "Inventory Allocated" && (
                             <button
                               onClick={() => RequestForAllocated(row.original._id, "request for allow")}
-                              className="px-3 py-1 text-xs font-medium rounded-lg"
+                              className="px-3 py-1 text-sm font-medium rounded-md"
                               style={{
-                                backgroundColor: colors.warning[100],
+                                backgroundColor: colors.error[200],
                                 color: colors.warning[700],
                               }}
                             >
@@ -664,14 +677,28 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                             <button
                               // onClick={() => updateProcessStatus(row.original._id, "production start")}
                               onClick={() => UpdatedStatus(row.original._id)}
-                              className="px-3 py-1 text-xs font-medium rounded-lg"
+                              className="px-3 py-1 text-sm font-medium rounded-md"
                               style={{
-                                backgroundColor: colors.success[100],
+                                backgroundColor: colors.success[200],
                                 color: colors.success[700],
                               }}
                             >
                               Inventory Received
                             </button>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-sm whitespace-nowrap">
+                          {row.original.status ? (
+                            <span
+                              className={`
+        px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap capitalize
+        ${statusColorMap[row.original.status] || defaultStatusClass}
+      `}
+                            >
+                              {row.original.status}
+                            </span>
+                          ) : (
+                            <span className="text-gray-500 italic">N/A</span>
                           )}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
