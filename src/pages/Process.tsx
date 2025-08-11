@@ -32,30 +32,36 @@ const Process: React.FC = () => {
   const [id, setId] = useState<string | undefined>();
 
   const fetchProcessHandler = async () => {
-    try {
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "production-process/all",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
+  try {
+    setIsLoading(true); // Set loading state
+    const response = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}production-process/all`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${cookies?.access_token}`,
+        },
       }
-console.log("dataprodcut", data)
-      setData(data.production_processes);
-      setFilteredData(data.production_processes);
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong");
-    } finally {
-      setIsLoading(false);
+    );
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.message);
     }
-  };
 
+    // Filter out processes with status "production started"
+    const filteredProcesses = data.production_processes.filter(
+      (process: any) => process.status.toLowerCase() !== "production started"
+    );
+
+    console.log("filtered processes (excluding production started)", filteredProcesses);
+    setData(filteredProcesses);
+    setFilteredData(filteredProcesses);
+  } catch (error: any) {
+    toast.error(error.message || "Something went wrong");
+  } finally {
+    setIsLoading(false);
+  }
+};
   const {
     isAddProcessDrawerOpened,
     isUpdateProcessDrawerOpened,
@@ -187,7 +193,7 @@ console.log("dataprodcut", data)
                   className="text-2xl lg:text-3xl font-bold"
                   style={{ color: colors.text.primary }}
                 >
-                  Production Process
+                  Pre Production 
                 </h1>
                 <p
                   className="text-sm mt-1"

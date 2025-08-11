@@ -1,4 +1,5 @@
 // @ts-nocheck
+
 import { useMemo, useState } from "react";
 import {
   Column,
@@ -34,6 +35,8 @@ interface ProcessTableProps {
 
 }
 
+
+
 const updateProcessStatus = async (id, status) => { //new
   try {
     const res = await fetch(
@@ -64,7 +67,7 @@ const updateProcessStatus = async (id, status) => { //new
 
 
 
-const ProcessTable: React.FC<ProcessTableProps> = ({
+const ProcessStatusTable: React.FC<ProcessTableProps> = ({
   proces,
   isLoadingProcess,
   openUpdateProcessDrawerHandler,
@@ -1086,4 +1089,4 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   );
 };
 
-export default ProcessTable;
+export default ProcessStatusTable;
