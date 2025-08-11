@@ -506,8 +506,8 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                 >
                   <option value="">Select Payment Mode</option>
-                  <option value="cash">Cash</option>
-                  <option value="cheque">Cheque</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Cheque">Cheque</option>
                   <option value="NEFT/RTGS">NEFT/RTGS</option>
                   <option value="UPI">UPI</option>
                   <option value="Credit Card">Credit Card</option>

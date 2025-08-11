@@ -2,6 +2,7 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { ToWords } from "to-words";
+import { useCookies } from "react-cookie";
 
 const styles = StyleSheet.create({
   page: {
@@ -230,7 +231,11 @@ const BOMPDF = ({ bom }: any) => {
   const resources = bom?.resources || [];
   const manpower = bom?.manpower || [];
   const otherCharges = bom?.other_charges || {};
+  const process = bom?.processes || []
 
+
+  const [cookies] = useCookies()
+  console.log(bom)
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -268,9 +273,9 @@ const BOMPDF = ({ bom }: any) => {
             </View>
             <View style={styles.costSection}>
               <Text style={styles.sectionLabel}>Total Cost</Text>
-              <Text style={styles.sectionValue}>
+              { cookies?.role === "admin" ? ( <Text style={styles.sectionValue}>
                 ₹{Number(totalCost).toFixed(2)}
-              </Text>
+              </Text>) : <Text style={[styles.col7, { width: "10%" }]}>*****</Text>}
             </View>
             <View style={styles.partsSection}>
               <Text style={styles.sectionLabel}>Total Parts</Text>
@@ -308,9 +313,13 @@ const BOMPDF = ({ bom }: any) => {
               <Text style={[styles.col5, { width: "10%" }]}>
                 {bom.finished_good?.item?.uom || "PCS"}
               </Text>
-              <Text style={[styles.col7, { width: "10%" }]}>
-                ₹{Number(bom.finished_good?.cost || 0).toFixed(2)}
-              </Text>
+              {cookies?.role === "admin" ? (
+                <Text style={[styles.col7, { width: "10%" }]}>
+                  ₹{Number(bom.finished_good?.cost || 0).toFixed(2)}
+                </Text>
+              ) : (
+                <Text style={[styles.col7, { width: "10%" }]}>*****</Text>
+              )}
             </View>
           </View>
         )}
@@ -347,9 +356,13 @@ const BOMPDF = ({ bom }: any) => {
                     material?.item?.price || material?.unit_cost || 0
                   ).toFixed(2)}
                 </Text>
-                <Text style={styles.col7}>
-                  ₹{Number(material?.total_part_cost || 0).toFixed(2)}
-                </Text>
+                {cookies?.role === "admin" ? (
+                  <Text style={[styles.col7, { width: "10%" }]}>
+                    ₹{Number(material?.total_part_cost || 0).toFixed(2)}
+                  </Text>
+                ) : ( 
+                  <Text style={[styles.col7, { width: "10%" }]}>*****</Text>
+                )}
               </View>
             ))}
           </View>
@@ -387,9 +400,13 @@ const BOMPDF = ({ bom }: any) => {
                     material?.item?.price || material?.unit_cost || 0
                   ).toFixed(2)}
                 </Text>
-                <Text style={styles.col7}>
-                  ₹{Number(material?.total_part_cost || 0).toFixed(2)}
-                </Text>
+                {cookies?.role === "admin" ? (
+                  <Text style={[styles.col7, { width: "10%" }]}>
+                    ₹{Number(material?.total_part_cost || 0).toFixed(2)}
+                  </Text>
+                ) : (
+                  <Text style={[styles.col7, { width: "10%" }]}>*****</Text>
+                )}
               </View>
             ))}
           </View>
@@ -449,17 +466,47 @@ const BOMPDF = ({ bom }: any) => {
             </View>
 
             {manpower.map((person: any, index: number) => (
+
+
               <View key={index} style={styles.tableRow}>
                 <Text style={[styles.col1, { width: "15%" }]}>{index + 1}</Text>
                 <Text style={[styles.col2, { width: "40%" }]}>
-                  {`${person?.user?.first_name || ""} ${
-                    person?.user?.last_name || ""
-                  }`.trim() || "N/A"}
+                  {`${person?.user?.first_name || ""} ${person?.user?.last_name || ""
+                    }`.trim() || "N/A"}
                 </Text>
               </View>
             ))}
           </View>
         )}
+
+
+        {/* Manpower Table */}
+        {process.length > 0 && (
+          <View style={[styles.table, { marginTop: 15 }]}>
+            <Text
+              style={[
+                styles.sectionLabel,
+                { marginBottom: 5, fontSize: 12, fontWeight: "bold" },
+              ]}
+            >
+              Process
+            </Text>
+            <View style={[styles.tableRow, styles.tableHeader]}>
+              <Text style={[styles.col1, { width: "15%" }]}>S. No.</Text>
+              <Text style={[styles.col2, { width: "40%" }]}>Process </Text>
+            </View>
+
+            {process.map((process: any, index: number) => (
+              <View key={index} style={styles.tableRow}>
+                <Text style={[styles.col1, { width: "15%" }]}>{index + 1}</Text>
+                <Text style={[styles.col2, { width: "40%" }]}>
+                  {`${process} ` || "N/A"}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
 
         {/* Cost Breakdown */}
         <View style={[styles.table, { marginTop: 15 }]}>
@@ -475,7 +522,7 @@ const BOMPDF = ({ bom }: any) => {
             <Text style={[styles.col2, { width: "60%" }]}>
               Raw Materials Total
             </Text>
-            <Text style={[styles.col3, { width: "40%" }]}>
+           { cookies?.role === "admin" ?  (<Text style={[styles.col3, { width: "40%" }]}>
               ₹
               {rawMaterials
                 .reduce(
@@ -484,13 +531,13 @@ const BOMPDF = ({ bom }: any) => {
                   0
                 )
                 .toFixed(2)}
-            </Text>
+            </Text>) : <Text style={[styles.col7, { width: "10%" }]}>*****</Text> } 
           </View>
           <View style={styles.tableRow}>
             <Text style={[styles.col2, { width: "60%" }]}>
               Scrap Materials Total
             </Text>
-            <Text style={[styles.col3, { width: "40%" }]}>
+          { cookies?.role === "admin" ?  (<Text style={[styles.col3, { width: "40%" }]}>
               ₹
               {scrapMaterials
                 .reduce(
@@ -499,7 +546,7 @@ const BOMPDF = ({ bom }: any) => {
                   0
                 )
                 .toFixed(2)}
-            </Text>
+            </Text>) : <Text style={[styles.col7, { width: "10%" }]}>*****</Text> }
           </View>
           {/* <View style={styles.tableRow}>
             <Text style={[styles.col2, { width: "60%" }]}>Labour Charges</Text>
@@ -531,18 +578,18 @@ const BOMPDF = ({ bom }: any) => {
           </View> */}
           <View style={[styles.tableRow, styles.totalRow]}>
             <Text style={[styles.col2, { width: "60%" }]}>TOTAL BOM COST</Text>
-            <Text style={[styles.col3, { width: "40%" }]}>
+           { cookies?.role === "admin" ?  (<Text style={[styles.col3, { width: "40%" }]}>
               ₹{Number(totalCost).toFixed(2)}
-            </Text>
+            </Text>) : <Text style={[styles.col7, { width: "10%" }]}>*****</Text>}
           </View>
         </View>
 
         {/* Total Cost in Words */}
         <View style={styles.amountInWords}>
           <Text style={styles.amountLabel}>Total Cost in Words:</Text>
-          <Text style={styles.amountValue}>
+          { cookies?.role === "admin" ? ( <Text style={styles.amountValue}>
             {toWords.convert(Number(totalCost), { currency: true })}
-          </Text>
+          </Text>) : <Text style={[styles.col7, { width: "10%" }]}>*****</Text>}
         </View>
 
         {/* Notes/Remarks Section */}

@@ -425,7 +425,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                       Actions
                     </th>
                   </tr>
-                </thead>
+                </thead>  
                 <tbody>
                   {page.map((row: any, index) => {
                     prepareRow(row);
