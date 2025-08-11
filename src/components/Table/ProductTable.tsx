@@ -22,6 +22,8 @@ import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
 import { useCookies } from "react-cookie";
+import axios from "axios";
+import { MdOutlineRefresh } from "react-icons/md";
 
 interface ProductTableProps {
   products: Array<any>;
@@ -137,6 +139,32 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
   const isAllSelected = page.length > 0 && selectedProducts.length === page.length;
   const isIndeterminate = selectedProducts.length > 0 && selectedProducts.length < page.length;
+
+  // Add this function inside the ProductTable component
+  const handleUpdateInventory = async (product) => {
+    const newStock = prompt(`Enter new stock for ${product.name} (current: ${product.current_stock}):`, product.current_stock);
+    if (newStock === null || newStock === "") return;
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}product/update-inventory`,
+        {
+          product_id: product._id,
+          new_stock: Number(newStock),
+        },
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      if (response.data.success) {
+        toast.success("Inventory updated successfully!");
+        if (typeof window !== 'undefined') window.location.reload(); // Or call a refresh handler if available
+      } else {
+        toast.error(response.data.message || "Failed to update inventory");
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err?.message || "Failed to update inventory");
+    }
+  };
 
   return (
     <div className="p-6">
@@ -658,6 +686,24 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                 <MdEdit size={16} />
                               </button>
                             )}
+                            {/* Update Inventory Button */}
+                            <button
+                              onClick={() => handleUpdateInventory(row.original)}
+                              className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                              style={{
+                                color: colors.success[600],
+                                backgroundColor: colors.success[50],
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = colors.success[100];
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = colors.success[50];
+                              }}
+                              title="Update Inventory"
+                            >
+                              <MdOutlineRefresh size={16} />
+                            </button>
                             {deleteProductHandler && cookies?.role === "admin" && (
                               <button
                                 onClick={() => {
