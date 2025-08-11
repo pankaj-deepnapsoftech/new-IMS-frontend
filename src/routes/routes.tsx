@@ -75,7 +75,6 @@ import PurchaseOrder from "../pages/PurchaseOrder";
 import Precurement from "../pages/Precurement";
 import Resources from "../pages/Resources";
 import ProductionStatus from "../pages/ProductionStatus";
-import InventoryShortages from "../pages/InventoryShortages";
 
 const routes = [
   {
@@ -262,13 +261,6 @@ const routes = [
     icon: <CgProfile />,
     path: "userprofile",
     element: <Userprofile />,
-    isSublink: false,
-  },
-  {
-    name: "Inventory Shortages",
-    icon: <MdOutlineRefresh />,
-    path: "inventory-shortages",
-    element: <InventoryShortages />,
     isSublink: false,
   },
 ];
