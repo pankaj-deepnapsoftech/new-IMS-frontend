@@ -61,12 +61,21 @@ interface AddInvoiceProps {
   fetchInvoicesHandler: () => void;
 }
 
+interface BuyerOption {
+  value: string;
+  label: string;
+  data: any;
+}
+
 const AddInvoice: React.FC<AddInvoiceProps> = ({
   closeDrawerHandler,
   fetchInvoicesHandler,
 }) => {
   const [cookies] = useCookies();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [buyerOptions, setBuyerOptions] = useState<BuyerOption[]>([]);
+  const [isLoadingBuyers, setIsLoadingBuyers] = useState(false);
+  const [isManualEntry, setIsManualEntry] = useState(false);
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -74,19 +83,21 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
   const textColor = useColorModeValue("gray.600", "gray.300");
 
   const validationSchema = Yup.object({
-    sellerAddress: Yup.string().required("Seller address is required"),
+    // invoiceNo: Yup.string().required("Invoice number is required"),
 
-    consigneeShipTo: Yup.string().required("Consignee ship to is required"),
+    // sellerAddress: Yup.string().required("Seller address is required"),
+
+    consigneeShipTo: Yup.string().required("Please select a buyer"),
     address: Yup.string().required("Address is required"),
-    gstin: Yup.string().required("GSTIN is required"),
-    pincode: Yup.string().required("Pincode is required"),
-    state: Yup.string().required("State is required"),
+    gstin: Yup.string(),
+    // pincode: Yup.string().required("Pincode is required"),
+    // state: Yup.string().required("State is required"),
 
-    billerBillTo: Yup.string().required("Biller bill to is required"),
+    // billerBillTo: Yup.string().required("Biller bill to is required"),
     billerAddress: Yup.string().required("Biller address is required"),
-    billerGSTIN: Yup.string().required("Biller GSTIN is required"),
-    billerPincode: Yup.string().required("Biller pincode is required"),
-    billerState: Yup.string().required("Biller state is required"),
+    billerGSTIN: Yup.string(),
+    // billerPincode: Yup.string().required("Biller pincode is required"),
+    // billerState: Yup.string().required("Biller state is required"),
 
     deliveryNote: Yup.string(),
     modeTermsOfPayment: Yup.string().required(
@@ -105,25 +116,26 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
     remarks: Yup.string(),
   });
 
-  
-
   const [addInvoice] = useCreateInvoiceMutation();
 
   const formik = useFormik({
     initialValues: {
-      sellerAddress: "",
+      // Basic Invoice Info
+      invoiceNo: `INV-${Date.now()}`,
+
+      // sellerAddress: "",
 
       consigneeShipTo: "",
       address: "",
       gstin: "",
-      pincode: "",
-      state: "",
+      // pincode: "",
+      // state: "",
 
-      billerBillTo: "",
+      // billerBillTo: "",
       billerAddress: "",
       billerGSTIN: "",
-      billerPincode: "",
-      billerState: "",
+      // billerPincode: "",
+      // billerState: "",
 
       deliveryNote: "",
       modeTermsOfPayment: "",
@@ -145,7 +157,30 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
       setIsSubmitting(true);
 
       try {
-        const response = await addInvoice(values).unwrap();
+        // Prepare data with both new comprehensive fields and essential legacy fields
+        const invoiceData = {
+          // New comprehensive fields
+          ...values,
+
+          // Essential fields that need to be added
+          // Note: These should be collected from the form or have default values
+          // invoice_no: values.invoiceNo, // Use the invoice number from form
+          document_date: new Date().toISOString(),
+          sales_order_date: new Date().toISOString(),
+          category: "sale", // Default to sale for now
+          note: values.remarks || "", // Use remarks as note
+          buyer: values.consigneeShipTo, // Set buyer ID for legacy support
+          items: [], // Empty items array for now - this needs to be implemented
+          subtotal: 0, // Default values - these need to be calculated
+          total: 0,
+          tax: {
+            tax_amount: 0,
+            tax_name: "No Tax",
+          },
+        };
+
+        console.log("Sending invoice data:", invoiceData);
+        const response = await addInvoice(invoiceData).unwrap();
         if (!response.success) {
           throw new Error(response.message);
         }
@@ -161,6 +196,66 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
       }
     },
   });
+
+  // Fetch buyers (parties with merchant type "Buyer")
+  const fetchBuyersHandler = async () => {
+    try {
+      setIsLoadingBuyers(true);
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}parties/get?page=1&limit=1000`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!data?.data) {
+        throw new Error("Failed to fetch parties data");
+      }
+
+      // Filter for buyers and map to dropdown options
+      const buyers = data.data
+        .filter((party: any) => party.parties_type === "Buyer")
+        .map((buyer: any) => ({
+          value: buyer._id,
+          label: buyer.consignee_name?.[0] || buyer.company_name || "Unknown",
+          data: buyer, // Store full data for later use
+        }));
+
+      setBuyerOptions(buyers);
+    } catch (error: any) {
+      console.error("Error fetching buyers:", error);
+      toast.error(error?.message || "Failed to fetch buyers");
+    } finally {
+      setIsLoadingBuyers(false);
+    }
+  };
+
+  const handleBuyerSelect = (buyerId: string) => {
+    const selectedBuyer = buyerOptions.find((buyer) => buyer.value === buyerId);
+    if (selectedBuyer && selectedBuyer.data) {
+      formik.setValues({
+        ...formik.values,
+        consigneeShipTo: buyerId,
+        // Ship To fields
+        address: selectedBuyer.data.shipped_to || "",
+        gstin: selectedBuyer.data.shipped_gst_to || "",
+        // Bill To fields - auto-fill from the same buyer's bill_to data
+        billerAddress:
+          selectedBuyer.data.bill_to || selectedBuyer.data.shipped_to || "",
+        billerGSTIN:
+          selectedBuyer.data.bill_gst_to ||
+          selectedBuyer.data.shipped_gst_to ||
+          "",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchBuyersHandler();
+  }, []);
 
   // const addInvoiceHandler = async (e: React.FormEvent) => {
   //   e.preventDefault();
@@ -397,8 +492,65 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
       {/* Form */}
       <div className="p-6">
         <form onSubmit={formik.handleSubmit} className="space-y-6">
+          {/* Invoice Basic Details Section */}
+          {/* <div
+            className="p-6 rounded-xl border"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: colors.primary[50] }}
+              >
+                <BiPackage size={20} style={{ color: colors.primary[500] }} />
+              </div>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.text.primary }}
+              >
+                Invoice Details
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Invoice Number *
+                </label>
+                <input
+                  type="text"
+                  name="invoiceNo"
+                  value={formik.values.invoiceNo}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor:
+                      formik.touched.invoiceNo && formik.errors.invoiceNo
+                        ? "#ef4444"
+                        : colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                  placeholder="Enter invoice number"
+                />
+                {formik.touched.invoiceNo && formik.errors.invoiceNo && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formik.errors.invoiceNo}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div> */}
+
           {/* Seller Details Section */}
-          <div
+          {/* <div
             className="p-6 rounded-xl border"
             style={{
               backgroundColor: colors.background.card,
@@ -449,7 +601,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                 </p>
               )}
             </div>
-          </div>
+          </div> */}
 
           {/* Consignee Ship To Section */}
           <div
@@ -474,19 +626,24 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <label
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
                 >
-                  Consignee Name *
+                  Consignee Name (Buyer) *
                 </label>
-                <input
-                  type="text"
+                <select
                   name="consigneeShipTo"
                   value={formik.values.consigneeShipTo}
-                  onChange={formik.handleChange}
+                  onChange={(e) => {
+                    formik.handleChange(e);
+                    // Also handle auto-fill when selection changes
+                    if (e.target.value) {
+                      handleBuyerSelect(e.target.value);
+                    }
+                  }}
                   onBlur={formik.handleBlur}
                   className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
                   style={{
@@ -498,8 +655,17 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                         : colors.input.border,
                     color: colors.text.primary,
                   }}
-                  placeholder="Enter consignee name"
-                />
+                  disabled={isLoadingBuyers}
+                >
+                  <option value="">
+                    {isLoadingBuyers ? "Loading buyers..." : "Select a buyer"}
+                  </option>
+                  {buyerOptions.map((buyer) => (
+                    <option key={buyer.value} value={buyer.value}>
+                      {buyer.label}
+                    </option>
+                  ))}
+                </select>
                 {formik.touched.consigneeShipTo &&
                   formik.errors.consigneeShipTo && (
                     <p className="text-red-500 text-xs mt-1">
@@ -513,7 +679,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
                 >
-                  GSTIN *
+                  GSTIN
                 </label>
                 <input
                   type="text"
@@ -539,7 +705,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                 )}
               </div>
 
-              <div className="md:col-span-2">
+              <div>
                 <label
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
@@ -569,7 +735,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                 )}
               </div>
 
-              <div>
+              {/*<div>
                 <label
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
@@ -598,9 +764,9 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     {formik.errors.pincode}
                   </p>
                 )}
-              </div>
+              </div>*/}
 
-              <div>
+              {/* <div>
                 <label
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
@@ -629,7 +795,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     {formik.errors.state}
                   </p>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -660,7 +826,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              {/* <div>
                 <label
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
@@ -689,14 +855,14 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     {formik.errors.billerBillTo}
                   </p>
                 )}
-              </div>
+              </div> */}
 
               <div>
                 <label
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
                 >
-                  GSTIN *
+                  GSTIN
                 </label>
                 <input
                   type="text"
@@ -722,7 +888,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                 )}
               </div>
 
-              <div className="md:col-span-2">
+              <div>
                 <label
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
@@ -754,7 +920,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                   )}
               </div>
 
-              <div>
+              {/* <div>
                 <label
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
@@ -785,9 +951,9 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                       {formik.errors.billerPincode}
                     </p>
                   )}
-              </div>
+              </div> */}
 
-              <div>
+              {/* <div>
                 <label
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
@@ -816,7 +982,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     {formik.errors.billerState}
                   </p>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
 
