@@ -43,6 +43,15 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
   ];
   
   const category = { value: "sale", label: "Sales" };
+  const [paymentMode, setPaymentMode] = useState<{ value: string; label: string } | undefined>();
+
+  const paymentModeOptions = [
+    { value: "cash", label: "Cash" },
+    { value: "neft", label: "NEFT/RTGS" },
+    { value: "upi", label: "UPI" },
+    { value: "cheque", label: "Cheque" }, { value: "credit", label: "Credit Card" }, { value: "debit", label: "Debit Card" },
+    { value: "other", label: "Other" },
+  ];
 
   const [inputs, setInputs] = useState<
     {
@@ -163,7 +172,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
     }
   };
 
-  console.log(buyer)
+
   // Fetch all stores
   const fetchStoresHandler = async () => {
     try {
@@ -199,6 +208,10 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       toast.error("Please select a buyer");
       return;
     }
+    if (!paymentMode?.value) {
+      toast.error("Please select a payment mode");
+      return;
+    }
 
     if (!documentDate) {
       toast.error("Please select a document date");
@@ -229,6 +242,7 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
       category: category.value,
       buyer: buyer.value,
       proforma_invoice_no: proformaInvoiceNo,
+      payment_mode: paymentMode.value,
     };
 
     try {
@@ -470,7 +484,56 @@ const AddProformaInvoice: React.FC<AddProformaInvoiceProps> = ({
                 placeholder="Write your notes..."
               />
             </FormControl>
+            <FormControl className="mt-3 mb-5" isRequired>
+              <FormLabel fontWeight="bold" color="gray.700">
+                Payment Mode
+              </FormLabel>
+              <Select
+                value={paymentMode}
+                options={paymentModeOptions}
+                onChange={(selectedOption: any) => setPaymentMode(selectedOption)}
+                placeholder="Select Payment Mode"
+                required={true}
+                styles={{
+                  control: (provided: any) => ({
+                    ...provided,
+                    backgroundColor: "white",
+                    borderColor: "#d1d5db",
+                    color: "#374151",
+                    minHeight: "40px",
+                    "&:hover": {
+                      borderColor: "#9ca3af",
+                    },
+                  }),
+                  option: (provided: any, state: any) => ({
+                    ...provided,
+                    backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                    color: "#374151",
+                    "&:hover": {
+                      backgroundColor: "#f3f4f6",
+                    },
+                  }),
+                  placeholder: (provided: any) => ({
+                    ...provided,
+                    color: "#9ca3af",
+                  }),
+                  singleValue: (provided: any) => ({
+                    ...provided,
+                    color: "#374151",
+                  }),
+                  menu: (provided: any) => ({
+                    ...provided,
+                    zIndex: 9999,
+                    backgroundColor: "white",
+                    border: "1px solid #d1d5db",
+                  }),
+                }}
+              />
+            </FormControl>
+
           </div>
+
+          
 
           {/* Items Section */}
           <FormControl className="mt-3 mb-5" isRequired>

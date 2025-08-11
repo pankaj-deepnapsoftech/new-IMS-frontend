@@ -10,6 +10,7 @@ import {
   Thead,
   Tr,
   Button,
+  Toast,
 } from "@chakra-ui/react";
 import moment from "moment";
 import { useMemo } from "react";
@@ -34,6 +35,12 @@ import Loading from "../../ui/Loading";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
 import { FaArrowDownLong, FaArrowUpLong } from "react-icons/fa6";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { useCookies } from "react-cookie";
+
+
+
 
 interface BOMRawMaterialTableProps {
   products: Array<{
@@ -59,6 +66,32 @@ interface BOMRawMaterialTableProps {
   deleteProductHandler?: (id: string) => void;
   approveProductHandler?: (id: string) => void;
 }
+//newwww
+const updateProcessStatus = async (id, status) => {
+  try {
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}production-process/update-status`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies?.access_token}`, // optional
+        },
+        body: JSON.stringify({ _id: id, status }),
+      }
+    );
+
+    const data = await res.json();
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+
+    toast.success(data.message || "Status updated");
+    window.location.reload(); // Or trigger a re-fetch if you have one
+  } catch (err) {
+    toast.error(err.message || "Failed to update status");
+  }
+};
 
 const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
   products = [],
@@ -106,6 +139,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
         Header: "Category",
         accessor: "category",
       },
+
       {
         Header: "Sub Category",
         accessor: "sub_category",
@@ -125,6 +159,10 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
       {
         Header: "Price",
         accessor: "price",
+      },
+      {
+        Header: "Status",
+        accessor: "status",
       },
       {
         Header: "Current stock",
@@ -153,6 +191,34 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
     ],
     []
   );
+  const [cookies] = useCookies();
+
+//  console.log(`process.env.REACT_APP_BACKEND_URL: ${process.env.REACT_APP_BACKEND_URL}`);
+  const handleOutAllottedInventory = async (process_id) => {
+    console.log("process_id", process_id);
+
+    try {
+      const res = await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}production-process/inventory-in-transit`,
+        { _id: process_id }, // ✅ Correct body
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies?.access_token}`, // ✅ Correct headers
+          },
+        }
+      );
+
+      if (!res.data.success) {
+        throw new Error(res.data.message);
+      }
+
+      toast.success("Status updated to Inventory in Transit");
+      window.location.reload();
+    } catch (err) {
+      toast.error(err.message || "Something went wrong");
+    }
+  };
 
   const inventoryCategoryStyles = {
     indirect: {
@@ -211,7 +277,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
   if (products.length === 0 && !isLoadingProducts) {
     return <EmptyData />;
   }
-
+  console.log("products", products);
   return (
     <div className="p-4 space-y-4">
       {!isLoadingProducts && products.length > 0 && (
@@ -343,10 +409,14 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                                 ?.charAt(0)
                                 .toUpperCase() +
                                 original.inventory_category?.slice(1) || "N/A"}
+
                             </span>
                           );
                         } else if (colId === "price") {
                           displayValue = `₹${original.price || 0}`;
+
+                        } else if (colId === "status") {
+                          displayValue = original.bom_status || "N/A";
                         } else if (colId === "createdAt") {
                           displayValue = original.createdAt
                             ? moment(original.createdAt).format("DD/MM/YYYY")
@@ -439,7 +509,8 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                             </Button>
                           )}
 
-                          {approveProductHandler && (
+                          {/* Approve Inventory Button */}
+                          {original.bom_status === "raw material approval pending" && (
                             <Button
                               size="sm"
                               style={{
@@ -447,14 +518,28 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                                 color: colors.text.inverse,
                               }}
                               _hover={{ bg: colors.success[600] }}
-                              onClick={() =>
-                                approveProductHandler(original._id)
-                              }
+                              onClick={() => approveProductHandler(original._id)}
                               leftIcon={<FaCheckCircle />}
                             >
                               Approve
                             </Button>
                           )}
+
+                          {/* Out Allotted Inventory Button */}
+                          {original.bom_status === "request for allow inventory" && (
+                            <Button
+                              size="sm"
+                              style={{
+                                backgroundColor: colors.warning[500],
+                                color: colors.text.inverse,
+                              }}
+                              _hover={{ bg: colors.warning[600] }}
+                              onClick={() => handleOutAllottedInventory(original.production_process_id)}
+                            >
+                              Out Allotted Inventory
+                            </Button>
+                          )}
+
 
                           {deleteProductHandler && (
                             <Button
@@ -545,3 +630,4 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
 };
 
 export default BOMRawMaterialTable;
+

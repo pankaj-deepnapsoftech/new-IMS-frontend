@@ -234,7 +234,26 @@ const Parties = () => {
                 <FiPlus size={16} />
                 Add Merchant
               </button>
-              {/* Export */}
+
+              <button
+                onClick={() => setShowBulkUploadMenu(true)}
+                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  backgroundColor: colors.warning[600],
+                  focusRingColor: colors.warning[500],
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.warning[700];
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.warning[600];
+                }}
+              >
+                <AiFillFileExcel size={20} />
+                Bulk Upload
+              </button>
+
+              {/* Excel Export Button */}
               <button
                 onClick={exportToExcel}
                 disabled={isExporting}
@@ -253,20 +272,9 @@ const Parties = () => {
                 {isExporting ? 'Exporting...' : 'Export Excel'}
               </button>
               {/* Bulk Upload */}
-              <button
-                onClick={() => setShowBulkUploadMenu(true)}
-                className="flex items-center gap-1 px-3 py-2 text-white font-medium rounded-md transition-all duration-150 hover:shadow focus:outline-none focus:ring-2"
-                style={{
-                  backgroundColor: colors.warning[600],
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.warning[700])}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.warning[600])}
-              >
-                <AiFillFileExcel size={16} />
-                Bulk Upload
-              </button>
+    
 
-
+       
 
               {/* Refresh */}
               <button

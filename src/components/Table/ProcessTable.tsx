@@ -14,9 +14,11 @@ import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
 import moment from "moment";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 
 interface ProcessTableProps {
-  process: Array<{
+  proces: Array<{
     creator: any;
     item: string;
     rm_store: string;
@@ -30,15 +32,49 @@ interface ProcessTableProps {
   openUpdateProcessDrawerHandler?: (id: string) => void;
   openProcessDetailsDrawerHandler?: (id: string) => void;
   deleteProcessHandler?: (id: string) => void;
+
 }
 
+
+
+const updateProcessStatus = async (id, status) => { //new
+  try {
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}production-process/update-status`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies?.access_token}`, // if needed
+        },
+        body: JSON.stringify({ _id: id, status }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+
+    toast.success(data.message || "Status updated successfully");
+    // Refresh list after status update
+    window.location.reload(); // or re-fetch process data if available
+  } catch (err) {
+    toast.error(err.message || "Failed to update status");
+  }
+};
+
+
+
 const ProcessTable: React.FC<ProcessTableProps> = ({
-  process,
+  proces,
   isLoadingProcess,
   openUpdateProcessDrawerHandler,
   openProcessDetailsDrawerHandler,
   deleteProcessHandler,
 }) => {
+
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
 
@@ -46,6 +82,48 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   const [selectedProcesses, setSelectedProcesses] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [cookies] = useCookies();
+
+  const UpdatedStatus = async (id) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}production-process/start-production`,
+
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+          body: JSON.stringify({ _id: id }),
+        }
+      );
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+
+      toast.success(data.message || "Status updated successfully");
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update status");
+    }
+  };
+
+  const RequestForAllocated = async (id) => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}production-process/allocation?_id=${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          }
+        }
+      )
+      console.log(cookies?.access_token);
+    } catch (error) {
+      console.error("Error requesting for allocated inventory:", error);
+      toast.error("Failed to request for allocated inventory. Please try again.");
+    }
+  }
 
   const columns = useMemo(
     () => [
@@ -94,7 +172,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
     pageCount,
     setPageSize,
   }: TableInstance<{
-    process: string;
+    proces: string;
     description: string;
     creator: any;
     createdAt: string;
@@ -102,7 +180,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   }> = useTable(
     {
       columns,
-      data: process,
+      data: proces,
       initialState: { pageIndex: 0 },
     },
     useSortBy,
@@ -110,12 +188,18 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   );
 
   // Bulk selection functions
+
+
+   
+
+
+
   const handleSelectAll = (checked) => {
     if (checked) {
       setSelectedProcesses(page.map((row) => row.original._id));
     } else {
       setSelectedProcesses([]);
-    }
+    }     
   };
 
   const handleSelectProcess = (processId, checked) => {
@@ -145,8 +229,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
 
       // Success feedback
       toast.success(
-        `Successfully deleted ${selectedProcesses.length} process${
-          selectedProcesses.length > 1 ? "es" : ""
+        `Successfully deleted ${selectedProcesses.length} process${selectedProcesses.length > 1 ? "es" : ""
         }`
       );
 
@@ -159,6 +242,9 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
       setIsBulkDeleting(false);
     }
   };
+
+
+
 
   const isAllSelected =
     page.length > 0 && selectedProcesses.length === page.length;
@@ -184,7 +270,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
         </div>
       )}
 
-      {!isLoadingProcess && process.length === 0 && (
+      {!isLoadingProcess && proces.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div
             className="rounded-full p-6 mb-4"
@@ -217,7 +303,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
         </div>
       )}
 
-      {!isLoadingProcess && process.length > 0 && (
+      {!isLoadingProcess && proces.length > 0 && (
         <>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-6">
@@ -226,7 +312,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                   className="text-lg font-semibold"
                   style={{ color: colors.text.primary }}
                 >
-                  {process.length} Process{process.length !== 1 ? "es" : ""}{" "}
+                  {proces.length} Process{proces.length !== 1 ? "es" : ""}{" "}
                   Found
                 </h3>
                 {selectedProcesses.length > 0 && (
@@ -410,6 +496,13 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                     >
                       Last Updated
                     </th>
+                  {   <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      button
+                    </th>}
+
                     <th
                       className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -486,8 +579,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                           }}
                         >
                           {row.original.creator
-                            ? `${row.original.creator.first_name || ""} ${
-                                row.original.creator.last_name || ""
+                            ? `${row.original.creator.first_name || ""} ${row.original.creator.last_name || ""
                               }`.trim() || "N/A"
                             : "N/A"}
                         </td>
@@ -537,8 +629,8 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                         >
                           {row.original.createdAt
                             ? moment(row.original.createdAt).format(
-                                "DD/MM/YYYY"
-                              )
+                              "DD/MM/YYYY"
+                            )
                             : "N/A"}
                         </td>
                         <td
@@ -547,9 +639,40 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                         >
                           {row.original.updatedAt
                             ? moment(row.original.updatedAt).format(
-                                "DD/MM/YYYY"
-                              )
+                              "DD/MM/YYYY"
+                            )
                             : "N/A"}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap"
+                          style={{ color: colors.text.secondary }}
+                        >
+                          {row.original.status === "Inventory Allocated" && (
+                            <button
+                              onClick={() => RequestForAllocated(row.original._id, "request for allow")}
+                              className="px-3 py-1 text-xs font-medium rounded-lg"
+                              style={{
+                                backgroundColor: colors.warning[100],
+                                color: colors.warning[700],
+                              }}
+                            >
+                              Request Allow
+                            </button>
+                          )}
+
+                          {row.original.status === "inventory in transit" && (
+                            <button
+                              // onClick={() => updateProcessStatus(row.original._id, "production start")}
+                              onClick={() => UpdatedStatus(row.original._id)}
+                              className="px-3 py-1 text-xs font-medium rounded-lg"
+                              style={{
+                                backgroundColor: colors.success[100],
+                                color: colors.success[700],
+                              }}
+                            >
+                              Inventory Received
+                            </button>
+                          )}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center justify-center gap-2">
@@ -627,6 +750,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                                 <MdDeleteOutline size={16} />
                               </button>
                             )}
+
                           </div>
                         </td>
                       </tr>
@@ -952,8 +1076,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                       Deleting...
                     </>
                   ) : (
-                    `Delete ${selectedProcesses.length} Process${
-                      selectedProcesses.length > 1 ? "es" : ""
+                    `Delete ${selectedProcesses.length} Process${selectedProcesses.length > 1 ? "es" : ""
                     }`
                   )}
                 </button>
