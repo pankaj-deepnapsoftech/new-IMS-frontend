@@ -233,7 +233,7 @@ const toWords = new ToWords({
     currencyOptions: {
       name: "Rupee",
       plural: "Rupees",
-      symbol: "₹",
+      symbol: "",
       fractionalUnit: {
         name: "Paisa",
         plural: "Paise",
@@ -300,7 +300,7 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
   };
 
   const formatCurrency = (amount: number) => {
-    return `₹${amount.toLocaleString("en-IN", {
+    return `${amount.toLocaleString("en-IN", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
