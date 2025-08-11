@@ -23,15 +23,17 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { FaCaretDown, FaCaretUp, FaFilePdf } from "react-icons/fa";
 import moment from "moment";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
 import { useCookies } from "react-cookie";
+import BOMPDF from "../PDF/BOMPDF";
 
 interface BOMTableProps {
   boms: Array<{
+    _id: string;
     bom_name: string;
     parts_count: string;
     total_cost: string;
@@ -56,15 +58,61 @@ const BOMTable: React.FC<BOMTableProps> = ({
 }) => {
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
-  const [cookies] = useCookies()
-  
+  const [cookies] = useCookies();
+
   // Bulk selection states
   const [selectedBoms, setSelectedBoms] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
-  
+
+  // PDF generation state
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  // Function to fetch complete BOM data for PDF
+  const fetchBomForPDF = async (bomId: string) => {
+    try {
+      setIsGeneratingPDF(true);
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + `bom/${bomId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message);
+      return data.bom;
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to fetch BOM data");
+      return null;
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  // Handle PDF download with complete BOM data
+  const handlePDFDownload = async (bomId: string, bomName: string) => {
+    const fullBomData = await fetchBomForPDF(bomId);
+    if (fullBomData) {
+      // Create a temporary PDF download link
+      const { pdf } = await import("@react-pdf/renderer");
+      const blob = await pdf(<BOMPDF bom={fullBomData} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `BOM_${bomName || bomId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  };
+
   const columns = useMemo(
     () => [
+      { Header: "BOM ID", accessor: "_id" },
       { Header: "BOM Name", accessor: "bom_name" },
       { Header: "Parts Count", accessor: "parts_count" },
       { Header: "Total Cost", accessor: "total_cost" },
@@ -88,6 +136,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
     pageCount,
     setPageSize,
   }: TableInstance<{
+    _id: string;
     bom_name: string;
     parts_count: string;
     total_cost: string;
@@ -106,7 +155,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
   // Bulk selection functions
   const handleSelectAll = (checked) => {
     if (checked) {
-      setSelectedBoms(page.map(row => row.original._id));
+      setSelectedBoms(page.map((row) => row.original._id));
     } else {
       setSelectedBoms([]);
     }
@@ -114,27 +163,32 @@ const BOMTable: React.FC<BOMTableProps> = ({
 
   const handleSelectBom = (bomId, checked) => {
     if (checked) {
-      setSelectedBoms(prev => [...prev, bomId]);
+      setSelectedBoms((prev) => [...prev, bomId]);
     } else {
-      setSelectedBoms(prev => prev.filter(id => id !== bomId));
+      setSelectedBoms((prev) => prev.filter((id) => id !== bomId));
     }
   };
 
   const handleBulkDelete = async () => {
-    if (isBulkDeleting || selectedBoms.length === 0 || !deleteBomHandler) return;
+    if (isBulkDeleting || selectedBoms.length === 0 || !deleteBomHandler)
+      return;
     setIsBulkDeleting(true);
 
     try {
       // Call the delete handler for each selected BOM
-      const deletePromises = selectedBoms.map(bomId => 
+      const deletePromises = selectedBoms.map((bomId) =>
         deleteBomHandler(bomId)
       );
 
       await Promise.all(deletePromises);
-      
+
       // Success feedback
-      toast.success(`Successfully deleted ${selectedBoms.length} BOM${selectedBoms.length > 1 ? 's' : ''}`);
-      
+      toast.success(
+        `Successfully deleted ${selectedBoms.length} BOM${
+          selectedBoms.length > 1 ? "s" : ""
+        }`
+      );
+
       setSelectedBoms([]);
       setShowBulkDeleteModal(false);
     } catch (error) {
@@ -146,7 +200,8 @@ const BOMTable: React.FC<BOMTableProps> = ({
   };
 
   const isAllSelected = page.length > 0 && selectedBoms.length === page.length;
-  const isIndeterminate = selectedBoms.length > 0 && selectedBoms.length < page.length;
+  const isIndeterminate =
+    selectedBoms.length > 0 && selectedBoms.length < page.length;
 
   return (
     <div className="p-6">
@@ -331,6 +386,12 @@ const BOMTable: React.FC<BOMTableProps> = ({
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
+                      BOM ID
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
                       BOM Name
                     </th>
                     <th
@@ -409,6 +470,13 @@ const BOMTable: React.FC<BOMTableProps> = ({
                             }
                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                           />
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap font-mono"
+                          style={{ color: colors.text.secondary }}
+                          title={row.original._id}
+                        >
+                          {row.original.bom_id || "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
@@ -554,6 +622,45 @@ const BOMTable: React.FC<BOMTableProps> = ({
                                 <FcApproval size={16} />
                               </button>
                             )}
+
+                            {/* PDF Download Button */}
+                            <button
+                              disabled={isGeneratingPDF}
+                              onClick={() =>
+                                handlePDFDownload(
+                                  row.original._id,
+                                  row.original.bom_name
+                                )
+                              }
+                              className="p-2 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-50"
+                              style={{
+                                color: colors.warning[600],
+                                backgroundColor: colors.warning[50],
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!e.currentTarget.disabled) {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.warning[100];
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!e.currentTarget.disabled) {
+                                  e.currentTarget.style.backgroundColor =
+                                    colors.warning[50];
+                                }
+                              }}
+                              title={
+                                isGeneratingPDF
+                                  ? "Generating PDF..."
+                                  : "Download BOM PDF"
+                              }
+                            >
+                              {isGeneratingPDF ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-b-transparent border-current"></div>
+                              ) : (
+                                <FaFilePdf size={16} />
+                              )}
+                            </button>
                           </div>
                         </td>
                       </tr>
