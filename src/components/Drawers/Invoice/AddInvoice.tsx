@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   BiX,
-  BiBuilding,
   BiUser,
   BiPhone,
   BiMapPin,
@@ -75,10 +74,6 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
   const textColor = useColorModeValue("gray.600", "gray.300");
 
   const validationSchema = Yup.object({
-    companyAddress: Yup.string().required("Company address is required"),
-    companyPanNo: Yup.string().required("Company PAN No is required"),
-    companyWebsite: Yup.string().required("Company website is required"),
-
     sellerAddress: Yup.string().required("Seller address is required"),
 
     consigneeShipTo: Yup.string().required("Consignee ship to is required"),
@@ -110,14 +105,12 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
     remarks: Yup.string(),
   });
 
+  
+
   const [addInvoice] = useCreateInvoiceMutation();
 
   const formik = useFormik({
     initialValues: {
-      companyAddress: "",
-      companyPanNo: "",
-      companyWebsite: "",
-
       sellerAddress: "",
 
       consigneeShipTo: "",
@@ -404,128 +397,6 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
       {/* Form */}
       <div className="p-6">
         <form onSubmit={formik.handleSubmit} className="space-y-6">
-          {/* Company Details Section */}
-          <div
-            className="p-6 rounded-xl border"
-            style={{
-              backgroundColor: colors.background.card,
-              borderColor: colors.border.light,
-            }}
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div
-                className="p-2 rounded-lg"
-                style={{ backgroundColor: colors.primary[50] }}
-              >
-                <BiBuilding size={20} style={{ color: colors.primary[500] }} />
-              </div>
-              <h3
-                className="text-lg font-semibold"
-                style={{ color: colors.text.primary }}
-              >
-                Company Details
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.text.primary }}
-                >
-                  Company Address *
-                </label>
-                <input
-                  name="companyAddress"
-                  value={formik.values.companyAddress}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200 resize-none"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor:
-                      formik.touched.companyAddress &&
-                      formik.errors.companyAddress
-                        ? "#ef4444"
-                        : colors.input.border,
-                    color: colors.text.primary,
-                  }}
-                  placeholder="Enter company address"
-                />
-                {formik.touched.companyAddress &&
-                  formik.errors.companyAddress && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {formik.errors.companyAddress}
-                    </p>
-                  )}
-              </div>
-
-              <div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.text.primary }}
-                >
-                  Company PAN No *
-                </label>
-                <input
-                  type="text"
-                  name="companyPanNo"
-                  value={formik.values.companyPanNo}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor:
-                      formik.touched.companyPanNo && formik.errors.companyPanNo
-                        ? "#ef4444"
-                        : colors.input.border,
-                    color: colors.text.primary,
-                  }}
-                  placeholder="Enter company PAN number"
-                />
-                {formik.touched.companyPanNo && formik.errors.companyPanNo && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {formik.errors.companyPanNo}
-                  </p>
-                )}
-              </div>
-
-              <div className="md:col-span-2">
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.text.primary }}
-                >
-                  Company Website *
-                </label>
-                <input
-                  type="url"
-                  name="companyWebsite"
-                  value={formik.values.companyWebsite}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor:
-                      formik.touched.companyWebsite &&
-                      formik.errors.companyWebsite
-                        ? "#ef4444"
-                        : colors.input.border,
-                    color: colors.text.primary,
-                  }}
-                  placeholder="Enter company website"
-                />
-                {formik.touched.companyWebsite &&
-                  formik.errors.companyWebsite && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {formik.errors.companyWebsite}
-                    </p>
-                  )}
-              </div>
-            </div>
-          </div>
-
           {/* Seller Details Section */}
           <div
             className="p-6 rounded-xl border"

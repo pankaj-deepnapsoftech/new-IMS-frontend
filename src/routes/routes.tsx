@@ -97,7 +97,7 @@ const routes = [
     element: <UserRole />,
     isSublink: false,
   },
-  
+
   {
     name: "Resources",
     icon: <Wrench />,
@@ -121,7 +121,7 @@ const routes = [
         name: "Direct",
         icon: <SlDirection />,
         path: "direct",
-        element: <Products />,  
+        element: <Products />,
       },
       {
         name: "Indirect",
@@ -227,7 +227,7 @@ const routes = [
       {
         name: "Tax Invoices",
         icon: <RiBillLine />,
-        path: " taxInvoice",
+        path: "taxInvoice",
         element: <Invoice />,
       },
 
