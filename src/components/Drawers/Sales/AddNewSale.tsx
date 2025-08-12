@@ -182,7 +182,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
     console.log("product quantity", quantity)
     try {
       const res = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}bom/autobom?product_id=${productId}&quantity=${quantity}`,
+        `${process.env.REACT_APP_BACKEND_URL}bom/autobom?product_id=${productId}&quantity=${quantity}&`,
         {
           headers: { Authorization: `Bearer ${cookies?.access_token}` },
         }

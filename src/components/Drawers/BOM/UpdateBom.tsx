@@ -54,6 +54,27 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
     number | undefined
   >();
   const [otherCharges, setOtherCharges] = useState<number | undefined>();
+  // Resources & Manpower states
+  const [resources, setResources] = useState<any[]>([]);
+  const [resourceOptions, setResourceOptions] = useState<{ value: string; label: string }[]>([]);
+  type OptionType = { value: string; label: string };
+  type ResourceRow = { name: OptionType | null; type: OptionType | null; specification: string };
+
+  const [selectedResources, setSelectedResources] = useState<ResourceRow[]>([
+    { name: null, type: null, specification: "" },
+  ]);
+
+  // Manpower rows state
+  const [selectedManpower, setSelectedManpower] = useState<
+    { employee: { value: string; label: string } | null; role: string; hours: string }[]
+  >([
+    { employee: null, role: "", hours: "" }
+  ]);
+
+  const [empData, setEmpData] = useState<any[]>([]);
+  const [manPowerOptions, setManPowerOptions] = useState<{ value: string; label: string }[]>([]);
+  const [manpowerInput, setManpowerInput] = useState<string>("");
+  const [manpowerCount, setManpowerCount] = useState<number>(0);
 
   const [rawMaterials, setRawMaterials] = useState<any[]>([
     {
@@ -198,7 +219,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
       );
       const data = await response.json();
       if (!data.success) throw new Error(data.message);
-
+    // console.log(data)
       setBomName(data.bom.bom_name);
       setPartsCount(data.bom.parts_count);
       setTotalPartsCost(data.bom.total_cost);
@@ -215,6 +236,26 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
       setComments(data.bom.finished_good.comments);
       setRemarks(data?.bom?.remarks)
       setProcesses(data.bom.processes || [""]);
+      setSelectedResources(
+        data.bom.resources?.length
+          ? data.bom.resources.map((r: any) => ({
+            name: r.resource_id
+              ? { value: r.resource_id._id, label: r.resource_id.name }
+              : null,
+            type: r.type
+              ? { value: r.type, label: r.type }
+              : null,
+            specification: r.specification || "",
+          }))
+          : [{ name: null, type: null, specification: "" }]
+      );
+
+
+
+
+      setManpowerCount(data.bom.manpower?.[0]?.number || empData?.length || 0);
+
+      setManpowerInput(data.bom.manpower?.[0]?.number || "");
 
       const inputs: any = [];
       data.bom.raw_materials.forEach((material: any) => {
@@ -317,6 +358,9 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
         item: material?.item_name?.value,
         description: material?.description,
         quantity: material?.quantity,
+        uom: material?.uom,
+        unit_cost: material?.unit_cost,
+        category: material?.category,
         assembly_phase: material?.assembly_phase?.value,
         supplier: material?.supplier?.value,
         supporting_doc: material?.supporting_doc,
@@ -336,6 +380,8 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
           item: material?.item_name?.value,
           description: material?.description,
           quantity: material?.quantity,
+          uom: material?.uom,
+          unit_cost: material?.unit_cost,
           total_part_cost: material?.total_part_cost,
         };
         if (material?._id && material._id.trim() !== "") {
@@ -343,6 +389,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
         }
         return materialData;
       });
+
 
     const body = {
       _id: bomId,
@@ -353,10 +400,13 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
         item: finishedGood?.value,
         description: description,
         quantity: quantity,
+        uom: uom,
+        category: category,
         supporting_doc: pdfUrl,
         comments: comments,
         cost: cost,
       },
+
       bom_name: bomName,
       parts_count: partsCount,
       total_cost: totalPartsCost,
@@ -367,6 +417,15 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
         other_charges: otherCharges || 0,
       },
       remarks:remarks,
+      manpower: [{ number: String(manpowerInput || manpowerCount) }],
+      resources: selectedResources.map((r) => ({
+        resource_id: r.name,
+        type: r.type || r.type,
+        specification: r.specification || r.specification,
+      })),
+
+      
+
     };
 
     try {
@@ -383,12 +442,54 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
     }
   };
 
+  console.log(manpowerCount)
+
   // ---------- Effects ----------
+  const fetchResourceHandler = async () => {
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "resources",
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      const results = await response.json();
+      if (!results.success) throw new Error(results?.message);
+      setResources(results.resources);
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    }
+  };
+
+  const fetchEmployeeHandler = async () => {
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "auth/all",
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      const results = await response.json();
+      if (!results.success) throw new Error(results?.message);
+
+      const manPowerUsers = results?.users?.filter(
+        (user: any) => user.role?.role?.toLowerCase().includes("man power")
+      );
+
+      setEmpData(manPowerUsers);
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    }
+  };
+
 
   useEffect(() => {
     fetchBomDetails();
     fetchProductsHandler();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchResourceHandler();
+    fetchEmployeeHandler();
   }, [bomId]);
 
   useEffect(() => {
@@ -423,6 +524,15 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
       setTotalPartsCost(cost);
     }
   }, [rawMaterials]);
+  useEffect(() => {
+    const options = resources?.map((res: any) => ({
+      label: res.name,
+      value: res._id,
+      type: res.type,
+      specification: res.specification,
+    }));
+    setResourceOptions(options);
+  }, [resources]);
 
   // ---------- Styles ----------
 
@@ -922,6 +1032,93 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                   </div>
                 </div>
               </div>
+              {/* Resources */}
+              <div className="bg-white border-b px-4 py-4 sm:px-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Resources</h3>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedResources([...selectedResources, { name: null, type: null, specification: "" }])}
+                    className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded"
+                  >
+                    <Plus size={16} /> Add
+                  </button>
+                </div>
+
+                {selectedResources.map((res, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    {/* Resource Name Dropdown */}
+                    <Select
+                      options={resourceOptions}
+                      value={res.name}
+                      onChange={(selected) => {
+                        const updated = [...selectedResources];
+                        updated[index].name = selected;
+                        setSelectedResources(updated);
+                      }}
+                      placeholder="Select Resource"
+                    />
+
+                    {/* Resource Type Dropdown */}
+                    <Select
+                      options={[
+                        { value: "assemble_line", label: "Assemble Line" },
+                        { value: "machine", label: "Machine" },
+                        { value: "tool", label: "Tool" },
+                      ]}
+                      value={res.type}
+                      onChange={(selected) => {
+                        const updated = [...selectedResources];
+                        updated[index].type = selected;
+                        setSelectedResources(updated);
+                      }}
+                      placeholder="Select Type"
+                    />
+
+                    {/* Specification Input */}
+                    <input
+                      type="text"
+                      className="border p-2 rounded"
+                      placeholder="Specification"
+                      value={res.specification}
+                      onChange={(e) => {
+                        const updated = [...selectedResources];
+                        updated[index].specification = e.target.value;
+                        setSelectedResources(updated);
+                      }}
+                    />
+
+                    {/* Remove Button */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedResources(selectedResources.filter((_, i) => i !== index))}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+          {/* Manpower Data */}
+              <div className="bg-white border-b">
+                <div className="px-4 py-4 sm:px-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Manpower</h3>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Available manpower
+                    </label>
+                    <input
+                      type="number"
+                      value={manpowerInput || manpowerCount || ""}
+                      onChange={(e) => setManpowerInput(e.target.value)}
+                      placeholder="Enter manpower count"
+                      className="w-full px-3 py-2 border border-gray-300 rounded"
+                    />
+                  </div>
+                </div>
+              </div>
+
 
               {/* Scrap Materials */}
               <div className="bg-white border-b">

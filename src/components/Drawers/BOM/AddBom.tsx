@@ -224,7 +224,7 @@ const AddBom: React.FC<AddBomProps> = ({
 
 
     };
-
+ console.log(body)
     try {
       const response = await addBom(body).unwrap();
       toast.success(response?.message);

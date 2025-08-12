@@ -469,7 +469,7 @@ const Sales = () => {
       </div>
 
       {/* Drawers */}
-      <AddNewSale
+      <AddNewSale 
         editTable={editTable}
         show={show}
         setShow={setShow}
