@@ -152,6 +152,8 @@ const PurchaseOrder: React.FC = () => {
   // Modal states
   const [showInventoryShortagesModal, setShowInventoryShortagesModal] = useState(false);
   const [showUpdateInventoryModal, setShowUpdateInventoryModal] = useState(false);
+  const [showEditRawMaterialModal, setShowEditRawMaterialModal] = useState(false);
+  const [selectedRawMaterial, setSelectedRawMaterial] = useState<InventoryShortage | null>(null);
   
   // Update Inventory Form state
   const [updateInventoryForm, setUpdateInventoryForm] = useState<InventoryUpdateForm[]>([]);
@@ -466,104 +468,64 @@ const PurchaseOrder: React.FC = () => {
     }
   };
 
+  // Open edit raw material modal
+  const openEditRawMaterialModal = (item: InventoryShortage) => {
+    setSelectedRawMaterial(item);
+    setShowEditRawMaterialModal(true);
+  };
+
   // Submit all changes in Raw Material Shortages modal
   const submitRawMaterialChanges = async () => {
     try {
       console.log("Total inventory shortages:", inventoryShortages.length);
       
       // Find items that have been modified
-      const itemsWithPriceChanges = inventoryShortages.filter(item => 
-        item.updated_price && item.updated_price !== null && item.updated_price !== item.current_price
-      );
-      
-      const itemsWithStockChanges = inventoryShortages.filter(item => 
-        item.updated_stock && item.updated_stock !== null && item.updated_stock !== 0
+      const modifiedItems = inventoryShortages.filter(item => 
+        (item.updated_price && item.updated_price !== item.current_price) ||
+        (item.current_stock !== item.original_stock)
       );
 
-      console.log("Items with price changes:", itemsWithPriceChanges.length);
-      console.log("Items with stock changes:", itemsWithStockChanges.length);
-      console.log("Price changes:", itemsWithPriceChanges.map(item => ({
-        item_name: item.item_name,
-        current_price: item.current_price,
-        updated_price: item.updated_price
-      })));
-      console.log("Stock changes:", itemsWithStockChanges.map(item => ({
-        item_name: item.item_name,
-        current_stock: item.current_stock,
-        updated_stock: item.updated_stock,
-        total_available: item.current_stock + (item.updated_stock || 0)
-      })));
-
-      const totalModifiedItems = itemsWithPriceChanges.length + itemsWithStockChanges.length;
-
-      if (totalModifiedItems === 0) {
+      if (modifiedItems.length === 0) {
         toast.info("No changes to save");
         return;
       }
 
-      // Update prices (now stores in updated_price field)
-      const priceUpdates = itemsWithPriceChanges.map(item => 
-        axios.put(
-          `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
-          {
-            productId: item.item,
-            newPrice: item.updated_price
-          },
-          {
-            headers: { Authorization: `Bearer ${cookies?.access_token}` },
-          }
-        )
-      );
+      // Update prices
+      const priceUpdates = modifiedItems
+        .filter(item => item.updated_price && item.updated_price !== item.current_price)
+        .map(item => 
+          axios.put(
+            `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
+            {
+              productId: item.item,
+              newPrice: item.updated_price
+            },
+            {
+              headers: { Authorization: `Bearer ${cookies?.access_token}` },
+            }
+          )
+        );
 
-      // Update stocks (now stores in updated_stock field)
-      const stockUpdates = itemsWithStockChanges.map(item => 
-        axios.put(
-          `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
-          {
-            productId: item.item,
-            newStock: item.updated_stock
-          },
-          {
-            headers: { Authorization: `Bearer ${cookies?.access_token}` },
-          }
-        )
-      );
+      // Update stocks
+      const stockUpdates = modifiedItems
+        .filter(item => item.current_stock !== item.original_stock)
+        .map(item => 
+          axios.put(
+            `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
+            {
+              productId: item.item,
+              newStock: item.current_stock
+            },
+            {
+              headers: { Authorization: `Bearer ${cookies?.access_token}` },
+            }
+          )
+        );
 
       // Execute all updates
       await Promise.all([...priceUpdates, ...stockUpdates]);
 
-      const uniqueItemsUpdated = new Set([
-        ...itemsWithPriceChanges.map(item => item.item),
-        ...itemsWithStockChanges.map(item => item.item)
-      ]).size;
-      
-      toast.success(`Successfully updated ${uniqueItemsUpdated} items (${itemsWithPriceChanges.length} price updates, ${itemsWithStockChanges.length} stock updates)`);
-      
-      // Automatically remove updated items from inventory shortages
-      const allUpdatedItems = [...itemsWithPriceChanges, ...itemsWithStockChanges];
-      const uniqueUpdatedItems = allUpdatedItems.filter((item, index, self) => 
-        index === self.findIndex(t => t.item === item.item)
-      );
-      
-      const removalPromises = uniqueUpdatedItems.map(item => 
-        axios.put(
-          `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
-          {
-            productId: item.item
-          },
-          {
-            headers: { Authorization: `Bearer ${cookies?.access_token}` },
-          }
-        ).catch(error => {
-          // Ignore errors - item might not be in shortages
-          console.log(`Item ${item.item_name} not in shortages or no updates:`, error);
-          return null;
-        })
-      );
-      
-      await Promise.all(removalPromises);
-      
-      toast.success(`Automatically removed ${uniqueUpdatedItems.length} updated items from shortages list`);
+      toast.success(`Successfully updated ${modifiedItems.length} items`);
       
       // Refresh all data to sync across components
       await Promise.all([
@@ -1042,17 +1004,8 @@ const PurchaseOrder: React.FC = () => {
                                 step="0.01"
                               />
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm">
-                              {item.updated_price && item.updated_price !== null && item.updated_price !== item.current_price ? (
-                                <span className="font-semibold text-blue-600">
-                                  ₹{item.updated_price.toFixed(2)}
-                                </span>
-                              ) : (
-                                <span className="text-gray-400">-</span>
-                              )}
-                            </td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm">
-                             {item.updated_price && item.updated_price !== null && item.updated_price !== item.current_price ? (
+                             {item.updated_price && item.updated_price !== item.current_price ? (
                                <div className="flex flex-col">
                                  <span className={`font-semibold ${item.updated_price > item.current_price ? 'text-red-600' : 'text-green-600'}`}>
                                    ₹{Math.abs(item.updated_price - item.current_price).toFixed(2)}
@@ -1065,23 +1018,16 @@ const PurchaseOrder: React.FC = () => {
                                <span className="text-gray-400">-</span>
                              )}
                            </td>
-
-                           <td className="px-6 py-4 whitespace-nowrap text-sm">
-                             {(item.updated_price && item.updated_price !== null && item.updated_price !== item.current_price) ||
-                              (item.updated_stock && item.updated_stock !== null && item.updated_stock !== 0) ? (
-                               <button
-                                 onClick={() => removeFromShortages(item.item)}
-                                 className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium"
-                                 title="Remove this item from shortages (item has been updated)"
-                               >
-                                 Remove
-                               </button>
-                             ) : (
-                               <span className="text-gray-400 text-xs">-</span>
-                             )}
-                           </td>
                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {new Date(item.updated_at).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <button
+                                onClick={() => openEditRawMaterialModal(item)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
+                              >
+                                Edit
+                              </button>
                             </td>
                           </tr>
                        ))}

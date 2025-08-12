@@ -46,6 +46,7 @@ const InventoryApprovals: React.FC = () => {
   };
 
   const approveRmHandler = async (id: string) => {
+    console.log(id)
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}bom/approve/inventory/raw-materials`,

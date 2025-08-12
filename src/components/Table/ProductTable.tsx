@@ -23,7 +23,6 @@ import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
 import { useCookies } from "react-cookie";
 import axios from "axios";
-import { MdOutlineRefresh } from "react-icons/md";
 
 interface ProductTableProps {
   products: Array<any>;
@@ -141,56 +140,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const isAllSelected = page.length > 0 && selectedProducts.length === page.length;
   const isIndeterminate = selectedProducts.length > 0 && selectedProducts.length < page.length;
 
-  // Add this function inside the ProductTable component
-  const handleUpdateInventory = async (product) => {
-    const additionalStock = prompt(`Enter additional stock for ${product.name} (current: ${product.current_stock}, updated: ${product.updated_stock || 0}):`, "0");
-    if (additionalStock === null || additionalStock === "") return;
-    try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
-        {
-          productId: product._id,
-          newStock: Number(additionalStock),
-        },
-        {
-          headers: { Authorization: `Bearer ${cookies?.access_token}` },
-        }
-      );
-      if (response.data.success) {
-        toast.success("Updated stock saved successfully!");
-        if (typeof window !== 'undefined') window.location.reload(); // Or call a refresh handler if available
-      } else {
-        toast.error(response.data.message || "Failed to update stock");
-      }
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to update stock");
-    }
-  };
 
-  const handleUpdatePrice = async (product) => {
-    const newPrice = prompt(`Enter updated price for ${product.name} (current: ₹${product.price}, updated: ₹${product.updated_price || product.price}):`, product.updated_price || product.price);
-    if (newPrice === null || newPrice === "") return;
-    try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
-        {
-          productId: product._id,
-          newPrice: Number(newPrice),
-        },
-        {
-          headers: { Authorization: `Bearer ${cookies?.access_token}` },
-        }
-      );
-      if (response.data.success) {
-        toast.success("Updated price saved successfully!");
-        if (typeof window !== 'undefined') window.location.reload(); // Or call a refresh handler if available
-      } else {
-        toast.error(response.data.message || "Failed to update price");
-      }
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to update price");
-    }
-  };
 
   return (
     <div className="p-6">
@@ -762,7 +712,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                 <MdEdit size={16} />
                               </button>
                             )}
-                          
+
                             {deleteProductHandler && cookies?.role === "admin" && (
                               <button
                                 onClick={() => {
