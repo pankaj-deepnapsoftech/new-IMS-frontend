@@ -496,17 +496,7 @@
                />
              </FormControl>
              
-             <FormControl className="mt-3 mb-5" isRequired>
-               <FormLabel fontWeight="bold" color="gray.700">
-                 Product/Service
-               </FormLabel>
-               <Select
-                 styles={customStyles}
-                 value={productOrService}
-                 options={productOrServiceOptions}
-                 onChange={(e: any) => setProductOrService(e)}
-               />
-             </FormControl>
+      
  
              <FormControl className="mt-3 mb-5" >
                <FormLabel fontWeight="bold" color="gray.700">

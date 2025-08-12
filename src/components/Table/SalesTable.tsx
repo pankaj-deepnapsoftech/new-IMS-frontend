@@ -34,7 +34,7 @@ const SalesTable = ({
     const totalPrice = basePrice + gstVal;
     return totalPrice;
   };
-  // console.log(filteredPurchases)
+  console.log(filteredPurchases)
   const [selectedSale, setSelectedSale] = useState([]);
   const [paymentshow, setPaymentshow] = useState(false);
   const [isOpen, setViewDesign] = useState(false);
