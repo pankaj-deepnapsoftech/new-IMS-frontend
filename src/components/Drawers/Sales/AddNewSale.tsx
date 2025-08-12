@@ -135,7 +135,6 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
           await PostDataAutoCreateBom(value.product_id, value.product_qty);
           resetForm();
         }
-
         toast.success(
           `Sale ${editTable?._id ? "updated" : "created"} successfully`
         );
