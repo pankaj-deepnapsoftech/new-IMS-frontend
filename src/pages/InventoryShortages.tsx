@@ -19,7 +19,7 @@ const InventoryShortages: React.FC = () => {
             Authorization: `Bearer ${cookies?.access_token}`,
           },
         }
-      );
+      ); 
       const data = await response.json();
       if (!data.success) throw new Error(data.message);
       setShortages(data.shortages || []);
