@@ -531,18 +531,25 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                           <Button
                             size="sm"
                             style={{
-                              backgroundColor: isApproved || original.bom_status !== "raw material approval pending"
-                                ? colors.success[700] // Dark green if approved
-                                : colors.success[500], // Normal green if pending
+                              backgroundColor:
+                                isApproved ||
+                                  original.bom_status !== "raw material approval pending" ||
+                                  original.isInventoryApprovalClicked // ✅ disable if already clicked
+                                  ? colors.success[700] // Dark green if approved or clicked
+                                  : colors.success[500], // Normal green if pending
                               color: colors.text.inverse,
                               cursor:
-                                isApproved || original.bom_status !== "raw material approval pending"
+                                isApproved ||
+                                  original.bom_status !== "raw material approval pending" ||
+                                  original.isInventoryApprovalClicked // ✅ also here
                                   ? "not-allowed"
                                   : "pointer",
                             }}
                             _hover={{
                               bg:
-                                isApproved || original.bom_status !== "raw material approval pending"
+                                isApproved ||
+                                  original.bom_status !== "raw material approval pending" ||
+                                  original.isInventoryApprovalClicked // ✅ also here
                                   ? colors.success[700]
                                   : colors.success[600],
                             }}
@@ -552,13 +559,18 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                             }}
                             leftIcon={<FaCheckCircle />}
                             disabled={
-                              isApproved || original.bom_status !== "raw material approval pending"
+                              isApproved ||
+                              original.bom_status !== "raw material approval pending" ||
+                              original.isInventoryApprovalClicked // ✅ also here
                             }
                           >
-                            {isApproved || original.bom_status !== "raw material approval pending"
+                            {isApproved ||
+                              original.bom_status !== "raw material approval pending" ||
+                              original.isInventoryApprovalClicked // ✅ also here
                               ? "Approved"
                               : "Approve"}
                           </Button>
+
 
 
 
