@@ -151,8 +151,6 @@ const PurchaseOrder: React.FC = () => {
   // Modal states
   const [showInventoryShortagesModal, setShowInventoryShortagesModal] = useState(false);
   const [showUpdateInventoryModal, setShowUpdateInventoryModal] = useState(false);
-  const [showEditRawMaterialModal, setShowEditRawMaterialModal] = useState(false);
-  const [editingRawMaterial, setEditingRawMaterial] = useState<any>(null);
   
   // Update Inventory Form state
   const [updateInventoryForm, setUpdateInventoryForm] = useState<InventoryUpdateForm[]>([]);
@@ -226,12 +224,21 @@ const PurchaseOrder: React.FC = () => {
          console.log("Total shortages:", allShortages.length);
          console.log("Raw material shortages:", rawMaterialShortages.length);
          
-         // Add original_stock field to track changes
-         const shortagesWithOriginalStock = rawMaterialShortages.map((shortage: any) => ({
+         // Remove duplicates based on item ID and add original_stock field to track changes
+         const uniqueShortages = rawMaterialShortages.reduce((acc: any[], shortage: any) => {
+           const existingIndex = acc.findIndex(item => item.item === shortage.item);
+           if (existingIndex === -1) {
+             acc.push(shortage);
+           }
+           return acc;
+         }, []);
+         
+         const shortagesWithOriginalStock = uniqueShortages.map((shortage: any) => ({
            ...shortage,
            original_stock: shortage.current_stock
          }));
          
+         console.log("Unique raw material shortages:", shortagesWithOriginalStock.length);
          setInventoryShortages(shortagesWithOriginalStock);
       } else {
         toast.error(shortagesResponse.data.message || "Failed to fetch inventory shortages");
@@ -458,53 +465,74 @@ const PurchaseOrder: React.FC = () => {
   // Submit all changes in Raw Material Shortages modal
   const submitRawMaterialChanges = async () => {
     try {
+      console.log("Total inventory shortages:", inventoryShortages.length);
+      
       // Find items that have been modified
-      const modifiedItems = inventoryShortages.filter(item => 
-        (item.updated_price && item.updated_price !== item.current_price) ||
-        (item.current_stock !== item.original_stock)
+      const itemsWithPriceChanges = inventoryShortages.filter(item => 
+        item.updated_price && item.updated_price !== item.current_price
+      );
+      
+      const itemsWithStockChanges = inventoryShortages.filter(item => 
+        item.current_stock !== item.original_stock
       );
 
-      if (modifiedItems.length === 0) {
+      console.log("Items with price changes:", itemsWithPriceChanges.length);
+      console.log("Items with stock changes:", itemsWithStockChanges.length);
+      console.log("Price changes:", itemsWithPriceChanges.map(item => ({
+        item_name: item.item_name,
+        current_price: item.current_price,
+        updated_price: item.updated_price
+      })));
+      console.log("Stock changes:", itemsWithStockChanges.map(item => ({
+        item_name: item.item_name,
+        original_stock: item.original_stock,
+        current_stock: item.current_stock
+      })));
+
+      const totalModifiedItems = itemsWithPriceChanges.length + itemsWithStockChanges.length;
+
+      if (totalModifiedItems === 0) {
         toast.info("No changes to save");
         return;
       }
 
       // Update prices
-      const priceUpdates = modifiedItems
-        .filter(item => item.updated_price && item.updated_price !== item.current_price)
-        .map(item => 
-          axios.put(
-            `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
-            {
-              productId: item.item,
-              newPrice: item.updated_price
-            },
-            {
-              headers: { Authorization: `Bearer ${cookies?.access_token}` },
-            }
-          )
-        );
+      const priceUpdates = itemsWithPriceChanges.map(item => 
+        axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
+          {
+            productId: item.item,
+            newPrice: item.updated_price
+          },
+          {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          }
+        )
+      );
 
       // Update stocks
-      const stockUpdates = modifiedItems
-        .filter(item => item.current_stock !== item.original_stock)
-        .map(item => 
-          axios.put(
-            `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
-            {
-              productId: item.item,
-              newStock: item.current_stock
-            },
-            {
-              headers: { Authorization: `Bearer ${cookies?.access_token}` },
-            }
-          )
-        );
+      const stockUpdates = itemsWithStockChanges.map(item => 
+        axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
+          {
+            productId: item.item,
+            newStock: item.current_stock
+          },
+          {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          }
+        )
+      );
 
       // Execute all updates
       await Promise.all([...priceUpdates, ...stockUpdates]);
 
-      toast.success(`Successfully updated ${modifiedItems.length} items`);
+      const uniqueItemsUpdated = new Set([
+        ...itemsWithPriceChanges.map(item => item.item),
+        ...itemsWithStockChanges.map(item => item.item)
+      ]).size;
+      
+      toast.success(`Successfully updated ${uniqueItemsUpdated} items (${itemsWithPriceChanges.length} price updates, ${itemsWithStockChanges.length} stock updates)`);
       
       // Refresh all data to sync across components
       await Promise.all([
@@ -546,18 +574,6 @@ const PurchaseOrder: React.FC = () => {
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to update raw material");
     }
-  };
-
-  // Open edit raw material modal
-  const openEditRawMaterialModal = (item: any) => {
-    setEditingRawMaterial(item);
-    setShowEditRawMaterialModal(true);
-  };
-
-  // Close edit raw material modal
-  const closeEditRawMaterialModal = () => {
-    setEditingRawMaterial(null);
-    setShowEditRawMaterialModal(false);
   };
 
   useEffect(() => {
@@ -699,7 +715,7 @@ const PurchaseOrder: React.FC = () => {
              </button>
             
             {/* Update Inventory Button */}
-            <button
+            {/* <button
               className="bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
               onClick={() => {
                 setShowUpdateInventoryModal(true);
@@ -723,7 +739,7 @@ const PurchaseOrder: React.FC = () => {
                 />
               </svg>
               Update Inventory
-            </button>
+            </button> */}
             
 
             
@@ -866,9 +882,9 @@ const PurchaseOrder: React.FC = () => {
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shortage Quantity</th>
                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated Price</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latest Price</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price Change</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                        </tr>
                      </thead>
                      <tbody className="bg-white divide-y divide-gray-200">
@@ -901,6 +917,15 @@ const PurchaseOrder: React.FC = () => {
                                 step="0.01"
                               />
                             </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                              {item.updated_price && item.updated_price !== item.current_price ? (
+                                <span className="font-semibold text-blue-600">
+                                  ₹{item.updated_price.toFixed(2)}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm">
                              {item.updated_price && item.updated_price !== item.current_price ? (
                                <div className="flex flex-col">
@@ -917,14 +942,6 @@ const PurchaseOrder: React.FC = () => {
                            </td>
                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {new Date(item.updated_at).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              <button
-                                onClick={() => openEditRawMaterialModal(item)}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
-                              >
-                                Edit
-                              </button>
                             </td>
                           </tr>
                        ))}
@@ -1171,104 +1188,7 @@ const PurchaseOrder: React.FC = () => {
        )}
 
        {/* Edit Raw Material Modal */}
-       {showEditRawMaterialModal && editingRawMaterial && (
-         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-             <div className="flex justify-between items-center p-6 border-b border-gray-200">
-               <h2 className="text-2xl font-bold text-gray-900">Edit Raw Material: {editingRawMaterial.item_name}</h2>
-               <button
-                 onClick={closeEditRawMaterialModal}
-                 className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
-               >
-                 Close
-               </button>
-             </div>
-             
-             <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-               <div className="space-y-4">
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                     Item Name
-                   </label>
-                   <input
-                     type="text"
-                     value={editingRawMaterial.item_name}
-                     disabled
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
-                   />
-                 </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                     Current Stock
-                   </label>
-                   <input
-                     type="number"
-                     value={editingRawMaterial.current_stock}
-                     onChange={(e) => setEditingRawMaterial({
-                       ...editingRawMaterial,
-                       current_stock: Number(e.target.value)
-                     })}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                     min="-999999"
-                     step="1"
-                   />
-                 </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                     Current Price
-                   </label>
-                   <input
-                     type="number"
-                     value={editingRawMaterial.current_price}
-                     onChange={(e) => setEditingRawMaterial({
-                       ...editingRawMaterial,
-                       current_price: Number(e.target.value)
-                     })}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                     min="0"
-                     step="0.01"
-                   />
-                 </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                     Shortage Quantity
-                   </label>
-                   <input
-                     type="number"
-                     value={editingRawMaterial.shortage_quantity}
-                     disabled
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
-                   />
-                 </div>
-                 
-                 <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                   <button
-                     onClick={closeEditRawMaterialModal}
-                     className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium"
-                   >
-                     Cancel
-                   </button>
-                   <button
-                     onClick={() => {
-                       updateRawMaterial(editingRawMaterial.item, {
-                         current_stock: editingRawMaterial.current_stock,
-                         price: editingRawMaterial.current_price
-                       });
-                       closeEditRawMaterialModal();
-                     }}
-                     className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium"
-                   >
-                     Update Raw Material
-                   </button>
-                 </div>
-               </div>
-             </div>
-           </div>
-         </div>
-       )}
+       {/* This modal is no longer needed as the Edit button is removed */}
      </div>
    );
  }
