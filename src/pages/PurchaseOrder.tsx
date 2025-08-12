@@ -215,36 +215,39 @@ const PurchaseOrder: React.FC = () => {
       if (shortagesResponse.data.success) {
         const allShortages = shortagesResponse.data.shortages || [];
         
-                 // Filter shortages to only include raw materials
-         const rawMaterialShortages = allShortages.filter((shortage: any) => {
-           // Check if the shortage item is in our raw materials list
-           return rawMaterials.some((rawMaterial: any) => 
-             rawMaterial.name.toLowerCase() === shortage.item_name?.toLowerCase() ||
-             rawMaterial._id === shortage.item
-           );
-         });
+        console.log("All shortages from API:", allShortages);
+        
+        // Filter shortages to only include raw materials
+        const rawMaterialShortages = allShortages.filter((shortage: any) => {
+          // Check if the shortage item is in our raw materials list
+          return rawMaterials.some((rawMaterial: any) => 
+            rawMaterial.name.toLowerCase() === shortage.item_name?.toLowerCase() ||
+            rawMaterial._id === shortage.item
+          );
+        });
 
-         console.log("Total shortages:", allShortages.length);
-         console.log("Raw material shortages:", rawMaterialShortages.length);
-         
-         // Remove duplicates based on item ID and add original_stock field to track changes
-         const uniqueShortages = rawMaterialShortages.reduce((acc: any[], shortage: any) => {
-           const existingIndex = acc.findIndex(item => item.item === shortage.item);
-           if (existingIndex === -1) {
-             acc.push(shortage);
-           }
-           return acc;
-         }, []);
-         
-         const shortagesWithOriginalStock = uniqueShortages.map((shortage: any) => ({
-           ...shortage,
-           original_stock: shortage.current_stock,
-           updated_price: shortage.updated_price || null,
-           updated_stock: shortage.updated_stock || null
-         }));
-         
-         console.log("Unique raw material shortages:", shortagesWithOriginalStock.length);
-         setInventoryShortages(shortagesWithOriginalStock);
+        console.log("Total shortages:", allShortages.length);
+        console.log("Raw material shortages:", rawMaterialShortages.length);
+        
+        // Remove duplicates based on item ID and add original_stock field to track changes
+        const uniqueShortages = rawMaterialShortages.reduce((acc: any[], shortage: any) => {
+          const existingIndex = acc.findIndex(item => item.item === shortage.item);
+          if (existingIndex === -1) {
+            acc.push(shortage);
+          }
+          return acc;
+        }, []);
+        
+        const shortagesWithOriginalStock = uniqueShortages.map((shortage: any) => ({
+          ...shortage,
+          original_stock: shortage.current_stock,
+          updated_price: shortage.updated_price || null,
+          updated_stock: shortage.updated_stock || null
+        }));
+        
+        console.log("Unique raw material shortages:", shortagesWithOriginalStock.length);
+        console.log("Final shortages data:", shortagesWithOriginalStock);
+        setInventoryShortages(shortagesWithOriginalStock);
       } else {
         toast.error(shortagesResponse.data.message || "Failed to fetch inventory shortages");
       }
@@ -480,52 +483,90 @@ const PurchaseOrder: React.FC = () => {
       console.log("Total inventory shortages:", inventoryShortages.length);
       
       // Find items that have been modified
-      const modifiedItems = inventoryShortages.filter(item => 
-        (item.updated_price && item.updated_price !== item.current_price) ||
-        (item.current_stock !== item.original_stock)
+      const itemsWithPriceChanges = inventoryShortages.filter(item => 
+        item.updated_price && item.updated_price !== null && item.updated_price !== item.current_price
+      );
+      
+      const itemsWithStockChanges = inventoryShortages.filter(item => 
+        item.updated_stock && item.updated_stock !== null && item.updated_stock !== 0
       );
 
-      if (modifiedItems.length === 0) {
+      console.log("All inventory shortages:", inventoryShortages);
+      console.log("Items with price changes:", itemsWithPriceChanges);
+      console.log("Items with stock changes:", itemsWithStockChanges);
+      console.log("Items with price changes count:", itemsWithPriceChanges.length);
+      console.log("Items with stock changes count:", itemsWithStockChanges.length);
+
+      const totalModifiedItems = itemsWithPriceChanges.length + itemsWithStockChanges.length;
+
+      if (totalModifiedItems === 0) {
         toast.info("No changes to save");
         return;
       }
 
-      // Update prices
-      const priceUpdates = modifiedItems
-        .filter(item => item.updated_price && item.updated_price !== item.current_price)
-        .map(item => 
-          axios.put(
-            `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
-            {
-              productId: item.item,
-              newPrice: item.updated_price
-            },
-            {
-              headers: { Authorization: `Bearer ${cookies?.access_token}` },
-            }
-          )
-        );
+      // Update prices (now stores in updated_price field)
+      const priceUpdates = itemsWithPriceChanges.map(item => 
+        axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
+          {
+            productId: item.item,
+            newPrice: item.updated_price
+          },
+          {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          }
+        )
+      );
 
-      // Update stocks
-      const stockUpdates = modifiedItems
-        .filter(item => item.current_stock !== item.original_stock)
-        .map(item => 
-          axios.put(
-            `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
-            {
-              productId: item.item,
-              newStock: item.current_stock
-            },
-            {
-              headers: { Authorization: `Bearer ${cookies?.access_token}` },
-            }
-          )
-        );
+      // Update stocks (now stores in updated_stock field)
+      const stockUpdates = itemsWithStockChanges.map(item => 
+        axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
+          {
+            productId: item.item,
+            newStock: item.updated_stock
+          },
+          {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          }
+        )
+      );
 
       // Execute all updates
       await Promise.all([...priceUpdates, ...stockUpdates]);
 
-      toast.success(`Successfully updated ${modifiedItems.length} items`);
+      const uniqueItemsUpdated = new Set([
+        ...itemsWithPriceChanges.map(item => item.item),
+        ...itemsWithStockChanges.map(item => item.item)
+      ]).size;
+      
+      toast.success(`Successfully updated ${uniqueItemsUpdated} items (${itemsWithPriceChanges.length} price updates, ${itemsWithStockChanges.length} stock updates)`);
+      
+      // Automatically remove updated items from inventory shortages
+      const allUpdatedItems = [...itemsWithPriceChanges, ...itemsWithStockChanges];
+      const uniqueUpdatedItems = allUpdatedItems.filter((item, index, self) => 
+        index === self.findIndex(t => t.item === item.item)
+      );
+      
+      const removalPromises = uniqueUpdatedItems.map(item => 
+        axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
+          {
+            productId: item.item
+          },
+          {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          }
+        ).catch(error => {
+          // Ignore errors - item might not be in shortages
+          console.log(`Item ${item.item_name} not in shortages or no updates:`, error);
+          return null;
+        })
+      );
+      
+      await Promise.all(removalPromises);
+      
+      toast.success(`Automatically removed ${uniqueUpdatedItems.length} updated items from shortages list`);
       
       // Refresh all data to sync across components
       await Promise.all([
