@@ -53,6 +53,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       { Header: "Product/Service", accessor: "product_or_service" },
       { Header: "UOM", accessor: "uom" },
       { Header: "Price", accessor: "price" },
+      { Header: "Latest Price", accessor: "latest_price" },
       { Header: "Current stock", accessor: "current_stock" },
       { Header: "Last Change", accessor: "change" },
       { Header: "Min stock", accessor: "min_stock" },
@@ -142,27 +143,52 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
   // Add this function inside the ProductTable component
   const handleUpdateInventory = async (product) => {
-    const newStock = prompt(`Enter new stock for ${product.name} (current: ${product.current_stock}):`, product.current_stock);
-    if (newStock === null || newStock === "") return;
+    const additionalStock = prompt(`Enter additional stock for ${product.name} (current: ${product.current_stock}, updated: ${product.updated_stock || 0}):`, "0");
+    if (additionalStock === null || additionalStock === "") return;
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}product/update-inventory`,
+      const response = await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}product/update-stock`,
         {
-          product_id: product._id,
-          new_stock: Number(newStock),
+          productId: product._id,
+          newStock: Number(additionalStock),
         },
         {
           headers: { Authorization: `Bearer ${cookies?.access_token}` },
         }
       );
       if (response.data.success) {
-        toast.success("Inventory updated successfully!");
+        toast.success("Updated stock saved successfully!");
         if (typeof window !== 'undefined') window.location.reload(); // Or call a refresh handler if available
       } else {
-        toast.error(response.data.message || "Failed to update inventory");
+        toast.error(response.data.message || "Failed to update stock");
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to update inventory");
+      toast.error(err?.response?.data?.message || err?.message || "Failed to update stock");
+    }
+  };
+
+  const handleUpdatePrice = async (product) => {
+    const newPrice = prompt(`Enter updated price for ${product.name} (current: ₹${product.price}, updated: ₹${product.updated_price || product.price}):`, product.updated_price || product.price);
+    if (newPrice === null || newPrice === "") return;
+    try {
+      const response = await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
+        {
+          productId: product._id,
+          newPrice: Number(newPrice),
+        },
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      if (response.data.success) {
+        toast.success("Updated price saved successfully!");
+        if (typeof window !== 'undefined') window.location.reload(); // Or call a refresh handler if available
+      } else {
+        toast.error(response.data.message || "Failed to update price");
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err?.message || "Failed to update price");
     }
   };
 
@@ -427,7 +453,26 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
+                      Latest Price
+                    </th>
+
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
                       Current Stock
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Updated Stock
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Total Available Stocks
                     </th>
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
@@ -592,10 +637,41 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           ₹{row.original.price || "0"}
                         </td>
                         <td
+                          className="px-4 py-3 text-sm font-medium whitespace-nowrap"
+                          style={{ color: colors.primary[600] }}
+                        >
+                          {row.original.latest_price && row.original.latest_price !== row.original.price ? (
+                            <span className="font-semibold">
+                              ₹{row.original.latest_price.toFixed(2)}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+
+                        <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
                           {row.original.current_stock || "0"}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap"
+                          style={{ color: colors.primary[600] }}
+                        >
+                          {row.original.updated_stock && row.original.updated_stock !== null ? (
+                            <span className="font-semibold">
+                              +{row.original.updated_stock}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap font-semibold"
+                          style={{ color: colors.success[600] }}
+                        >
+                          {(row.original.current_stock || 0) + (row.original.updated_stock || 0)}
                         </td>
                         <td className="px-4 py-3 text-sm whitespace-nowrap">
                           {row.original.change_type && (
@@ -686,24 +762,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                 <MdEdit size={16} />
                               </button>
                             )}
-                            {/* Update Inventory Button */}
-                            <button
-                              onClick={() => handleUpdateInventory(row.original)}
-                              className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                              style={{
-                                color: colors.success[600],
-                                backgroundColor: colors.success[50],
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = colors.success[100];
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = colors.success[50];
-                              }}
-                              title="Update Inventory"
-                            >
-                              <MdOutlineRefresh size={16} />
-                            </button>
+                          
                             {deleteProductHandler && cookies?.role === "admin" && (
                               <button
                                 onClick={() => {
