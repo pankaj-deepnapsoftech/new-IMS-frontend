@@ -35,31 +35,33 @@ const Sales = () => {
   // };
   const [isExporting, setIsExporting] = useState(false);
 
-  const fetchPurchases = async () => {
-    try {
-      setIsLoading(true);
-      if (!token) throw new Error("Authentication token not found");
+const fetchPurchases = async (currentPage = page) => {
+  try {
+    setIsLoading(true);
+    if (!token) throw new Error("Authentication token not found");
 
-      const url =
-        role === "admin"
-          ? `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=${page}&&limit=10`
-          : `${process.env.REACT_APP_BACKEND_URL}sale/getOne?page=${page}&&limit=10`;
+    const url =
+      role === "admin"
+        ? `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=${currentPage}&&limit=10`
+        : `${process.env.REACT_APP_BACKEND_URL}sale/getOne?page=${currentPage}&&limit=10`;
 
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log(response);
-      setPurchases(response?.data?.data);
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
+    const response = await axios.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Force new reference to trigger re-render
+    setPurchases([...response?.data?.data]);
+  } catch (error: any) {
+    toast.error(
+      error.response?.data?.message ||
         error.message ||
-        "Failed to fetch sale data";
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        "Failed to fetch sale data"
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const fetchEmployees = async () => {
     try {
@@ -235,7 +237,7 @@ const Sales = () => {
     setFilteredPurchases(filtered);
   }, [filterText, filterDate, filterStatus, purchases]);
 
-  console.log(purchases);
+  
 
   return (
     <div
@@ -376,35 +378,6 @@ const Sales = () => {
               </div>
             </div>
 
-            {/* Date Filter */}
-            {/* <div className="w-full lg:w-48">
-                            <label
-                                className="block text-sm font-medium mb-2"
-                                style={{ color: colors.text.primary }}
-                            >
-                                Date
-                            </label>
-                            <input
-                                type="date"
-                                value={filterDate}
-                                onChange={(e) => setFilterDate(e.target.value)}
-                                className="w-full px-4 py-3 text-sm border rounded-lg transition-colors focus:outline-none focus:ring-2"
-                                style={{
-                                    backgroundColor: colors.input.background,
-                                    borderColor: colors.input.border,
-                                    color: colors.text.primary,
-                                }}
-                                onFocus={(e) => {
-                                    e.target.style.borderColor = colors.input.borderFocus;
-                                    e.target.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
-                                }}
-                                onBlur={(e) => {
-                                    e.target.style.borderColor = colors.input.border;
-                                    e.target.style.boxShadow = "none";
-                                }}
-                            />
-                        </div> */}
-
             {/* Status Filter */}
             <div className="w-full lg:w-48">
               <label
@@ -473,7 +446,7 @@ const Sales = () => {
         editTable={editTable}
         show={show}
         setShow={setShow}
-        refresh={fetchPurchases}
+        fetchPurchases={fetchPurchases}
       />
       {/* <UpdateSale editshow={editshow} sale={selectedSale} seteditsale={seteditsale} refresh={fetchPurchases} /> */}
     </div>

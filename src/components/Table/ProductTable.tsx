@@ -23,7 +23,6 @@ import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
 import { useCookies } from "react-cookie";
 import axios from "axios";
-import { MdOutlineRefresh } from "react-icons/md";
 
 interface ProductTableProps {
   products: Array<any>;
@@ -141,56 +140,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const isAllSelected = page.length > 0 && selectedProducts.length === page.length;
   const isIndeterminate = selectedProducts.length > 0 && selectedProducts.length < page.length;
 
-  // Add this function inside the ProductTable component
-  const handleUpdateInventory = async (product) => {
-    const newStock = prompt(`Enter new stock for ${product.name} (current: ${product.current_stock}):`, product.current_stock);
-    if (newStock === null || newStock === "") return;
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}product/update-inventory`,
-        {
-          product_id: product._id,
-          new_stock: Number(newStock),
-        },
-        {
-          headers: { Authorization: `Bearer ${cookies?.access_token}` },
-        }
-      );
-      if (response.data.success) {
-        toast.success("Inventory updated successfully!");
-        if (typeof window !== 'undefined') window.location.reload(); // Or call a refresh handler if available
-      } else {
-        toast.error(response.data.message || "Failed to update inventory");
-      }
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to update inventory");
-    }
-  };
 
-  const handleUpdatePrice = async (product) => {
-    const newPrice = prompt(`Enter new price for ${product.name} (current: ₹${product.price}):`, product.price);
-    if (newPrice === null || newPrice === "") return;
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
-        {
-          product_id: product._id,
-          new_price: Number(newPrice),
-        },
-        {
-          headers: { Authorization: `Bearer ${cookies?.access_token}` },
-        }
-      );
-      if (response.data.success) {
-        toast.success("Price updated successfully!");
-        if (typeof window !== 'undefined') window.location.reload(); // Or call a refresh handler if available
-      } else {
-        toast.error(response.data.message || "Failed to update price");
-      }
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to update price");
-    }
-  };
 
   return (
     <div className="p-6">
@@ -455,11 +405,24 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     >
                       Latest Price
                     </th>
+
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
                       Current Stock
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Updated Stock
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
+                      Total Available Stocks
                     </th>
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
@@ -635,11 +598,30 @@ const ProductTable: React.FC<ProductTableProps> = ({
                             <span className="text-gray-400">-</span>
                           )}
                         </td>
+
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
                           {row.original.current_stock || "0"}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap"
+                          style={{ color: colors.primary[600] }}
+                        >
+                          {row.original.updated_stock && row.original.updated_stock !== null ? (
+                            <span className="font-semibold">
+                              +{row.original.updated_stock}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm whitespace-nowrap font-semibold"
+                          style={{ color: colors.success[600] }}
+                        >
+                          {(row.original.current_stock || 0) + (row.original.updated_stock || 0)}
                         </td>
                         <td className="px-4 py-3 text-sm whitespace-nowrap">
                           {row.original.change_type && (
@@ -730,44 +712,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                 <MdEdit size={16} />
                               </button>
                             )}
-                            {/* Update Inventory Button */}
-                            <button
-                              onClick={() => handleUpdateInventory(row.original)}
-                              className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                              style={{
-                                color: colors.success[600],
-                                backgroundColor: colors.success[50],
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = colors.success[100];
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = colors.success[50];
-                              }}
-                              title="Update Inventory"
-                            >
-                              <MdOutlineRefresh size={16} />
-                            </button>
-                            {/* Update Price Button */}
-                            <button
-                              onClick={() => handleUpdatePrice(row.original)}
-                              className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                              style={{
-                                color: colors.warning[600],
-                                backgroundColor: colors.warning[50],
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = colors.warning[100];
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = colors.warning[50];
-                              }}
-                              title="Update Price"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                              </svg>
-                            </button>
+
                             {deleteProductHandler && cookies?.role === "admin" && (
                               <button
                                 onClick={() => {

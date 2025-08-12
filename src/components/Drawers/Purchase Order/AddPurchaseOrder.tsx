@@ -206,6 +206,9 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
       };
 
       try {
+        // Find the product ID for the selected item
+        const selectedProduct = rawMaterials.find(item => item.name === values.itemName);
+        
         if (edittable?._id) {
           const res = await axios.put(
             `${process.env.REACT_APP_BACKEND_URL}purchase-order/${edittable._id}`,
@@ -217,6 +220,26 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
             }
           );
           if (res.data.success) {
+            // Remove item from inventory shortages if it has updates
+            if (selectedProduct?._id) {
+              try {
+                await axios.put(
+                  `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
+                  {
+                    productId: selectedProduct._id
+                  },
+                  {
+                    headers: {
+                      Authorization: `Bearer ${cookies?.access_token}`,
+                    },
+                  }
+                );
+              } catch (shortageError) {
+                // Ignore shortage removal errors - item might not be in shortages
+                console.log("Item not in shortages or no updates:", shortageError);
+              }
+            }
+            
             setPopupMessage("Purchase order updated successfully!");
             setPopupType("success");
             onModalOpen();
@@ -239,6 +262,26 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
           );
 
           if (res.data.success) {
+            // Remove item from inventory shortages if it has updates
+            if (selectedProduct?._id) {
+              try {
+                await axios.put(
+                  `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
+                  {
+                    productId: selectedProduct._id
+                  },
+                  {
+                    headers: {
+                      Authorization: `Bearer ${cookies?.access_token}`,
+                    },
+                  }
+                );
+              } catch (shortageError) {
+                // Ignore shortage removal errors - item might not be in shortages
+                console.log("Item not in shortages or no updates:", shortageError);
+              }
+            }
+            
             setPopupMessage("Purchase order created successfully!");
             setPopupType("success");
             onModalOpen();

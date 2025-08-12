@@ -25,13 +25,16 @@ export const SalesFormValidation = Yup.object({
     .oneOf(["5", "12", "18"], "Select a valid GST rate")
     .required("GST rate is required"),
 
- mode_of_payment: Yup.string()
-  .oneOf(
-    ["Cash", "Cheque", "NEFT/RTGS", "UPI", "Credit Card", "Debit Card"],
-    "Select a valid mode of payment"
-  )
-  .required("Mode of payment is required"),
+  mode_of_payment: Yup.string()
+    .oneOf(
+      ["Cash", "Cheque", "NEFT/RTGS", "UPI", "Credit Card", "Debit Card"],
+      "Select a valid mode of payment"
+    )
+    .required("Mode of payment is required"),
 
+  terms_of_delivery: Yup.string(),
+  comment: Yup.string(),
+  uom: Yup.string(),
 });
 
 export const AssignFormValidation = Yup.object({
