@@ -53,6 +53,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       { Header: "Product/Service", accessor: "product_or_service" },
       { Header: "UOM", accessor: "uom" },
       { Header: "Price", accessor: "price" },
+      { Header: "Latest Price", accessor: "latest_price" },
       { Header: "Current stock", accessor: "current_stock" },
       { Header: "Last Change", accessor: "change" },
       { Header: "Min stock", accessor: "min_stock" },
@@ -163,6 +164,31 @@ const ProductTable: React.FC<ProductTableProps> = ({
       }
     } catch (err) {
       toast.error(err?.response?.data?.message || err?.message || "Failed to update inventory");
+    }
+  };
+
+  const handleUpdatePrice = async (product) => {
+    const newPrice = prompt(`Enter new price for ${product.name} (current: ₹${product.price}):`, product.price);
+    if (newPrice === null || newPrice === "") return;
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}product/update-price`,
+        {
+          product_id: product._id,
+          new_price: Number(newPrice),
+        },
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      if (response.data.success) {
+        toast.success("Price updated successfully!");
+        if (typeof window !== 'undefined') window.location.reload(); // Or call a refresh handler if available
+      } else {
+        toast.error(response.data.message || "Failed to update price");
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err?.message || "Failed to update price");
     }
   };
 
@@ -427,6 +453,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
+                      Latest Price
+                    </th>
+                    <th
+                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                      style={{ color: colors.table.headerText }}
+                    >
                       Current Stock
                     </th>
                     <th
@@ -592,6 +624,18 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           ₹{row.original.price || "0"}
                         </td>
                         <td
+                          className="px-4 py-3 text-sm font-medium whitespace-nowrap"
+                          style={{ color: colors.primary[600] }}
+                        >
+                          {row.original.latest_price && row.original.latest_price !== row.original.price ? (
+                            <span className="font-semibold">
+                              ₹{row.original.latest_price.toFixed(2)}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
@@ -703,6 +747,26 @@ const ProductTable: React.FC<ProductTableProps> = ({
                               title="Update Inventory"
                             >
                               <MdOutlineRefresh size={16} />
+                            </button>
+                            {/* Update Price Button */}
+                            <button
+                              onClick={() => handleUpdatePrice(row.original)}
+                              className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                              style={{
+                                color: colors.warning[600],
+                                backgroundColor: colors.warning[50],
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = colors.warning[100];
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = colors.warning[50];
+                              }}
+                              title="Update Price"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                              </svg>
                             </button>
                             {deleteProductHandler && cookies?.role === "admin" && (
                               <button

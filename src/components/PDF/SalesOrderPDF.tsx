@@ -198,7 +198,7 @@ const toWords = new ToWords({
     currencyOptions: {
       name: "Rupee",
       plural: "Rupees",
-      symbol: "₹",
+      symbol: "",
       fractionalUnit: {
         name: "Paisa",
         plural: "Paise",
@@ -289,9 +289,9 @@ const SalesOrderPDF = ({ sale }: any) => {
               {sale.product_id?.[0]?.name || "N/A"}
             </Text>
             <Text style={styles.col3}>{sale.product_qty}</Text>
-            <Text style={styles.col4}>₹{subtotal.toFixed(2)}</Text>
+            <Text style={styles.col4}>{subtotal.toFixed(2)}</Text>
             <Text style={styles.col5}>{sale.GST}%</Text>
-            <Text style={styles.col6}>₹{total.toFixed(2)}</Text>
+            <Text style={styles.col6}>{total.toFixed(2)}</Text>
           </View>
 
           {/* Empty rows for spacing */}
@@ -311,9 +311,9 @@ const SalesOrderPDF = ({ sale }: any) => {
             <Text style={styles.col1}></Text>
             <Text style={styles.col2}>Total</Text>
             <Text style={styles.col3}>{sale.product_qty}</Text>
-            <Text style={styles.col4}>₹{subtotal.toFixed(2)}</Text>
-            <Text style={styles.col5}>₹{gstAmount.toFixed(2)}</Text>
-            <Text style={styles.col6}>₹{total.toFixed(2)}</Text>
+            <Text style={styles.col4}>{subtotal.toFixed(2)}</Text>
+            <Text style={styles.col5}>{gstAmount.toFixed(2)}</Text>
+            <Text style={styles.col6}>{total.toFixed(2)}</Text>
           </View>
         </View>
 

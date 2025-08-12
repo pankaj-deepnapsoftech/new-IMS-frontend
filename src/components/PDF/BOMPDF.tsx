@@ -213,7 +213,7 @@ const toWords = new ToWords({
     currencyOptions: {
       name: "Rupee",
       plural: "Rupees",
-      // symbol: "",
+      symbol: "", 
       fractionalUnit: {
         name: "Paisa",
         plural: "Paise",

@@ -240,7 +240,7 @@ const toWords = new ToWords({
     currencyOptions: {
       name: "Rupee",
       plural: "Rupees",
-      symbol: "₹",
+      symbol: "",
       fractionalUnit: {
         name: "Paisa",
         plural: "Paise",
@@ -398,8 +398,8 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
                 "1234"}
             </Text>
             <Text style={styles.colQty}>{quantity}</Text>
-            <Text style={styles.colRate}>₹{itemRate.toFixed(2)}</Text>
-            <Text style={styles.colAmount}>₹{baseAmount.toFixed(2)}</Text>
+            <Text style={styles.colRate}>{itemRate.toFixed(2)}</Text>
+            <Text style={styles.colAmount}>{baseAmount.toFixed(2)}</Text>
           </View>
 
           {/* Empty rows for spacing */}
@@ -423,7 +423,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             <Text style={styles.colHsnCode}></Text>
             <Text style={styles.colQty}></Text>
             <Text style={styles.colRate}>TOTAL</Text>
-            <Text style={styles.colAmount}>₹{baseAmount.toFixed(2)}</Text>
+            <Text style={styles.colAmount}>{baseAmount.toFixed(2)}</Text>
           </View>
 
           <View style={[styles.tableRow, styles.totalSection]}>
@@ -433,7 +433,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             <Text style={styles.colHsnCode}></Text>
             <Text style={styles.colQty}></Text>
             <Text style={styles.colRate}>CGST @ {cgstRate}%</Text>
-            <Text style={styles.colAmount}>₹{cgst.toFixed(2)}</Text>
+            <Text style={styles.colAmount}>{cgst.toFixed(2)}</Text>
           </View>
 
           <View style={[styles.tableRow, styles.totalSection]}>
@@ -443,7 +443,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             <Text style={styles.colHsnCode}></Text>
             <Text style={styles.colQty}></Text>
             <Text style={styles.colRate}>SGST @ {sgstRate}%</Text>
-            <Text style={styles.colAmount}>₹{sgst.toFixed(2)}</Text>
+            <Text style={styles.colAmount}>{sgst.toFixed(2)}</Text>
           </View>
 
           <View style={[styles.tableRow, styles.totalSection]}>
@@ -453,7 +453,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             <Text style={styles.colHsnCode}></Text>
             <Text style={styles.colQty}></Text>
             <Text style={styles.colRate}>GRAND TOTAL</Text>
-            <Text style={styles.colAmount}>₹{grandTotal.toFixed(2)}</Text>
+            <Text style={styles.colAmount}>{grandTotal.toFixed(2)}</Text>
           </View>
         </View>
 

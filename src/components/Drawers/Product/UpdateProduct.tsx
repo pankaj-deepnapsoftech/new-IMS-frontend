@@ -116,6 +116,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
         max_stock: maxStock,
         current_stock: currentStock,
         price: price,
+        latest_price: price, // Update latest price when price is updated
         hsn,
         regular_buying_price: regularBuyingPrice,
         wholesale_buying_price: wholesaleBuyingPrice,
