@@ -63,7 +63,7 @@ const InventoryApprovals: React.FC = () => {
       if (!data.success) {
         throw new Error(data.message);
       }
-
+      window.location.reload()
       toast.success("Raw material approved successfully!");
 
  
