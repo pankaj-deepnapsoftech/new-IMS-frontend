@@ -18,6 +18,7 @@ import {
 } from "react-icons/fa";
 import SalesOrderPDF from "../PDF/SalesOrderPDF";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Textarea } from "@chakra-ui/react";
 
 const SalesTable = ({
   filteredPurchases,
@@ -34,7 +35,7 @@ const SalesTable = ({
     const totalPrice = basePrice + gstVal;
     return totalPrice;
   };
-  // console.log(filteredPurchases)
+
   const [selectedSale, setSelectedSale] = useState([]);
   const [paymentshow, setPaymentshow] = useState(false);
   const [isOpen, setViewDesign] = useState(false);
@@ -64,7 +65,7 @@ const SalesTable = ({
     return <EmptyData />;
   }
 
-  console.log(filteredPurchases);
+  console.log("Filtered Purchases:", filteredPurchases);
 
   return (
     <div className="space-y-4 bg-[#f8f9fa]">
@@ -303,20 +304,26 @@ const SalesTable = ({
               </div>
             </div>
           </div>
-          {/* <div className="flex items-center gap-2 -mt-3">
+
+          {/* Terms of Delivery Section */}
+          <div className="flex items-center gap-2 -mt-3">
             <span
               className="text-sm font-medium w-40"
               style={{ color: colors.text.secondary }}
             >
               Terms of Delivery:
             </span>
-            <textarea
-              className="mt-1 p-2 w-full rounded-lg border border-gray-200"
-              style={{ backgroundColor: colors.background.card }}
-              value={purchase?.comment || ""}
-              rows={2}
-            />
-          </div> */}
+            <Textarea
+              className="mt-1 p-2 w-full rounded-lg border border-gray-200 text-sm"
+              style={{
+                backgroundColor: colors.background.card,
+                color: colors.text.primary,
+              }}
+              isDisabled={true}
+            >
+              {purchase?.terms_of_delivery || purchase?.comment || "N/A"}
+            </Textarea>
+          </div>
 
           {/* Action Buttons */}
           {/* <div

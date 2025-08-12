@@ -35,6 +35,9 @@ const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
         product_type: sale?.product_type || "finished goods",
         GST: sale?.GST || "",
         comment: sale?.comment || "",
+        terms_of_delivery: sale?.terms_of_delivery || "",
+        uom: sale?.uom || "",
+        mode_of_payment: sale?.mode_of_payment || "",
       },
       validationSchema: SalesFormValidation,
       enableReinitialize: true,
@@ -267,6 +270,69 @@ const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
                 {touched.GST && errors.GST && (
                   <p className="text-red-500 text-sm">{errors.GST}</p>
                 )}
+              </div>
+
+              {/* UOM Field */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Calculator className="h-4 w-4 text-gray-500" />
+                  Unit of Measurement (UOM)
+                </label>
+                <input
+                  type="text"
+                  name="uom"
+                  value={values.uom}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  placeholder="Enter UOM (e.g., kg, pcs, meters)"
+                  readOnly
+                />
+              </div>
+
+              {/* Mode of Payment */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <MessageSquare className="h-4 w-4 text-gray-500" />
+                  Mode of Payment *
+                </label>
+                <select
+                  name="mode_of_payment"
+                  value={values.mode_of_payment || ""}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  required
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors bg-white text-gray-900"
+                >
+                  <option value="">Select Payment Mode</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Cheque">Cheque</option>
+                  <option value="NEFT/RTGS">NEFT/RTGS</option>
+                  <option value="UPI">UPI</option>
+                  <option value="Credit Card">Credit Card</option>
+                  <option value="Debit Card">Debit Card</option>
+                </select>
+                {touched.mode_of_payment && errors.mode_of_payment && (
+                  <p className="text-red-500 text-sm">
+                    {errors.mode_of_payment}
+                  </p>
+                )}
+              </div>
+
+              {/* Terms of Delivery */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <MessageSquare className="h-4 w-4 text-gray-500" />
+                  Terms of Delivery
+                </label>
+                <textarea
+                  name="terms_of_delivery"
+                  value={values.terms_of_delivery}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
+                  placeholder="Enter terms of delivery..."
+                />
               </div>
 
               {/* Remarks */}

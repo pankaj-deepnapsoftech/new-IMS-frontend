@@ -19,7 +19,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { toast } from "react-toastify";
-const AddNewSale = ({ show, setShow, refresh, editTable }) => {
+const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
   const [cookies] = useCookies();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [partiesData, setpartiesData] = useState([]);
@@ -63,6 +63,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       product_type: editTable?.product_type || "finished goods",
       GST: editTable?.GST || "",
       comment: editTable?.comment || "",
+      terms_of_delivery: editTable?.terms_of_delivery || "",
       uom: editTable?.uom || "",
       productFile: editTable?.productFile || "",
       bompdf: editTable?.bompdf || "",
@@ -108,10 +109,10 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
           bompdf: bomImageUrl,
         };
 
-        console.log(payload)
+        console.log(payload);
 
         if (editTable?._id) {
-          await axios.put(
+          const response = await axios.put(
             `${process.env.REACT_APP_BACKEND_URL}sale/update/${editTable._id}`,
             payload,
             {
@@ -120,7 +121,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
               },
             }
           );
-          resetForm();
+          console.log(response.data); 
         } else {
           const res = await axios.post(
             `${process.env.REACT_APP_BACKEND_URL}sale/create`,
@@ -133,17 +134,19 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
           );
 
           await PostDataAutoCreateBom(value.product_id, value.product_qty);
-          resetForm();
         }
+
+        // Refresh data before closing modal to ensure updated data is displayed
+        await fetchPurchases();
 
         toast.success(
           `Sale ${editTable?._id ? "updated" : "created"} successfully`
         );
 
+        resetForm();
         setImageFile(null);
         setImagePreview(null);
         setShow(false);
-        refresh();
       } catch (error) {
         console.error("Error saving sale:", error);
         toast.error("Something went wrong. Please try again.");
@@ -169,17 +172,15 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       );
       setpartiesData(partiesRes?.data?.data || []);
       setProducts(filteredProducts || []);
-
     } catch (error) {
       console.log("testing data", error);
       toast.error("Failed to fetch data for dropdowns.");
     }
   };
 
-
   const PostDataAutoCreateBom = async (productId, quantity) => {
-    console.log("product Id", productId)
-    console.log("product quantity", quantity)
+    console.log("product Id", productId);
+    console.log("product quantity", quantity);
     try {
       const res = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}bom/autobom?product_id=${productId}&quantity=${quantity}`,
@@ -192,9 +193,6 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
       console.log("Auto BOM creation failed:", error);
     }
   };
-
-
-
 
   useEffect(() => {
     fetchDropdownData();
@@ -222,8 +220,9 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
 
       {/* Drawer */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full  sm:w-[55vw] md:w-[35vw] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${show ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed inset-y-0 right-0 z-50 w-full  sm:w-[55vw] md:w-[35vw] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
+          show ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <div className="h-full flex flex-col">
           {/* Header */}
@@ -467,10 +466,11 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                   {[18, 12, 5].map((rate) => (
                     <label
                       key={rate}
-                      className={`flex items-center justify-center p-2 border-2 rounded-lg cursor-pointer transition-all duration-200 ${values.GST === String(rate)
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
-                        : "border-gray-300 hover:border-gray-400"
-                        }`}
+                      className={`flex items-center justify-center p-2 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                        values.GST === String(rate)
+                          ? "border-blue-500 bg-blue-50 text-blue-700"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
                     >
                       <input
                         type="radio"
@@ -512,7 +512,6 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                   <option value="UPI">UPI</option>
                   <option value="Credit Card">Credit Card</option>
                   <option value="Debit Card">Debit Card</option>
-
                 </select>
                 {touched.mode_of_payment && errors.mode_of_payment && (
                   <p className="text-red-500 text-sm">
@@ -521,11 +520,27 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                 )}
               </div>
 
-              {/* Remarks */}
+              {/* Terms of Delivery */}
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                   <MessageSquare className="h-4 w-4 text-gray-500" />
                   Terms of Delivery
+                </label>
+                <textarea
+                  name="terms_of_delivery"
+                  value={values.terms_of_delivery}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                  placeholder="Enter terms of delivery..."
+                />
+              </div>
+
+              {/* Remarks */}
+              {/* <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <MessageSquare className="h-4 w-4 text-gray-500" />
+                  Remarks
                 </label>
                 <textarea
                   name="comment"
@@ -535,7 +550,7 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
                   placeholder="Add any additional notes or comments..."
                 />
-              </div>
+              </div> */}
             </form>
           </div>
 
@@ -553,10 +568,11 @@ const AddNewSale = ({ show, setShow, refresh, editTable }) => {
                 type="submit"
                 disabled={isSubmitting}
                 onClick={handleSubmit}
-                className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${isSubmitting
-                  ? "bg-gray-400 text-white cursor-not-allowed"
-                  : "bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md"
-                  }`}
+                className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                  isSubmitting
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md"
+                }`}
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-2">

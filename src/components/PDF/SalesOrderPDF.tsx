@@ -267,7 +267,9 @@ const SalesOrderPDF = ({ sale }: any) => {
             </View>
             <View style={styles.termsSection}>
               <Text style={styles.sectionLabel}>Terms of Delivery</Text>
-              <Text style={styles.sectionValue}>{sale.comment || "N/A"}</Text>
+              <Text style={styles.sectionValue}>
+                {sale.terms_of_delivery || sale.comment || "N/A"}
+              </Text>
             </View>
           </View>
         </View>
