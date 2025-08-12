@@ -287,14 +287,14 @@ const AddBom: React.FC<AddBomProps> = ({
       if (!results.success) {
         throw new Error(results?.message);
       }
-      setResources(results.resources);  
+      setResources(results.resources);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
       setIsLoadingProducts(false);
     }
-  };  
-                                                                           
+  };
+
   const fetchEmployeeHandler = async () => {
     try {
       setIsLoadingProducts(true);
@@ -389,7 +389,7 @@ const AddBom: React.FC<AddBomProps> = ({
         value: prd._id,
         label: prd.name,
       }));
-  
+
     setFinishedGoodsOptions(finishedGoodsOptions);
     setRawMaterialsOptions(rawMaterialsOptions);
   }, [products]);
@@ -690,6 +690,7 @@ const AddBom: React.FC<AddBomProps> = ({
                             Quantity
                           </label>
                           <input
+                          required
                             type="number"
                             value={material.quantity || ""}
                             onChange={(e) => {
@@ -1140,6 +1141,7 @@ const AddBom: React.FC<AddBomProps> = ({
                             Estimated Quantity
                           </label>
                           <input
+                            required
                             type={cookies?.role === "admin" ? "number" : "text"}
                             value={material.quantity || ""}
                             onChange={(e) => {

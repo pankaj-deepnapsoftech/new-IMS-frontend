@@ -37,9 +37,10 @@ interface InventoryShortage {
   item: string;
   shortage_quantity: number;
   current_stock: number;
+  updated_stock?: number | null;
   original_stock: number;
   current_price: number;
-  updated_price?: number;
+  updated_price?: number | null;
   price_change?: number;
   price_change_percentage?: number;
   updated_at: string;
@@ -152,7 +153,7 @@ const PurchaseOrder: React.FC = () => {
   const [showInventoryShortagesModal, setShowInventoryShortagesModal] = useState(false);
   const [showUpdateInventoryModal, setShowUpdateInventoryModal] = useState(false);
   const [showEditRawMaterialModal, setShowEditRawMaterialModal] = useState(false);
-  const [editingRawMaterial, setEditingRawMaterial] = useState<any>(null);
+  const [selectedRawMaterial, setSelectedRawMaterial] = useState<InventoryShortage | null>(null);
   
   // Update Inventory Form state
   const [updateInventoryForm, setUpdateInventoryForm] = useState<InventoryUpdateForm[]>([]);
@@ -226,12 +227,23 @@ const PurchaseOrder: React.FC = () => {
          console.log("Total shortages:", allShortages.length);
          console.log("Raw material shortages:", rawMaterialShortages.length);
          
-         // Add original_stock field to track changes
-         const shortagesWithOriginalStock = rawMaterialShortages.map((shortage: any) => ({
+         // Remove duplicates based on item ID and add original_stock field to track changes
+         const uniqueShortages = rawMaterialShortages.reduce((acc: any[], shortage: any) => {
+           const existingIndex = acc.findIndex(item => item.item === shortage.item);
+           if (existingIndex === -1) {
+             acc.push(shortage);
+           }
+           return acc;
+         }, []);
+         
+         const shortagesWithOriginalStock = uniqueShortages.map((shortage: any) => ({
            ...shortage,
-           original_stock: shortage.current_stock
+           original_stock: shortage.current_stock,
+           updated_price: shortage.updated_price || null,
+           updated_stock: shortage.updated_stock || null
          }));
          
+         console.log("Unique raw material shortages:", shortagesWithOriginalStock.length);
          setInventoryShortages(shortagesWithOriginalStock);
       } else {
         toast.error(shortagesResponse.data.message || "Failed to fetch inventory shortages");
@@ -421,9 +433,10 @@ const PurchaseOrder: React.FC = () => {
     const item = updatedShortages[index];
     
     // Update UI immediately for better user experience
+    // newStock represents the additional stock to be added
     updatedShortages[index] = {
       ...item,
-      current_stock: newStock
+      updated_stock: newStock
     };
     setInventoryShortages(updatedShortages);
   };
@@ -455,9 +468,17 @@ const PurchaseOrder: React.FC = () => {
     }
   };
 
+  // Open edit raw material modal
+  const openEditRawMaterialModal = (item: InventoryShortage) => {
+    setSelectedRawMaterial(item);
+    setShowEditRawMaterialModal(true);
+  };
+
   // Submit all changes in Raw Material Shortages modal
   const submitRawMaterialChanges = async () => {
     try {
+      console.log("Total inventory shortages:", inventoryShortages.length);
+      
       // Find items that have been modified
       const modifiedItems = inventoryShortages.filter(item => 
         (item.updated_price && item.updated_price !== item.current_price) ||
@@ -518,6 +539,93 @@ const PurchaseOrder: React.FC = () => {
     }
   };
 
+  // Clear updated price (optional functionality)
+  const clearUpdatedPrice = async (productId: string) => {
+    try {
+      const response = await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}product/clear-updated-price`,
+        {
+          productId: productId
+        },
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      
+      if (response.data.success) {
+        toast.success("Updated price cleared successfully");
+        // Refresh all data to sync across components
+        await Promise.all([
+          fetchInventoryShortages(),
+          fetchProducts(),
+          fetchUpdateInventoryForm()
+        ]);
+      } else {
+        toast.error(response.data.message || "Failed to clear updated price");
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to clear updated price");
+    }
+  };
+
+  // Clear updated stock (optional functionality)
+  const clearUpdatedStock = async (productId: string) => {
+    try {
+      const response = await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}product/clear-updated-stock`,
+        {
+          productId: productId
+        },
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      
+      if (response.data.success) {
+        toast.success("Updated stock cleared successfully");
+        // Refresh all data to sync across components
+        await Promise.all([
+          fetchInventoryShortages(),
+          fetchProducts(),
+          fetchUpdateInventoryForm()
+        ]);
+      } else {
+        toast.error(response.data.message || "Failed to clear updated stock");
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to clear updated stock");
+    }
+  };
+
+  // Remove item from inventory shortages (when item has been updated)
+  const removeFromShortages = async (productId: string) => {
+    try {
+      const response = await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
+        {
+          productId: productId
+        },
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      
+      if (response.data.success) {
+        toast.success(`Item removed from shortages (${response.data.deletedShortages} shortages removed)`);
+        // Refresh all data to sync across components
+        await Promise.all([
+          fetchInventoryShortages(),
+          fetchProducts(),
+          fetchUpdateInventoryForm()
+        ]);
+      } else {
+        toast.error(response.data.message || "Failed to remove from shortages");
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to remove from shortages");
+    }
+  };
+
   // Update raw material details
   const updateRawMaterial = async (itemId: string, updates: any) => {
     try {
@@ -546,18 +654,6 @@ const PurchaseOrder: React.FC = () => {
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to update raw material");
     }
-  };
-
-  // Open edit raw material modal
-  const openEditRawMaterialModal = (item: any) => {
-    setEditingRawMaterial(item);
-    setShowEditRawMaterialModal(true);
-  };
-
-  // Close edit raw material modal
-  const closeEditRawMaterialModal = () => {
-    setEditingRawMaterial(null);
-    setShowEditRawMaterialModal(false);
   };
 
   useEffect(() => {
@@ -699,7 +795,7 @@ const PurchaseOrder: React.FC = () => {
              </button>
             
             {/* Update Inventory Button */}
-            <button
+            {/* <button
               className="bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
               onClick={() => {
                 setShowUpdateInventoryModal(true);
@@ -723,7 +819,7 @@ const PurchaseOrder: React.FC = () => {
                 />
               </svg>
               Update Inventory
-            </button>
+            </button> */}
             
 
             
@@ -839,20 +935,21 @@ const PurchaseOrder: React.FC = () => {
                           <span className="text-blue-700 font-medium">Total Impact:</span>
                           <span className={`ml-2 font-semibold ${
                             inventoryShortages.reduce((total, item) => {
-                              const change = item.price_change || 0;
+                              const change = item.updated_price && item.updated_price !== null ? (item.updated_price - item.current_price) : 0;
                               return total + (change * item.shortage_quantity);
                             }, 0) > 0 ? 'text-red-600' : 'text-green-600'
                           }`}>
                             ₹{inventoryShortages.reduce((total, item) => {
-                              const change = item.price_change || 0;
+                              const change = item.updated_price && item.updated_price !== null ? (item.updated_price - item.current_price) : 0;
                               return total + (change * item.shortage_quantity);
                             }, 0).toFixed(2)}
                           </span>
                         </div>
                       </div>
                       <p className="text-blue-700 text-xs mt-3">
-                        💡 <strong>Tip:</strong> Make your changes to prices and stock levels, then click "Save Changes" to update the backend. 
-                        Use the "Edit" button to modify raw material details directly.
+                        💡 <strong>Tip:</strong> Update prices in "Updated Price" and stocks in "Updated Stock" columns. Click "Save Changes" to store updates and automatically remove items from shortages. 
+                        Current prices and stocks remain unchanged. Total Available = Current Stock + Updated Stock.
+                        Use "Remove from Shortages" for manual removal if needed.
                       </p>
                     </div>
                    
@@ -863,12 +960,15 @@ const PurchaseOrder: React.FC = () => {
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BOM Name</th>
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated Stock</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Available</th>
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shortage Quantity</th>
                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated Price</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latest Price</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price Change</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remove from Shortages</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                        </tr>
                      </thead>
                      <tbody className="bg-white divide-y divide-gray-200">
@@ -876,24 +976,27 @@ const PurchaseOrder: React.FC = () => {
                          <tr key={idx} className="hover:bg-gray-50">
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.bom_name || "-"}</td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.item_name || "-"}</td>
-                                                       <td className="px-6 py-4 whitespace-nowrap">
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.current_stock}</td>
+                           <td className="px-6 py-4 whitespace-nowrap">
                               <input
                                 type="number"
-                                value={item.current_stock}
+                                value={item.updated_stock !== null ? item.updated_stock : 0}
                                 onChange={(e) => handleStockUpdate(idx, Number(e.target.value))}
-                                className={`w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                  item.current_stock < 0 ? "text-red-600 font-semibold" : "text-gray-900"
-                                }`}
-                                min="-999999"
+                                className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="0"
+                                min="0"
                                 step="1"
                               />
                             </td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
+                             {item.current_stock + (item.updated_stock || 0)}
+                           </td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">{item.shortage_quantity}</td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{item.current_price}</td>
                                                        <td className="px-6 py-4 whitespace-nowrap">
                               <input
                                 type="number"
-                                value={item.updated_price || item.current_price}
+                                value={item.updated_price !== null ? item.updated_price : item.current_price}
                                 onChange={(e) => handlePriceUpdate(idx, Number(e.target.value))}
                                 className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder={item.current_price.toString()}
@@ -1171,104 +1274,7 @@ const PurchaseOrder: React.FC = () => {
        )}
 
        {/* Edit Raw Material Modal */}
-       {showEditRawMaterialModal && editingRawMaterial && (
-         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-             <div className="flex justify-between items-center p-6 border-b border-gray-200">
-               <h2 className="text-2xl font-bold text-gray-900">Edit Raw Material: {editingRawMaterial.item_name}</h2>
-               <button
-                 onClick={closeEditRawMaterialModal}
-                 className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
-               >
-                 Close
-               </button>
-             </div>
-             
-             <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-               <div className="space-y-4">
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                     Item Name
-                   </label>
-                   <input
-                     type="text"
-                     value={editingRawMaterial.item_name}
-                     disabled
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
-                   />
-                 </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                     Current Stock
-                   </label>
-                   <input
-                     type="number"
-                     value={editingRawMaterial.current_stock}
-                     onChange={(e) => setEditingRawMaterial({
-                       ...editingRawMaterial,
-                       current_stock: Number(e.target.value)
-                     })}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                     min="-999999"
-                     step="1"
-                   />
-                 </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                     Current Price
-                   </label>
-                   <input
-                     type="number"
-                     value={editingRawMaterial.current_price}
-                     onChange={(e) => setEditingRawMaterial({
-                       ...editingRawMaterial,
-                       current_price: Number(e.target.value)
-                     })}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                     min="0"
-                     step="0.01"
-                   />
-                 </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                     Shortage Quantity
-                   </label>
-                   <input
-                     type="number"
-                     value={editingRawMaterial.shortage_quantity}
-                     disabled
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
-                   />
-                 </div>
-                 
-                 <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                   <button
-                     onClick={closeEditRawMaterialModal}
-                     className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium"
-                   >
-                     Cancel
-                   </button>
-                   <button
-                     onClick={() => {
-                       updateRawMaterial(editingRawMaterial.item, {
-                         current_stock: editingRawMaterial.current_stock,
-                         price: editingRawMaterial.current_price
-                       });
-                       closeEditRawMaterialModal();
-                     }}
-                     className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium"
-                   >
-                     Update Raw Material
-                   </button>
-                 </div>
-               </div>
-             </div>
-           </div>
-         </div>
-       )}
+       {/* This modal is no longer needed as the Edit button is removed */}
      </div>
    );
  }

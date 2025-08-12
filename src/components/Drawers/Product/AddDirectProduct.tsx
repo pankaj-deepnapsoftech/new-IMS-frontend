@@ -371,7 +371,6 @@ const AddProduct: React.FC<AddProductProps> = ({
                   }
                 }}
               />
-
               {showNewInput && (
                 <div className="mt-1 gap-2">
                   <Input
@@ -505,18 +504,6 @@ const AddProduct: React.FC<AddProductProps> = ({
               />
             </FormControl>
 
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Product/Service
-              </FormLabel>
-              <Select
-                styles={customStyles}
-                value={productOrService}
-                options={productOrServiceOptions}
-                onChange={(e: any) => setProductOrService(e)}
-              />
-            </FormControl>
-
             <FormControl className="mt-3 mb-5">
               <FormLabel fontWeight="bold" color="gray.700">
                 Color Name
@@ -554,24 +541,6 @@ const AddProduct: React.FC<AddProductProps> = ({
                 _placeholder={{ color: "gray.500" }}
               />
             </FormControl>
-            <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="gray.700">
-                HSN Code
-              </FormLabel>
-              <Input
-                value={hsn}
-                onChange={(e) => setHsn(e.target.value)}
-                type="text"
-                placeholder="Enter HSN Code"
-                bg="white"
-                borderColor="gray.300"
-                _focus={{
-                  borderColor: "blue.500",
-                  boxShadow: "0 0 0 1px #3182ce",
-                }}
-                _placeholder={{ color: "gray.500" }}
-              />
-            </FormControl>
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
                 Store
@@ -593,60 +562,6 @@ const AddProduct: React.FC<AddProductProps> = ({
                 onChange={(e) => setRegularBuyingPrice(+e.target.value)}
                 type="number"
                 placeholder="Regular Buying Price"
-                bg="white"
-                borderColor="gray.300"
-                _focus={{
-                  borderColor: "blue.500",
-                  boxShadow: "0 0 0 1px #3182ce",
-                }}
-                _placeholder={{ color: "gray.500" }}
-              />
-            </FormControl>
-            <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="gray.700">
-                Min Stock
-              </FormLabel>
-              <Input
-                value={minStock}
-                onChange={(e) => setMinStock(e.target.value)}
-                type="number"
-                placeholder="Minimum Stock"
-                bg="white"
-                borderColor="gray.300"
-                _focus={{
-                  borderColor: "blue.500",
-                  boxShadow: "0 0 0 1px #3182ce",
-                }}
-                _placeholder={{ color: "gray.500" }}
-              />
-            </FormControl>
-            <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="gray.700">
-                Max Stock
-              </FormLabel>
-              <Input
-                value={maxStock}
-                onChange={(e) => setMaxStock(e.target.value)}
-                type="number"
-                placeholder="Maximum Stock"
-                bg="white"
-                borderColor="gray.300"
-                _focus={{
-                  borderColor: "blue.500",
-                  boxShadow: "0 0 0 1px #3182ce",
-                }}
-                _placeholder={{ color: "gray.500" }}
-              />
-            </FormControl>
-            <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="gray.700">
-                Sub Category
-              </FormLabel>
-              <Input
-                value={subCategory}
-                onChange={(e) => setSubCategory(e.target.value)}
-                type="text"
-                placeholder="Enter Sub Category"
                 bg="white"
                 borderColor="gray.300"
                 _focus={{
@@ -822,6 +737,7 @@ const AddProduct: React.FC<AddProductProps> = ({
       </div>
     </div>
   );
-};
-
-export default AddProduct;
+ };
+ 
+ export default AddProduct;
+ 

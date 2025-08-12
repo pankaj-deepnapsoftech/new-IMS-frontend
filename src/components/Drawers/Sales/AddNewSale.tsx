@@ -17,6 +17,7 @@ import {
   FileImage,
   Calculator,
   MessageSquare,
+  IndianRupee,
 } from "lucide-react";
 import { toast } from "react-toastify";
 const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
@@ -418,7 +419,7 @@ const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
               {/* Price and Quantity Row */}
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <DollarSign className="h-4 w-4 text-gray-500" />
+                  <IndianRupee className="h-4 w-4 text-gray-500" />
                   Price *
                 </label>
                 <input

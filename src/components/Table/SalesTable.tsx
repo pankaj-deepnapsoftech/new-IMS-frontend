@@ -35,7 +35,6 @@ const SalesTable = ({
     const totalPrice = basePrice + gstVal;
     return totalPrice;
   };
-
   const [selectedSale, setSelectedSale] = useState([]);
   const [paymentshow, setPaymentshow] = useState(false);
   const [isOpen, setViewDesign] = useState(false);
@@ -324,6 +323,7 @@ const SalesTable = ({
               {purchase?.terms_of_delivery || purchase?.comment || "N/A"}
             </Textarea>
           </div>
+          
 
           {/* Action Buttons */}
           {/* <div
