@@ -6,6 +6,7 @@ import { RxCross2 } from "react-icons/rx";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   useDeleteProductMutation,
+  useBulkDeleteProductsMutation,
   useLazyFetchProductsQuery,
   useProductBulKUploadMutation,
 } from "../redux/api/api";
@@ -66,6 +67,7 @@ const Products: React.FC = () => {
   const dispatch = useDispatch();
 
   const [deleteProduct] = useDeleteProductMutation();
+  const [bulkDeleteProducts] = useBulkDeleteProductsMutation();
 
   const openAddProductDrawerHandler = () => {
     dispatch(openAddProductDrawer());
@@ -96,6 +98,16 @@ const Products: React.FC = () => {
   const deleteProductHandler = async (id: string) => {
     try {
       const response: any = await deleteProduct({ _id: id }).unwrap();
+      toast.success(response.message);
+      fetchProductsHandler();
+    } catch (err: any) {
+      toast.error(err?.data?.message || err?.message || "Something went wrong");
+    }
+  };
+
+  const bulkDeleteProductsHandler = async (productIds: string[]) => {
+    try {
+      const response: any = await bulkDeleteProducts(productIds).unwrap();
       toast.success(response.message);
       fetchProductsHandler();
     } catch (err: any) {
@@ -232,7 +244,7 @@ const Products: React.FC = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      toast.success('Export completed successfully!');
+      toast.success("Export completed successfully!");
     } catch (error: any) {
       toast.error(error?.message || "Export failed");
     } finally {
@@ -266,7 +278,7 @@ const Products: React.FC = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      toast.success('Sample template downloaded!');
+      toast.success("Sample template downloaded!");
     } catch (error: any) {
       toast.error(error?.message || "Download failed");
     }
@@ -292,8 +304,8 @@ const Products: React.FC = () => {
       backgroundColor: state.isSelected
         ? colors.primary[500]
         : state.isFocused
-          ? colors.primary[50]
-          : colors.input.background,
+        ? colors.primary[50]
+        : colors.input.background,
       color: state.isSelected ? colors.text.inverse : colors.text.primary,
       padding: "12px",
     }),
@@ -457,7 +469,6 @@ const Products: React.FC = () => {
 
               {/* Refresh */}
 
-
               {/* Export Excel */}
               <button
                 onClick={exportToExcelHandler}
@@ -467,14 +478,16 @@ const Products: React.FC = () => {
                   backgroundColor: colors.success[600],
                 }}
                 onMouseEnter={(e) => {
-                  if (!isExporting) e.currentTarget.style.backgroundColor = colors.success[700];
+                  if (!isExporting)
+                    e.currentTarget.style.backgroundColor = colors.success[700];
                 }}
                 onMouseLeave={(e) => {
-                  if (!isExporting) e.currentTarget.style.backgroundColor = colors.success[600];
+                  if (!isExporting)
+                    e.currentTarget.style.backgroundColor = colors.success[600];
                 }}
               >
-                <FiDownload size={16} /> 
-                {isExporting ? 'Exporting...' : 'Export Excel'}
+                <FiDownload size={16} />
+                {isExporting ? "Exporting..." : "Export Excel"}
               </button>
 
               {/* Bulk Upload */}
@@ -506,7 +519,8 @@ const Products: React.FC = () => {
                   e.currentTarget.style.backgroundColor = colors.gray[50];
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.background.card;
+                  e.currentTarget.style.backgroundColor =
+                    colors.background.card;
                 }}
               >
                 <MdOutlineRefresh size="16px" />
@@ -514,7 +528,6 @@ const Products: React.FC = () => {
               </button>
             </div>
           </div>
-
 
           {/* Search and Filters Row */}
           <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
@@ -715,6 +728,7 @@ const Products: React.FC = () => {
             openUpdateProductDrawerHandler={openUpdateProductDrawerHandler}
             openProductDetailsDrawerHandler={openProductDetailsDrawerHandler}
             deleteProductHandler={deleteProductHandler}
+            bulkDeleteProductsHandler={bulkDeleteProductsHandler}
           />
         </div>
       </div>

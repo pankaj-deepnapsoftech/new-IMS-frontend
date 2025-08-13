@@ -120,6 +120,14 @@ const productApi = createApi({
       }),
       invalidatesTags: ["Product"],
     }),
+    bulkDeleteProducts: builder.mutation({
+      query: (productIds: string[]) => ({
+        url: "/bulk-delete",
+        method: "DELETE",
+        body: { productIds },
+      }),
+      invalidatesTags: ["Product"],
+    }),
     productDetails: builder.query({
       query: (id) => `/${id}`,
       providesTags: (result, error, id) => [{ type: "Product", id }],
@@ -201,12 +209,12 @@ const storeApi = createApi({
     }),
     storeBulKUpload: builder.mutation({
       query: (data) => ({
-        url: '/bulk',
-        method: 'POST',
-        body: data
+        url: "/bulk",
+        method: "POST",
+        body: data,
       }),
-      invalidatesTags: ['Store']
-    })
+      invalidatesTags: ["Store"],
+    }),
   }),
 });
 
@@ -272,12 +280,12 @@ const agentApi = createApi({
     }),
     agentBulKUpload: builder.mutation({
       query: (data) => ({
-        url: '/bulk',
-        method: 'POST',
-        body: data
+        url: "/bulk",
+        method: "POST",
+        body: data,
       }),
-      invalidatesTags: ['Agent']
-    })
+      invalidatesTags: ["Agent"],
+    }),
   }),
 });
 
@@ -371,260 +379,272 @@ const userRoleApi = createApi({
       invalidatesTags: ["Role"],
     }),
     deleteRole: builder.mutation({
-      query: (data)=>({
-        url: '/',
+      query: (data) => ({
+        url: "/",
         method: "DELETE",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ["Role"]
+      invalidatesTags: ["Role"],
     }),
     roleDetails: builder.query({
-      query: (_id)=>`/${_id}`
-    })
+      query: (_id) => `/${_id}`,
+    }),
   }),
 });
 
 const employeeApi = createApi({
-  reducerPath: 'employeeApi',
+  reducerPath: "employeeApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_BACKEND_URL+'auth',
-    mode: 'cors',
+    baseUrl: process.env.REACT_APP_BACKEND_URL + "auth",
+    mode: "cors",
     prepareHeaders: (headers) => {
       const cookies = parseCookies();
       const token = cookies?.access_token;
-      if(token){
-        headers.set('Authorization', `Bearer ${token}`);
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
-    }
+    },
   }),
-  tagTypes: ['Employee'],
+  tagTypes: ["Employee"],
 
-  endpoints: (builder)=>({
+  endpoints: (builder) => ({
     fetchEmployees: builder.query({
-      query: ()=>'/all',
-      providesTags: ['Employee']
+      query: () => "/all",
+      providesTags: ["Employee"],
     }),
     updateEmployee: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: "/user",
         method: "PUT",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ["Employee"]
+      invalidatesTags: ["Employee"],
     }),
     employeeDetails: builder.query({
-      query: (data)=>'/user',
-    })
-  })
+      query: (data) => "/user",
+    }),
+  }),
 });
 
 const proformaInvoiceApi = createApi({
-  reducerPath: 'proformaInvoiceApi',
+  reducerPath: "proformaInvoiceApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_BACKEND_URL+'proforma-invoice',
-    mode: 'cors',
-    prepareHeaders: (headers)=>{
+    baseUrl: process.env.REACT_APP_BACKEND_URL + "proforma-invoice",
+    mode: "cors",
+    prepareHeaders: (headers) => {
       const cookies = parseCookies();
       const token = cookies?.access_token;
-      if(token){
-        headers.set('Authorization', `Bearer ${token}`);
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
-    }
+    },
   }),
-  tagTypes: ['Proforma Invoice'],
+  tagTypes: ["Proforma Invoice"],
 
-  endpoints: (builder)=>({
+  endpoints: (builder) => ({
     fetchProformaInvoices: builder.query({
-      query: ()=>'/all',
-      providesTags: ['Proforma Invoice']
+      query: () => "/all",
+      providesTags: ["Proforma Invoice"],
     }),
     proformaInvoiceDetails: builder.query({
-      query: (_id)=> `/${_id}`,
-      providesTags: ['Proforma Invoice']
+      query: (_id) => `/${_id}`,
+      providesTags: ["Proforma Invoice"],
     }),
     createProformaInvoice: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: `/`,
         method: "POST",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ['Proforma Invoice']
+      invalidatesTags: ["Proforma Invoice"],
     }),
     updateProformaInvoice: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: `/${data._id}`,
         method: "PUT",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ['Proforma Invoice']
+      invalidatesTags: ["Proforma Invoice"],
     }),
     deleteProformaInvoice: builder.mutation({
-      query: (_id)=>({
+      query: (_id) => ({
         url: `/${_id}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
-      invalidatesTags: ['Proforma Invoice']
+      invalidatesTags: ["Proforma Invoice"],
     }),
-  })
+  }),
 });
 
 const invoiceApi = createApi({
-  reducerPath: 'invoiceApi',
+  reducerPath: "invoiceApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_BACKEND_URL+'invoice',
-    mode: 'cors',
-    prepareHeaders: (headers)=>{
+    baseUrl: process.env.REACT_APP_BACKEND_URL + "invoice",
+    mode: "cors",
+    prepareHeaders: (headers) => {
       const cookies = parseCookies();
       const token = cookies?.access_token;
-      if(token){
-        headers.set('Authorization', `Bearer ${token}`);
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
-    }
+    },
   }),
-  tagTypes: ['Invoice'],
+  tagTypes: ["Invoice"],
 
-  endpoints: (builder)=>({
+  endpoints: (builder) => ({
     fetchInvoices: builder.query({
-      query: ()=>'/all',
-      providesTags: ['Invoice']
+      query: () => "/all",
+      providesTags: ["Invoice"],
     }),
     invoiceDetails: builder.query({
-      query: (_id)=> `/${_id}`,
-      providesTags: ['Invoice']
+      query: (_id) => `/${_id}`,
+      providesTags: ["Invoice"],
     }),
     createInvoice: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: `/`,
         method: "POST",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ['Invoice']
+      invalidatesTags: ["Invoice"],
     }),
     updateInvoice: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: `/${data._id}`,
         method: "PUT",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ['Invoice']
+      invalidatesTags: ["Invoice"],
     }),
     deleteInvoice: builder.mutation({
-      query: (_id)=>({
+      query: (_id) => ({
         url: `/${_id}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
-      invalidatesTags: ['Invoice']
+      invalidatesTags: ["Invoice"],
     }),
-  })
-})
+  }),
+});
 
 const processApi = createApi({
-  reducerPath: 'processApi',
+  reducerPath: "processApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_BACKEND_URL+'production-process',
-    mode: 'cors',
-    prepareHeaders: (headers)=>{
+    baseUrl: process.env.REACT_APP_BACKEND_URL + "production-process",
+    mode: "cors",
+    prepareHeaders: (headers) => {
       const cookies = parseCookies();
       const token = cookies?.access_token;
-      if(token){
-        headers.set('Authorization', `Bearer ${token}`);
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
-    }
+    },
   }),
-  tagTypes: ['Process'],
+  tagTypes: ["Process"],
 
-  endpoints: (builder)=>({
+  endpoints: (builder) => ({
     fetchProcess: builder.query({
-      query: ()=>'/all',
-      providesTags: ['Process']
+      query: () => "/all",
+      providesTags: ["Process"],
     }),
     processDetails: builder.query({
-      query: (_id)=> `/${_id}`,
-      providesTags: ['Process']
+      query: (_id) => `/${_id}`,
+      providesTags: ["Process"],
     }),
     createProcess: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: `/`,
         method: "POST",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ['Process']
+      invalidatesTags: ["Process"],
     }),
     updateProcess: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: `/${data._id}`,
         method: "PUT",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ['Process']
+      invalidatesTags: ["Process"],
     }),
     deleteProcess: builder.mutation({
-      query: (_id)=>({
+      query: (_id) => ({
         url: `/${_id}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
-      invalidatesTags: ['Process']
+      invalidatesTags: ["Process"],
     }),
-  })
-})
+  }),
+});
 
 const paymentApi = createApi({
-  reducerPath: 'paymentApi',
+  reducerPath: "paymentApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_BACKEND_URL+'payment',
-    mode: 'cors',
-    prepareHeaders: (headers)=>{
+    baseUrl: process.env.REACT_APP_BACKEND_URL + "payment",
+    mode: "cors",
+    prepareHeaders: (headers) => {
       const cookies = parseCookies();
       const token = cookies?.access_token;
-      if(token){
-        headers.set('Authorization', `Bearer ${token}`);
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
-    }
+    },
   }),
-  tagTypes: ['Payment'],
+  tagTypes: ["Payment"],
 
-  endpoints: (builder)=>({
+  endpoints: (builder) => ({
     fetchPayment: builder.query({
-      query: ()=>'/all',
-      providesTags: ['Payment']
+      query: () => "/all",
+      providesTags: ["Payment"],
     }),
     paymentDetails: builder.query({
-      query: (_id)=> `/${_id}`,
-      providesTags: ['Payment']
+      query: (_id) => `/${_id}`,
+      providesTags: ["Payment"],
     }),
     createPayment: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: `/`,
         method: "POST",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ['Payment']
+      invalidatesTags: ["Payment"],
     }),
     updatePayment: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: `/${data._id}`,
         method: "PUT",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ['Payment']
+      invalidatesTags: ["Payment"],
     }),
     deletePayment: builder.mutation({
-      query: (_id)=>({
+      query: (_id) => ({
         url: `/${_id}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
-      invalidatesTags: ['Payment']
+      invalidatesTags: ["Payment"],
     }),
-  })
-})
+  }),
+});
 
 // export default api;
-export { api, productApi, storeApi, agentApi, bomApi, userRoleApi, employeeApi, proformaInvoiceApi, invoiceApi, processApi, paymentApi };
+export {
+  api,
+  productApi,
+  storeApi,
+  agentApi,
+  bomApi,
+  userRoleApi,
+  employeeApi,
+  proformaInvoiceApi,
+  invoiceApi,
+  processApi,
+  paymentApi,
+};
 
 // Authentication APIs
 export const {
@@ -643,6 +663,7 @@ export const {
   useAddProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useBulkDeleteProductsMutation,
   useLazyProductDetailsQuery,
   useLazyUnapprovedProductsQuery,
   useProductBulKUploadMutation,
@@ -657,7 +678,7 @@ export const {
   useDeleteStoresMutation,
   useLazyStoreDetailsQuery,
   useLazyUnapprovedStoresQuery,
-  useStoreBulKUploadMutation
+  useStoreBulKUploadMutation,
 } = storeApi;
 
 // Agent APIs
@@ -670,7 +691,7 @@ export const {
   useLazyAgentDetailsQuery,
   useLazyUnapprovedBuyersQuery,
   useLazyUnapprovedSellersQuery,
-  useAgentBulKUploadMutation
+  useAgentBulKUploadMutation,
 } = agentApi;
 
 // BOM APIs
@@ -689,15 +710,15 @@ export const {
   useAddRoleMutation,
   useUpdateRoleMutation,
   useDeleteRoleMutation,
-  useLazyRoleDetailsQuery
+  useLazyRoleDetailsQuery,
 } = userRoleApi;
 
 // Employee APIs
 export const {
   useLazyEmployeeDetailsQuery,
   useLazyFetchEmployeesQuery,
-  useUpdateEmployeeMutation
-} = employeeApi
+  useUpdateEmployeeMutation,
+} = employeeApi;
 
 // Proforma Invoice APIs
 export const {
@@ -705,17 +726,17 @@ export const {
   useLazyProformaInvoiceDetailsQuery,
   useCreateProformaInvoiceMutation,
   useUpdateProformaInvoiceMutation,
-  useDeleteProformaInvoiceMutation
-} = proformaInvoiceApi
+  useDeleteProformaInvoiceMutation,
+} = proformaInvoiceApi;
 
 // Invoice APIs
 export const {
-useLazyFetchInvoicesQuery,
-useLazyInvoiceDetailsQuery,
-useCreateInvoiceMutation,
-useUpdateInvoiceMutation,
-useDeleteInvoiceMutation
-} = invoiceApi
+  useLazyFetchInvoicesQuery,
+  useLazyInvoiceDetailsQuery,
+  useCreateInvoiceMutation,
+  useUpdateInvoiceMutation,
+  useDeleteInvoiceMutation,
+} = invoiceApi;
 
 // Process APIs
 export const {
@@ -723,13 +744,13 @@ export const {
   useLazyProcessDetailsQuery,
   useCreateProcessMutation,
   useUpdateProcessMutation,
-  useDeleteProcessMutation
-} = processApi
+  useDeleteProcessMutation,
+} = processApi;
 
 // Payment APIs
 export const {
   useLazyFetchPaymentQuery,
   useLazyPaymentDetailsQuery,
   useCreatePaymentMutation,
-  useUpdatePaymentMutation
-} = paymentApi
+  useUpdatePaymentMutation,
+} = paymentApi;

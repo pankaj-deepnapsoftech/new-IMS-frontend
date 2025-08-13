@@ -73,7 +73,7 @@ const AddResource = ({
   const [localEditResource] = useState(editResource);
   const [typeOptions, setTypeOptions] = useState([
     { value: "machine", label: "Machine" },
-    { value: "assembly_line", label: "Assembly Line" },
+    { value: "assembly line", label: "Assembly Line" },
   ]);
 
   const [selectedType, setSelectedType] = useState(null);
