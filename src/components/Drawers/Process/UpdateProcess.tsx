@@ -96,7 +96,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   const [rawMaterialApprovalPending, setRawMaterialApprovalPending] =
     useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
-  const [processProgress, setProcessProgress] = useState<{ done: number; left: number }[]>(
+  const [processProgress, setProcessProgress] = useState<{ done: number;  }[]>(
     []
   );
 
@@ -196,9 +196,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       process: (proc as any)?.process ?? proc,
       start: processStatuses[index]?.start || false,
       done: processStatuses[index]?.done || false,
-      work_done: processProgress[index]?.done || 0, // send work done
-      work_left: processProgress[index]?.left ?? (proc.quantity || 0) - (processProgress[index]?.done || 0),
+      work_done: Number(processProgress[index]?.done) || 0, // ensure number
     }));
+
 
 
     const data = {
@@ -350,19 +350,13 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setScrapMaterials(scrap);
 
       const processList = data?.production_process?.bom?.processes || [];
-      setProcesses(
-        processList.map((p: any) => ({
-          process: p.process,
-          quantity: p.quantity,
+ 
+      setProcesses(data.production_process?.processes || []);
+      setProcessProgress(
+        (data.production_process?.processes || []).map((p: any) => ({
+          done: typeof p.work_done === "number" ? p.work_done : 0,
         }))
-      );
-
-      setProcessStatuses(
-        processList.map((p: any) => ({
-          start: p.start,
-          done: p.done,
-        }))
-      );
+      );;
 
       const fetchedStatuses = data.production_process.processes || [];
       const initialStatuses: {
@@ -854,16 +848,14 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
               <div className="flex flex-wrap gap-4 p-4 w-full">
                 {processes.map((process: any, index) => {
                   const status = processStatuses[index];
-                  const progress = processProgress[index] || { done: 0, left: process.quantity || 0 };
+                  const progress = processProgress[index] || { done: 0};
 
                   const handleDoneChange = (value: number) => {
                     const updatedProgress = [...processProgress];
-                    updatedProgress[index] = {
-                      done: value,
-                      left: Math.max((process.quantity || 0) - value, 0),
-                    };
+                    updatedProgress[index] = { done: Number(value) };
                     setProcessProgress(updatedProgress);
                   };
+
 
                   return (
                     <div
