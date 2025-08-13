@@ -54,7 +54,7 @@ const AddBom: React.FC<AddBomProps> = ({
   const supportingDoc = useRef<HTMLInputElement | null>(null);
   const [comments, setComments] = useState<string | undefined>();
   const [cost, setCost] = useState<number | undefined>();
-  const [unitCost, setUnitCost] = useState<string | undefined>();
+  const [unitCost, setUnitCost] = useState<string | undefined>(); 
   const [processes, setProcesses] = useState<string[]>([""]);
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
   const [products, setProducts] = useState<any[]>([]);
@@ -71,8 +71,7 @@ const AddBom: React.FC<AddBomProps> = ({
   const [electricityCharges, setElectricityCharges] = useState<
     number | undefined
   >();
-  const [selectedManPower, setSelectedManPower] = useState<any | null>(null);
-  const [manPowerList, setManPowerList] = useState<any[]>([]);
+ 
   const [otherCharges, setOtherCharges] = useState<number | undefined>();
   const [resources, setResources] = useState<any[]>([]);
   const [empData, setEmpData] = useState<any[]>([]);
@@ -80,6 +79,9 @@ const AddBom: React.FC<AddBomProps> = ({
   const [selectedResources, setSelectedResources] = useState([
     { name: null, type: null, specification: "" },
   ]);
+  // NEW: user-entered manpower (string) and auto-calculated available count
+  const [manpowerInput, setManpowerInput] = useState<string>("");
+  const [manpowerCount, setManpowerCount] = useState<number>(0);
 
   const [addBom] = useAddBomMutation();
 
@@ -128,23 +130,8 @@ const AddBom: React.FC<AddBomProps> = ({
     { value: "inch", label: "inch" },
     { value: "mtr", label: "mtr" },
   ];
-  const [manpower, setManpower] = useState([{ user: null }]);
 
-  const handleAddManpower = () => {
-    setManpower([...manpower, { user: null }]);
-  };
 
-  const handleRemoveManpower = (index) => {
-    const updated = [...manpower];
-    updated.splice(index, 1);
-    setManpower(updated);
-  };
-
-  const handleManpowerChange = (index, key, value) => {
-    const updated = [...manpower];
-    updated[index][key] = value;
-    setManpower(updated);
-  };
 
 
 
@@ -218,8 +205,15 @@ const AddBom: React.FC<AddBomProps> = ({
         machinery_charges: machineryCharges || 0,
         electricity_charges: electricityCharges || 0,
         other_charges: otherCharges || 0,
-      },
-      manpower: manpower.map(mp => ({ user: mp.user })),
+      }, 
+      manpower: [
+        {
+          number: String(manpowerInput || manpowerCount),
+        },
+      ],
+
+
+
 
       remarks: remarks,
       resources: selectedResources.map((r) => ({
@@ -230,7 +224,7 @@ const AddBom: React.FC<AddBomProps> = ({
 
 
     };
-
+ console.log(body)
     try {
       const response = await addBom(body).unwrap();
       toast.success(response?.message);
@@ -368,6 +362,12 @@ const AddBom: React.FC<AddBomProps> = ({
       setTotalPartsCost(cost);
     }
   }, [rawMaterials]);
+
+  useEffect(() => {
+    // empData ko fetchEmployeeHandler me already filtered man-power users ke saath set kiya ja raha tha
+    setManpowerCount(empData?.length || 0);
+  }, [empData]);
+
 
   useEffect(() => {
     fetchProductsHandler();
@@ -1014,48 +1014,23 @@ const AddBom: React.FC<AddBomProps> = ({
                     <h3 className="text-lg font-semibold text-gray-900">Manpower</h3>
                   </div>
 
-                  <div className="space-y-4">
-                    {manpower.map((entry, index) => (
-                      <div key={index} className="flex gap-4 items-center">
-                        {/* Dropdown for Man Power Employee */}
-                        <Select
-                          styles={customStyles}
-                          options={manPowerOptions}
-                          placeholder="Select Employee"
-                          value={manPowerOptions.find(opt => opt.value === entry.user)}
-                          onChange={(option) =>
-                            handleManpowerChange(index, 'user', option?.value)
-                          }
-                          className="flex-1"
-                        />
-
-                        {/* Remove Button */}
-                        {manpower.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveManpower(index)}
-                            className="text-red-600 hover:text-red-800"
-                            title="Remove"
-                          >
-                            ❌
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                  <div className="text-sm text-gray-600 mb-2">
+                    Available manpower: <span className="font-medium">{manpowerCount}</span>
                   </div>
 
-                  {/* Add Button */}
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      onClick={handleAddManpower}
-                      className="px-3 py-1 flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded"
-                    >
-                      <Plus size={16} /> Add Manpower
-                    </button>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="number"
+                      value={manpowerInput}
+                      onChange={(e) => setManpowerInput(e.target.value)}
+                      placeholder={manpowerCount?.toString() || "0"}
+                      className="w-40 px-2 py-1 border border-gray-300 rounded text-sm"
+                    />
+                    <span className="text-sm text-gray-500">(Leave empty to send available count)</span>
                   </div>
                 </div>
               </div>
+
 
 
 
