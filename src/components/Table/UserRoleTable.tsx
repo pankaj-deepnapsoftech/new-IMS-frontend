@@ -42,7 +42,12 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
 }) => {
   const columns = useMemo(
     () => [
-      { Header: "Role", accessor: "role" },
+      {
+        Header: "Role",
+        accessor: "role",
+        minWidth: 120, // Ensure minimum width for sticky column
+        width: 150, // Set preferred width
+      },
       { Header: "Description", accessor: "description" },
       { Header: "Created On", accessor: "createdAt" },
       { Header: "Last Updated", accessor: "updatedAt" },
@@ -163,7 +168,7 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                   boxShadow: `0 0 0 1px ${colors.primary[500]}`,
                 }}
               >
-                {[5,10, 20, 50, 100, 100000].map((size) => (
+                {[5, 10, 20, 50, 100, 100000].map((size) => (
                   <option key={size} value={size}>
                     {size === 100000 ? "All" : size}
                   </option>
@@ -180,7 +185,14 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
               border: `1px solid ${colors.border.light}`,
             }}
           >
-            <div className="overflow-x-auto">
+            <div
+              className="overflow-x-auto"
+              style={{
+                WebkitOverflowScrolling: "touch",
+                scrollbarWidth: "thin",
+                scrollbarColor: `${colors.gray[300]} ${colors.gray[100]}`,
+              }}
+            >
               <Table
                 {...getTableProps()}
                 variant="simple"
@@ -203,7 +215,9 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                     >
                       {hg.headers.map((column) => (
                         <Th
-                          {...column.getHeaderProps(column.getSortByToggleProps())}
+                          {...column.getHeaderProps(
+                            column.getSortByToggleProps()
+                          )}
                           fontSize="14px"
                           color="gray.700"
                           fontWeight="600"
@@ -211,13 +225,22 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                           px={4}
                           py={3}
                           style={{
-                            backgroundColor: colors.table.header, // Ensures the background stays solid when sticky
+                            backgroundColor: colors.table.header,
+                            ...(column.id === "role" && {
+                              position: "sticky",
+                              left: 0,
+                              zIndex: 2,
+                            }),
                           }}
                         >
                           <div className="flex items-center gap-1">
                             {column.render("Header")}
                             {column.isSorted &&
-                              (column.isSortedDesc ? <FaCaretDown /> : <FaCaretUp />)}
+                              (column.isSortedDesc ? (
+                                <FaCaretDown />
+                              ) : (
+                                <FaCaretUp />
+                              ))}
                           </div>
                         </Th>
                       ))}
@@ -237,7 +260,6 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                     </Tr>
                   ))}
                 </Thead>
-
 
                 <Tbody {...getTableBodyProps()}>
                   {page.map((row, index) => {
@@ -264,6 +286,17 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
                             color={colors.text.primary}
                             px={4}
                             py={3}
+                            style={{
+                              // Make Role column sticky on horizontal scroll
+                              ...(cell.column.id === "role" && {
+                                position: "sticky",
+                                left: 0,
+                                zIndex: 1,
+                                backgroundColor: dynamicBg(index),
+                                boxShadow: "4px 0 8px rgba(0,0,0,0.15)",
+                                borderRight: `2px solid ${colors.border.light}`,
+                              }),
+                            }}
                           >
                             {cell.column.id === "createdAt" ||
                             cell.column.id === "updatedAt" ? (

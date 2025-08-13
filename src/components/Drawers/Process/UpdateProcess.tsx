@@ -96,6 +96,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   const [rawMaterialApprovalPending, setRawMaterialApprovalPending] =
     useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [processProgress, setProcessProgress] = useState<{ done: number;  }[]>(
+    []
+  );
 
   const [scrapMaterials, setScrapMaterials] = useState<any[]>([
     {
@@ -129,6 +132,16 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setFinishedGoodCost(+finishedGoodUnitCost * qty);
     }
   };
+  const completedCount = Object.values(processStatuses).filter(
+    (status) => status?.done
+  ).length;
+
+  const totalProcesses = processes.length;
+  const remainingCount = totalProcesses - completedCount;
+
+  // Calculate percentage
+  const progressPercentage =
+    totalProcesses > 0 ? Math.round((completedCount / totalProcesses) * 100) : 0;
 
   const handleProcessStatusChange = (
     processIndex: number,
@@ -157,7 +170,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       return updated;
     });
   };
-
+  // console.log("All Product", products)
   const updateProcessHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -183,10 +196,12 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       process: (proc as any)?.process ?? proc,
       start: processStatuses[index]?.start || false,
       done: processStatuses[index]?.done || false,
+      work_done: Number(processProgress[index]?.done) || 0, // ensure number
     }));
 
+
+
     const data = {
-      // BOM
       bom: {
         _id: bomId,
         raw_materials: selectedProducts,
@@ -203,17 +218,15 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
         bom_name: bomName,
         total_cost: totalCost,
       },
-      // Production Process
       status: processStatus,
       _id: productionProcessId,
-      // Process Statuses
-      process_statuses: processStatuses,
     };
+
 
     try {
       setIsUpdating(true);
       const response = await updateProcess(data).unwrap();
-
+    console.log(response);
       if (!response.success) {
         throw new Error(response.message);
       }
@@ -288,7 +301,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
             (p: any) => p.item._id === material.item._id
           );
 
-          return {
+          return { 
             _id: material._id,
             item: material.item._id,
             item_name: { value: material.item._id, label: material.item.name },
@@ -337,19 +350,13 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setScrapMaterials(scrap);
 
       const processList = data?.production_process?.bom?.processes || [];
-      setProcesses(
-        processList.map((p: any) => ({
-          process: p.process,
-          quantity: p.quantity,
+ 
+      setProcesses(data.production_process?.processes || []);
+      setProcessProgress(
+        (data.production_process?.processes || []).map((p: any) => ({
+          done: typeof p.work_done === "number" ? p.work_done : 0,
         }))
-      );
-
-      setProcessStatuses(
-        processList.map((p: any) => ({
-          start: p.start,
-          done: p.done,
-        }))
-      );
+      );;
 
       const fetchedStatuses = data.production_process.processes || [];
       const initialStatuses: {
@@ -837,109 +844,106 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                 </div>
               </div>
 
-              {/* Process Section */}
-              <div className="bg-white border-b">
-                <div className="px-4 py-4 sm:px-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Processes
-                    </h3>
-                    <div className="text-sm text-gray-600">
-                      {
-                        Object.values(processStatuses).filter(
-                          (status) => status?.done
-                        ).length
-                      }{" "}
-                      of {processes.length} completed
-                    </div>
-                  </div>
+              {/* Container with flex-wrap */}
+              <div className="flex flex-wrap gap-4 p-4 w-full">
+                {processes.map((process: any, index) => {
+                  const status = processStatuses[index];
+                  const progress = processProgress[index] || { done: 0};
 
-                  <div className="flex gap-4 flex-wrap">
-                    {processes.map((process: any, index) => {
-                      const status = processStatuses[index];
+                  const handleDoneChange = (value: number) => {
+                    const updatedProgress = [...processProgress];
+                    updatedProgress[index] = { done: Number(value) };
+                    setProcessProgress(updatedProgress);
+                  };
 
-                      return (
-                        <div key={index} className="mb-4 flex items-end gap-1">
+
+                  return (
+                    <div
+                      key={index}
+                      className="w-[280px]" 
+                    >
+                      <div
+                        className={`border p-3 rounded-lg ${status?.done
+                            ? "bg-green-50 border-green-200"
+                            : status?.start
+                              ? "bg-blue-50 border-blue-200"
+                              : "bg-gray-50 border-gray-200"
+                          }`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Process {index + 1}
+                          </label>
                           <div
-                            className={`border p-3 rounded-lg min-w-[280px] sm:min-w-[300px] ${
-                              status?.done
-                                ? "bg-green-50 border-green-200"
+                            className={`px-2 py-1 rounded text-xs  font-medium ${status?.done
+                                ? "bg-green-100 text-green-800"
                                 : status?.start
-                                ? "bg-blue-50 border-blue-200"
-                                : "bg-gray-50 border-gray-200"
-                            }`}
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-gray-100 text-gray-600"
+                              }`}
                           >
-                            <div className="flex items-center justify-between mb-2">
-                              <label className="block text-sm font-medium text-gray-700">
-                                Process {index + 1}
-                              </label>
-                              <div
-                                className={`px-2 py-1 rounded text-xs font-medium ${
-                                  status?.done
-                                    ? "bg-green-100 text-green-800"
-                                    : status?.start
-                                    ? "bg-blue-100 text-blue-800"
-                                    : "bg-gray-100 text-gray-600"
-                                }`}
-                              >
-                                {status?.done
-                                  ? "Completed"
-                                  : status?.start
-                                  ? "In Progress"
-                                  : "Not Start"}
-                              </div>
-                            </div>
-                            <input
-                              type="text"
-                              value={(process as any)?.process ?? process}
-                              readOnly
-                              className="w-full px-3 py-2 border border-gray-300 rounded bg-white mb-3"
-                            />
-
-                            <div className="flex gap-4">
-                              <label className="flex items-center gap-2">
-                                <input
-                                  type="checkbox"
-                                  checked={status?.start || false}
-                                  onChange={(e) =>
-                                    handleProcessStatusChange(
-                                      index,
-                                      "start",
-                                      e.target.checked
-                                    )
-                                  }
-                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-                                />
-                                <span className="text-sm text-gray-700">
-                                  Start
-                                </span>
-                              </label>
-
-                              <label className="flex items-center gap-2">
-                                <input
-                                  type="checkbox"
-                                  checked={status?.done || false}
-                                  onChange={(e) =>
-                                    handleProcessStatusChange(
-                                      index,
-                                      "done",
-                                      e.target.checked
-                                    )
-                                  }
-                                  className="w-4 h-4 text-green-600 border-gray-300 rounded"
-                                />
-                                <span className="text-sm text-gray-700">
-                                  Done
-                                </span>
-                              </label>
-                            </div>
+                            {status?.done
+                              ? "Completed"
+                              : status?.start
+                                ? "In Progress"
+                                : "Not Start"}
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
+
+                        {/* Process name */}
+                        <input
+                          type="text"
+                          value={(process as any)?.process ?? process}
+                          readOnly
+                          className="w-full px-3 py-2 border border-gray-300 rounded bg-white mb-3 text-sm"
+                        />
+
+                        {/* Done input */}
+                        <div className="mb-3">
+                          <label className="block text-xs text-gray-700">Work Done</label>
+                          <input
+                            type="number"
+                            value={progress.done}
+                            onChange={(e) => handleDoneChange(Number(e.target.value))}
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
+
+                        {/* Start / Done checkboxes */}
+                        <div className="flex  gap-2">
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={status?.start || false}
+                              onChange={(e) =>
+                                handleProcessStatusChange(index, "start", e.target.checked)
+                              }
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                            />
+                            <span className="text-sm text-gray-700">Start</span>
+                          </label>
+
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={status?.done || false}
+                              onChange={(e) =>
+                                handleProcessStatusChange(index, "done", e.target.checked)
+                              }
+                              className="w-4 h-4 text-green-600 border-gray-300 rounded"
+                            />
+                            <span className="text-sm text-gray-700">Done</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+
+
+
+
 
               {/* Scrap Materials Section */}
               <div className="bg-white border-b">

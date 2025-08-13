@@ -30,6 +30,7 @@ interface ProductTableProps {
   openUpdateProductDrawerHandler?: (id: string) => void;
   openProductDetailsDrawerHandler?: (id: string) => void;
   deleteProductHandler?: (id: string) => void;
+  bulkDeleteProductsHandler?: (productIds: string[]) => void;
   approveProductHandler?: (id: string) => void;
 }
 
@@ -39,6 +40,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   openUpdateProductDrawerHandler,
   openProductDetailsDrawerHandler,
   deleteProductHandler,
+  bulkDeleteProductsHandler,
   approveProductHandler,
 }) => {
   const columns: Column<any>[] = useMemo(
@@ -94,11 +96,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
     usePagination
   );
 
-  const [cookies] = useCookies()
+  const [cookies] = useCookies();
   // Bulk selection functions
   const handleSelectAll = (checked) => {
     if (checked) {
-      setSelectedProducts(page.map(row => row.original._id));
+      setSelectedProducts(page.map((row) => row.original._id));
     } else {
       setSelectedProducts([]);
     }
@@ -106,41 +108,39 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
   const handleSelectProduct = (productId, checked) => {
     if (checked) {
-      setSelectedProducts(prev => [...prev, productId]);
+      setSelectedProducts((prev) => [...prev, productId]);
     } else {
-      setSelectedProducts(prev => prev.filter(id => id !== productId));
+      setSelectedProducts((prev) => prev.filter((id) => id !== productId));
     }
   };
 
   const handleBulkDelete = async () => {
-    if (isBulkDeleting || selectedProducts.length === 0 || !deleteProductHandler) return;
+    if (
+      isBulkDeleting ||
+      selectedProducts.length === 0 ||
+      !bulkDeleteProductsHandler
+    )
+      return;
     setIsBulkDeleting(true);
 
     try {
-      // Call the delete handler for each selected product
-      const deletePromises = selectedProducts.map(productId =>
-        deleteProductHandler(productId)
-      );
-
-      await Promise.all(deletePromises);
-
-      // Success feedback
-      toast.success(`Successfully deleted ${selectedProducts.length} product${selectedProducts.length > 1 ? 's' : ''}`);
+      // Use the new bulk delete handler
+      await bulkDeleteProductsHandler(selectedProducts);
 
       setSelectedProducts([]);
       setShowBulkDeleteModal(false);
     } catch (error) {
       console.error("Error in bulk delete:", error);
-      toast.error("Failed to delete some products. Please try again.");
+      toast.error("Failed to delete products. Please try again.");
     } finally {
       setIsBulkDeleting(false);
     }
   };
 
-  const isAllSelected = page.length > 0 && selectedProducts.length === page.length;
-  const isIndeterminate = selectedProducts.length > 0 && selectedProducts.length < page.length;
-
-
+  const isAllSelected =
+    page.length > 0 && selectedProducts.length === page.length;
+  const isIndeterminate =
+    selectedProducts.length > 0 && selectedProducts.length < page.length;
 
   return (
     <div className="p-6">
@@ -216,7 +216,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
               {/* Bulk Actions */}
               {selectedProducts.length > 0 && (
                 <div className="flex items-center gap-3">
-                  {deleteProductHandler && (
+                  {bulkDeleteProductsHandler && (
                     <button
                       onClick={() => setShowBulkDeleteModal(true)}
                       className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
@@ -313,34 +313,26 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{
                         color: colors.table.headerText,
-                        position: "sticky",
-                        top: 0,
-                        left: 0,
-                        zIndex: 3,
-                        backgroundColor: colors.table.header,
                         width: "60px",
                         minWidth: "60px",
                       }}
                     >
-                      {cookies?.role === "admin" && (<input
-                        type="checkbox"
-                        checked={isAllSelected}
-                        ref={(el) => {
-                          if (el) el.indeterminate = isIndeterminate;
-                        }}
-                        onChange={(e) => handleSelectAll(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                      />)}
+                      {cookies?.role === "admin" && (
+                        <input
+                          type="checkbox"
+                          checked={isAllSelected}
+                          ref={(el) => {
+                            if (el) el.indeterminate = isIndeterminate;
+                          }}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                      )}
                     </th>
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{
                         color: colors.table.headerText,
-                        position: "sticky",
-                        top: 0,
-                        left: "60px",
-                        zIndex: 3,
-                        backgroundColor: colors.table.header,
                         width: "160px", // Fixed width
                         minWidth: "160px",
                       }}
@@ -354,11 +346,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         color: colors.table.headerText,
                         position: "sticky",
                         top: 0,
-                        left: "220px", // Shifted to right of checkbox + Product ID
+                        left: 0,
                         zIndex: 3,
                         backgroundColor: colors.table.header,
-                        width: "120px",
-                        minWidth: "120px",
+                        width: "160px",
+                        minWidth: "160px",
                       }}
                     >
                       Name
@@ -399,12 +391,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     >
                       Price
                     </th>
-                    <th
-                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{ color: colors.table.headerText }}
-                    >
-                      Latest Price
-                    </th>
 
                     {/* <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
@@ -412,12 +398,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     >
                       Current Stock
                     </th> */}
-                    <th
-                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{ color: colors.table.headerText }}
-                    >
-                      Updated Stock
-                    </th>
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -473,42 +453,30 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{
                             color: colors.text.secondary,
-                            position: "sticky",
-                            left: 0,
-                            zIndex: 1,
-                            backgroundColor:
-                              index % 2 === 0
-                                ? colors.background.card
-                                : colors.table.stripe,
                             width: "60px",
                             minWidth: "60px",
                           }}
                         >
-                          {cookies?.role === "admin" && (<input
-                            type="checkbox"
-                            checked={selectedProducts.includes(
-                              row.original._id
-                            )}
-                            onChange={(e) =>
-                              handleSelectProduct(
-                                row.original._id,
-                                e.target.checked
-                              )
-                            }
-                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                          />)}
+                          {cookies?.role === "admin" && (
+                            <input
+                              type="checkbox"
+                              checked={selectedProducts.includes(
+                                row.original._id
+                              )}
+                              onChange={(e) =>
+                                handleSelectProduct(
+                                  row.original._id,
+                                  e.target.checked
+                                )
+                              }
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                            />
+                          )}
                         </td>
                         <td
                           className="px-4 py-3 text-sm font-mono whitespace-nowrap"
                           style={{
                             color: colors.text.secondary,
-                            position: "sticky",
-                            left: "60px",
-                            zIndex: 1,
-                            backgroundColor:
-                              index % 2 === 0
-                                ? colors.background.card
-                                : colors.table.stripe,
                             width: "160px",
                             minWidth: "160px",
                           }}
@@ -521,14 +489,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           style={{
                             color: colors.text.secondary,
                             position: "sticky",
-                            left: "220px", // Match updated <th>
+                            left: 0,
                             zIndex: 1,
                             backgroundColor:
                               index % 2 === 0
                                 ? colors.background.card
                                 : colors.table.stripe,
-                            width: "120px",
-                            minWidth: "120px",
+                            width: "160px",
+                            minWidth: "160px",
                           }}
                           title={row.original.name}
                         >
@@ -580,48 +548,50 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         >
                           {row.original.uom || "N/A"}
                         </td>
-                        <td
-                          className="px-4 py-3 text-sm font-medium whitespace-nowrap"
-                          style={{ color: colors.success[600] }}
-                        >
-                          ₹{row.original.price || "0"}
-                        </td>
-                        <td
-                          className="px-4 py-3 text-sm font-medium whitespace-nowrap"
-                          style={{ color: colors.primary[600] }}
-                        >
-                          {row.original.latest_price && row.original.latest_price !== row.original.price ? (
-                            <span className="font-semibold">
-                              ₹{row.original.latest_price.toFixed(2)}
+                        <td className="px-4 py-3 text-sm whitespace-nowrap">
+                          <div className="flex flex-col">
+                            <span
+                              className="font-medium"
+                              style={{ color: colors.success[600] }}
+                            >
+                              ₹{row.original.price || "0"}
                             </span>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
+                            {row.original.latest_price &&
+                              row.original.latest_price !==
+                                row.original.price && (
+                                <span
+                                  className="text-xs font-medium"
+                                  style={{ color: colors.primary[600] }}
+                                >
+                                  Latest: ₹
+                                  {row.original.latest_price.toFixed(2)}
+                                </span>
+                              )}
+                          </div>
                         </td>
 
-                        {/* <td
-                          className="px-4 py-3 text-sm whitespace-nowrap"
-                          style={{ color: colors.text.secondary }}
-                        >
-                          {row.original.current_stock || "0"}
-                        </td> */}
-                        <td
-                          className="px-4 py-3 text-sm whitespace-nowrap"
-                          style={{ color: colors.primary[600] }}
-                        >
-                          {row.original.updated_stock && row.original.updated_stock !== null ? (
-                            <span className="font-semibold">
-                              +{row.original.updated_stock}
+                        <td className="px-4 py-3 text-sm whitespace-nowrap">
+                          <div className="flex flex-col">
+                            <span style={{ color: colors.text.secondary }}>
+                              {row.original.current_stock || "0"}
                             </span>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
+                            {row.original.updated_stock &&
+                              row.original.updated_stock !== null && (
+                                <span
+                                  className="text-xs font-medium"
+                                  style={{ color: colors.primary[600] }}
+                                >
+                                  Updated: +{row.original.updated_stock}
+                                </span>
+                              )}
+                          </div>
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap font-semibold"
                           style={{ color: colors.success[600] }}
                         >
-                          {(row.original.current_stock || 0) + (row.original.updated_stock || 0)}
+                          {(row.original.current_stock || 0) +
+                            (row.original.updated_stock || 0)}
                         </td>
                         <td className="px-4 py-3 text-sm whitespace-nowrap">
                           {row.original.change_type && (
@@ -656,8 +626,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         >
                           {row.original.createdAt
                             ? moment(row.original.createdAt).format(
-                              "DD/MM/YYYY"
-                            )
+                                "DD/MM/YYYY"
+                              )
                             : "N/A"}
                         </td>
                         <td className="px-4 py-3">
@@ -713,30 +683,31 @@ const ProductTable: React.FC<ProductTableProps> = ({
                               </button>
                             )}
 
-                            {deleteProductHandler && cookies?.role === "admin" && (
-                              <button
-                                onClick={() => {
-                                  setdeleteId(row.original._id);
-                                  setshowDeletePage(true);
-                                }}
-                                className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                                style={{
-                                  color: colors.error[600],
-                                  backgroundColor: colors.error[50],
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    colors.error[100];
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    colors.error[50];
-                                }}
-                                title="Delete product"
-                              >
-                                <MdDeleteOutline size={16} />
-                              </button>
-                            )}
+                            {deleteProductHandler &&
+                              cookies?.role === "admin" && (
+                                <button
+                                  onClick={() => {
+                                    setdeleteId(row.original._id);
+                                    setshowDeletePage(true);
+                                  }}
+                                  className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                                  style={{
+                                    color: colors.error[600],
+                                    backgroundColor: colors.error[50],
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.error[100];
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor =
+                                      colors.error[50];
+                                  }}
+                                  title="Delete product"
+                                >
+                                  <MdDeleteOutline size={16} />
+                                </button>
+                              )}
                             {approveProductHandler && (
                               <button
                                 onClick={() =>
@@ -1085,7 +1056,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       Deleting...
                     </>
                   ) : (
-                    `Delete ${selectedProducts.length} Product${selectedProducts.length > 1 ? "s" : ""
+                    `Delete ${selectedProducts.length} Product${
+                      selectedProducts.length > 1 ? "s" : ""
                     }`
                   )}
                 </button>

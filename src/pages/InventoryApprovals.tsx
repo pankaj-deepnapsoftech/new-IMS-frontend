@@ -59,12 +59,11 @@ const InventoryApprovals: React.FC = () => {
           body: JSON.stringify({ _id: id }),
         }
       );
-
       const data = await response.json();
       if (!data.success) {
         throw new Error(data.message);
       }
-
+      window.location.reload()
       toast.success("Raw material approved successfully!");
 
  

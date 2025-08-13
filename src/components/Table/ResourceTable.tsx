@@ -201,8 +201,8 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
 
       {!isLoadingResources && resources.length > 0 && (
         <>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
               <div>
                 <h3
                   className="text-lg font-semibold"
@@ -215,14 +215,14 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
 
               {/* Bulk Actions */}
               {selectedResources.length > 0 && (
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   {deleteResourceHandler && (
                     <button
                       onClick={() => setShowBulkDeleteModal(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
+                      className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
                     >
                       <svg
-                        className="w-4 h-4"
+                        className="w-4 h-4 flex-shrink-0"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -234,15 +234,17 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                           d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                         />
                       </svg>
-                      Delete Selected ({selectedResources.length})
+                      <span className="hidden sm:inline">Delete Selected</span>
+                      <span className="sm:hidden">Delete</span>
+                      <span className="ml-1">({selectedResources.length})</span>
                     </button>
                   )}
                   <button
                     onClick={() => setSelectedResources([])}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
                   >
                     <svg
-                      className="w-4 h-4"
+                      className="w-4 h-4 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -254,22 +256,23 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                         d="M6 18L18 6M6 6l12 12"
                       />
                     </svg>
-                    Clear Selection
+                    <span className="hidden sm:inline">Clear Selection</span>
+                    <span className="sm:hidden">Clear</span>
                   </button>
                 </div>
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 lg:flex-shrink-0">
               <span
-                className="text-sm font-medium"
+                className="text-sm font-medium whitespace-nowrap"
                 style={{ color: colors.text.secondary }}
               >
                 Show:
               </span>
               <select
                 onChange={(e) => setPageSize(Number(e.target.value))}
-                className="px-3 py-2 text-sm rounded-lg border transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border transition-colors min-w-0"
                 value={pageSize}
                 style={{
                   backgroundColor: colors.input.background,
@@ -434,18 +437,17 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                             className="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
                             style={{
                               backgroundColor:
-                                row.original.type === "machine"
+                                row.original.type === "Machine"
                                   ? colors.primary[100]
                                   : colors.secondary[100],
                               color:
-                                row.original.type === "machine"
+                                row.original.type === "Machine"
                                   ? colors.primary[700]
                                   : colors.secondary[700],
                             }}
                           >
-                            {row.original.type === "machine"
-                              ? "Machine"
-                              : "Assemble Line"}
+                            {console.log("dsfsdf", row.original.type)}
+                            {row.original.type}
                           </span>
                         </td>
                         <td
@@ -676,7 +678,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                   className="rounded-lg p-4 mb-4"
                   style={{ backgroundColor: colors.error[50] }}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-center gap-3">
                     <svg
                       className="w-6 h-6 flex-shrink-0"
                       style={{ color: colors.error[500] }}
@@ -691,7 +693,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
                       />
                     </svg>
-                    <div>
+                    <div className="text-center">
                       <p
                         className="font-medium"
                         style={{ color: colors.error[800] }}
@@ -784,7 +786,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                   className="rounded-lg p-4 mb-4"
                   style={{ backgroundColor: colors.error[50] }}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-center gap-3">
                     <svg
                       className="w-6 h-6 flex-shrink-0"
                       style={{ color: colors.error[500] }}
@@ -799,7 +801,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
                       />
                     </svg>
-                    <div>
+                    <div className="text-center">
                       <p
                         className="font-medium"
                         style={{ color: colors.error[800] }}

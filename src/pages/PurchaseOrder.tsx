@@ -781,7 +781,7 @@ const PurchaseOrder: React.FC = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Purchase Order & Inventory Management
+                Purchase Order
               </h1>
               <p className="text-gray-600 mt-1">Manage purchase orders and inventory</p>
             </div>
@@ -791,7 +791,7 @@ const PurchaseOrder: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-3">
             {activeTab === 'purchase-orders' && (
               <button
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
                 onClick={openAddPurchaseOrderDrawerHandler}
               >
                 <svg
@@ -807,13 +807,13 @@ const PurchaseOrder: React.FC = () => {
                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                   />
                 </svg>
-                Add New Purchase
+                Add Purchase
               </button>
             )}
             
                          {/* Raw Material Shortages Button */}
              <button
-               className="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
+               className="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
                onClick={() => {
                  setShowInventoryShortagesModal(true);
                  fetchInventoryShortages();

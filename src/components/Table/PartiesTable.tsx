@@ -235,36 +235,32 @@ const PartiesTable = ({
   return (
     <div className="p-6">
       {/* Header with count and page size selector */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        {/* Left section */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
           <div>
             <h3
-              className="text-lg font -semibold"
+              className="text-lg font-semibold"
               style={{ color: colors.text.primary }}
             >
               {filteredParties.length} Part
               {filteredParties.length !== 1 ? "ies" : "y"} Found
             </h3>
-            {/* {selectedParties.length > 0 && (
-              <p className="text-sm mt-1" style={{ color: colors.text.secondary }}>
-                {selectedParties.length} selected
-              </p>
-            )} */}
           </div>
 
           {/* Bulk Actions */}
           {selectedParties.length > 0 && (
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setShowBulkDeleteModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors w-full sm:w-auto"
               >
                 <BiSolidTrash size={16} />
                 Delete Selected ({selectedParties.length})
               </button>
               <button
                 onClick={() => setSelectedParties([])}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white text-sm font-medium rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white text-sm font-medium rounded-lg transition-colors w-full sm:w-auto"
               >
                 <BiX size={16} />
                 Clear Selection
@@ -273,6 +269,7 @@ const PartiesTable = ({
           )}
         </div>
 
+        {/* Right section */}
         <div className="flex items-center gap-3">
           <span
             className="text-sm font-medium"
@@ -315,15 +312,17 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-                  {cookies?.role === "admin" && (<input
-                    type="checkbox"
-                    checked={isAllSelected}
-                    ref={(el) => {
-                      if (el) el.indeterminate = isIndeterminate;
-                    }}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                  />)}
+                  {cookies?.role === "admin" && (
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected}
+                      ref={(el) => {
+                        if (el) el.indeterminate = isIndeterminate;
+                      }}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                  )}
                 </th>
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
@@ -367,7 +366,6 @@ const PartiesTable = ({
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
-
                   Email
                 </th>
                 <th
@@ -464,14 +462,16 @@ const PartiesTable = ({
                     className="px-4 py-3 text-sm whitespace-nowrap"
                     style={{ color: colors.text.secondary }}
                   >
-                    {cookies.role === "admin" && (<input
-                      type="checkbox"
-                      checked={selectedParties.includes(party._id)}
-                      onChange={(e) =>
-                        handleSelectParty(party._id, e.target.checked)
-                      }
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                    />)}
+                    {cookies.role === "admin" && (
+                      <input
+                        type="checkbox"
+                        checked={selectedParties.includes(party._id)}
+                        onChange={(e) =>
+                          handleSelectParty(party._id, e.target.checked)
+                        }
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                    )}
                   </td>
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap"
@@ -514,7 +514,7 @@ const PartiesTable = ({
                   <td
                     className="px-4 py-3 text-sm whitespace-nowrap truncate max-w-xs"
                     style={{ color: colors.text.secondary }}
-                  // title={party.company_name}
+                    // title={party.company_name}
                   >
                     {party.contact_person_name || "N/A"}
                   </td>
@@ -532,7 +532,7 @@ const PartiesTable = ({
                     style={{ color: colors.text.secondary }}
                   >
                     {Array.isArray(party.contact_number) &&
-                      party.contact_number.length > 0
+                    party.contact_number.length > 0
                       ? party.contact_number.join(", ")
                       : "N/A"}
                   </td>
@@ -544,14 +544,14 @@ const PartiesTable = ({
                           party.type === "Customer"
                             ? colors.success[100]
                             : party.type === "Supplier"
-                              ? colors.primary[100]
-                              : colors.gray[100],
+                            ? colors.primary[100]
+                            : colors.gray[100],
                         color:
                           party.type === "Customer"
                             ? colors.success[700]
                             : party.type === "Supplier"
-                              ? colors.primary[700]
-                              : colors.gray[700],
+                            ? colors.primary[700]
+                            : colors.gray[700],
                       }}
                     >
                       {party.type || "N/A"}
@@ -640,28 +640,30 @@ const PartiesTable = ({
                       >
                         <MdEdit size={16} />
                       </button>
-                      {cookies?.role === "admin" && (<button
-                        onClick={() => {
-                          setshowDeletePage(true);
-                          setDeleteId(party._id);
-                        }}
-                        className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                        style={{
-                          color: colors.error[600],
-                          backgroundColor: colors.error[50],
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.error[100];
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.error[50];
-                        }}
-                        title="Delete party"
-                      >
-                        <MdDeleteOutline size={16} />
-                      </button>)}
+                      {cookies?.role === "admin" && (
+                        <button
+                          onClick={() => {
+                            setshowDeletePage(true);
+                            setDeleteId(party._id);
+                          }}
+                          className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                          style={{
+                            color: colors.error[600],
+                            backgroundColor: colors.error[50],
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              colors.error[100];
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              colors.error[50];
+                          }}
+                          title="Delete party"
+                        >
+                          <MdDeleteOutline size={16} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -839,8 +841,9 @@ const PartiesTable = ({
                 >
                   {isBulkDeleting
                     ? "Deleting..."
-                    : `Delete ${selectedParties.length} ${selectedParties.length === 1 ? "Party" : "Parties"
-                    }`}
+                    : `Delete ${selectedParties.length} ${
+                        selectedParties.length === 1 ? "Party" : "Parties"
+                      }`}
                 </button>
               </div>
             </div>

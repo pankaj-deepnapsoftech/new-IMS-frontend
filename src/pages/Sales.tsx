@@ -281,7 +281,7 @@ const fetchPurchases = async (currentPage = page) => {
                   setShow(!show);
                   setEditTable(null);
                 }}
-                className="flex items-center gap-2 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+                className="flex items-center gap-2 px-4 py-3 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
                 style={{
                   backgroundColor: colors.primary[600],
                   focusRingColor: colors.primary[500],
@@ -442,7 +442,7 @@ const fetchPurchases = async (currentPage = page) => {
       </div>
 
       {/* Drawers */}
-      <AddNewSale
+      <AddNewSale 
         editTable={editTable}
         show={show}
         setShow={setShow}
