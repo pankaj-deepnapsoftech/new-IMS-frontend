@@ -294,7 +294,7 @@ const Process: React.FC = () => {
             borderColor: colors.border.light,
           }}
         >
-          <ProcessTable
+          <ProcessTable 
             isLoadingProcess={isLoading}
             proces={filteredData}
             deleteProcessHandler={deleteProcessHandler}

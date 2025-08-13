@@ -10,7 +10,7 @@ import {
 } from "react-table";
 import { toast } from "react-toastify";
 import Loading from "../../ui/Loading";
-import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
+import { MdDeleteOutline, MdEdit, MdInfoOutline, MdOutlineVisibility } from "react-icons/md";
 import moment from "moment";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
@@ -77,6 +77,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
 
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
+  const [selectedProcess, setSelectedProcess] = useState(null);
 
   // Bulk selection states
   const [selectedProcesses, setSelectedProcesses] = useState([]);
@@ -118,7 +119,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
           }
         }
       )
-      console.log(cookies?.access_token);
+ 
     } catch (error) {
       console.error("Error requesting for allocated inventory:", error);
       toast.error("Failed to request for allocated inventory. Please try again.");
@@ -200,6 +201,9 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
     } else {
       setSelectedProcesses([]);
     }     
+  };
+  const openProcessFullDetails = (process) => {
+    setSelectedProcess(process);
   };
 
   const handleSelectProcess = (processId, checked) => {
@@ -666,6 +670,24 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                                 <MdOutlineVisibility size={16} />
                               </button>
                             )}
+                            <button
+                              onClick={() =>  (row.original)}
+                              className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                              style={{  
+                                color: colors.secondary[600],
+                                backgroundColor: colors.secondary[50],
+                              }} 
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = colors.secondary[100];
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = colors.secondary[50];
+                              }}
+                              title="View all details"
+                            >
+                              <MdInfoOutline size={16} />
+                            </button>
+                                  
                             {openUpdateProcessDrawerHandler && (
                               <button
                                 onClick={() =>
@@ -700,7 +722,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                               }}>
                               Pause
                               </button>
-
+                            
                             {deleteProcessHandler && (
                               <button
                                 onClick={() => {
@@ -1060,6 +1082,39 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
           </div>
         </div>
       )}
+
+      {selectedProcess && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div
+            className="bg-white p-6 rounded-lg max-w-2xl w-full shadow-lg"
+            style={{ backgroundColor: colors.background.card }}
+          >
+            <h2 className="text-lg font-bold mb-4" style={{ color: colors.text.primary }}>
+              Process Details - {selectedProcess.item?.name || "N/A"}
+            </h2>
+
+            <div className="space-y-3 text-sm" style={{ color: colors.text.secondary }}>
+              <p><strong>Finished Goods:</strong> {selectedProcess.fg_store?.name || "N/A"}</p>
+              <p><strong>Raw Material:</strong> {selectedProcess.rm_store?.name || "N/A"}</p>
+              <p><strong>Scrap:</strong> {selectedProcess.scrap_store?.name || "N/A"}</p>
+              <p><strong>Status:</strong> {selectedProcess.status}</p>
+              <p><strong>Work Done:</strong> {selectedProcess.workDonePercentage || "0"}%</p>
+              <p><strong>Created On:</strong> {moment(selectedProcess.createdAt).format("DD/MM/YYYY")}</p>
+              <p><strong>Last Updated:</strong> {moment(selectedProcess.updatedAt).format("DD/MM/YYYY")}</p>
+            </div>
+
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => setSelectedProcess(null)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

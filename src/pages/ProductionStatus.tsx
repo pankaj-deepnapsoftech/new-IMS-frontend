@@ -50,10 +50,8 @@ const ProductionStatus: React.FC = () => {
     // Filter for processes with status "production started"
     const filteredProcesses = data.production_processes.filter(
       (process: any) =>
-        ["production started", "production inprogress"].includes(process.status.toLowerCase())
+        ["production started", "production in progress"].includes(process.status.toLowerCase())
     );
-
-
 
     console.log("filtered production started processes", filteredProcesses);
     setData(filteredProcesses);
