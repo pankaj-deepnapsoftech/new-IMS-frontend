@@ -406,12 +406,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       Latest Price
                     </th>
 
-                    <th
+                    {/* <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
                       Current Stock
-                    </th>
+                    </th> */}
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -599,12 +599,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           )}
                         </td>
 
-                        <td
+                        {/* <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
                           {row.original.current_stock || "0"}
-                        </td>
+                        </td> */}
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.primary[600] }}

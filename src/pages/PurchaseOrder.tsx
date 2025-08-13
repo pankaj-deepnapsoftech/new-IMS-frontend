@@ -960,8 +960,8 @@ const PurchaseOrder: React.FC = () => {
                  <div className="space-y-4">
                    {/* Price Impact Summary */}
                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <h3 className="text-lg font-semibold text-blue-900 mb-2">Price Impact Summary</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <h3 className="text-lg font-semibold text-blue-900 mb-2">Price & Stock Impact Summary</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                         <div>
                           <span className="text-blue-700 font-medium">Total Items:</span>
                           <span className="ml-2 text-blue-900">{inventoryShortages.length}</span>
@@ -970,6 +970,12 @@ const PurchaseOrder: React.FC = () => {
                           <span className="text-blue-700 font-medium">Price Changes:</span>
                           <span className="ml-2 text-blue-900">
                             {inventoryShortages.filter(item => item.updated_price && item.updated_price !== item.current_price).length}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-blue-700 font-medium">Stock Changes:</span>
+                          <span className="ml-2 text-blue-900">
+                            {inventoryShortages.filter(item => item.updated_stock && item.updated_stock > 0).length}
                           </span>
                         </div>
                         <div>
@@ -988,8 +994,8 @@ const PurchaseOrder: React.FC = () => {
                         </div>
                       </div>
                       <p className="text-blue-700 text-xs mt-3">
-                        💡 <strong>Tip:</strong> Update prices in "Updated Price" and stocks in "Updated Stock" columns. Click "Save Changes" to store updates and automatically remove items from shortages. 
-                        Current prices and stocks remain unchanged. Total Available = Current Stock + Updated Stock.
+                        💡 <strong>Tip:</strong> "Total Available Stock" shows Current Stock + Updated Stock. Update prices in "Updated Price" and additional stocks in "Updated Stock" columns. Click "Save Changes" to store updates and automatically remove items from shortages. 
+                        Current prices and stocks remain unchanged.
                         Use "Remove from Shortages" for manual removal if needed.
                       </p>
                     </div>
@@ -1000,9 +1006,8 @@ const PurchaseOrder: React.FC = () => {
                        <tr>
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BOM Name</th>
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
-                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Available Stock</th>
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated Stock</th>
-                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Available</th>
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shortage Quantity</th>
                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated Price</th>
@@ -1017,7 +1022,7 @@ const PurchaseOrder: React.FC = () => {
                          <tr key={idx} className="hover:bg-gray-50">
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.bom_name || "-"}</td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.item_name || "-"}</td>
-                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.current_stock}</td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.current_stock + (item.updated_stock || 0)}</td>
                            <td className="px-6 py-4 whitespace-nowrap">
                               <input
                                 type="number"
@@ -1028,10 +1033,10 @@ const PurchaseOrder: React.FC = () => {
                                 min="0"
                                 step="1"
                               />
+                              {item.updated_stock && item.updated_stock > 0 && (
+                                <div className="text-xs text-green-600 mt-1">+{item.updated_stock}</div>
+                              )}
                             </td>
-                           <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
-                             {item.current_stock + (item.updated_stock || 0)}
-                           </td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">{item.shortage_quantity}</td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{item.current_price}</td>
                                                        <td className="px-6 py-4 whitespace-nowrap">
