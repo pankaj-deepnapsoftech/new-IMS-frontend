@@ -226,7 +226,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
     try {
       setIsUpdating(true);
       const response = await updateProcess(data).unwrap();
-      console.log(response)
+    console.log(response);
       if (!response.success) {
         throw new Error(response.message);
       }

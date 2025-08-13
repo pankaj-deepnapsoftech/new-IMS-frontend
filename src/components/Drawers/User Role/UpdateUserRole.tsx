@@ -177,120 +177,121 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
   };
 
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
+    // <Drawer closeDrawerHandler={closeDrawerHandler}>
+
+    // </Drawer>
+    <div
+      className="absolute overflow-auto h-[100vh] w-[99vw] md:w-[350px] bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
+      style={{
+        boxShadow:
+          "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+      }}
+    >
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[350px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
+        className="flex items-center justify-between p-6 border-b"
+        style={{ borderColor: colors.border.light }}
       >
-        <div
-          className="flex items-center justify-between p-6 border-b"
-          style={{ borderColor: colors.border.light }}
+        <h1
+          className="text-xl font-semibold"
+          style={{ color: colors.text.primary }}
         >
-          <h1
-            className="text-xl font-semibold"
-            style={{ color: colors.text.primary }}
-          >
-            Update Role
-          </h1>
-          <button
-            onClick={closeDrawerHandler}
-            className="p-2 rounded-lg transition-colors duration-200"
-            style={{
-              color: colors.text.secondary,
-              backgroundColor: colors.gray[100],
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[200];
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[100];
-            }}
-          >
-            <BiX size={20} />
-          </button>
-        </div>
-
-        <div className="mt-8 px-5">
-          {isLoadingRole && <Loading />}
-          {!isLoadingRole && (
-            <form onSubmit={updateRoleHandler}>
-              <FormControl className="mt-3 mb-5 " isRequired>
-                <FormLabel fontWeight="500" color="gray.700">
-                  Role
-                </FormLabel>
-                <Input
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  type="text"
-                  placeholder="Role"
-                  bg="white"
-                  borderColor="gray.300"
-                  _focus={{
-                    borderColor: "blue.500",
-                    boxShadow: "0 0 0 1px #3182ce",
-                  }}
-                  _placeholder={{ color: "gray.500" }}
-                />
-              </FormControl>
-
-              <FormControl className="mt-3 mb-5">
-                <FormLabel fontWeight="500" color="gray.700">
-                  Description
-                </FormLabel>
-                <Input
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  type="text"
-                  placeholder="Description"
-                  bg="white"
-                  borderColor="gray.300"
-                  _focus={{
-                    borderColor: "blue.500",
-                    boxShadow: "0 0 0 1px #3182ce",
-                  }}
-                  _placeholder={{ color: "gray.500" }}
-                />
-              </FormControl>
-
-              <FormControl>
-                <FormLabel fontWeight="500" color="gray.700">
-                  Permissions
-                </FormLabel>
-                <Select
-                  required
-                  className="rounded mt-2"
-                  options={permissionOptions}
-                  placeholder="Select"
-                  value={permissions}
-                  name="item_name"
-                  onChange={(d: any) => {
-                    setPermissions(d);
-                  }}
-                  isMulti
-                  styles={customStyles}
-                />
-              </FormControl>
-
-              <div>
-                <Button
-                  isLoading={isUpdatingRole}
-                  type="submit"
-                  className="mt-5"
-                  colorScheme="blue"
-                  size="md"
-                  width="full"
-                >
-                  Submit
-                </Button>
-              </div>
-            </form>
-          )}
-        </div>
+          Update Role
+        </h1>
+        <button
+          onClick={closeDrawerHandler}
+          className="p-2 rounded-lg transition-colors duration-200"
+          style={{
+            color: colors.text.secondary,
+            backgroundColor: colors.gray[100],
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[200];
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[100];
+          }}
+        >
+          <BiX size={20} />
+        </button>
       </div>
-    </Drawer>
+
+      <div className="mt-8 px-5">
+        {isLoadingRole && <Loading />}
+        {!isLoadingRole && (
+          <form onSubmit={updateRoleHandler}>
+            <FormControl className="mt-3 mb-5 " isRequired>
+              <FormLabel fontWeight="500" color="gray.700">
+                Role
+              </FormLabel>
+              <Input
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                type="text"
+                placeholder="Role"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
+              />
+            </FormControl>
+
+            <FormControl className="mt-3 mb-5">
+              <FormLabel fontWeight="500" color="gray.700">
+                Description
+              </FormLabel>
+              <Input
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                type="text"
+                placeholder="Description"
+                bg="white"
+                borderColor="gray.300"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px #3182ce",
+                }}
+                _placeholder={{ color: "gray.500" }}
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel fontWeight="500" color="gray.700">
+                Permissions
+              </FormLabel>
+              <Select
+                required
+                className="rounded mt-2"
+                options={permissionOptions}
+                placeholder="Select"
+                value={permissions}
+                name="item_name"
+                onChange={(d: any) => {
+                  setPermissions(d);
+                }}
+                isMulti
+                styles={customStyles}
+              />
+            </FormControl>
+
+            <div>
+              <Button
+                isLoading={isUpdatingRole}
+                type="submit"
+                className="mt-5"
+                colorScheme="blue"
+                size="md"
+                width="full"
+              >
+                Submit
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
   );
 };
 

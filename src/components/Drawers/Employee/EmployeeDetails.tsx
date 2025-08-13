@@ -60,108 +60,104 @@ const EmployeeDetails: React.FC<EmployeeDetailsProps> = ({
   }, []);
 
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
+    <div
+      className="absolute overflow-auto h-[100vh] w-[99vw] md:w-[350px] bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
+      style={{
+        boxShadow:
+          "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+      }}
+    >
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[350px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
+        className="flex items-center justify-between p-6 border-b"
+        style={{ borderColor: colors.border.light }}
       >
-        <div
-          className="flex items-center justify-between p-6 border-b"
-          style={{ borderColor: colors.border.light }}
+        <h1
+          className="text-xl font-semibold"
+          style={{ color: colors.text.primary }}
         >
-          <h1
-            className="text-xl font-semibold"
-            style={{ color: colors.text.primary }}
-          >
-            Employee Details
-          </h1>
-          <button
-            onClick={closeDrawerHandler}
-            className="p-2 rounded-lg transition-colors duration-200"
-            style={{
-              color: colors.text.secondary,
-              backgroundColor: colors.gray[100],
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[200];
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[100];
-            }}
-          >
-            <BiX size={20} />
-          </button>
-        </div>
+          Employee Details
+        </h1>
+        <button
+          onClick={closeDrawerHandler}
+          className="p-2 rounded-lg transition-colors duration-200"
+          style={{
+            color: colors.text.secondary,
+            backgroundColor: colors.gray[100],
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[200];
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[100];
+          }}
+        >
+          <BiX size={20} />
+        </button>
+      </div>
 
-        <div className="mt-8 px-5">
-          {isLoadingEmployee && <Loading />}
-          {!isLoadingEmployee && (
-            <div>
-              <div className="mt-3 mb-5">
-                <p className="font-bold text-gray-700 mb-2">First Name</p>
-                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
-                  {firstname}
-                </p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-bold text-gray-700 mb-2">Last Name</p>
-                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
-                  {lastname}
-                </p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-bold text-gray-700 mb-2">Email</p>
-                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
-                  {email}
-                </p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-bold text-gray-700 mb-2">Phone</p>
-                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
-                  {phone}
-                </p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-bold text-gray-700 mb-2">Is Verified</p>
-                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
-                  {isVerified ? "Verified" : "Not Verified"}
-                </p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-bold text-gray-700 mb-2">Role</p>
-                <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
-                  {(isSuper && "Super Admin") || role?.role || "N/A"}
-                </p>
-              </div>
-              <div className="mt-3 mb-5">
-                <p className="font-bold text-gray-700 mb-2">Permissions</p>
-                <div className="bg-gray-50 p-3 rounded-md border">
-                  {!role?.permissions && <p className="text-gray-600">N/A</p>}
-                  {role?.permissions && (
-                    <ul className="space-y-2">
-                      {role.permissions.map(
-                        (permission: any, index: number) => (
-                          <li
-                            key={index}
-                            className="flex items-center text-gray-600"
-                          >
-                            <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
-                            {permission}
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  )}
-                </div>
+      <div className="mt-8 px-5">
+        {isLoadingEmployee && <Loading />}
+        {!isLoadingEmployee && (
+          <div>
+            <div className="mt-3 mb-5">
+              <p className="font-bold text-gray-700 mb-2">First Name</p>
+              <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                {firstname}
+              </p>
+            </div>
+            <div className="mt-3 mb-5">
+              <p className="font-bold text-gray-700 mb-2">Last Name</p>
+              <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                {lastname}
+              </p>
+            </div>
+            <div className="mt-3 mb-5">
+              <p className="font-bold text-gray-700 mb-2">Email</p>
+              <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                {email}
+              </p>
+            </div>
+            <div className="mt-3 mb-5">
+              <p className="font-bold text-gray-700 mb-2">Phone</p>
+              <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                {phone}
+              </p>
+            </div>
+            <div className="mt-3 mb-5">
+              <p className="font-bold text-gray-700 mb-2">Is Verified</p>
+              <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                {isVerified ? "Verified" : "Not Verified"}
+              </p>
+            </div>
+            <div className="mt-3 mb-5">
+              <p className="font-bold text-gray-700 mb-2">Role</p>
+              <p className="text-gray-600 bg-gray-50 p-3 rounded-md border">
+                {(isSuper && "Super Admin") || role?.role || "N/A"}
+              </p>
+            </div>
+            <div className="mt-3 mb-5">
+              <p className="font-bold text-gray-700 mb-2">Permissions</p>
+              <div className="bg-gray-50 p-3 rounded-md border">
+                {!role?.permissions && <p className="text-gray-600">N/A</p>}
+                {role?.permissions && (
+                  <ul className="space-y-2">
+                    {role.permissions.map((permission: any, index: number) => (
+                      <li
+                        key={index}
+                        className="flex items-center text-gray-600"
+                      >
+                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                        {permission}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-    </Drawer>
+    </div>
   );
 };
 

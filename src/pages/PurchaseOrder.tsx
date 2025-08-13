@@ -781,7 +781,7 @@ const PurchaseOrder: React.FC = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Purchase Order & Inventory Management
+                Purchase Order
               </h1>
               <p className="text-gray-600 mt-1">Manage purchase orders and inventory</p>
             </div>
@@ -807,7 +807,7 @@ const PurchaseOrder: React.FC = () => {
                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                   />
                 </svg>
-                Add New Purchase
+                Add Purchase
               </button>
             )}
             

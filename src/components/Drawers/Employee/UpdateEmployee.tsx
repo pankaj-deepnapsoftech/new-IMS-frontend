@@ -124,142 +124,140 @@ const UpdateEmployee: React.FC<UpdateEmployeeProps> = ({
   }, []);
 
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
+    // <Drawer closeDrawerHandler={closeDrawerHandler}>
+
+    // </Drawer>
+
+    <div
+      className="absolute overflow-auto h-screen w-[99vw] md:w-[450px] bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
+      style={{
+        boxShadow:
+          "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+      }}
+    >
       <div
-        className="absolute overflow-auto h-screen w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
+        className="flex items-center justify-between p-6 border-b"
+        style={{ borderColor: colors.border.light }}
       >
-        <div
-          className="flex items-center justify-between p-6 border-b"
-          style={{ borderColor: colors.border.light }}
+        <h1
+          className="text-xl font-semibold"
+          style={{ color: colors.text.primary }}
         >
-          <h1
-            className="text-xl font-semibold"
-            style={{ color: colors.text.primary }}
-          >
-            Update Employee
-          </h1>
-          <button
-            onClick={closeDrawerHandler}
-            className="p-2 rounded-lg transition-colors duration-200"
-            style={{
-              color: colors.text.secondary,
-              backgroundColor: colors.gray[100],
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[200];
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[100];
-            }}
-          >
-            <BiX size={20} />
-          </button>
-        </div>
-
-        <div className="mt-8 px-5">
-          {isLoadingEmployee && <Loading />}
-          {!isLoadingEmployee && (
-            <form onSubmit={updateEmployeeHandler}>
-              <div className="space-y-4">
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">
-                    First Name
-                  </h3>
-                  <p className="text-gray-600">{firstname}</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">
-                    Last Name
-                  </h3>
-                  <p className="text-gray-600">{lastname}</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Email</h3>
-                  <p className="text-gray-600">{email}</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">Phone</h3>
-                  <p className="text-gray-600">{phone}</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-semibold text-gray-700 mb-2">
-                    Is Verified
-                  </h3>
-                  <p className="text-gray-600">
-                    {isVerified ? "Verified" : "Not Verified"}
-                  </p>
-                </div>
-
-                <FormControl className="mt-3 mb-5" isRequired>
-                  <FormLabel fontWeight="bold" color="gray.700">
-                    Role
-                  </FormLabel>
-                  <Select
-                    required
-                    value={role}
-                    options={roleOptions}
-                    onChange={(e: any) => setRole(e)}
-                    styles={{
-                      control: (provided: any) => ({
-                        ...provided,
-                        backgroundColor: "white",
-                        borderColor: "#d1d5db",
-                        color: "#374151",
-                        minHeight: "40px",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
-                        },
-                      }),
-                      option: (provided: any, state: any) => ({
-                        ...provided,
-                        backgroundColor: state.isFocused ? "#e5e7eb" : "white",
-                        color: "#374151",
-                        "&:hover": {
-                          backgroundColor: "#f3f4f6",
-                        },
-                      }),
-                      placeholder: (provided: any) => ({
-                        ...provided,
-                        color: "#9ca3af",
-                      }),
-                      singleValue: (provided: any) => ({
-                        ...provided,
-                        color: "#374151",
-                      }),
-                      menu: (provided: any) => ({
-                        ...provided,
-                        zIndex: 9999,
-                        backgroundColor: "white",
-                        border: "1px solid #d1d5db",
-                      }),
-                    }}
-                  />
-                </FormControl>
-
-                <Button
-                  isLoading={isUpdatingEmployee}
-                  type="submit"
-                  className="mt-1 w-full"
-                  colorScheme="blue"
-                  size="lg"
-                  _hover={{ bg: "blue.600" }}
-                >
-                  Update Employee
-                </Button>
-              </div>
-            </form>
-          )}
-        </div>
+          Update Employee
+        </h1>
+        <button
+          onClick={closeDrawerHandler}
+          className="p-2 rounded-lg transition-colors duration-200"
+          style={{
+            color: colors.text.secondary,
+            backgroundColor: colors.gray[100],
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[200];
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[100];
+          }}
+        >
+          <BiX size={20} />
+        </button>
       </div>
-    </Drawer>
+
+      <div className="mt-8 px-5">
+        {isLoadingEmployee && <Loading />}
+        {!isLoadingEmployee && (
+          <form onSubmit={updateEmployeeHandler}>
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">First Name</h3>
+                <p className="text-gray-600">{firstname}</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">Last Name</h3>
+                <p className="text-gray-600">{lastname}</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">Email</h3>
+                <p className="text-gray-600">{email}</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">Phone</h3>
+                <p className="text-gray-600">{phone}</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">
+                  Is Verified
+                </h3>
+                <p className="text-gray-600">
+                  {isVerified ? "Verified" : "Not Verified"}
+                </p>
+              </div>
+
+              <FormControl className="mt-3 mb-5" isRequired>
+                <FormLabel fontWeight="bold" color="gray.700">
+                  Role
+                </FormLabel>
+                <Select
+                  required
+                  value={role}
+                  options={roleOptions}
+                  onChange={(e: any) => setRole(e)}
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      backgroundColor: "white",
+                      borderColor: "#d1d5db",
+                      color: "#374151",
+                      minHeight: "40px",
+                      "&:hover": {
+                        borderColor: "#9ca3af",
+                      },
+                    }),
+                    option: (provided: any, state: any) => ({
+                      ...provided,
+                      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
+                      color: "#374151",
+                      "&:hover": {
+                        backgroundColor: "#f3f4f6",
+                      },
+                    }),
+                    placeholder: (provided: any) => ({
+                      ...provided,
+                      color: "#9ca3af",
+                    }),
+                    singleValue: (provided: any) => ({
+                      ...provided,
+                      color: "#374151",
+                    }),
+                    menu: (provided: any) => ({
+                      ...provided,
+                      zIndex: 9999,
+                      backgroundColor: "white",
+                      border: "1px solid #d1d5db",
+                    }),
+                  }}
+                />
+              </FormControl>
+
+              <Button
+                isLoading={isUpdatingEmployee}
+                type="submit"
+                className="mt-1 w-full"
+                colorScheme="blue"
+                size="lg"
+                _hover={{ bg: "blue.600" }}
+              >
+                Update Employee
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
   );
 };
 
