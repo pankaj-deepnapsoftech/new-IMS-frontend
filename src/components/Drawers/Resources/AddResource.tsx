@@ -31,11 +31,6 @@ interface AddResourceProps {
   editResource?: Resource | null;
 }
 
- 
-
-
-
-
 const customStyles = {
   control: (provided: any) => ({
     ...provided,
@@ -78,13 +73,35 @@ const AddResource = ({
   const [localEditResource] = useState(editResource);
   const [typeOptions, setTypeOptions] = useState([
     { value: "machine", label: "Machine" },
-    { value: "assemble_line", label: "Assemble Line" },
+    { value: "assembly_line", label: "Assembly Line" },
   ]);
 
   const [selectedType, setSelectedType] = useState(null);
   const [showNewTypeInput, setShowNewTypeInput] = useState(false);
   const [newType, setNewType] = useState("");
 
+  const handleAddNewType = () => {
+    const trimmedType = newType.trim().toLowerCase();
+
+    if (!trimmedType) {
+      toast.warning("Type cannot be empty.");
+      return;
+    }
+
+    const exists = typeOptions.some((opt) => opt.value === trimmedType);
+    if (exists) {
+      toast.warning("This type already exists.");
+      return;
+    }
+
+    const newOption = { value: trimmedType, label: trimmedType };
+    setTypeOptions((prev) => [...prev, newOption]);
+    setSelectedType(newOption);
+    formik.setFieldValue("type", trimmedType);
+    setNewType("");
+    setShowNewTypeInput(false);
+    toast.success(`Type "${trimmedType}" added.`);
+  };
 
   const formik = useFormik({
     initialValues: localEditResource || {
@@ -116,7 +133,6 @@ const AddResource = ({
           toast.success("Resource updated successfully");
 
           fetchResourcesHandler();
-          
         } else {
           res = await axios.post(
             `${process.env.REACT_APP_BACKEND_URL}resources/`,
@@ -154,7 +170,10 @@ const AddResource = ({
       if (match) {
         setSelectedType(match);
       } else {
-        const newOption = { value: editResource.type, label: editResource.type };
+        const newOption = {
+          value: editResource.type,
+          label: editResource.type,
+        };
         setTypeOptions((prev) => [...prev, newOption]);
         setSelectedType(newOption);
       }
@@ -162,152 +181,179 @@ const AddResource = ({
   }, [editResource]);
 
   return (
-    <Drawer closeDrawerHandler={closeDrawerHandler}>
+    // <Drawer closeDrawerHandler={closeDrawerHandler}>
+
+    // </Drawer>
+    <div
+      className="absolute overflow-auto h-[100vh] w-[99vw] md:w-[450px] bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
+      style={{
+        boxShadow:
+          "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
+      }}
+    >
       <div
-        className="absolute overflow-auto h-[100vh] w-[90vw] md:w-[450px] bg-white right-0 top-0 z-10 py-3 border-l border-gray-200"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.08) 0px 6px 16px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px -4px, rgba(0, 0, 0, 0.05) 0px 9px 28px 8px",
-        }}
+        className="flex items-center justify-between p-6 border-b"
+        style={{ borderColor: colors.border.light }}
       >
-        <div
-          className="flex items-center justify-between p-6 border-b"
-          style={{ borderColor: colors.border.light }}
+        <h1
+          className="text-xl font-semibold"
+          style={{ color: colors.text.primary }}
         >
-          <h1
-            className="text-xl font-semibold"
-            style={{ color: colors.text.primary }}
-          >
-            {editResource ? "Edit Resource" : "Add New Resource"}
-          </h1>
-          <button
-            onClick={closeDrawerHandler}
-            className="p-2 rounded-lg transition-colors duration-200"
-            style={{
-              color: colors.text.secondary,
-              backgroundColor: colors.gray[100],
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[200];
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.gray[100];
-            }}
-          >
-            <BiX size={20} />
-          </button>
-        </div>
-
-        <div className="mt-8 px-5">
-          <form onSubmit={formik.handleSubmit}>
-            {/* Machine Type */}
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Resource Type
-              </FormLabel>
-              <Select
-                className="rounded mt-2 border"
-                placeholder="Select Resource Type"
-                name="type"
-                value={selectedType}
-                options={[
-                  ...typeOptions,
-                  { value: "add_new_type", label: "+ Add New Type" },
-                ]}
-                styles={customStyles}
-                onChange={(selected: any) => {
-                  if (selected?.value === "add_new_type") {
-                    const newType = prompt("Enter new type (e.g. Packaging):")?.trim().toLowerCase();
-                    if (!newType) {
-                      toast.warning("Type cannot be empty.");
-                      return;
-                    }
-
-                    const exists = typeOptions.some((opt) => opt.value === newType);
-                    if (exists) {
-                      toast.warning("This type already exists.");
-                      return;
-                    }
-
-                    const confirmed = window.confirm(`Are you sure you want to add "${newType}"?`);
-                    if (!confirmed) return;
-
-                    const newOption = { value: newType, label: newType };
-                    const updatedOptions = [...typeOptions, newOption];
-
-                    setTypeOptions(updatedOptions);
-                    setSelectedType(newOption);
-                    formik.setFieldValue("type", newType);
-
-                    toast.success(`Type "${newType}" added.`);
-                  } else {
-                    setSelectedType(selected);
-                    formik.setFieldValue("type", selected?.value || "");
-                  }
-                }}
-                onBlur={formik.handleBlur}
-              />
-            </FormControl>
-
-              
-            {/* Name */}
-            <FormControl className="mt-3 mb-5" isRequired>
-              <FormLabel fontWeight="bold" color="gray.700">
-                Name
-              </FormLabel>
-              <Input
-                name="name"
-                value={formik.values.name}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                type="text"
-                placeholder="Name"
-                bg="white"
-                borderColor="gray.300"
-                _focus={{
-                  borderColor: "blue.500",
-                  boxShadow: "0 0 0 1px #3182ce",
-                }}
-                _placeholder={{ color: "gray.500" }}
-              />
-            </FormControl>
-
-            {/* Specification */}
-            <FormControl className="mt-3 mb-5">
-              <FormLabel fontWeight="bold" color="gray.700">
-                Specification
-              </FormLabel>
-              <Textarea
-                name="specification"
-                value={formik.values.specification}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Specification"
-                bg="white"
-                borderColor="gray.300"
-                _focus={{
-                  borderColor: "blue.500",
-                  boxShadow: "0 0 0 1px #3182ce",
-                }}
-                _placeholder={{ color: "gray.500" }}
-                rows={4}
-              />
-            </FormControl>
-
-            <Button
-              isLoading={isSubmitting}
-              type="submit"
-              className="mt-5"
-              colorScheme="blue"
-              size="md"
-              width="full"
-            >
-              Submit
-            </Button>
-          </form>
-        </div>
+          {editResource ? "Edit Resource" : "Add New Resource"}
+        </h1>
+        <button
+          onClick={closeDrawerHandler}
+          className="p-2 rounded-lg transition-colors duration-200"
+          style={{
+            color: colors.text.secondary,
+            backgroundColor: colors.gray[100],
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[200];
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = colors.gray[100];
+          }}
+        >
+          <BiX size={20} />
+        </button>
       </div>
-    </Drawer>
+
+      <div className="mt-8 px-5">
+        <form onSubmit={formik.handleSubmit}>
+          {/* Machine Type */}
+          <FormControl className="mt-3 mb-5" isRequired>
+            <FormLabel fontWeight="bold" color="gray.700">
+              Resource Type
+            </FormLabel>
+            <Select
+              className="rounded mt-2 border"
+              placeholder="Select Resource Type"
+              name="type"
+              value={selectedType}
+              options={[
+                ...typeOptions,
+                { value: "__add_new__", label: "+ Add New Type" },
+              ]}
+              styles={customStyles}
+              onChange={(selected: any) => {
+                if (selected?.value === "__add_new__") {
+                  setShowNewTypeInput(true);
+                } else {
+                  setSelectedType(selected);
+                  formik.setFieldValue("type", selected?.value || "");
+                }
+              }}
+              onBlur={formik.handleBlur}
+            />
+            {showNewTypeInput && (
+              <div className="mt-3 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                <FormLabel
+                  fontSize="sm"
+                  fontWeight="bold"
+                  color="gray.700"
+                  mb={2}
+                >
+                  Add New Resource Type
+                </FormLabel>
+                <div className="flex gap-2">
+                  <Input
+                    value={newType}
+                    onChange={(e) => setNewType(e.target.value)}
+                    placeholder="Enter new type (e.g. Packaging)"
+                    size="sm"
+                    bg="white"
+                    borderColor="gray.300"
+                    _focus={{
+                      borderColor: "blue.500",
+                      boxShadow: "0 0 0 1px #3182ce",
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        handleAddNewType();
+                      }
+                    }}
+                  />
+                  <Button
+                    size="sm"
+                    colorScheme="blue"
+                    onClick={handleAddNewType}
+                    disabled={!newType.trim()}
+                  >
+                    Add
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setShowNewTypeInput(false);
+                      setNewType("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </FormControl>
+
+          {/* Name */}
+          <FormControl className="mt-3 mb-5" isRequired>
+            <FormLabel fontWeight="bold" color="gray.700">
+              Name
+            </FormLabel>
+            <Input
+              name="name"
+              value={formik.values.name}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              type="text"
+              placeholder="Name"
+              bg="white"
+              borderColor="gray.300"
+              _focus={{
+                borderColor: "blue.500",
+                boxShadow: "0 0 0 1px #3182ce",
+              }}
+              _placeholder={{ color: "gray.500" }}
+            />
+          </FormControl>
+
+          {/* Specification */}
+          <FormControl className="mt-3 mb-5">
+            <FormLabel fontWeight="bold" color="gray.700">
+              Specification
+            </FormLabel>
+            <Textarea
+              name="specification"
+              value={formik.values.specification}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Specification"
+              bg="white"
+              borderColor="gray.300"
+              _focus={{
+                borderColor: "blue.500",
+                boxShadow: "0 0 0 1px #3182ce",
+              }}
+              _placeholder={{ color: "gray.500" }}
+              rows={4}
+            />
+          </FormControl>
+
+          <Button
+            isLoading={isSubmitting}
+            type="submit"
+            className="mt-5"
+            colorScheme="blue"
+            size="md"
+            width="full"
+          >
+            Submit
+          </Button>
+        </form>
+      </div>
+    </div>
   );
 };
 
