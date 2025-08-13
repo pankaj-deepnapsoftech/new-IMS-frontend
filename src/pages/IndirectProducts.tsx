@@ -7,6 +7,7 @@ import SampleCSV from "../assets/csv/product-sample.csv";
 import React, { useEffect, useRef, useState } from "react";
 import {
   useDeleteProductMutation,
+  useBulkDeleteProductsMutation,
   useProductBulkUploadIndirectMutation,
   useProductBulKUploadMutation,
 } from "../redux/api/api";
@@ -62,6 +63,7 @@ const IndirectProducts: React.FC = () => {
   const dispatch = useDispatch();
 
   const [deleteProduct] = useDeleteProductMutation();
+  const [bulkDeleteProducts] = useBulkDeleteProductsMutation();
 
   const openAddProductDrawerHandler = () => {
     dispatch(openAddProductDrawer());
@@ -92,6 +94,16 @@ const IndirectProducts: React.FC = () => {
   const deleteProductHandler = async (id: string) => {
     try {
       const response: any = await deleteProduct({ _id: id }).unwrap();
+      toast.success(response.message);
+      fetchProductsHandler();
+    } catch (err: any) {
+      toast.error(err?.data?.message || err?.message || "Something went wrong");
+    }
+  };
+
+  const bulkDeleteProductsHandler = async (productIds: string[]) => {
+    try {
+      const response: any = await bulkDeleteProducts(productIds).unwrap();
       toast.success(response.message);
       fetchProductsHandler();
     } catch (err: any) {
@@ -236,36 +248,36 @@ const IndirectProducts: React.FC = () => {
   };
 
   const downloadSampleTemplate = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}product/exports/insample`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${cookies?.access_token}`,
-            },
-          }
-        );
-  
-        if (!response.ok) {
-          throw new Error("Download failed");
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}product/exports/insample`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
         }
-  
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "indirect_products_sample_template.xlsx";
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(url);
-  
-        toast.success("Sample template downloaded!");
-      } catch (error: any) {
-        toast.error(error?.message || "Download failed");
+      );
+
+      if (!response.ok) {
+        throw new Error("Download failed");
       }
-    };
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "indirect_products_sample_template.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Sample template downloaded!");
+    } catch (error: any) {
+      toast.error(error?.message || "Download failed");
+    }
+  };
 
   // Custom styles for react-select to match theme
   const customSelectStyles = {
@@ -701,6 +713,7 @@ const IndirectProducts: React.FC = () => {
             openUpdateProductDrawerHandler={openUpdateProductDrawerHandler}
             openProductDetailsDrawerHandler={openProductDetailsDrawerHandler}
             deleteProductHandler={deleteProductHandler}
+            bulkDeleteProductsHandler={bulkDeleteProductsHandler}
           />
         </div>
       </div>

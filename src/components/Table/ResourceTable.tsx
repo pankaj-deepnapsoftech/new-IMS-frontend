@@ -447,9 +447,7 @@ const ResourceTable: React.FC<ResourceTableProps> = ({
                             }}
                           >
                             {console.log("dsfsdf", row.original.type)}
-                            {row.original.type === "Machine"
-                              ? "Machine"
-                              : "Assembly Line"}
+                            {row.original.type}
                           </span>
                         </td>
                         <td
