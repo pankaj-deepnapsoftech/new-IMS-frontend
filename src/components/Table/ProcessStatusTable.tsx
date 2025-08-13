@@ -496,12 +496,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                     >
                       Last Updated
                     </th>
-                  {   <th
-                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{ color: colors.table.headerText }}
-                    >
-                      button
-                    </th>}
+              
 
                     <th
                       className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
@@ -643,37 +638,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                             )
                             : "N/A"}
                         </td>
-                        <td
-                          className="px-4 py-3 text-sm whitespace-nowrap"
-                          style={{ color: colors.text.secondary }}
-                        >
-                          {row.original.status === "Inventory Allocated" && (
-                            <button
-                              onClick={() => RequestForAllocated(row.original._id, "request for allow")}
-                              className="px-3 py-1 text-xs font-medium rounded-lg"
-                              style={{
-                                backgroundColor: colors.warning[100],
-                                color: colors.warning[700],
-                              }}
-                            >
-                              Request Allow
-                            </button>
-                          )}
-
-                          {row.original.status === "inventory in transit" && (
-                            <button
-                              // onClick={() => updateProcessStatus(row.original._id, "production start")}
-                              onClick={() => UpdatedStatus(row.original._id)}
-                              className="px-3 py-1 text-xs font-medium rounded-lg"
-                              style={{
-                                backgroundColor: colors.success[100],
-                                color: colors.success[700],
-                              }}
-                            >
-                              Inventory Received
-                            </button>
-                          )}
-                        </td>
+                       
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center justify-center gap-2">
                             {openProcessDetailsDrawerHandler && (
@@ -723,9 +688,19 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                                 }}
                                 title="Edit process"
                               >
-                                <MdEdit size={16} />
+                                {/* <MdEdit size={16} /> */}
+                                Start
                               </button>
                             )}
+
+                            <button className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                              style={{
+                                color: colors.error[600],
+                                backgroundColor: colors.error[50],
+                              }}>
+                              Pause
+                              </button>
+
                             {deleteProcessHandler && (
                               <button
                                 onClick={() => {
