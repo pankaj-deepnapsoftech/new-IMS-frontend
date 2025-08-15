@@ -69,7 +69,9 @@ const updateProcessStatus = async (id, status) => { //new
 
     toast.success(data.message || "Status updated successfully");
     // Refresh list after status update
-    window.location.reload(); // or re-fetch process data if available
+    if (fetchProcessHandler) {
+      fetchProcessHandler();
+    }
   } catch (err) {
     toast.error(err.message || "Failed to update status");
   }
@@ -114,7 +116,9 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
       if (!data.success) throw new Error(data.message);
 
       toast.success(data.message || "Status updated successfully");
-      window.location.reload();
+      if (fetchProcessHandler) {
+        fetchProcessHandler();
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to update status");
     }
