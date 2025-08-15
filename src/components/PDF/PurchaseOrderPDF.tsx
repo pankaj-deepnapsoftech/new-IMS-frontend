@@ -254,11 +254,26 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
   const itemRate = 100;
   const quantity = 10;
   const baseAmount = itemRate * quantity;
+
+  // Dynamic GST calculation based on GSTApply value
+  const isIGST = purchaseOrder?.GSTApply === "igst";
   const cgstRate = 9; // 9% CGST
   const sgstRate = 9; // 9% SGST
-  const cgst = (baseAmount * cgstRate) / 100;
-  const sgst = (baseAmount * sgstRate) / 100;
-  const grandTotal = baseAmount + cgst + sgst;
+  const igstRate = 18; // 18% IGST
+
+  let cgst = 0;
+  let sgst = 0;
+  let igst = 0;
+  let grandTotal = baseAmount;
+
+  if (isIGST) {
+    igst = (baseAmount * igstRate) / 100;
+    grandTotal = baseAmount + igst;
+  } else {
+    cgst = (baseAmount * cgstRate) / 100;
+    sgst = (baseAmount * sgstRate) / 100;
+    grandTotal = baseAmount + cgst + sgst;
+  }
 
   console.log("Purchase Order Data:", purchaseOrder);
 
@@ -426,25 +441,42 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             <Text style={styles.colAmount}>{baseAmount.toFixed(2)}</Text>
           </View>
 
-          <View style={[styles.tableRow, styles.totalSection]}>
-            <Text style={styles.colSno}></Text>
-            <Text style={styles.colItem}></Text>
-            <Text style={styles.colItemCode}></Text>
-            <Text style={styles.colHsnCode}></Text>
-            <Text style={styles.colQty}></Text>
-            <Text style={styles.colRate}>CGST @ {cgstRate}%</Text>
-            <Text style={styles.colAmount}>{cgst.toFixed(2)}</Text>
-          </View>
+          {/* Tax Section - Conditional GST Display */}
+          {isIGST ? (
+            // Show IGST when GST Apply is "igst"
+            <View style={[styles.tableRow, styles.totalSection]}>
+              <Text style={styles.colSno}></Text>
+              <Text style={styles.colItem}></Text>
+              <Text style={styles.colItemCode}></Text>
+              <Text style={styles.colHsnCode}></Text>
+              <Text style={styles.colQty}></Text>
+              <Text style={styles.colRate}>IGST @ {igstRate}%</Text>
+              <Text style={styles.colAmount}>{igst.toFixed(2)}</Text>
+            </View>
+          ) : (
+            // Show CGST and SGST when GST Apply is "cgst/sgst"
+            <>
+              <View style={[styles.tableRow, styles.totalSection]}>
+                <Text style={styles.colSno}></Text>
+                <Text style={styles.colItem}></Text>
+                <Text style={styles.colItemCode}></Text>
+                <Text style={styles.colHsnCode}></Text>
+                <Text style={styles.colQty}></Text>
+                <Text style={styles.colRate}>CGST @ {cgstRate}%</Text>
+                <Text style={styles.colAmount}>{cgst.toFixed(2)}</Text>
+              </View>
 
-          <View style={[styles.tableRow, styles.totalSection]}>
-            <Text style={styles.colSno}></Text>
-            <Text style={styles.colItem}></Text>
-            <Text style={styles.colItemCode}></Text>
-            <Text style={styles.colHsnCode}></Text>
-            <Text style={styles.colQty}></Text>
-            <Text style={styles.colRate}>SGST @ {sgstRate}%</Text>
-            <Text style={styles.colAmount}>{sgst.toFixed(2)}</Text>
-          </View>
+              <View style={[styles.tableRow, styles.totalSection]}>
+                <Text style={styles.colSno}></Text>
+                <Text style={styles.colItem}></Text>
+                <Text style={styles.colItemCode}></Text>
+                <Text style={styles.colHsnCode}></Text>
+                <Text style={styles.colQty}></Text>
+                <Text style={styles.colRate}>SGST @ {sgstRate}%</Text>
+                <Text style={styles.colAmount}>{sgst.toFixed(2)}</Text>
+              </View>
+            </>
+          )}
 
           <View style={[styles.tableRow, styles.totalSection]}>
             <Text style={styles.colSno}></Text>
@@ -468,7 +500,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
         {/* <View style={styles.termsConditionsSection}>
           <Text style={styles.termsTitle}>TERMS & CONDITIONS</Text>
           <Text style={styles.termsList}>
-            1) GST @ 9% and SGST @ 9%{"\n"}
+            1) {isIGST ? `IGST @ ${igstRate}%` : `CGST @ ${cgstRate}% and SGST @ ${sgstRate}%`}{"\n"}
             2) Packing and Forwarding{"\n"}
             3) Freight{"\n"}
             4) Mode of Payment: {purchaseOrder?.modeOfPayment || "Net Banking"}
@@ -503,7 +535,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             documents.{"\n"}
             5) Weight and measurement to be verified carefully before final.
             {"\n"}
-            6) Please Deposit CGST/SGST and send us documentary evidence to
+            6) Please Deposit {isIGST ? 'IGST' : 'CGST/SGST'} and send us documentary evidence to
             enable us to process your payment.
           </Text>
         </View> */}

@@ -214,7 +214,7 @@ const Invoice: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                  Invoice Management
+                  Tax Invoice Management
                 </h1>
                 <p className="text-gray-600 mt-1">
                   Manage invoices for your business.
