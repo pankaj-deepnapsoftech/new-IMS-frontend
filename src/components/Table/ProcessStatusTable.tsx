@@ -10,7 +10,12 @@ import {
 } from "react-table";
 import { toast } from "react-toastify";
 import Loading from "../../ui/Loading";
-import { MdDeleteOutline, MdEdit, MdInfoOutline, MdOutlineVisibility } from "react-icons/md";
+import {
+  MdDeleteOutline,
+  MdEdit,
+  MdInfoOutline,
+  MdOutlineVisibility,
+} from "react-icons/md";
 import moment from "moment";
 import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
@@ -32,12 +37,10 @@ interface ProcessTableProps {
   openUpdateProcessDrawerHandler?: (id: string) => void;
   openProcessDetailsDrawerHandler?: (id: string) => void;
   deleteProcessHandler?: (id: string) => void;
-
 }
 
-
-
-const updateProcessStatus = async (id, status) => { //new
+const updateProcessStatus = async (id, status) => {
+  //new
   try {
     const res = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}production-process/update-status`,
@@ -65,8 +68,6 @@ const updateProcessStatus = async (id, status) => { //new
   }
 };
 
-
-
 const ProcessStatusTable: React.FC<ProcessTableProps> = ({
   proces,
   isLoadingProcess,
@@ -74,7 +75,6 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
   openProcessDetailsDrawerHandler,
   deleteProcessHandler,
 }) => {
-
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
   const [selectedProcess, setSelectedProcess] = useState(null);
@@ -112,33 +112,37 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
 
   const RequestForAllocated = async (id) => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}production-process/allocation?_id=${id}`,
+      const res = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}production-process/allocation?_id=${id}`,
         {
           headers: {
             Authorization: `Bearer ${cookies?.access_token}`,
-          }
+          },
         }
-      )
-
+      );
     } catch (error) {
       console.error("Error requesting for allocated inventory:", error);
-      toast.error("Failed to request for allocated inventory. Please try again.");
+      toast.error(
+        "Failed to request for allocated inventory. Please try again."
+      );
     }
-  }
+  };
 
   const markOutFinishGoods = async (id) => {
     try {
       const baseURL = process.env.REACT_APP_BACKEND_URL || "";
-      const res = await axios.post(`${baseURL}production-process/out-finish-goods`, { id });
+      const res = await axios.post(
+        `${baseURL}production-process/out-finish-goods`,
+        { id }
+      );
 
-      alert(res.data.message || "Finished goods marked out!");
-// optional table refresh
+      toast.success(res.data.message || "Finished goods marked out!");
+      // optional table refresh
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Error marking finished goods");
+      toast.error(err.response?.data?.message || "Error marking finished goods");
     }
-  }
-
+  };
 
   const columns = useMemo(
     () => [
@@ -167,9 +171,53 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
       backgroundColor: colors.warning[100],
       color: colors.warning[700],
     },
-    "completed": {
+    "production started": {
+      backgroundColor: "#e0f2fe",
+      color: "#0277bd",
+    },
+    "Production Started": {
+      backgroundColor: "#e0f2fe",
+      color: "#0277bd",
+    },
+    "production in progress": {
+      backgroundColor: "#fff3e0", 
+      color: "#f57c00",
+    },
+    "Production in Progress": {
+      backgroundColor: "#fff3e0", 
+      color: "#f57c00",
+    },
+    completed: {
       backgroundColor: colors.success[100],
       color: colors.success[700],
+    },
+    Completed: {
+      backgroundColor: colors.success[100],
+      color: colors.success[700],
+    },
+    "moved to inventory": {
+      backgroundColor: "#f3e5f5", 
+      color: "#7b1fa2", 
+    },
+    "Moved to Inventory": {
+      backgroundColor: "#f3e5f5",
+      color: "#7b1fa2", 
+    },
+    allocated: {
+      backgroundColor: "#e8f5e8", 
+      color: "#2e7d32",
+    },
+    Allocated: {
+      backgroundColor: "#e8f5e8", 
+      color: "#2e7d32", 
+    },
+    received: {
+      backgroundColor: "#e1f5fe", 
+      color: "#0097a7", 
+    },
+    Received: {
+      backgroundColor: "#e1f5fe", 
+      color: "#0097a7",
     },
   };
 
@@ -204,11 +252,6 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
 
   // Bulk selection functions
 
-
-
-
-
-
   const handleSelectAll = (checked) => {
     if (checked) {
       setSelectedProcesses(page.map((row) => row.original._id));
@@ -217,7 +260,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
     }
   };
   const openProcessFullDetails = async (data) => {
-    console.log(data)
+    console.log(data);
     try {
       const res = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}production-process/${data._id}`,
@@ -262,7 +305,8 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
 
       // Success feedback
       toast.success(
-        `Successfully deleted ${selectedProcesses.length} process${selectedProcesses.length > 1 ? "es" : ""
+        `Successfully deleted ${selectedProcesses.length} process${
+          selectedProcesses.length > 1 ? "es" : ""
         }`
       );
 
@@ -277,7 +321,6 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
   };
 
   const moveToInventory = async (processId) => {
-
     try {
       const apiUrl = `${process.env.REACT_APP_BACKEND_URL}production-process/move-to-inventory`;
 
@@ -292,18 +335,15 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
 
       const data = await res.json();
       if (data.success) {
-        alert(data.message);
+        toast.success("Moved to inventory successfully");
+
       } else {
-        alert("Failed to move to inventory");
+        toast.error("Failed to move to inventory");
       }
     } catch (err) {
-      console.error(err);
-      alert("Error moving to inventory");
+      toast.error("Error moving to inventory");
     }
   };
-
-
-
 
   const isAllSelected =
     page.length > 0 && selectedProcesses.length === page.length;
@@ -371,8 +411,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                   className="text-lg font-semibold"
                   style={{ color: colors.text.primary }}
                 >
-                  {proces.length} Process{proces.length !== 1 ? "es" : ""}{" "}
-                  Found
+                  {proces.length} Process{proces.length !== 1 ? "es" : ""} Found
                 </h3>
                 {selectedProcesses.length > 0 && (
                   <p
@@ -635,7 +674,8 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                           }}
                         >
                           {row.original.creator
-                            ? `${row.original.creator.first_name || ""} ${row.original.creator.last_name || ""
+                            ? `${row.original.creator.first_name || ""} ${
+                                row.original.creator.last_name || ""
                               }`.trim() || "N/A"
                             : "N/A"}
                         </td>
@@ -685,8 +725,8 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                         >
                           {row.original.createdAt
                             ? moment(row.original.createdAt).format(
-                              "DD/MM/YYYY"
-                            )
+                                "DD/MM/YYYY"
+                              )
                             : "N/A"}
                         </td>
                         <td
@@ -695,14 +735,16 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                         >
                           {row.original.updatedAt
                             ? moment(row.original.updatedAt).format(
-                              "DD/MM/YYYY"
-                            )
+                                "DD/MM/YYYY"
+                              )
                             : "N/A"}
                         </td>
                         <td className="px-4 py-3 text-left">
                           {row?.original.status === "allocated" && (
                             <button
-                              onClick={() => markOutFinishGoods(row.original?._id)} // function call with ID
+                              onClick={() =>
+                                markOutFinishGoods(row.original?._id)
+                              } // function call with ID
                               className="px-3 py-2 text-xs font-medium rounded-md border transition-all"
                               style={{
                                 backgroundColor: colors.primary[50],
@@ -714,7 +756,6 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                             </button>
                           )}
                         </td>
-
 
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center justify-center gap-2">
@@ -744,24 +785,26 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                               </button>
                             )}
                             <button
-                              onClick={() => openProcessFullDetails(row.original)}
+                              onClick={() =>
+                                openProcessFullDetails(row.original)
+                              }
                               className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
                               style={{
                                 color: colors.secondary[600],
                                 backgroundColor: colors.secondary[50],
                               }}
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = colors.secondary[100];
+                                e.currentTarget.style.backgroundColor =
+                                  colors.secondary[100];
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = colors.secondary[50];
+                                e.currentTarget.style.backgroundColor =
+                                  colors.secondary[50];
                               }}
                               title="View all details"
                             >
                               <MdInfoOutline size={16} />
                             </button>
-
-
 
                             {openUpdateProcessDrawerHandler && (
                               <button
@@ -790,11 +833,13 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                               </button>
                             )}
 
-                            <button className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                            <button
+                              className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
                               style={{
                                 color: colors.error[600],
                                 backgroundColor: colors.error[50],
-                              }}>
+                              }}
+                            >
                               Pause
                             </button>
 
@@ -822,7 +867,6 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                                 <MdDeleteOutline size={16} />
                               </button>
                             )}
-
                           </div>
                         </td>
                       </tr>
@@ -1148,7 +1192,8 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                       Deleting...
                     </>
                   ) : (
-                    `Delete ${selectedProcesses.length} Process${selectedProcesses.length > 1 ? "es" : ""
+                    `Delete ${selectedProcesses.length} Process${
+                      selectedProcesses.length > 1 ? "es" : ""
                     }`
                   )}
                 </button>
@@ -1160,9 +1205,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
 
       {selectedProcess && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div
-            className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-6 overflow-y-auto max-h-[90vh] border border-gray-200"
-          >
+          <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-6 overflow-y-auto max-h-[90vh] border border-gray-200">
             {/* Header */}
             <div className="flex justify-between items-center border-b pb-4 mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
@@ -1178,40 +1221,69 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
 
             {/* General Info */}
             <section className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-xl shadow-sm mb-6 text-gray-800">
-              <p><strong>Created By:</strong> {`${selectedProcess.creator?.first_name} ${selectedProcess.creator?.last_name}`}</p>
+              <p>
+                <strong>Created By:</strong>{" "}
+                {`${selectedProcess.creator?.first_name} ${selectedProcess.creator?.last_name}`}
+              </p>
               <p>
                 <strong>Status:</strong>
                 <span className="ml-2 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                   {selectedProcess.status}
                 </span>
               </p>
-              <p><strong>Finished Goods Store:</strong> {selectedProcess.fg_store?.name}</p>
-              <p><strong>Raw Material Store:</strong> {selectedProcess.rm_store?.name}</p>
-              <p><strong>Scrap Store:</strong> {selectedProcess.scrap_store?.name}</p>
-              <p><strong>Created On:</strong> {moment(selectedProcess.createdAt).format("DD/MM/YYYY")}</p>
-              <p><strong>Last Updated:</strong> {moment(selectedProcess.updatedAt).format("DD/MM/YYYY")}</p>
+              <p>
+                <strong>Finished Goods Store:</strong>{" "}
+                {selectedProcess.fg_store?.name}
+              </p>
+              <p>
+                <strong>Raw Material Store:</strong>{" "}
+                {selectedProcess.rm_store?.name}
+              </p>
+              <p>
+                <strong>Scrap Store:</strong>{" "}
+                {selectedProcess.scrap_store?.name}
+              </p>
+              <p>
+                <strong>Created On:</strong>{" "}
+                {moment(selectedProcess.createdAt).format("DD/MM/YYYY")}
+              </p>
+              <p>
+                <strong>Last Updated:</strong>{" "}
+                {moment(selectedProcess.updatedAt).format("DD/MM/YYYY")}
+              </p>
             </section>
 
             {/* Production Progress */}
             <section className="mb-6">
-              <h3 className="font-semibold mb-3 text-lg text-gray-900">Production Progress</h3>
+              <h3 className="font-semibold mb-3 text-lg text-gray-900">
+                Production Progress
+              </h3>
               <div className="relative w-full bg-gray-200 rounded-full h-4 overflow-hidden">
                 <div
                   className="h-4 rounded-full transition-all duration-500 ease-out"
                   style={{
-                    width: `${((selectedProcess.finished_good?.produced_quantity || 0) / (selectedProcess.finished_good?.estimated_quantity || 1)) * 100}%`,
+                    width: `${
+                      ((selectedProcess.finished_good?.produced_quantity || 0) /
+                        (selectedProcess.finished_good?.estimated_quantity ||
+                          1)) *
+                      100
+                    }%`,
                     background: "linear-gradient(to right, #4ade80, #22c55e)",
                   }}
                 />
               </div>
               <p className="text-xs mt-2 text-gray-600">
-                {selectedProcess.finished_good?.produced_quantity || 0} / {selectedProcess.finished_good?.estimated_quantity || 0} units completed
+                {selectedProcess.finished_good?.produced_quantity || 0} /{" "}
+                {selectedProcess.finished_good?.estimated_quantity || 0} units
+                completed
               </p>
             </section>
 
             {/* Process Steps */}
             <section className="mb-6">
-              <h3 className="font-semibold mb-3 text-lg text-gray-900">Process Steps</h3>
+              <h3 className="font-semibold mb-3 text-lg text-gray-900">
+                Process Steps
+              </h3>
               <ul className="space-y-2">
                 {selectedProcess.processes?.map((step, idx) => (
                   <li
@@ -1220,7 +1292,9 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                   >
                     <div className="flex items-center gap-3">
                       <span
-                        className={`w-3 h-3 rounded-full ${step.done ? 'bg-green-500' : 'bg-gray-400'}`}
+                        className={`w-3 h-3 rounded-full ${
+                          step.done ? "bg-green-500" : "bg-gray-400"
+                        }`}
                       ></span>
                       <span className="text-gray-800">{step.process}</span>
                     </div>
@@ -1233,7 +1307,9 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
             </section>
             {/* Finished Good Table */}
             <section className="mb-6">
-              <h3 className="font-semibold mb-3 text-lg text-gray-900">Finished Good</h3>
+              <h3 className="font-semibold mb-3 text-lg text-gray-900">
+                Finished Good
+              </h3>
               <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
                 <thead>
                   <tr className="bg-blue-600 text-white">
@@ -1246,11 +1322,21 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                 </thead>
                 <tbody>
                   <tr className="bg-white hover:bg-gray-100 transition">
-                    <td className="p-3 text-gray-800">{selectedProcess.finished_good?.item?.name || "N/A"}</td>
-                    <td className="p-3 text-gray-800">{selectedProcess.finished_good?.estimated_quantity || 0}</td>
-                    <td className="p-3 text-gray-800">{selectedProcess.finished_good?.produced_quantity || 0}</td>
-                    <td className="p-3 text-gray-800">₹{selectedProcess.finished_good?.unit_price || 0}</td>
-                    <td className="p-3 text-gray-800">₹{selectedProcess.finished_good?.total_cost || 0}</td>
+                    <td className="p-3 text-gray-800">
+                      {selectedProcess.finished_good?.item?.name || "N/A"}
+                    </td>
+                    <td className="p-3 text-gray-800">
+                      {selectedProcess.finished_good?.estimated_quantity || 0}
+                    </td>
+                    <td className="p-3 text-gray-800">
+                      {selectedProcess.finished_good?.produced_quantity || 0}
+                    </td>
+                    <td className="p-3 text-gray-800">
+                      ₹{selectedProcess.finished_good?.unit_price || 0}
+                    </td>
+                    <td className="p-3 text-gray-800">
+                      ₹{selectedProcess.finished_good?.total_cost || 0}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -1258,7 +1344,9 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
 
             {/* Raw Materials Table */}
             <section className="mb-6">
-              <h3 className="font-semibold mb-3 text-lg text-gray-900">Raw Materials</h3>
+              <h3 className="font-semibold mb-3 text-lg text-gray-900">
+                Raw Materials
+              </h3>
               <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
                 <thead>
                   <tr className="bg-blue-600 text-white">
@@ -1273,13 +1361,25 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                   {selectedProcess?.raw_materials?.map((rm, idx) => (
                     <tr
                       key={idx}
-                      className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100 transition`}
+                      className={`${
+                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-gray-100 transition`}
                     >
-                      <td className="p-3 text-gray-800">{rm.item?.name || "N/A"}</td>
-                      <td className="p-3 text-gray-800">{rm.estimated_quantity || 0}</td>
-                      <td className="p-3 text-gray-800">{rm.used_quantity || 0}</td>
-                      <td className="p-3 text-gray-800">₹{rm.unit_price || 0}</td>
-                      <td className="p-3 text-gray-800">₹{rm.total_part_cost || 0}</td>
+                      <td className="p-3 text-gray-800">
+                        {rm.item?.name || "N/A"}
+                      </td>
+                      <td className="p-3 text-gray-800">
+                        {rm.estimated_quantity || 0}
+                      </td>
+                      <td className="p-3 text-gray-800">
+                        {rm.used_quantity || 0}
+                      </td>
+                      <td className="p-3 text-gray-800">
+                        ₹{rm.unit_price || 0}
+                      </td>
+                      <td className="p-3 text-gray-800">
+                        ₹{rm.total_part_cost || 0}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -1288,7 +1388,9 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
 
             {/* Scrap Materials Table */}
             <section className="mb-6">
-              <h3 className="font-semibold mb-3 text-lg text-gray-900">Scrap Materials</h3>
+              <h3 className="font-semibold mb-3 text-lg text-gray-900">
+                Scrap Materials
+              </h3>
               <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
                 <thead>
                   <tr className="bg-blue-600 text-white">
@@ -1303,19 +1405,32 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                   {selectedProcess?.bom.scrap_materials?.map((sm, idx) => (
                     <tr
                       key={idx}
-                      className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100 transition`}
+                      className={`${
+                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-gray-100 transition`}
                     >
-                      <td className="p-3 text-gray-800">{sm.item?.name || "N/A"}</td>
-                      <td className="p-3 text-gray-800">{selectedProcess?.scrap_materials[0].estimated_quantity || 0}</td>
-                      <td className="p-3 text-gray-800">{selectedProcess?.scrap_materials[0].produced_quantity || 0}</td>
-                      <td className="p-3 text-gray-800">₹{sm.unit_price || 0}</td>
-                      <td className="p-3 text-gray-800">₹{sm.total_part_cost || 0}</td>
+                      <td className="p-3 text-gray-800">
+                        {sm.item?.name || "N/A"}
+                      </td>
+                      <td className="p-3 text-gray-800">
+                        {selectedProcess?.scrap_materials[0]
+                          .estimated_quantity || 0}
+                      </td>
+                      <td className="p-3 text-gray-800">
+                        {selectedProcess?.scrap_materials[0]
+                          .produced_quantity || 0}
+                      </td>
+                      <td className="p-3 text-gray-800">
+                        ₹{sm.unit_price || 0}
+                      </td>
+                      <td className="p-3 text-gray-800">
+                        ₹{sm.total_part_cost || 0}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </section>
-
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-4">
@@ -1335,8 +1450,6 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
           </div>
         </div>
       )}
-
-
     </div>
   );
 };

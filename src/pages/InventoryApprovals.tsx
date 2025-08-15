@@ -29,7 +29,7 @@ const InventoryApprovals: React.FC = () => {
 
   // Tabs
   type Tab = "" | "raw" | "fg"; // "" = nothing shown until user clicks
-  const [activeTab, setActiveTab] = useState<Tab>("");
+  const [activeTab, setActiveTab] = useState<Tab>("raw");
 
   // RAW MATERIALS state
   const [rmData, setRmData] = useState<any[]>([]);
