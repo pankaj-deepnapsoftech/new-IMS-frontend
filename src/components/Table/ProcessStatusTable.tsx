@@ -126,6 +126,30 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
     }
   }
 
+ const handlePauseProcess = async (id) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}production-process/pause`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+          body: JSON.stringify({ _id: id }),
+        }
+      );
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+
+      toast.success(data.message || "Process paused successfully");
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to pause process");
+    }
+  };
+
   const columns = useMemo(
     () => [
       { Header: "Created By", accessor: "creator" },
@@ -716,6 +740,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                             )}
 
                             <button className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                            onClick={() => handlePauseProcess(row.original?._id)}
                               style={{
                                 color: colors.error[600],
                                 backgroundColor: colors.error[50],
