@@ -123,7 +123,7 @@ const InventoryApprovals: React.FC = () => {
           body: JSON.stringify({ processId: id, status: "allocated" }), // fixed
         }
       );
-
+      window.location.reload()
       const data = await response.json();
       if (!data?.success) throw new Error(data?.message || "Approval failed");
 

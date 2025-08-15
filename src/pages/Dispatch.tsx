@@ -424,7 +424,7 @@ console.log(data)
                                   {acc?.product_qty || acc?.Quantity || "N/A"}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center whitespace-nowrap gap-2">
                                 <span className="font-medium" style={{ color: colors.text.primary }}>
                                   Bom Name:
                                 </span>

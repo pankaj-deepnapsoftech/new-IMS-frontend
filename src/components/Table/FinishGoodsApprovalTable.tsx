@@ -9,6 +9,24 @@ const colors = {
   text: { primary: "#111827", secondary: "#6b7280" },
   primary: { 50: "#eff6ff", 200: "#bfdbfe", 700: "#1d4ed8" },
 };
+const getStatusStyle = (status) => {
+  switch ((status || "").toLowerCase()) {
+    case "active":
+      return "bg-green-100 text-green-800";
+    case "inactive":
+      return "bg-gray-200 text-gray-800";
+    case "pending":
+      return "bg-yellow-100 text-yellow-800";
+    case "error":
+    case "failed":
+      return "bg-red-100 text-red-800";
+    case "on hold":
+    case "on_hold":
+      return "bg-orange-100 text-orange-800";
+    default:
+      return "bg-blue-100 text-blue-800"; // fallback
+  }
+};
 
 // API call for Receive by Inventory
 
@@ -34,7 +52,7 @@ const FinishedGoodsTable = ({
           },
         }
       );
-
+      window.location.reload()
       toast.success(res.data.message || "Goods received by inventory!");
     } catch (err) {
       console.error(err);
@@ -121,9 +139,21 @@ const FinishedGoodsTable = ({
                 <td className="p-3" style={{ color: colors.text.primary }}>
                   {row?.finished_good?.produced_quantity || 0}
                 </td>
-                <td className="p-3" style={{ color: colors.text.primary }}>
-                  {row?.status || "—"}
+                <td>
+                  <span
+                    className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${getStatusStyle(
+                      row?.status
+                    )}`}
+                  >
+                    {row?.status
+                      ? row.status
+                        .replace(/[_-]/g, " ")
+                        .toLowerCase()
+                        .replace(/\b\w/g, (char) => char.toUpperCase())
+                      : "—"}
+                  </span>
                 </td>
+
                 <td className="p-3" style={{ color: colors.text.primary }}>
                   {row?.createdAt
                     ? new Date(row.createdAt).toLocaleDateString()
@@ -133,6 +163,7 @@ const FinishedGoodsTable = ({
                   {/* Request for Finish Goods button */}
                   {row?.status !== "out finish goods" && (
                     <button
+                      disabled={row?.status === "allocated"}
                       onClick={() => onApprove(row?._id)}
                       className="px-3 py-2 text-xs font-medium rounded-md border transition-all mr-2 whitespace-nowrap"
                       style={{
@@ -140,11 +171,14 @@ const FinishedGoodsTable = ({
                         borderColor: colors.primary[200],
                         color: colors.primary[700],
                         minWidth: "fit-content",
+                        opacity: row?.status === "allocated" ? 0.5 : 1,  // Adjust opacity when disabled
                       }}
                     >
                       Request for Finish Goods
                     </button>
                   )}
+
+
                   {/* Receive by Inventory button */}
                   {row?.status === "out finish goods" && (
                     <button
