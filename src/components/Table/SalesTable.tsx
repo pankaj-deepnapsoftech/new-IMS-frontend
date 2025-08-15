@@ -19,6 +19,7 @@ import {
 import SalesOrderPDF from "../PDF/SalesOrderPDF";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Textarea } from "@chakra-ui/react";
+import { toast } from "react-toastify";
 
 const SalesTable = ({
   filteredPurchases,
@@ -44,7 +45,7 @@ const SalesTable = ({
     if (designFile) {
       window.open(designFile, "_blank");
     } else {
-      alert("Design file not available.");
+      toast.error("Design file not available.");
     }
   };
 
@@ -52,7 +53,7 @@ const SalesTable = ({
     if (designFile) {
       window.open(designFile, "_blank");
     } else {
-      alert("Design file not available.");
+      toast.error("Design file not available.");
     }
   };
 
