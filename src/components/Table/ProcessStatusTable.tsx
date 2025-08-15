@@ -21,6 +21,7 @@ import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { Button } from "@chakra-ui/react";
 
 interface ProcessTableProps {
   proces: Array<{
@@ -783,7 +784,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                         </td>
                         <td className="px-4 py-3 text-left">
                           {row?.original.status === "allocated" && (
-                            <button
+                            <Button
                               onClick={() =>
                                 markOutFinishGoods(row.original?._id)
                               }
@@ -795,7 +796,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                               }}
                             >
                               Out Finish Goods
-                            </button>
+                            </Button>
                           )}
                         </td>
 
