@@ -620,7 +620,7 @@ const BOMPDF = ({ bom }: any) => {
             <Text style={{ marginTop: 30, fontSize: 10 }}>
               _________________________
             </Text>
-            <Text style={{ marginTop: 5, fontSize: 9 }}>
+            {/* <Text style={{ marginTop: 5, fontSize: 9 }}>
               Engineering Manager
             </Text>
             <Text style={{ marginTop: 10, fontSize: 9 }}>
@@ -628,19 +628,19 @@ const BOMPDF = ({ bom }: any) => {
               {bom?.approval_date
                 ? new Date(bom.approval_date).toLocaleDateString()
                 : "___________"}
-            </Text>
+            </Text> */}
           </View>
           <View style={styles.signatureBox}>
             <Text style={styles.signatureLabel}>Authorized Signature</Text>
             <Text style={{ marginTop: 30, fontSize: 10 }}>
               _________________________
             </Text>
-            <Text style={{ marginTop: 5, fontSize: 9 }}>
+            {/* <Text style={{ marginTop: 5, fontSize: 9 }}>
               Production Manager
             </Text>
             <Text style={{ marginTop: 10, fontSize: 9 }}>
               Date: {new Date().toLocaleDateString()}
-            </Text>
+            </Text> */}
           </View>
         </View>
       </Page>
