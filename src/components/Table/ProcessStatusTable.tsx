@@ -298,7 +298,6 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
     usePagination
   );
 
-
   const handleSelectAll = (checked) => {
     if (checked) {
       setSelectedProcesses(page.map((row) => row.original._id));
@@ -784,19 +783,20 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                         </td>
                         <td className="px-4 py-3 text-left">
                           {row?.original.status === "allocated" && (
-                            <Button
+                            <button
                               onClick={() =>
                                 markOutFinishGoods(row.original?._id)
                               }
-                              className="px-3 py-2 text-xs font-medium rounded-md border transition-all"
+                              className="px-3 py-2 text-xs font-medium rounded-md border transition-all whitespace-nowrap"
                               style={{
                                 backgroundColor: colors.primary[50],
                                 borderColor: colors.primary[200],
                                 color: colors.primary[700],
+                                minWidth: "fit-content",
                               }}
                             >
                               Out Finish Goods
-                            </Button>
+                            </button>
                           )}
                         </td>
 
