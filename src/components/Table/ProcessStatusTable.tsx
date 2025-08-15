@@ -37,10 +37,10 @@ interface ProcessTableProps {
   openUpdateProcessDrawerHandler?: (id: string) => void;
   openProcessDetailsDrawerHandler?: (id: string) => void;
   deleteProcessHandler?: (id: string) => void;
+  fetchProcessHandler?: () => void;
 }
 
 const updateProcessStatus = async (id, status) => {
-  //new
   try {
     const res = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}production-process/update-status`,
@@ -48,7 +48,7 @@ const updateProcessStatus = async (id, status) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies?.access_token}`, // if needed
+          Authorization: `Bearer ${cookies?.access_token}`,
         },
         body: JSON.stringify({ _id: id, status }),
       }
@@ -61,8 +61,7 @@ const updateProcessStatus = async (id, status) => {
     }
 
     toast.success(data.message || "Status updated successfully");
-    // Refresh list after status update
-    window.location.reload(); // or re-fetch process data if available
+    window.location.reload();
   } catch (err) {
     toast.error(err.message || "Failed to update status");
   }
@@ -74,12 +73,12 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
   openUpdateProcessDrawerHandler,
   openProcessDetailsDrawerHandler,
   deleteProcessHandler,
+  fetchProcessHandler,
 }) => {
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
   const [selectedProcess, setSelectedProcess] = useState(null);
 
-  // Bulk selection states
   const [selectedProcesses, setSelectedProcesses] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
@@ -128,7 +127,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
     }
   };
 
- const handlePauseProcess = async (id) => {
+  const handlePauseProcess = async (id) => {
     try {
       const res = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}production-process/pause`,
@@ -160,35 +159,37 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
       );
 
       toast.success(res.data.message || "Finished goods marked out!");
-      // optional table refresh
+      if (fetchProcessHandler) {
+        fetchProcessHandler();
+      }
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data?.message || "Error marking finished goods");
+      toast.error(
+        err.response?.data?.message || "Error marking finished goods"
+      );
     }
-  }
-  
+  };
 
+  const handleMoveToDispatch = async (id) => {
+    try {
+      const baseURL = process.env.REACT_APP_BACKEND_URL || "";
+      const res = await axios.post(
+        `${baseURL}dispatch/send-from-production`,
+        { production_process_id: id },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
 
-const handleMoveToDispatch = async (id) => {
-  try {
-    const baseURL = process.env.REACT_APP_BACKEND_URL || "";
-    const res = await axios.post(
-      `${baseURL}dispatch/send-from-production`,
-      { production_process_id: id },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies?.access_token}`,
-        },
-      }
-    );
-
-    alert(res.data.message || "Finished goods marked out!");
-  } catch (err) {
-    console.error(err);
-    alert(err.response?.data?.message || "Error marking finished goods");
-  }
-};
+      alert(res.data.message || "Finished goods marked out!");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Error marking finished goods");
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -226,11 +227,11 @@ const handleMoveToDispatch = async (id) => {
       color: "#0277bd",
     },
     "production in progress": {
-      backgroundColor: "#fff3e0", 
+      backgroundColor: "#fff3e0",
       color: "#f57c00",
     },
     "Production in Progress": {
-      backgroundColor: "#fff3e0", 
+      backgroundColor: "#fff3e0",
       color: "#f57c00",
     },
     completed: {
@@ -242,27 +243,27 @@ const handleMoveToDispatch = async (id) => {
       color: colors.success[700],
     },
     "moved to inventory": {
-      backgroundColor: "#f3e5f5", 
-      color: "#7b1fa2", 
+      backgroundColor: "#f3e5f5",
+      color: "#7b1fa2",
     },
     "Moved to Inventory": {
       backgroundColor: "#f3e5f5",
-      color: "#7b1fa2", 
+      color: "#7b1fa2",
     },
     allocated: {
-      backgroundColor: "#e8f5e8", 
+      backgroundColor: "#e8f5e8",
       color: "#2e7d32",
     },
     Allocated: {
-      backgroundColor: "#e8f5e8", 
-      color: "#2e7d32", 
+      backgroundColor: "#e8f5e8",
+      color: "#2e7d32",
     },
     received: {
-      backgroundColor: "#e1f5fe", 
-      color: "#0097a7", 
+      backgroundColor: "#e1f5fe",
+      color: "#0097a7",
     },
     Received: {
-      backgroundColor: "#e1f5fe", 
+      backgroundColor: "#e1f5fe",
       color: "#0097a7",
     },
   };
@@ -296,7 +297,6 @@ const handleMoveToDispatch = async (id) => {
     usePagination
   );
 
-  // Bulk selection functions
 
   const handleSelectAll = (checked) => {
     if (checked) {
@@ -312,17 +312,16 @@ const handleMoveToDispatch = async (id) => {
         `${process.env.REACT_APP_BACKEND_URL}production-process/${data._id}`,
         {
           headers: {
-            Authorization: `Bearer ${cookies?.access_token}`, // if needed
+            Authorization: `Bearer ${cookies?.access_token}`,
           },
         }
       );
-      setSelectedProcess(res.data?.production_process); // store the fetched details
+      setSelectedProcess(res.data?.production_process);
     } catch (error) {
       console.error("Failed to fetch process details:", error);
       toast.error("Failed to load process details");
     }
   };
-  // console.log(selectedProcess)
 
   const handleSelectProcess = (processId, checked) => {
     if (checked) {
@@ -342,14 +341,12 @@ const handleMoveToDispatch = async (id) => {
     setIsBulkDeleting(true);
 
     try {
-      // Call the delete handler for each selected process
       const deletePromises = selectedProcesses.map((processId) =>
         deleteProcessHandler(processId)
       );
 
       await Promise.all(deletePromises);
 
-      // Success feedback
       toast.success(
         `Successfully deleted ${selectedProcesses.length} process${
           selectedProcesses.length > 1 ? "es" : ""
@@ -382,7 +379,6 @@ const handleMoveToDispatch = async (id) => {
       const data = await res.json();
       if (data.success) {
         toast.success("Moved to inventory successfully");
-
       } else {
         toast.error("Failed to move to inventory");
       }
@@ -790,7 +786,7 @@ const handleMoveToDispatch = async (id) => {
                             <button
                               onClick={() =>
                                 markOutFinishGoods(row.original?._id)
-                              } // function call with ID
+                              }
                               className="px-3 py-2 text-xs font-medium rounded-md border transition-all"
                               style={{
                                 backgroundColor: colors.primary[50],
@@ -879,8 +875,11 @@ const handleMoveToDispatch = async (id) => {
                               </button>
                             )}
 
-                            <button className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
-                            onClick={() => handlePauseProcess(row.original?._id)}
+                            <button
+                              className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
+                              onClick={() =>
+                                handlePauseProcess(row.original?._id)
+                              }
                               style={{
                                 color: colors.error[600],
                                 backgroundColor: colors.error[50],
