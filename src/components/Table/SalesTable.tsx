@@ -466,7 +466,7 @@ const SalesTable = ({
     if (designFile) {
       window.open(designFile, "_blank");
     } else {
-      alert("Design file not available.");
+      toast.error("Design file not available.");
     }
   };
 
@@ -474,7 +474,7 @@ const SalesTable = ({
     if (designFile) {
       window.open(designFile, "_blank");
     } else {
-      alert("Design file not available.");
+      toast.error("Design file not available.");
     }
   };
 

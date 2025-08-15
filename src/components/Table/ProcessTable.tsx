@@ -17,11 +17,12 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 
 
-const statusColorMap = {
-  "production started": "bg-green-100 text-green-800",
+const statusColorMap = { 
+  "completed": "bg-green-100 text-green-800",
+  "production started": "bg-blue-100 text-blue-800",
   "request for allow inventory": "bg-yellow-100 text-yellow-800",
   "raw material approval pending": "bg-red-100 text-red-800",
-  "inventory in transit": "bg-orange-100 text-orange-800", // adjusted for better contrast
+  "inventory in transit": "bg-orange-100 text-orange-800", 
   "Inventory Allocated": "bg-purple-100 text-purple-800",
 };
 
