@@ -31,37 +31,44 @@ const ProductionStatus: React.FC = () => {
   const [id, setId] = useState<string | undefined>();
 
   const fetchProcessHandler = async () => {
-  try {
-    setIsLoading(true); // Set loading state
-    const response = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}production-process/all`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${cookies?.access_token}`,
-        },
+    try {
+      setIsLoading(true); // Set loading state
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}production-process/all`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message);
       }
-    );
-    const data = await response.json();
-    if (!data.success) {
-      throw new Error(data.message);
+
+      // Filter for processes with status "production started"
+      const filteredProcesses = data.production_processes.filter(
+        (process: any) =>
+          [
+            "production started",
+            "production in progress",
+            "completed",
+            "moved to inventory",
+            "allocated",
+            "received",
+          ].includes(process.status.toLowerCase())
+      );
+
+      console.log("filtered production started processes", filteredProcesses);
+      setData(filteredProcesses);
+      setFilteredData(filteredProcesses);
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
-
-    // Filter for processes with status "production started"  
-    const filteredProcesses = data.production_processes.filter(
-      (process: any) =>
-        ["production started", "production in progress","completed","moved to inventory","allocated","received"].includes(process.status.toLowerCase())
-    );
-
-    console.log("filtered production started processes", filteredProcesses);
-    setData(filteredProcesses);
-    setFilteredData(filteredProcesses);
-  } catch (error: any) {
-    toast.error(error.message || "Something went wrong");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   const {
     isAddProcessDrawerOpened,
@@ -194,7 +201,7 @@ const ProductionStatus: React.FC = () => {
                   className="text-2xl lg:text-3xl font-bold"
                   style={{ color: colors.text.primary }}
                 >
-                  Production Status 
+                  Production Status
                 </h1>
                 <p
                   className="text-sm mt-1"
@@ -300,6 +307,7 @@ const ProductionStatus: React.FC = () => {
             proces={filteredData}
             deleteProcessHandler={deleteProcessHandler}
             openUpdateProcessDrawerHandler={openUpdateProcessDrawerHandler}
+            fetchProcessHandler={fetchProcessHandler}
           />
         </div>
       </div>
