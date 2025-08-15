@@ -1,10 +1,21 @@
-import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import Loading from "../../../ui/Loading";
 import { colors } from "../../../theme/colors";
+
+// Utility function to capitalize first letter of each word
+const capitalizeWords = (str: string | undefined | null): string => {
+  if (!str) return "";
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+// Utility function to make entire string uppercase (for HSN codes)
+const toUpperCase = (str: string | undefined | null): string => {
+  if (!str) return "";
+  return str.toUpperCase();
+};
 
 interface ProductDetailsProps {
   closeDrawerHandler: () => void;
@@ -40,54 +51,61 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
   const [inventoryCategory, setInventoryCategory] = useState<
     string | undefined
   >();
+  const [colorName, setColorName] = useState<string | undefined>();
 
   const [cookies] = useCookies();
 
   const [isLoadingProduct, setIsLoadingProduct] = useState<boolean>(false);
 
-  const fetchProductDetails = async () => {
-    try {
-      setIsLoadingProduct(true);
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + `product/${productId}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
-      }
-      setName(data.product.name);
-      setId(data.product.product_id);
-      setCategory(data.product.category);
-      setUom(data.product.uom);
-      setPrice(data.product.price);
-      setCurrentStock(data.product.current_stock);
-      setMinStock(data.product?.min_stock);
-      setMaxStock(data.product?.max_stock);
-      setHsn(data.product?.hsn);
-      setSubCategory(data.product?.sub_category);
-      setRegularBuyingPrice(data.product?.regular_buying_price);
-      setWholeSaleBuyingPrice(data.product?.wholesale_buying_price);
-      setMrp(data.product?.mrp);
-      setDealerPrice(data.product?.dealer_price);
-      setDistributorPrice(data.product?.distributor_price);
-      setStore(data.product?.store?.name);
-      setInventoryCategory(data.product?.inventory_category);
-    } catch (err: any) {
-      toast.error(err?.data?.message || err?.message || "Something went wrong");
-    } finally {
-      setIsLoadingProduct(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchProductDetails = async () => {
+      try {
+        setIsLoadingProduct(true);
+        const response = await fetch(
+          process.env.REACT_APP_BACKEND_URL + `product/${productId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${cookies?.access_token}`,
+            },
+          }
+        );
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.message);
+        }
+        setName(data.product.name);
+        setId(data.product.product_id);
+        setCategory(data.product.category);
+        setUom(data.product.uom);
+        setPrice(data.product.price);
+        setCurrentStock(data.product.current_stock);
+        setMinStock(data.product?.min_stock);
+        setMaxStock(data.product?.max_stock);
+        setHsn(data.product?.hsn_code);
+        setSubCategory(data.product?.sub_category);
+        setRegularBuyingPrice(data.product?.regular_buying_price);
+        setWholeSaleBuyingPrice(data.product?.wholesale_buying_price);
+        setMrp(data.product?.mrp);
+        setDealerPrice(data.product?.dealer_price);
+        setDistributorPrice(data.product?.distributor_price);
+        setStore(data.product?.store?.name);
+        setInventoryCategory(data.product?.inventory_category);
+        setColorName(data.product?.color_name);
+
+        // Debug log to check HSN value
+        console.log("HSN Code from API:", data.product?.hsn_code);
+      } catch (err: any) {
+        toast.error(
+          err?.data?.message || err?.message || "Something went wrong"
+        );
+      } finally {
+        setIsLoadingProduct(false);
+      }
+    };
+
     fetchProductDetails();
-  }, []);
+  }, [productId, cookies?.access_token]);
 
   return (
     <div
@@ -134,17 +152,25 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
                 <p className="font-semibold text-gray-700 mb-1">
                   Inventory Category
                 </p>
-                <p className="text-gray-600">{inventoryCategory || "N/A"}</p>
+                <p className="text-gray-600">
+                  {capitalizeWords(inventoryCategory) || "N/A"}
+                </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="font-semibold text-gray-700 mb-1">Product ID</p>
                 <p className="text-gray-600">{id}</p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="font-semibold text-gray-700 mb-1">Product Name</p>
+                <p className="text-gray-600">{capitalizeWords(name)}</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="font-semibold text-gray-700 mb-1">
-                  Product Name
+                  Product Color
                 </p>
-                <p className="text-gray-600">{name}</p>
+                <p className="text-gray-600">
+                  {capitalizeWords(colorName) || "Not Available"}
+                </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="font-semibold text-gray-700 mb-1">
@@ -174,12 +200,12 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="font-semibold text-gray-700 mb-1">MRP</p>
-                <p className="text-gray-600">{mrp || "Not Available"}</p>
+                <p className="text-gray-600">
+                  {mrp ? `₹ ${mrp}/-` : "Not Available"}
+                </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-semibold text-gray-700 mb-1">
-                  Dealer Price
-                </p>
+                <p className="font-semibold text-gray-700 mb-1">Dealer Price</p>
                 <p className="text-gray-600">
                   {dealerPrice ? `₹ ${dealerPrice}/-` : "Not Available"}
                 </p>
@@ -198,14 +224,14 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
                 <p className="font-semibold text-gray-700 mb-1">
                   Product Category
                 </p>
-                <p className="text-gray-600">{category}</p>
+                <p className="text-gray-600">{capitalizeWords(category)}</p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="font-semibold text-gray-700 mb-1">
                   Product Sub Category
                 </p>
                 <p className="text-gray-600">
-                  {subCategory || "Not Available"}
+                  {capitalizeWords(subCategory) || "Not Available"}
                 </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -230,7 +256,9 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="font-semibold text-gray-700 mb-1">HSN</p>
-                <p className="text-gray-600">{hsn || "Not Available"}</p>
+                <p className="text-gray-600">
+                  {toUpperCase(hsn) || "Not Available"}
+                </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="font-semibold text-gray-700 mb-1">Store</p>

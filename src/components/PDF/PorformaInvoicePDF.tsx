@@ -165,14 +165,8 @@ const styles = StyleSheet.create({
     marginTop: 15,
     flexDirection: "row",
   },
-  additionalInfoSection: {
-    width: "50%",
-    padding: 8,
-    borderRight: "1px solid #000",
-    minHeight: 100,
-  },
   amountDetailsSection: {
-    width: "50%",
+    width: "100%",
     padding: 8,
   },
   amountRow: {
@@ -193,6 +187,28 @@ const styles = StyleSheet.create({
     minHeight: 80,
     marginTop: 10,
     textAlign: "center",
+  },
+  additionalInfoDetailSection: {
+    marginTop: 25,
+    padding: 15,
+    border: "1px solid #000",
+    minHeight: 50,
+  },
+  additionalInfoDetailLabel: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginBottom: 15,
+    color: "#333",
+    textTransform: "uppercase",
+  },
+  additionalInfoWritingSpace: {
+    marginTop: 10,
+  },
+  blankLine: {
+    fontSize: 10,
+    marginBottom: 12,
+    color: "#ccc",
+    letterSpacing: 0.5,
   },
 });
 
@@ -221,7 +237,6 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
   const cgst = (subtotal * 9) / 100;
   const sgst = (subtotal * 9) / 100;
   const total = subtotal + cgst + sgst;
-
 
   console.log(proformaInvoice);
   return (
@@ -384,7 +399,7 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
           )}
 
           {/* Empty rows for spacing */}
-          {[...Array(3)].map((_, i) => (
+          {[...Array(5)].map((_, i) => (
             <View key={i} style={styles.tableRow}>
               <Text style={styles.colSno}></Text>
               <Text style={styles.colName}></Text>
@@ -405,14 +420,8 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
           </Text>
         </View>
 
-        {/* Footer Section */}
-        <View style={styles.footerSection}>
-          <View style={styles.additionalInfoSection}>
-            <Text style={styles.sectionLabel}>Additional Info</Text>
-            <Text style={styles.sectionValue}>
-              {proformaInvoice?.note || "N/A"}
-            </Text>
-          </View>
+        {/* Footer Section - Amount Details Only */}
+        {/* <View style={styles.footerSection}>
           <View style={styles.amountDetailsSection}>
             <View style={styles.amountRow}>
               <Text style={styles.sectionLabel}>Net Amount:</Text>
@@ -435,7 +444,7 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
               </Text>
             </View>
           </View>
-        </View>
+        </View> */}
 
         {/* Bank Details and Signature */}
         <View style={styles.footerSection}>
@@ -450,6 +459,20 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
           <View style={styles.signatureSection}>
             <Text style={styles.sectionLabel}>Authorised Signatory</Text>
             <Text style={{ marginTop: 40 }}>_________________________</Text>
+          </View>
+        </View>
+
+        {/* Additional Info Detail Section with Writing Space */}
+        <View style={styles.additionalInfoDetailSection}>
+          <Text style={styles.additionalInfoDetailLabel}>
+            Additional Information:
+          </Text>
+          <View style={styles.additionalInfoWritingSpace}>
+            {[...Array(8)].map((_, i) => (
+              <Text key={i} style={styles.blankLine}>
+                _________________________________________________________________
+              </Text>
+            ))}
           </View>
         </View>
       </Page>
