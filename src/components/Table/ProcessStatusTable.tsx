@@ -161,7 +161,29 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
       alert(err.response?.data?.message || "Error marking finished goods");
     }
   }
+  
 
+
+const handleMoveToDispatch = async (id) => {
+  try {
+    const baseURL = process.env.REACT_APP_BACKEND_URL || "";
+    const res = await axios.post(
+      `${baseURL}dispatch/send-from-production`,
+      { production_process_id: id },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies?.access_token}`,
+        },
+      }
+    );
+
+    alert(res.data.message || "Finished goods marked out!");
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || "Error marking finished goods");
+  }
+};
 
   const columns = useMemo(
     () => [
