@@ -104,13 +104,14 @@ const Dispatch = () => {
       );
 
       setData(response?.data?.data);
+
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
     }
   };
-
+console.log(data)
   useEffect(() => {
     GetDispatch(page);
   }, [page]);
@@ -391,49 +392,49 @@ const Dispatch = () => {
                             className="text-sm"
                             style={{ color: colors.text.secondary }}
                           >
-                            {new Date(
-                              acc?.Sale_id[0]?.createdAt
-                            ).toLocaleDateString()}
+                            {new Date(acc?.createdAt).toLocaleDateString()}
                           </span>
+
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <span
-                                className="font-medium"
-                                style={{ color: colors.text.primary }}
-                              >
-                                Party:
-                              </span>
-                              <span style={{ color: colors.text.secondary }}>
-                                {acc?.Sale_id[0]?.customer_id[0]?.full_name ||
-                                  "N/A"}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span
-                                className="font-medium"
-                                style={{ color: colors.text.primary }}
-                              >
-                                Product:
-                              </span>
-                              <span style={{ color: colors.text.secondary }}>
-                                {acc?.Sale_id[0]?.product_id[0]?.name || "N/A"}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span
-                                className="font-medium"
-                                style={{ color: colors.text.primary }}
-                              >
-                                Quantity:
-                              </span>
-                              <span style={{ color: colors.text.secondary }}>
-                                {acc?.Sale_id[0]?.product_qty || "N/A"}
-                              </span>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium" style={{ color: colors.text.primary }}>
+                                  Party:
+                                </span>
+                                <span style={{ color: colors.text.secondary }}>
+                                  {acc?.[0]?.customer_id?.[0]?.full_name || "N/A"}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium" style={{ color: colors.text.primary }}>
+                                  Product:
+                                </span>
+                                <span style={{ color: colors.text.secondary }}>
+                                  {acc?.[0]?.product_id?.[0]?.name || acc?.Product || "N/A"}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium" style={{ color: colors.text.primary }}>
+                                  Quantity:
+                                </span>
+                                <span style={{ color: colors.text.secondary }}>
+                                  {acc?.product_qty || acc?.Quantity || "N/A"}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium" style={{ color: colors.text.primary }}>
+                                  Bom Name:
+                                </span>
+                                <span style={{ color: colors.text.secondary }}>
+                                  {acc?.Bom_name || "N/A"}
+                                </span>
+                              </div>
                             </div>
                           </div>
+
 
                           <div className="space-y-2">
                             {(role === "Accountant" ||
@@ -448,10 +449,8 @@ const Dispatch = () => {
                                 </span>
                                 <span style={{ color: colors.text.secondary }}>
                                   ₹
-                                  {calculateTotal(
-                                    acc?.Sale_id[0]?.selling_price || 0,
-                                    acc?.Sale_id[0]?.quantity || 0,
-                                    acc?.Sale_id[0]?.gst || 0
+                                  {(
+                                    acc?.Total
                                   )}
                                 </span>
                               </div>
