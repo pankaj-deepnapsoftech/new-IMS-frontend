@@ -3,6 +3,19 @@ import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { ToWords } from "to-words";
 
+// Company Information
+const COMPANY_INFO = {
+  name: "Deepnap Softech",
+  address: "123 Street, Sector 28, Faridabad, Haryana - 121002",
+  phone: "+91-1234567890",
+  gstin: "DF56D4F48R96E5F",
+  pan: "ABCDE1234F",
+  email: "info@deepnapsoftech.com",
+  bankName: "HDFC Bank",
+  accountNo: "123456789123456",
+  ifscCode: "F4H5ED08",
+};
+
 const styles = StyleSheet.create({
   page: {
     padding: 30,
@@ -246,52 +259,76 @@ const toWords = new ToWords({
 interface InvoicePDFProps {
   invoice: {
     _id: string;
-    invoice_no: string;
-    document_date: string;
-    sales_order_date: string;
-    category: string;
+    invoice_no?: string;
+    invoiceNo?: string;
+    document_date?: string;
+    sales_order_date?: string;
+    category?: string;
     note?: string;
-    subtotal: number;
-    total: number;
-    balance: number;
-    tax: {
-      tax_amount: number;
-      tax_name: string;
+    subtotal?: number;
+    total?: number;
+    balance?: number;
+    tax?: {
+      tax_amount?: number;
+      tax_name?: string;
     };
-    creator: {
-      first_name: string;
-      last_name: string;
+    creator?: {
+      first_name?: string;
+      last_name?: string;
     };
     buyer?: {
-      name: string;
+      _id?: string;
+      name?: string;
       address?: string;
       gstin?: string;
       cust_id?: string;
     };
     supplier?: {
-      name: string;
+      _id?: string;
+      name?: string;
       address?: string;
       gstin?: string;
       cust_id?: string;
     };
-    store: {
-      name: string;
+    store?: {
+      _id?: string;
+      name?: string;
       address?: string;
     };
-    items: Array<{
-      item: {
-        name: string;
+    items?: Array<{
+      item?: {
+        _id?: string;
+        name?: string;
         description?: string;
         hsn_code?: string;
       };
-      quantity: number;
-      amount: number;
+      quantity?: number;
+      amount?: number;
     }>;
+    // New comprehensive fields
+    consigneeShipTo?: string;
+    address?: string;
+    gstin?: string;
+    billerAddress?: string;
+    billerGSTIN?: string;
+    deliveryNote?: string;
+    modeTermsOfPayment?: string;
+    referenceNo?: string;
+    otherReferences?: string;
+    buyersOrderNo?: string;
+    date?: string;
+    dispatchDocNo?: string;
+    deliveryNoteDate?: string;
+    dispatchedThrough?: string;
+    destination?: string;
+    termsOfDelivery?: string;
+    remarks?: string;
   };
 }
 
 const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "2-digit",
@@ -299,14 +336,16 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
     });
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount?: number) => {
+    if (!amount && amount !== 0) return "0.00";
     return `${amount.toLocaleString("en-IN", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
   };
 
-  const getAmountInWords = (amount: number) => {
+  const getAmountInWords = (amount?: number) => {
+    if (!amount && amount !== 0) return "Zero Rupees only";
     try {
       return toWords.convert(amount);
     } catch (error) {
@@ -315,19 +354,41 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
   };
 
   const calculateTaxAmount = () => {
-    return invoice.total - invoice.subtotal;
+    const total = invoice.total || 0;
+    const subtotal = invoice.subtotal || 0;
+    return total - subtotal;
   };
 
   const customer = invoice.buyer || invoice.supplier;
   const isSupplier = !!invoice.supplier;
 
+  // Safe access to nested properties
+  const invoiceNumber = invoice.invoice_no || invoice.invoiceNo || "N/A";
+  const documentDate =
+    invoice.document_date || invoice.date || new Date().toISOString();
+  const salesOrderDate =
+    invoice.sales_order_date || invoice.date || new Date().toISOString();
+  const category = invoice.category || "sale";
+  const creatorName = invoice.creator
+    ? `${invoice.creator.first_name || ""} ${
+        invoice.creator.last_name || ""
+      }`.trim() || "Unknown"
+    : "Unknown";
+  const storeName = invoice.store?.name || "Default Store";
+  const storeAddress = invoice.store?.address || "";
+  const items = invoice.items || [];
+  const subtotal = invoice.subtotal || 0;
+  const total = invoice.total || 0;
+  const balance = invoice.balance || total;
+  const taxAmount = invoice.tax?.tax_amount || 0;
+  const taxName = invoice.tax?.tax_name || "No Tax";
+  const note = invoice.note || invoice.remarks || "";
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Title */}
-        <Text style={styles.title}>
-          {invoice.category.toUpperCase()} INVOICE
-        </Text>
+        <Text style={styles.title}>{category.toUpperCase()} INVOICE</Text>
 
         {/* Header Section */}
         <View style={styles.headerSection}>
@@ -338,20 +399,27 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
                 {isSupplier ? "Buyer Details:" : "Seller Details:"}
               </Text>
               <Text style={styles.sectionValue}>
-                Your Company Name{"\n"}
-                Your Company Address{"\n"}
-                City, State - Pincode{"\n"}
-                GSTIN: Your GSTIN Number
+                {COMPANY_INFO.name}
+                {"\n"}
+                {COMPANY_INFO.address}
+                {"\n"}
+                Phone: {COMPANY_INFO.phone}
+                {"\n"}
+                GSTIN: {COMPANY_INFO.gstin}
+                {"\n"}
+                PAN: {COMPANY_INFO.pan}
+                {"\n"}
+                Email: {COMPANY_INFO.email}
               </Text>
             </View>
             <View style={styles.invoiceNoSection}>
               <Text style={styles.sectionLabel}>Invoice No:</Text>
-              <Text style={styles.sectionValue}>{invoice.invoice_no}</Text>
+              <Text style={styles.sectionValue}>{invoiceNumber}</Text>
             </View>
             <View style={styles.issueDateSection}>
               <Text style={styles.sectionLabel}>Issue Date:</Text>
               <Text style={styles.sectionValue}>
-                {formatDate(invoice.document_date)}
+                {formatDate(documentDate)}
               </Text>
             </View>
           </View>
@@ -374,13 +442,13 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
             <View style={styles.documentDateSection}>
               <Text style={styles.sectionLabel}>Document Date:</Text>
               <Text style={styles.sectionValue}>
-                {formatDate(invoice.document_date)}
+                {formatDate(documentDate)}
               </Text>
             </View>
             <View style={styles.salesOrderDateSection}>
               <Text style={styles.sectionLabel}>Sales Order Date:</Text>
               <Text style={styles.sectionValue}>
-                {formatDate(invoice.sales_order_date)}
+                {formatDate(salesOrderDate)}
               </Text>
             </View>
           </View>
@@ -390,22 +458,19 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
             <View style={styles.storeSection}>
               <Text style={styles.sectionLabel}>Store:</Text>
               <Text style={styles.sectionValue}>
-                {invoice.store.name}
-                {invoice.store.address && `\n${invoice.store.address}`}
+                {storeName}
+                {storeAddress && `\n${storeAddress}`}
               </Text>
             </View>
             <View style={styles.categorySection}>
               <Text style={styles.sectionLabel}>Category:</Text>
               <Text style={styles.sectionValue}>
-                {invoice.category.charAt(0).toUpperCase() +
-                  invoice.category.slice(1)}
+                {category.charAt(0).toUpperCase() + category.slice(1)}
               </Text>
             </View>
             <View style={styles.balanceSection}>
               <Text style={styles.sectionLabel}>Balance:</Text>
-              <Text style={styles.sectionValue}>
-                {formatCurrency(invoice.balance)}
-              </Text>
+              <Text style={styles.sectionValue}>{formatCurrency(balance)}</Text>
             </View>
           </View>
         </View>
@@ -435,33 +500,33 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
           </View>
 
           {/* Table Rows */}
-          {invoice.items.map((item, index) => (
+          {items.map((item, index) => (
             <View key={index} style={styles.tableRow}>
               <View style={styles.tableCol1}>
                 <Text style={styles.tableCellText}>{index + 1}</Text>
               </View>
               <View style={styles.tableCol2}>
                 <Text style={styles.tableCellText}>
-                  {item.item.name}
-                  {item.item.description && `\n${item.item.description}`}
+                  {item.item?.name || "Unknown Item"}
+                  {item.item?.description && `\n${item.item.description}`}
                 </Text>
               </View>
               <View style={styles.tableCol3}>
                 <Text style={styles.tableCellText}>
-                  {item.item.hsn_code || "N/A"}
+                  {item.item?.hsn_code || "N/A"}
                 </Text>
               </View>
               <View style={styles.tableCol4}>
-                <Text style={styles.tableCellText}>{item.quantity}</Text>
+                <Text style={styles.tableCellText}>{item.quantity || 0}</Text>
               </View>
               <View style={styles.tableCol5}>
                 <Text style={styles.tableCellText}>
-                  {formatCurrency(item.amount / item.quantity)}
+                  {formatCurrency((item.amount || 0) / (item.quantity || 1))}
                 </Text>
               </View>
               <View style={styles.tableCol6}>
                 <Text style={styles.tableCellText}>
-                  {formatCurrency(item.amount)}
+                  {formatCurrency(item.amount || 0)}
                 </Text>
               </View>
             </View>
@@ -472,14 +537,11 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
         <View style={styles.totalsSection}>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Subtotal:</Text>
-            <Text style={styles.totalValue}>
-              {formatCurrency(invoice.subtotal)}
-            </Text>
+            <Text style={styles.totalValue}>{formatCurrency(subtotal)}</Text>
           </View>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>
-              {invoice.tax.tax_name} (
-              {(invoice.tax.tax_amount * 100).toFixed(0)}%):
+              {taxName} ({(taxAmount * 100).toFixed(0)}%):
             </Text>
             <Text style={styles.totalValue}>
               {formatCurrency(calculateTaxAmount())}
@@ -499,7 +561,7 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
             <Text
               style={[styles.totalValue, { fontSize: 12, color: "#059669" }]}
             >
-              {formatCurrency(invoice.total)}
+              {formatCurrency(total)}
             </Text>
           </View>
         </View>
@@ -508,15 +570,27 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
         <View style={styles.amountInWords}>
           <Text style={styles.amountInWordsLabel}>Amount in Words:</Text>
           <Text style={styles.amountInWordsText}>
-            {getAmountInWords(invoice.total)}
+            {getAmountInWords(total)}
+          </Text>
+        </View>
+
+        {/* Bank Details Section */}
+        <View style={styles.notesSection}>
+          <Text style={styles.notesLabel}>Bank Details:</Text>
+          <Text style={styles.notesText}>
+            Bank Name: {COMPANY_INFO.bankName}
+            {"\n"}
+            Account No.: {COMPANY_INFO.accountNo}
+            {"\n"}
+            IFSC Code: {COMPANY_INFO.ifscCode}
           </Text>
         </View>
 
         {/* Notes Section */}
-        {invoice.note && (
+        {note && (
           <View style={styles.notesSection}>
             <Text style={styles.notesLabel}>Notes:</Text>
-            <Text style={styles.notesText}>{invoice.note}</Text>
+            <Text style={styles.notesText}>{note}</Text>
           </View>
         )}
 
@@ -525,17 +599,15 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
           <View style={styles.signatureBox}>
             <Text style={styles.signatureLabel}>Prepared By</Text>
             <View style={styles.signatureLine} />
-            <Text style={styles.signatureText}>
-              {invoice.creator.first_name} {invoice.creator.last_name}
-            </Text>
+            <Text style={styles.signatureText}>{creatorName}</Text>
             <Text style={styles.signatureText}>
               Date: {formatDate(new Date().toISOString())}
             </Text>
           </View>
           <View style={styles.signatureBox}>
-            <Text style={styles.signatureLabel}>Authorized Signature</Text>
+            <Text style={styles.signatureLabel}>For {COMPANY_INFO.name}</Text>
             <View style={styles.signatureLine} />
-            <Text style={styles.signatureText}>Company Seal & Signature</Text>
+            <Text style={styles.signatureText}>Authorized Signatory</Text>
             <Text style={styles.signatureText}>Date: _______________</Text>
           </View>
         </View>

@@ -1,15 +1,20 @@
- // @ts-nocheck
+// @ts-nocheck
 import React, { useState } from "react";
 import {
-  Drawer, DrawerBody, DrawerHeader, DrawerOverlay,
-  DrawerContent, DrawerCloseButton, Button, useToast
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  Button,
 } from "@chakra-ui/react";
+import { toast } from "react-toastify";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 
 const UploadDesignFile = ({ show, setShow, saleId, refresh }) => {
-  const toast = useToast();
   const [cookies] = useCookies();
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -17,10 +22,13 @@ const UploadDesignFile = ({ show, setShow, saleId, refresh }) => {
 
   const uploadImage = async (formData) => {
     try {
-      const res = await axios.post("https://images.deepmart.shop/upload", formData);
+      const res = await axios.post(
+        "https://images.deepmart.shop/upload",
+        formData
+      );
       return res.data?.[0]; // return image URL
     } catch (error) {
-      toast({ title: "Image Upload Failed", status: "error" });
+      toast.error("Image Upload Failed");
       return null;
     }
   };
@@ -40,12 +48,12 @@ const UploadDesignFile = ({ show, setShow, saleId, refresh }) => {
           { designFile: uploadedUrl },
           { headers: { Authorization: `Bearer ${cookies.access_token}` } }
         );
-        toast({ title: "Design uploaded", status: "success" });
+        toast.success("Design uploaded successfully");
         setShow(false);
         refresh();
       } catch (err) {
         console.log(err);
-        toast({ title: "Upload failed", status: "error" });
+        toast.error("Upload failed");
       }
     }
 
@@ -70,7 +78,11 @@ const UploadDesignFile = ({ show, setShow, saleId, refresh }) => {
           />
           {preview && (
             <div className="mt-3 relative">
-              <img src={preview} alt="Preview" className="rounded-md w-full mt-2" />
+              <img
+                src={preview}
+                alt="Preview"
+                className="rounded-md w-full mt-2"
+              />
               <button
                 type="button"
                 className="absolute top-2 right-2 p-1 bg-red-600 rounded-full text-white"
@@ -83,7 +95,7 @@ const UploadDesignFile = ({ show, setShow, saleId, refresh }) => {
               </button>
             </div>
           )}
-    
+
           <Button
             mt={4}
             colorScheme="blue"

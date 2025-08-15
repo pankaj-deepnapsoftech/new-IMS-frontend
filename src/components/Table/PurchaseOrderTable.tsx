@@ -1,10 +1,8 @@
+// @ts-nocheck
+
 import React, { useState, useEffect } from "react";
-import {
-  MdDeleteOutline,
-  MdEdit,
-  MdOutlineVisibility,
-  MdPictureAsPdf,
-} from "react-icons/md";
+import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
+import { BiSolidTrash, BiX } from "react-icons/bi";
 import { colors } from "../../theme/colors";
 import { useCookies } from "react-cookie";
 import axios from "axios";
@@ -54,6 +52,15 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
   const [viewOrder, setViewOrder] = useState<PurchaseOrder | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
+  // Bulk delete states
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  // Single delete states
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState<string>("");
+
   // Auto-refresh setup
   useEffect(() => {
     setLoading(false);
@@ -72,17 +79,18 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
 
   // Handle delete purchase order
   const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this purchase order?"
-    );
-    if (!confirmDelete) {
-      return;
-    }
+    setDeleteId(id);
+    setShowDeleteModal(true);
+  };
 
-    setDeletingId(id);
+  // Confirm single delete
+  const confirmSingleDelete = async () => {
+    if (!deleteId) return;
+
+    setDeletingId(deleteId);
     try {
       const response = await axios.delete(
-        `${process.env.REACT_APP_BACKEND_URL}purchase-order/${id}`,
+        `${process.env.REACT_APP_BACKEND_URL}purchase-order/${deleteId}`,
         {
           headers: { Authorization: `Bearer ${cookies?.access_token}` },
         }
@@ -91,7 +99,7 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
       if (response.data.success) {
         toast.success("Purchase order deleted successfully!");
         if (onDelete) {
-          onDelete(id);
+          onDelete(deleteId);
         }
       } else {
         throw new Error(
@@ -103,6 +111,65 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
       toast.error(error.message || "Failed to delete purchase order");
     } finally {
       setDeletingId(null);
+      setShowDeleteModal(false);
+      setDeleteId("");
+    }
+  };
+
+  // Handle select all
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedOrders(filteredPurchaseOrders.map((order) => order._id));
+    } else {
+      setSelectedOrders([]);
+    }
+  };
+
+  // Handle select individual order
+  const handleSelectOrder = (orderId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedOrders((prev) => [...prev, orderId]);
+    } else {
+      setSelectedOrders((prev) => prev.filter((id) => id !== orderId));
+    }
+  };
+
+  // Handle bulk delete
+  const handleBulkDelete = async () => {
+    if (isBulkDeleting || selectedOrders.length === 0) return;
+    setIsBulkDeleting(true);
+
+    try {
+      const response = await axios.delete(
+        `${process.env.REACT_APP_BACKEND_URL}purchase-order/bulk-delete`,
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          data: { ids: selectedOrders },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success(
+          `Successfully deleted ${response.data.deletedCount} purchase order(s)`
+        );
+        // Remove deleted orders from local state
+        if (onDelete) {
+          selectedOrders.forEach((orderId) => onDelete(orderId));
+        }
+        setSelectedOrders([]);
+        setShowBulkDeleteModal(false);
+      } else {
+        throw new Error(
+          response.data.message || "Failed to delete purchase orders"
+        );
+      }
+    } catch (error: any) {
+      console.error("Error in bulk delete:", error);
+      toast.error(
+        error?.response?.data?.message || "Error deleting purchase orders"
+      );
+    } finally {
+      setIsBulkDeleting(false);
     }
   };
 
@@ -127,11 +194,19 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
     return dateB - dateA;
   });
 
+  // Selection state helpers
+  const isAllSelected =
+    filteredPurchaseOrders.length > 0 &&
+    selectedOrders.length === filteredPurchaseOrders.length;
+  const isIndeterminate =
+    selectedOrders.length > 0 &&
+    selectedOrders.length < filteredPurchaseOrders.length;
+
   return (
     <div className="p-6">
       {/* Header with count */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <div className="flex flex-col md:flex-row gap-3">
           <div>
             <h3
               className="text-lg font-semibold"
@@ -141,10 +216,30 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
               {filteredPurchaseOrders.length !== 1 ? "s" : ""} Found
             </h3>
           </div>
+
+          {/* Bulk Actions */}
+          {selectedOrders.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+              <button
+                onClick={() => setShowBulkDeleteModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors w-full sm:w-auto"
+              >
+                <BiSolidTrash size={16} />
+                Delete Selected ({selectedOrders.length})
+              </button>
+              <button
+                onClick={() => setSelectedOrders([])}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white text-sm font-medium rounded-lg transition-colors w-full sm:w-auto"
+              >
+                <BiX size={16} />
+                Clear Selection
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Limit Selector */}
         <div className="flex items-center gap-3">
+          {/* Limit Selector */}
           <span
             className="text-sm font-medium"
             style={{ color: colors.text.secondary }}
@@ -336,7 +431,9 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                   className="mt-1 text-sm"
                   style={{ color: colors.text.primary }}
                 >
-                  {viewOrder.GSTApply || "N/A"}
+                  {viewOrder.GSTApply
+                    ? viewOrder.GSTApply.toUpperCase()
+                    : "N/A"}
                 </p>
               </div>
               <div>
@@ -435,6 +532,20 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
             <thead style={{ backgroundColor: colors.table.header }}>
               <tr style={{ borderBottom: `1px solid ${colors.table.border}` }}>
                 <th
+                  className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
+                  style={{ color: colors.table.headerText }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isAllSelected}
+                    ref={(input) => {
+                      if (input) input.indeterminate = isIndeterminate;
+                    }}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                </th>
+                <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
@@ -517,7 +628,7 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={13} className="px-4 py-8 text-center">
+                  <td colSpan={14} className="px-4 py-8 text-center">
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                       <span className="ml-2">Loading...</span>
@@ -526,7 +637,7 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                 </tr>
               ) : sortedPurchaseOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="px-4 py-8 text-center">
+                  <td colSpan={14} className="px-4 py-8 text-center">
                     <span style={{ color: colors.text.secondary }}>
                       No purchase orders found
                     </span>
@@ -562,6 +673,16 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                         }
                       }}
                     >
+                      <td className="px-4 py-3 text-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedOrders.includes(order._id)}
+                          onChange={(e) =>
+                            handleSelectOrder(order._id, e.target.checked)
+                          }
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                      </td>
                       <td
                         className="px-4 py-3 text-sm whitespace-nowrap"
                         style={{ color: colors.text.secondary }}
@@ -644,7 +765,9 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                             color: colors.success[700],
                           }}
                         >
-                          {order.GSTApply || "N/A"}
+                          {order.GSTApply
+                            ? order.GSTApply.toUpperCase()
+                            : "N/A"}
                         </span>
                       </td>
                       <td
@@ -764,6 +887,185 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
           </table>
         </div>
       </div>
+
+      {/* Single Delete Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-md mx-4 rounded-xl shadow-xl"
+            style={{ backgroundColor: colors.background.card }}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Confirm Deletion
+                </h2>
+              </div>
+
+              <div className="mb-6">
+                <div
+                  className="rounded-lg p-4 mb-4"
+                  style={{ backgroundColor: colors.error[50] }}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: colors.error[100] }}
+                    >
+                      <BiSolidTrash className="w-6 h-6" style={{ color: colors.error[600] }} />
+                    </div>
+                    <div className="text-center">
+                      <p
+                        className="font-medium mb-1"
+                        style={{ color: colors.error[800] }}
+                      >
+                        Delete Purchase Order
+                      </p>
+                      <p
+                        className="text-sm"
+                        style={{ color: colors.error[600] }}
+                      >
+                        This action cannot be undone
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setDeleteId("");
+                  }}
+                  className="flex-1 px-4 py-2 rounded-lg border transition-all duration-200"
+                  style={{
+                    borderColor: colors.border.medium,
+                    color: colors.text.secondary,
+                    backgroundColor: colors.background.card,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSingleDelete}
+                  disabled={deletingId === deleteId}
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: colors.error[500],
+                    color: colors.text.inverse,
+                    opacity: deletingId === deleteId ? 0.7 : 1,
+                  }}
+                >
+                  {deletingId === deleteId && (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  )}
+                  {deletingId === deleteId ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Modal */}
+      {showBulkDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-md mx-4 rounded-xl shadow-xl"
+            style={{ backgroundColor: colors.background.card }}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Confirm Bulk Deletion
+                </h2>
+                {!isBulkDeleting && (
+                  <button
+                    onClick={() => setShowBulkDeleteModal(false)}
+                    className="p-1 rounded-lg transition-colors hover:bg-gray-100"
+                  >
+                    <BiX className="w-5 h-5" style={{ color: colors.text.secondary }} />
+                  </button>
+                )}
+              </div>
+
+              <div className="mb-6">
+                <div
+                  className="rounded-lg p-4 mb-4"
+                  style={{ backgroundColor: colors.error[50] }}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: colors.error[100] }}
+                    >
+                      <BiSolidTrash className="w-6 h-6" style={{ color: colors.error[600] }} />
+                    </div>
+                    <div className="text-center">
+                      <p
+                        className="font-medium mb-1"
+                        style={{ color: colors.error[800] }}
+                      >
+                        Delete {selectedOrders.length} Purchase Order{selectedOrders.length !== 1 ? "s" : ""}
+                      </p>
+                      <p
+                        className="text-sm"
+                        style={{ color: colors.error[600] }}
+                      >
+                        This action cannot be undone
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <p
+                  className="text-sm text-center"
+                  style={{ color: colors.text.secondary }}
+                >
+                  Are you sure you want to delete {selectedOrders.length} selected
+                  purchase order{selectedOrders.length !== 1 ? "s" : ""}?
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowBulkDeleteModal(false)}
+                  disabled={isBulkDeleting}
+                  className="flex-1 px-4 py-2 rounded-lg border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    borderColor: colors.border.medium,
+                    color: colors.text.secondary,
+                    backgroundColor: colors.background.card,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={isBulkDeleting}
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: colors.error[500],
+                    color: colors.text.inverse,
+                  }}
+                >
+                  {isBulkDeleting && (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  )}
+                  {isBulkDeleting ? "Deleting..." : "Delete All"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
