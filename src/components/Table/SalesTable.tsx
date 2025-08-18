@@ -446,9 +446,9 @@ const SalesTable = ({
             completedOrders
           });
           
-          // Show summary with all counts
-          const summary = `Loaded: ${data.totalSalesOrders} Sales Orders, ${data.totalPreProductionProcesses} Pre-Production Processes, ${data.totalBOMs} BOMs, ${data.totalRawMaterials} Raw Materials`;
-          toast.success(summary);
+          // Show summary with all counts - Toast commented out
+          // const summary = `Loaded: ${data.totalSalesOrders} Sales Orders, ${data.totalPreProductionProcesses} Pre-Production Processes, ${data.totalBOMs} BOMs, ${data.totalRawMaterials} Raw Materials`;
+          // toast.success(summary);
         }
       } else {
         console.error('Failed to fetch all sales orders status');
@@ -499,39 +499,31 @@ const SalesTable = ({
           <h3 className="text-lg font-semibold mb-3" style={{ color: colors.text.primary }}>
             📊 System Summary
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold" style={{ color: colors.primary[500] }}>
-                {summaryData.totalSalesOrders}
-              </div>
-              <div className="text-sm" style={{ color: colors.text.secondary }}>
-                Sales Orders
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold" style={{ color: colors.success[500] }}>
-                {summaryData.approvedBOMs}
-              </div>
-              <div className="text-sm" style={{ color: colors.text.secondary }}>
-                Approved BOMs
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold" style={{ color: colors.warning[500] }}>
-                {summaryData.activeProductions}
-              </div>
-              <div className="text-sm" style={{ color: colors.text.secondary }}>
-                Active Productions
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold" style={{ color: colors.info[500] }}>
-                {summaryData.completedOrders}
-              </div>
-              <div className="text-sm" style={{ color: colors.text.secondary }}>
-                Completed Orders
-              </div>
-            </div>
+                     <div className="grid grid-cols-3 gap-4">
+             <div className="text-center">
+               <div className="text-2xl font-bold" style={{ color: colors.primary[500] }}>
+                 {summaryData.totalSalesOrders}
+               </div>
+               <div className="text-sm" style={{ color: colors.text.secondary }}>
+                 Sales Orders
+               </div>
+             </div>
+             <div className="text-center">
+               <div className="text-2xl font-bold" style={{ color: colors.success[500] }}>
+                 {summaryData.approvedBOMs}
+               </div>
+               <div className="text-sm" style={{ color: colors.text.secondary }}>
+                 Approved BOMs
+               </div>
+             </div>
+             <div className="text-center">
+               <div className="text-2xl font-bold" style={{ color: colors.warning[500] }}>
+                 {summaryData.activeProductions}
+               </div>
+               <div className="text-sm" style={{ color: colors.text.secondary }}>
+                 Active Productions
+               </div>
+             </div>
           </div>
           
           {/* Additional Summary Details */}
@@ -1125,7 +1117,7 @@ const SalesTable = ({
                               {material.inventory_category} • {material.uom} • Stock: {material.current_stock || 0}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          {/* <div className="flex items-center gap-2">
                             <span
                               className={`px-2 py-1 rounded-full text-xs font-medium ${
                                 material.approved
@@ -1143,7 +1135,7 @@ const SalesTable = ({
                                 Approve
                               </button>
                             )}
-                          </div>
+                          </div> */}
                         </div>
                       ))}
                     </div>
@@ -1266,8 +1258,8 @@ const SalesTable = ({
                   </button>
                 )} */}
 
-                {/* Refresh Status Button */}
-                <button
+                {/* Refresh Status Button - Commented out */}
+                {/* <button
                   onClick={() => fetchSalesOrderStatus(purchase._id)}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
                   style={{
@@ -1277,10 +1269,10 @@ const SalesTable = ({
                 >
                   <MdRefresh size="16px" />
                   Refresh
-                </button>
+                </button> */}
 
-                {/* Load All Status Button */}
-                <button
+                {/* Load All Status Button - Commented out */}
+                {/* <button
                   onClick={fetchAllSalesOrdersStatus}
                   disabled={loadingStatuses.all}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
@@ -1292,7 +1284,7 @@ const SalesTable = ({
                 >
                   <MdRefresh size="16px" />
                   {loadingStatuses.all ? "Loading..." : "Load All Status"}
-                </button>
+                </button> */}
 
                 {/* Legacy Approve Button (for backward compatibility) */}
                 {!salesOrderStatuses[purchase._id] && (
