@@ -1102,7 +1102,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                       )}
                     </FormControl>
 
-                    <FormControl isInvalid={hasError("billingAddress")}>
+                    {/* <FormControl isInvalid={hasError("billingAddress")}>
                       <FormLabel
                         display="flex"
                         alignItems="center"
@@ -1131,7 +1131,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                           {getErrorMessage("billingAddress")}
                         </Text>
                       )}
-                    </FormControl>
+                    </FormControl> */}
                   </div>
                 </CardBody>
               </Card>
