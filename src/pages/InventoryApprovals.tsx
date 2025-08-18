@@ -46,7 +46,7 @@ const InventoryApprovals: React.FC = () => {
   };
 
   const approveRmHandler = async (id: string) => {
-    console.log(id)
+    console.log(id);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}bom/approve/inventory/raw-materials`,
@@ -63,10 +63,7 @@ const InventoryApprovals: React.FC = () => {
       if (!data.success) {
         throw new Error(data.message);
       }
-      window.location.reload()
       toast.success("Raw material approved successfully!");
-
- 
       fetchInventoryHandler();
     } catch (err: any) {
       toast.error(err?.message || "Something went wrong");
@@ -89,22 +86,23 @@ const InventoryApprovals: React.FC = () => {
 
     const searchTxt = searchKey.toLowerCase().trim();
 
-    const results = data.filter((emp: any) => {
-      const firstName = emp.first_name?.toString().toLowerCase() || "";
-      const lastName = emp.last_name?.toString().toLowerCase() || "";
-      const email = emp.email?.toString().toLowerCase() || "";
-      const phone = emp.phone?.toString() || "";
-      const role = emp?.role?.role?.toString().toLowerCase() || "";
-      const createdAt = emp?.createdAt
-        ? new Date(emp.createdAt)
+    const results = data.filter((item: any) => {
+      const name = item.name?.toString().toLowerCase() || "";
+      const productId = item.product_id?.toString().toLowerCase() || "";
+      const bomName = item.bom_name?.toString().toLowerCase() || "";
+      const bomStatus = item.bom_status?.toString().toLowerCase() || "";
+      const inventoryCategory = item.inventory_category?.toString().toLowerCase() || "";
+      const uom = item.uom?.toString().toLowerCase() || "";
+      const createdAt = item?.createdAt
+        ? new Date(item.createdAt)
           .toISOString()
           .substring(0, 10)
           .split("-")
           .reverse()
           .join("")
         : "";
-      const updatedAt = emp?.updatedAt
-        ? new Date(emp.updatedAt)
+      const updatedAt = item?.updatedAt
+        ? new Date(item.updatedAt)
           .toISOString()
           .substring(0, 10)
           .split("-")
@@ -113,11 +111,12 @@ const InventoryApprovals: React.FC = () => {
         : "";
 
       return (
-        firstName.includes(searchTxt) ||
-        lastName.includes(searchTxt) ||
-        email.includes(searchTxt) ||
-        phone.includes(searchTxt) ||
-        role.includes(searchTxt) ||
+        name.includes(searchTxt) ||
+        productId.includes(searchTxt) ||
+        bomName.includes(searchTxt) ||
+        bomStatus.includes(searchTxt) ||
+        inventoryCategory.includes(searchTxt) ||
+        uom.includes(searchTxt) ||
         createdAt.includes(searchTxt.replaceAll("/", "")) ||
         updatedAt.includes(searchTxt.replaceAll("/", ""))
       );

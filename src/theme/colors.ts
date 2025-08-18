@@ -84,6 +84,20 @@ export const  colors = {
     900: "#78350f",
   },
 
+  // Info colors
+  info: {
+    50: "#eff6ff",
+    100: "#dbeafe",
+    200: "#bfdbfe",
+    300: "#93c5fd",
+    400: "#60a5fa",
+    500: "#3b82f6",
+    600: "#2563eb",
+    700: "#1d4ed8",
+    800: "#1e40af",
+    900: "#1e3a8a",
+  },
+
   // Background colors
   background: {
     page: "#f9fafb", // Main page background
@@ -217,6 +231,7 @@ export type ColorPath =
   | `success.${keyof typeof colors.success}`
   | `error.${keyof typeof colors.error}`
   | `warning.${keyof typeof colors.warning}`
+  | `info.${keyof typeof colors.info}`
   | `background.${keyof typeof colors.background}`
   | `border.${keyof typeof colors.border}`
   | `text.${keyof typeof colors.text}`

@@ -93,7 +93,13 @@ const updateProcessStatus = async (id, status) => {
     }
 
     toast.success(data.message || "Status updated");
-    window.location.reload(); // Or trigger a re-fetch if you have one
+    // Trigger a re-fetch instead of full page reload
+    if (typeof window !== 'undefined') {
+      // Force a re-render by updating a state or calling a refresh function
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 100);
+    }
   } catch (err) {
     toast.error(err.message || "Failed to update status");
   }
@@ -220,7 +226,13 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
       }
 
       toast.success("Status updated to Inventory in Transit");
-      window.location.reload();
+      // Trigger a re-fetch instead of full page reload
+      if (typeof window !== 'undefined') {
+        // Force a re-render by updating a state or calling a refresh function
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 100);
+      }
     } catch (err) {
       toast.error(err.message || "Something went wrong");
     }
