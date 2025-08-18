@@ -446,7 +446,7 @@ const SalesTable = ({
             completedOrders
           });
           
-          // Show summary with all counts - Toast commented out
+          // Show summary with all counts
           // const summary = `Loaded: ${data.totalSalesOrders} Sales Orders, ${data.totalPreProductionProcesses} Pre-Production Processes, ${data.totalBOMs} BOMs, ${data.totalRawMaterials} Raw Materials`;
           // toast.success(summary);
         }
