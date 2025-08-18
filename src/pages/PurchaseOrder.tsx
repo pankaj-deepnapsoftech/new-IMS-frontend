@@ -412,6 +412,8 @@ const PurchaseOrder: React.FC = () => {
   // Handle form input changes
   const handleFormInputChange = (index: number, field: keyof InventoryUpdateForm, value: number) => {
     const updatedForm = [...updateInventoryForm];
+    const item = updatedForm[index];
+    
     updatedForm[index] = { ...updatedForm[index], [field]: value };
     setUpdateInventoryForm(updatedForm);
   };
@@ -462,6 +464,17 @@ const PurchaseOrder: React.FC = () => {
   // Submit update inventory form
   const submitUpdateInventoryForm = async () => {
     try {
+      // Validate that all buy quantities are sufficient to cover shortages
+      const insufficientItems = updateInventoryForm.filter(item => 
+        item.buyQuantity > 0 && item.buyQuantity < item.shortageQuantity
+      );
+      
+      if (insufficientItems.length > 0) {
+        const itemNames = insufficientItems.map(item => `${item.itemName} (${item.buyQuantity}/${item.shortageQuantity})`).join(', ');
+        toast.error(`❌ Submission blocked! Insufficient buy quantities for: ${itemNames}. Buy Quantity must be equal to or greater than Shortage Quantity.`);
+        return;
+      }
+      
       // Here you would typically send the form data to your backend
       console.log("Submitting form data:", updateInventoryForm);
       toast.success("Inventory update form submitted successfully");
@@ -481,6 +494,18 @@ const PurchaseOrder: React.FC = () => {
   const submitRawMaterialChanges = async () => {
     try {
       console.log("Total inventory shortages:", inventoryShortages.length);
+      
+      // Validate that all stock updates are sufficient to cover shortages
+      const insufficientItems = inventoryShortages.filter(item => 
+        item.updated_stock && item.updated_stock !== null && item.updated_stock > 0 && 
+        item.updated_stock < item.shortage_quantity
+      );
+      
+      if (insufficientItems.length > 0) {
+        const itemNames = insufficientItems.map(item => `${item.item_name} (${item.updated_stock}/${item.shortage_quantity})`).join(', ');
+        toast.error(`❌ Submission blocked! Insufficient quantities: ${itemNames}.`);
+        return;
+      }
       
       // Find items that have been modified
       const itemsWithPriceChanges = inventoryShortages.filter(item => 
@@ -994,7 +1019,10 @@ const PurchaseOrder: React.FC = () => {
                         </div>
                       </div>
                       <p className="text-blue-700 text-xs mt-3">
-                        💡 <strong>Tip:</strong> "Total Available Stock" shows Current Stock + Updated Stock. Update prices in "Updated Price" and additional stocks in "Updated Stock" columns. Click "Save Changes" to store updates and automatically remove items from shortages. 
+                        💡 <strong>Tip:</strong> "Total Available Stock" shows Current Stock + Updated Stock. Update prices in "Updated Price" and additional stocks in "Updated Stock" columns. 
+                        <strong>Important:</strong> Updated Stock must be equal to or greater than the Shortage Quantity to submit successfully. 
+                        You can enter any value, but submission will be blocked if insufficient. Input fields will show red if insufficient, green if sufficient. 
+                        Click "Save Changes" to store updates and automatically remove items from shortages. 
                         Current prices and stocks remain unchanged.
                         Use "Remove from Shortages" for manual removal if needed.
                       </p>
@@ -1028,13 +1056,28 @@ const PurchaseOrder: React.FC = () => {
                                 type="number"
                                 value={item.updated_stock !== null ? item.updated_stock : 0}
                                 onChange={(e) => handleStockUpdate(idx, Number(e.target.value))}
-                                className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className={`w-20 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                  item.updated_stock && item.updated_stock > 0 && item.updated_stock < item.shortage_quantity
+                                    ? 'border-red-500 bg-red-50'
+                                    : item.updated_stock && item.updated_stock >= item.shortage_quantity
+                                    ? 'border-green-500 bg-green-50'
+                                    : 'border-gray-300'
+                                }`}
                                 placeholder="0"
                                 min="0"
                                 step="1"
                               />
                               {item.updated_stock && item.updated_stock > 0 && (
-                                <div className="text-xs text-green-600 mt-1">+{item.updated_stock}</div>
+                                <div className={`text-xs mt-1 ${
+                                  item.updated_stock < item.shortage_quantity
+                                    ? 'text-red-600'
+                                    : 'text-green-600'
+                                }`}>
+                                  {item.updated_stock < item.shortage_quantity 
+                                    ? `Need ${item.shortage_quantity - item.updated_stock} more`
+                                    : `+${item.updated_stock}`
+                                  }
+                                </div>
                               )}
                             </td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">{item.shortage_quantity}</td>
@@ -1212,8 +1255,10 @@ const PurchaseOrder: React.FC = () => {
                         This form will help you plan your inventory purchases.
                       </p>
                       <p className="text-blue-700 text-xs mt-2">
-                        💡 <strong>Tip:</strong> Price and stock updates are automatically saved 1 second after you stop typing. 
-                        Look for the yellow indicator dot when updates are pending.
+                        💡 <strong>Tip:</strong> Update prices, fill in Buy Quantity and Price Difference for items with shortages. 
+                        <strong>Important:</strong> Buy Quantity must be equal to or greater than the Shortage Quantity to submit successfully.
+                        Input fields will show red if insufficient, green if sufficient.
+                        This form will help you plan your inventory purchases.
                       </p>
                     </div>
                   
@@ -1276,10 +1321,28 @@ const PurchaseOrder: React.FC = () => {
                                  type="number"
                                  value={item.buyQuantity}
                                  onChange={(e) => handleFormInputChange(index, 'buyQuantity', Number(e.target.value))}
-                                 className="w-24 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                 className={`w-24 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                   item.buyQuantity > 0 && item.buyQuantity < item.shortageQuantity
+                                     ? 'border-red-500 bg-red-50'
+                                     : item.buyQuantity >= item.shortageQuantity
+                                     ? 'border-green-500 bg-green-50'
+                                     : 'border-gray-300'
+                                 }`}
                                  placeholder="0"
                                  min="0"
                                />
+                               {item.buyQuantity > 0 && (
+                                 <div className={`text-xs mt-1 ${
+                                   item.buyQuantity < item.shortageQuantity
+                                     ? 'text-red-600'
+                                     : 'text-green-600'
+                                 }`}>
+                                   {item.buyQuantity < item.shortageQuantity 
+                                     ? `Need ${item.shortageQuantity - item.buyQuantity} more`
+                                     : `Sufficient quantity`
+                                   }
+                                 </div>
+                               )}
                              </td>
                              <td className="px-6 py-4 whitespace-nowrap">
                                <input

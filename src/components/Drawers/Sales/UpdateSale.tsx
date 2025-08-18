@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { BiX } from "react-icons/bi";
 import axios from "axios";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import { SalesFormValidation } from "../../../Validation/SalesformValidation";
 import { colors } from "../../../theme/colors";
@@ -20,7 +20,6 @@ import {
 
 const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
   const [cookies] = useCookies();
-  const toast = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [partiesData, setpartiesData] = useState([]);
   const [products, setProducts] = useState([]);
@@ -55,13 +54,7 @@ const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
             }
           );
 
-          toast({
-            title: "Sale updated successfully",
-            description: "The sale has been updated successfully.",
-            status: "success",
-            duration: 5000,
-            isClosable: true,
-          });
+          toast.success("Sale updated successfully");
 
           seteditsale(!editshow);
           await refresh();
@@ -91,13 +84,7 @@ const UpdateSale = ({ editshow, seteditsale, sale, refresh }) => {
       setpartiesData(partiesRes.data.data || []);
       setProducts(filteredProducts || []);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch data for dropdowns.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+      toast.error("Failed to fetch data for dropdowns.");
     }
   };
 

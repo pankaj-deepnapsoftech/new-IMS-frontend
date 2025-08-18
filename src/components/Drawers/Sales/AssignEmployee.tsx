@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
-import { Text, Badge, Button, useToast, HStack } from "@chakra-ui/react";
+import { Text, Badge, Button, HStack } from "@chakra-ui/react";
+import { toast } from "react-toastify";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { useFormik } from "formik";
@@ -21,21 +22,26 @@ import {
 } from "lucide-react";
 import { BiX } from "react-icons/bi";
 
-const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurchases }) => {
-    const [tasks, setTasks] = useState([]);
-    const [formData, setFormData] = useState({
-        sale_id: saleData?._id,
-        assined_to: "",
-        assined_process: "",
-        assinedby_comment: "",
-    });
+const AssignEmployee = ({
+  show,
+  setShow,
+  employeeData = [],
+  saleData,
+  fetchPurchases,
+}) => {
+  const [tasks, setTasks] = useState([]);
+  const [formData, setFormData] = useState({
+    sale_id: saleData?._id,
+    assined_to: "",
+    assined_process: "",
+    assinedby_comment: "",
+  });
 
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [editTaskId, setEditTaskId] = useState(null);
-    const [cookies] = useCookies(["access_token"]);
-    const toast = useToast();
-    const token = cookies?.access_token;
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editTaskId, setEditTaskId] = useState(null);
+  const [cookies] = useCookies(["access_token"]);
+  const token = cookies?.access_token;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     values,
@@ -62,42 +68,29 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
         if (!token) throw new Error("Authentication token not found");
 
         if (isEditMode && editTaskId) {
-                  const res =  await axios.patch(
-                        `${process.env.REACT_APP_BACKEND_URL}assined/update/${editTaskId}`,
-                        value,
-                        {
-                            headers: { Authorization: `Bearer ${token}` },
-                        }
-                    );
-                    // console.log(res)
-                    toast({
-                        title: "Task Updated",
-                        description: "The task has been successfully updated.",
-                        status: "success",
-                        duration: 3000,
-                        isClosable: true,
-                    });
-                    setIsEditMode(false);
-                    setEditTaskId(null);
-
-                } else {
-                  const res =  await axios.post(
-                        `${process.env.REACT_APP_BACKEND_URL}assined/create`,
-                        value,
-                        {
-                            headers: { Authorization: `Bearer ${token}` },
-                        }
-                    );
-                  console.log(res)
-                    toast({
-                        title: "Task Created",
-                        description: "The task has been successfully assigned.",
-                        status: "success",
-                        duration: 3000,
-                        isClosable: true,
-                    });
-                }
-                fetchPurchases()
+          const res = await axios.patch(
+            `${process.env.REACT_APP_BACKEND_URL}assined/update/${editTaskId}`,
+            value,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          // console.log(res)
+          toast.success("Task updated successfully");
+          setIsEditMode(false);
+          setEditTaskId(null);
+        } else {
+          const res = await axios.post(
+            `${process.env.REACT_APP_BACKEND_URL}assined/create`,
+            value,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          console.log(res);
+          toast.success("Task assigned successfully");
+        }
+        fetchPurchases();
         resetForm({
           values: {
             sale_id: saleData?._id,
@@ -107,18 +100,11 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
           },
         });
 
-
-                handleClose();
-            } catch (error) {
-                toast({
-                    title: "Error",
-                    description: error?.message,
-                    status: "error",
-                    duration: 3000,
-                    isClosable: true,
-                });
-            } finally {
-                setIsSubmitting(false);
+        handleClose();
+      } catch (error) {
+        toast.error(error?.message || "An error occurred");
+      } finally {
+        setIsSubmitting(false);
       }
     },
   });
@@ -143,23 +129,11 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
         }
       );
 
-      toast({
-        title: "Task Deleted",
-        description: "The task has been successfully deleted.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast.success("Task deleted successfully");
       handleClose();
       setTasks("");
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to remove assigned task.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast.error("Failed to remove assigned task");
     }
   };
 
@@ -203,8 +177,11 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
 
       {/* Modal Wrapper */}
       <div
-        className={`fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-300 ${show ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          }`}
+        className={`fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-300 ${
+          show
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
       >
         <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 sm:mx-6 overflow-hidden transform transition-transform duration-300">
           {/* Header */}
@@ -244,7 +221,9 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
                         <div className="space-y-2 text-sm">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-gray-500" />
-                            <span className="font-medium text-gray-700">Date:</span>
+                            <span className="font-medium text-gray-700">
+                              Date:
+                            </span>
                             <span className="text-gray-600">
                               {new Date(task?.createdAt).toLocaleDateString()}
                             </span>
@@ -275,12 +254,13 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
                               Status:
                             </span>
                             <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${task?.isCompleted === "Completed"
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                task?.isCompleted === "Completed"
                                   ? "bg-green-100 text-green-800"
                                   : task?.isCompleted === "UnderProcessing"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-gray-100 text-gray-800"
-                                }`}
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
                             >
                               {task?.isCompleted}
                             </span>
@@ -299,7 +279,9 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
                         <button
                           onClick={() => {
                             if (
-                              window.confirm("Are you sure you want to delete this task?")
+                              window.confirm(
+                                "Are you sure you want to delete this task?"
+                              )
                             ) {
                               handleDelete(task._id);
                             }
@@ -365,7 +347,9 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
                     placeholder="e.g., Design, Production"
                   />
                   {touched.assined_process && errors.assined_process && (
-                    <p className="text-red-500 text-sm">{errors.assined_process}</p>
+                    <p className="text-red-500 text-sm">
+                      {errors.assined_process}
+                    </p>
                   )}
                 </div>
 
@@ -397,10 +381,11 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${isSubmitting
+                    className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                      isSubmitting
                         ? "bg-blue-700 text-white cursor-not-allowed"
                         : "bg-blue-600 text-white shadow-sm hover:shadow-md"
-                      }`}
+                    }`}
                   >
                     {isSubmitting ? (
                       <div className="flex items-center justify-center gap-2">
@@ -420,7 +405,6 @@ const AssignEmployee = ({ show, setShow, employeeData = [], saleData, fetchPurch
         </div>
       </div>
     </>
-
   );
 };
 

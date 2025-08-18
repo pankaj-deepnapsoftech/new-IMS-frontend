@@ -30,16 +30,16 @@ const styles = StyleSheet.create({
     borderRight: "1px solid #000",
   },
   orderDetailsSection: {
-    width: "30%",
+    width: "15%",
     padding: 8,
     borderRight: "1px solid #000",
   },
   dateSection: {
-    width: "30%",
+    width: "15%",
     padding: 8,
   },
   merchantSection: {
-    width: "40%",
+    width: "50%",
     padding: 8,
     borderRight: "1px solid #000",
   },
@@ -49,13 +49,13 @@ const styles = StyleSheet.create({
     borderRight: "1px solid #000",
   },
   emptySection: {
-    width: "30%",
+    width: "50%",
     padding: 8,
+    borderRight: "1px solid #000",
   },
   billToSection: {
     width: "40%",
     padding: 8,
-    borderRight: "1px solid #000",
   },
   termsSection: {
     width: "60%",
@@ -186,6 +186,28 @@ const styles = StyleSheet.create({
     color: "#333",
     textTransform: "uppercase",
   },
+  termsOfDeliverySection: {
+    marginTop: 25,
+    padding: 15,
+    border: "1px solid #000",
+    minHeight: 75,
+  },
+  termsOfDeliveryLabel: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginBottom: 15,
+    color: "#333",
+    textTransform: "uppercase",
+  },
+  termsWritingSpace: {
+    marginTop: 10,
+  },
+  blankLine: {
+    fontSize: 10,
+    marginBottom: 12,
+    color: "#ccc",
+    letterSpacing: 0.5,
+  },
 });
 
 const toWords = new ToWords({
@@ -222,9 +244,33 @@ const SalesOrderPDF = ({ sale }: any) => {
         <View style={styles.headerSection}>
           {/* Row 1: Company, Order No, Date */}
           <View style={styles.headerRow}>
+            <View style={styles.merchantSection}>
+              <Text style={styles.sectionLabel}>Merchant Name</Text>
+              <Text style={styles.sectionValue}>
+                {sale?.party?.consignee_name?.[0]?.length > 0
+                  ? sale?.party?.consignee_name
+                  : sale?.party?.company_name}
+              </Text>
+            </View>
+            <View style={styles.emptySection}>
+              <Text style={styles.sectionLabel}>Bill To Address</Text>
+              <Text style={styles.sectionValue}>
+                {sale.party?.bill_to || "N/A"}
+              </Text>
+            </View>
+          </View>
+
+          {/* Row 2: Merchant, Payment, Empty */}
+          <View style={styles.headerRow}>
             <View style={styles.companySection}>
               <Text style={styles.sectionLabel}>Company Name</Text>
               <Text style={styles.sectionValue}>Deepnap Softech</Text>
+            </View>
+            <View style={styles.paymentSection}>
+              <Text style={styles.sectionLabel}>Mode of Payment</Text>
+              <Text style={styles.sectionValue}>
+                {sale.mode_of_payment || "N/A"}
+              </Text>
             </View>
             <View style={styles.orderDetailsSection}>
               <Text style={styles.sectionLabel}>Order No</Text>
@@ -237,48 +283,13 @@ const SalesOrderPDF = ({ sale }: any) => {
               </Text>
             </View>
           </View>
-
-          {/* Row 2: Merchant, Payment, Empty */}
-          <View style={styles.headerRow}>
-            <View style={styles.merchantSection}>
-              <Text style={styles.sectionLabel}>Merchant Name</Text>
-              <Text style={styles.sectionValue}>
-                {sale?.party?.consignee_name?.[0]?.length > 0
-                  ? sale?.party?.consignee_name
-                  : sale?.party?.company_name}
-              </Text>
-            </View>
-            <View style={styles.paymentSection}>
-              <Text style={styles.sectionLabel}>Mode of Payment</Text>
-              <Text style={styles.sectionValue}>
-                {sale.mode_of_payment || "N/A"}
-              </Text>
-            </View>
-            <View style={styles.emptySection}></View>
-          </View>
-
-          {/* Row 3: Bill To, Terms of Delivery */}
-          <View style={styles.headerRow}>
-            <View style={styles.billToSection}>
-              <Text style={styles.sectionLabel}>Bill To Address</Text>
-              <Text style={styles.sectionValue}>
-                {sale.party?.bill_to || "N/A"}
-              </Text>
-            </View>
-            <View style={styles.termsSection}>
-              <Text style={styles.sectionLabel}>Terms of Delivery</Text>
-              <Text style={styles.sectionValue}>
-                {sale.terms_of_delivery || sale.comment || "N/A"}
-              </Text>
-            </View>
-          </View>
         </View>
 
         {/* Product Table */}
         <View style={styles.table}>
           <View style={[styles.tableRow, styles.tableHeader]}>
             <Text style={styles.col1}>S. No.</Text>
-            <Text style={styles.col2}>Description</Text>
+            <Text style={styles.col2}>Product Name</Text>
             <Text style={styles.col3}>Quantity</Text>
             <Text style={styles.col4}>SubTotal</Text>
             <Text style={styles.col5}>GST</Text>
@@ -297,7 +308,7 @@ const SalesOrderPDF = ({ sale }: any) => {
           </View>
 
           {/* Empty rows for spacing */}
-          {[...Array(3)].map((_, i) => (
+          {[...Array(5)].map((_, i) => (
             <View key={i} style={styles.tableRow}>
               <Text style={styles.col1}></Text>
               <Text style={styles.col2}></Text>
@@ -342,6 +353,17 @@ const SalesOrderPDF = ({ sale }: any) => {
             <Text style={{ marginTop: 40, fontSize: 10 }}>
               _________________________
             </Text>
+          </View>
+        </View>
+
+        <View style={styles.termsOfDeliverySection}>
+          <Text style={styles.termsOfDeliveryLabel}>Terms of Delivery:</Text>
+          <View style={styles.termsWritingSpace}>
+            {[...Array(8)].map((_, i) => (
+              <Text key={i} style={styles.blankLine}>
+                _________________________________________________________________
+              </Text>
+            ))}
           </View>
         </View>
       </Page>
