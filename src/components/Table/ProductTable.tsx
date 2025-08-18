@@ -24,6 +24,11 @@ import { colors } from "../../theme/colors";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 
+const capitalizeWords = (str: string | undefined | null): string => {
+  if (!str) return "";
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 interface ProductTableProps {
   products: Array<any>;
   isLoadingProducts: boolean;
@@ -46,11 +51,31 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const columns: Column<any>[] = useMemo(
     () => [
       { Header: "ID", accessor: "product_id" },
-      { Header: "Name", accessor: "name" },
-      { Header: "Inventory Category", accessor: "inventory_category" },
-      { Header: "Category", accessor: "category" },
-      { Header: "Sub Category", accessor: "sub_category" },
-      { Header: "Type", accessor: "item_type" },
+      {
+        Header: "Name",
+        accessor: "name",
+        Cell: ({ value }: { value: string }) => capitalizeWords(value),
+      },
+      {
+        Header: "Inventory Category",
+        accessor: "inventory_category",
+        Cell: ({ value }: { value: string }) => capitalizeWords(value) || "N/A",
+      },
+      {
+        Header: "Category",
+        accessor: "category",
+        Cell: ({ value }: { value: string }) => capitalizeWords(value),
+      },
+      {
+        Header: "Sub Category",
+        accessor: "sub_category",
+        Cell: ({ value }: { value: string }) => capitalizeWords(value) || "N/A",
+      },
+      {
+        Header: "Type",
+        accessor: "item_type",
+        Cell: ({ value }: { value: string }) => capitalizeWords(value) || "N/A",
+      },
       { Header: "Product/Service", accessor: "product_or_service" },
       { Header: "UOM", accessor: "uom" },
       { Header: "Price", accessor: "price" },
@@ -359,12 +384,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
-                      Product Color
-                    </th>
-                    <th
-                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{ color: colors.table.headerText }}
-                    >
                       Inventory Type
                     </th>
                     <th
@@ -391,13 +410,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     >
                       Price
                     </th>
-
-                    {/* <th
+                    <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
                       Current Stock
-                    </th> */}
+                    </th>
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -500,19 +518,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           }}
                           title={row.original.name}
                         >
-                          {row.original.name || "N/A"}
+                          {capitalizeWords(row.original.name) || "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
-                          {row.original.color_name || "N/A"}
-                        </td>
-                        <td
-                          className="px-4 py-3 text-sm whitespace-nowrap"
-                          style={{ color: colors.text.secondary }}
-                        >
-                          {row.original.category || "N/A"}
+                          {capitalizeWords(row.original.category) || "N/A"}
                         </td>
                         <td className="px-4 py-3 text-sm whitespace-nowrap">
                           {row.original.inventory_category && (
@@ -529,10 +541,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                     : colors.error[700],
                               }}
                             >
-                              {row.original.inventory_category
-                                .charAt(0)
-                                .toUpperCase() +
-                                row.original.inventory_category.slice(1)}
+                              {capitalizeWords(row.original.inventory_category)}
                             </span>
                           )}
                         </td>
@@ -540,7 +549,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           className="px-4 py-3 text-sm whitespace-nowrap"
                           style={{ color: colors.text.secondary }}
                         >
-                          {row.original.item_type || "N/A"}
+                          {capitalizeWords(row.original.item_type) || "N/A"}
                         </td>
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"

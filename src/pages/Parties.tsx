@@ -126,7 +126,7 @@ const Parties = () => {
       const allPartiesData = await fetchAllPartiesForExport();
 
       if (!allPartiesData || allPartiesData.length === 0) {
-        alert("No data available to export");
+        toast.error("No data available to export");
         return;
       }
 
@@ -177,8 +177,7 @@ const Parties = () => {
 
       XLSX.writeFile(wb, filename);
     } catch (error) {
-      console.error("Error exporting to Excel:", error);
-      alert("Error exporting data to Excel. Please try again.");
+      toast.error("Error exporting data to Excel. Please try again.");
     }
   };
 

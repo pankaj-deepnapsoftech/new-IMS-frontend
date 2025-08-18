@@ -2,8 +2,14 @@ import { FormControl, FormLabel, Input, Button } from "@chakra-ui/react";
 import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import { MdEdit, MdReceipt } from "react-icons/md";
-import { FaFileInvoice, FaCalendarAlt, FaStore, FaUser, FaTags } from "react-icons/fa";
-import React, { useEffect, useState } from "react";
+import {
+  FaFileInvoice,
+  FaCalendarAlt,
+  FaStore,
+  FaUser,
+  FaTags,
+} from "react-icons/fa";
+import React, { useEffect, useState, useCallback } from "react";
 import Select from "react-select";
 import { useUpdateInvoiceMutation } from "../../../redux/api/api";
 import { useCookies } from "react-cookie";
@@ -119,7 +125,8 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
       backgroundColor: "white",
       border: `1px solid ${colors.gray[200]}`,
       borderRadius: "8px",
-      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      boxShadow:
+        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
       zIndex: 9999,
     }),
   };
@@ -161,71 +168,97 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
     }
   };
 
-  const fetchInvoiceDetailsHandler = async (id: string) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + `invoice/${id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
+  const fetchInvoiceDetailsHandler = useCallback(
+    async (id: string) => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(
+          process.env.REACT_APP_BACKEND_URL + `invoice/${id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${cookies?.access_token}`,
+            },
+          }
+        );
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.message);
         }
-      );
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
-      }
 
-      if (data.invoice.buyer) {
-        setBuyer({
-          value: data.invoice?.buyer?._id,
-          label: data.invoice?.buyer?.name,
-        });
-      } else {
-        setSupplier({
-          value: data.invoice?.supplier?._id,
-          label: data.invoice?.supplier?.name,
-        });
-      }
-      setInvoiceNo(data.invoice.invoice_no);
-      setDocumentDate(moment(data.invoice.document_date).format("YYYY-DD-MM"));
-      setSalesOrderDate(
-        moment(data.invoice.sales_order_date).format("YYYY-DD-MM")
-      );
-      setSubtotal(data.invoice.subtotal);
-      setTotal(data.invoice.total);
-      setNote(data.invoice?.note || "");
-      setStore({
-        value: data.invoice.store._id,
-        label: data.invoice.store.name,
-      });
-      setTax({
-        value: data.invoice.tax?.tax_amount,
-        label: data.invoice.tax?.tax_name,
-      });
-      setCategory({
-        value: data.invoice.category,
-        label:
-          data.invoice.category.substr(0, 1).toUpperCase() +
-          data.invoice.category.substr(1),
-      });
-      setInputs(
-        data.invoice.items.map((item: any) => ({
-          item: { value: item.item._id, label: item.item.name },
-          price: item.amount,
-          quantity: item.quantity,
-        }))
-      );
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        // Handle buyer/supplier safely
+        if (data.invoice.buyer) {
+          setBuyer({
+            value: data.invoice?.buyer?._id,
+            label: data.invoice?.buyer?.name,
+          });
+        } else if (data.invoice.supplier) {
+          setSupplier({
+            value: data.invoice?.supplier?._id,
+            label: data.invoice?.supplier?.name,
+          });
+        }
 
-  const fetchBuyersHandler = async () => {
+        setInvoiceNo(data.invoice.invoice_no || data.invoice.invoiceNo || "");
+        setDocumentDate(
+          moment(data.invoice.document_date).format("YYYY-MM-DD")
+        );
+        setSalesOrderDate(
+          moment(data.invoice.sales_order_date).format("YYYY-MM-DD")
+        );
+        setSubtotal(data.invoice.subtotal || 0);
+        setTotal(data.invoice.total || 0);
+        setNote(data.invoice?.note || "");
+
+        // Handle store safely
+        if (data.invoice.store) {
+          setStore({
+            value: data.invoice.store._id,
+            label: data.invoice.store.name,
+          });
+        }
+
+        // Handle tax safely
+        if (data.invoice.tax) {
+          setTax({
+            value: data.invoice.tax?.tax_amount || 0,
+            label: data.invoice.tax?.tax_name || "No Tax",
+          });
+        }
+
+        // Handle category safely
+        if (data.invoice.category) {
+          setCategory({
+            value: data.invoice.category,
+            label:
+              data.invoice.category.charAt(0).toUpperCase() +
+              data.invoice.category.slice(1),
+          });
+        }
+
+        // Handle items safely
+        if (data.invoice.items && Array.isArray(data.invoice.items)) {
+          setInputs(
+            data.invoice.items.map((item: any) => ({
+              item: {
+                value: item.item?._id || item.item || "",
+                label: item.item?.name || "Unknown Item",
+              },
+              price: item.amount || 0,
+              quantity: item.quantity || 0,
+            }))
+          );
+        }
+      } catch (error: any) {
+        toast.error(error.message || "Something went wrong");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [cookies?.access_token]
+  );
+
+  const fetchBuyersHandler = useCallback(async () => {
     try {
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL + "agent/buyers",
@@ -249,9 +282,9 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
-  };
+  }, [cookies?.access_token]);
 
-  const fetchSuppliersHandler = async () => {
+  const fetchSuppliersHandler = useCallback(async () => {
     try {
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL + "agent/suppliers",
@@ -275,9 +308,9 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
-  };
+  }, [cookies?.access_token]);
 
-  const fetchItemsHandler = async () => {
+  const fetchItemsHandler = useCallback(async () => {
     try {
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL + "product/all",
@@ -301,9 +334,9 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
-  };
+  }, [cookies?.access_token]);
 
-  const fetchStoresHandler = async () => {
+  const fetchStoresHandler = useCallback(async () => {
     try {
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL + "store/all",
@@ -326,7 +359,7 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
-  };
+  }, [cookies?.access_token]);
 
   useEffect(() => {
     if (tax && subtotal) {
@@ -346,11 +379,16 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
     fetchItemsHandler();
     fetchStoresHandler();
     fetchSuppliersHandler();
-  }, []);
+  }, [
+    fetchBuyersHandler,
+    fetchItemsHandler,
+    fetchStoresHandler,
+    fetchSuppliersHandler,
+  ]);
 
   useEffect(() => {
     fetchInvoiceDetailsHandler(id || "");
-  }, [id]);
+  }, [id, fetchInvoiceDetailsHandler]);
 
   return (
     <>

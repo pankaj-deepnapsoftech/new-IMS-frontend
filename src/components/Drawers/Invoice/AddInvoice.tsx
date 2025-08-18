@@ -1,38 +1,11 @@
-import React, { useState, useEffect } from "react";
-import {
-  BiX,
-  BiUser,
-  BiPhone,
-  BiMapPin,
-  BiCreditCard,
-  BiCalendar,
-  BiPackage,
-  BiEdit,
-} from "react-icons/bi";
+import React, { useState, useEffect, useCallback } from "react";
+import { BiX, BiMapPin, BiCreditCard, BiPackage, BiEdit } from "react-icons/bi";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import { useCreateInvoiceMutation } from "../../../redux/api/api";
-import {
-  Box,
-  Button,
-  Card,
-  CardBody,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  Grid,
-  GridItem,
-  Heading,
-  HStack,
-  Input,
-  Select as ChakraSelect,
-  Textarea,
-  VStack,
-  Flex,
-  useColorModeValue,
-} from "@chakra-ui/react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import AddItems from "../../Dynamic Add Components/AddItems";
 
 const colors = {
   background: { drawer: "#fff", card: "#fff" },
@@ -75,12 +48,31 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [buyerOptions, setBuyerOptions] = useState<BuyerOption[]>([]);
   const [isLoadingBuyers, setIsLoadingBuyers] = useState(false);
-  const [isManualEntry, setIsManualEntry] = useState(false);
 
-  const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.600");
-  const headingColor = useColorModeValue("gray.700", "gray.200");
-  const textColor = useColorModeValue("gray.600", "gray.300");
+  // Items management
+  const [items, setItems] = useState<
+    {
+      item: { value: string; label: string };
+      quantity: number;
+      price: number;
+      uom?: string;
+    }[]
+  >([{ item: { value: "", label: "" }, quantity: 0, price: 0, uom: "" }]);
+
+  // Tax and totals
+  const [tax, setTax] = useState<{ value: number; label: string } | undefined>({
+    value: 0.18,
+    label: "GST 18%",
+  });
+  const [subtotal, setSubtotal] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
+
+  const taxOptions = [
+    { value: 0.18, label: "GST 18%" },
+    { value: 0.12, label: "GST 12%" },
+    { value: 0.05, label: "GST 5%" },
+    { value: 0, label: "No Tax 0%" },
+  ];
 
   const validationSchema = Yup.object({
     // invoiceNo: Yup.string().required("Invoice number is required"),
@@ -157,25 +149,40 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
       setIsSubmitting(true);
 
       try {
+        // Validate items
+        if (!items.length || items.every((item) => !item.item.value)) {
+          toast.error("Please add at least one item to the invoice");
+          return;
+        }
+
         // Prepare data with both new comprehensive fields and essential legacy fields
         const invoiceData = {
           // New comprehensive fields
           ...values,
 
-          // Essential fields that need to be added
-          // Note: These should be collected from the form or have default values
-          // invoice_no: values.invoiceNo, // Use the invoice number from form
-          document_date: new Date().toISOString(),
-          sales_order_date: new Date().toISOString(),
-          category: "sale", // Default to sale for now
-          note: values.remarks || "", // Use remarks as note
-          buyer: values.consigneeShipTo, // Set buyer ID for legacy support
-          items: [], // Empty items array for now - this needs to be implemented
-          subtotal: 0, // Default values - these need to be calculated
-          total: 0,
+          // Essential fields for invoice functionality
+          invoice_no: values.invoiceNo,
+          document_date: new Date(values.date).toISOString(),
+          sales_order_date: new Date(values.date).toISOString(),
+          category: "sale",
+          note: values.remarks || "",
+          buyer: values.consigneeShipTo,
+
+          // Items with proper mapping
+          items: items
+            .filter((item) => item.item.value && item.quantity > 0)
+            .map((item) => ({
+              item: item.item.value,
+              quantity: item.quantity,
+              amount: item.price,
+            })),
+
+          // Financial calculations
+          subtotal: subtotal,
+          total: total,
           tax: {
-            tax_amount: 0,
-            tax_name: "No Tax",
+            tax_amount: tax?.value || 0,
+            tax_name: tax?.label || "No Tax",
           },
         };
 
@@ -186,7 +193,15 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
         }
         toast.success(response.message || "Invoice created successfully!");
         fetchInvoicesHandler();
+
+        // Reset form and items
         formik.resetForm();
+        setItems([
+          { item: { value: "", label: "" }, quantity: 0, price: 0, uom: "" },
+        ]);
+        setSubtotal(0);
+        setTotal(0);
+
         closeDrawerHandler();
       } catch (error: any) {
         console.error(error);
@@ -198,7 +213,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
   });
 
   // Fetch buyers (parties with merchant type "Buyer")
-  const fetchBuyersHandler = async () => {
+  const fetchBuyersHandler = useCallback(async () => {
     try {
       setIsLoadingBuyers(true);
       const response = await fetch(
@@ -231,7 +246,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
     } finally {
       setIsLoadingBuyers(false);
     }
-  };
+  }, [cookies?.access_token]);
 
   const handleBuyerSelect = (buyerId: string) => {
     const selectedBuyer = buyerOptions.find((buyer) => buyer.value === buyerId);
@@ -255,7 +270,23 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
 
   useEffect(() => {
     fetchBuyersHandler();
-  }, []);
+  }, [fetchBuyersHandler]);
+
+  // Calculate subtotal when items change
+  useEffect(() => {
+    const newSubtotal = items.reduce((acc, curr) => acc + (curr.price || 0), 0);
+    setSubtotal(newSubtotal);
+  }, [items]);
+
+  // Calculate total when subtotal or tax changes
+  useEffect(() => {
+    if (tax && subtotal) {
+      const taxAmount = subtotal * (tax.value || 0);
+      setTotal(subtotal + taxAmount);
+    } else {
+      setTotal(subtotal);
+    }
+  }, [tax, subtotal]);
 
   // const addInvoiceHandler = async (e: React.FormEvent) => {
   //   e.preventDefault();
@@ -417,40 +448,6 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
   //   fetchStoresHandler();
   //   fetchSuppliersHandler();
   // }, []);
-
-  const customSelectStyles = {
-    control: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: colors.input.background,
-      borderColor: state.isFocused
-        ? colors.input.borderFocus
-        : colors.input.border,
-      borderRadius: "8px",
-      minHeight: "44px",
-      boxShadow: state.isFocused ? `0 0 0 3px ${colors.primary[100]}` : "none",
-      "&:hover": {
-        borderColor: colors.input.borderHover,
-      },
-    }),
-    option: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: state.isSelected
-        ? colors.primary[500]
-        : state.isFocused
-        ? colors.primary[50]
-        : colors.input.background,
-      color: state.isSelected ? colors.text.inverse : colors.text.primary,
-      padding: "12px",
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      color: colors.text.primary,
-    }),
-    placeholder: (provided: any) => ({
-      ...provided,
-      color: colors.text.muted,
-    }),
-  };
 
   return (
     <div
@@ -1340,6 +1337,135 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     color: colors.text.primary,
                   }}
                   placeholder="Enter any remarks"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Items Section */}
+          <div
+            className="p-6 rounded-xl border"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: colors.primary[50] }}
+              >
+                <BiPackage size={20} style={{ color: colors.primary[500] }} />
+              </div>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.text.primary }}
+              >
+                Invoice Items
+              </h3>
+            </div>
+
+            <AddItems inputs={items} setInputs={setItems} />
+          </div>
+
+          {/* Tax and Financial Summary */}
+          <div
+            className="p-6 rounded-xl border"
+            style={{
+              backgroundColor: colors.background.card,
+              borderColor: colors.border.light,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: colors.primary[50] }}
+              >
+                <BiCreditCard
+                  size={20}
+                  style={{ color: colors.primary[500] }}
+                />
+              </div>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.text.primary }}
+              >
+                Tax & Financial Summary
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Tax
+                </label>
+                <select
+                  value={tax?.value || 0}
+                  onChange={(e) => {
+                    const selectedTax = taxOptions.find(
+                      (opt) => opt.value === parseFloat(e.target.value)
+                    );
+                    setTax(selectedTax);
+                  }}
+                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                >
+                  {taxOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Subtotal
+                </label>
+                <input
+                  type="text"
+                  value={`₹${subtotal.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`}
+                  readOnly
+                  className="w-full px-4 py-2 text-sm rounded-lg border bg-gray-50"
+                  style={{
+                    backgroundColor: colors.gray[100],
+                    borderColor: colors.input.border,
+                    color: colors.text.secondary,
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Total Amount
+                </label>
+                <input
+                  type="text"
+                  value={`₹${total.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`}
+                  readOnly
+                  className="w-full px-4 py-2 text-sm rounded-lg border bg-green-50 font-semibold text-green-700"
+                  style={{
+                    borderColor: colors.input.border,
+                  }}
                 />
               </div>
             </div>

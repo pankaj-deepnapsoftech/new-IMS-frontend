@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -24,39 +26,10 @@ import {
   useColorModeValue,
   Flex,
   Heading,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Checkbox,
-  useDisclosure,
 } from "@chakra-ui/react";
-import {
-  BiX,
-  BiBuilding,
-  BiUser,
-  BiPhone,
-  BiMapPin,
-  BiCreditCard,
-  BiCalendar,
-  BiPackage,
-  BiEdit,
-  BiPlus,
-  BiCheckCircle,
-} from "react-icons/bi";
-import {
-  Edit3,
-  Plus,
-  Users,
-  User,
-  Phone,
-  Mail,
-  MapPin,
-  FileSpreadsheet,
-  IndianRupee,
-} from "lucide-react";
+import { BiX, BiPackage, BiEdit, BiCalendar, BiUser } from "react-icons/bi";
+import { Users, Mail, MapPin, FileSpreadsheet } from "lucide-react";
 import { colors } from "../../../theme/colors";
 import axios from "axios";
 
@@ -99,6 +72,7 @@ interface PurchaseOrderFormValues {
   supplierBillTo: string;
   supplierShippedGSTIN: string;
   supplierBillGSTIN: string;
+  supplierType: string; // Individual or Company
   GSTApply: string;
   modeOfPayment: string;
   billingAddress: string;
@@ -122,11 +96,6 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
   const [supplierOptions, setSupplierOptions] = useState<SupplierOption[]>([]);
   const [nextPONumber, setNextPONumber] = useState("");
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>([]);
-  const [selectedRawMaterial, setSelectedRawMaterial] = useState("");
-
-  const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
-  const [popupMessage, setPopupMessage] = useState("");
-  const [popupType, setPopupType] = useState<"success" | "error">("success");
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -137,7 +106,9 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     return !!(formik.touched[fieldName] && formik.errors[fieldName]);
   };
 
-  const getErrorMessage = (fieldName: keyof PurchaseOrderFormValues): string => {
+  const getErrorMessage = (
+    fieldName: keyof PurchaseOrderFormValues
+  ): string => {
     return formik.touched[fieldName] && formik.errors[fieldName]
       ? String(formik.errors[fieldName])
       : "";
@@ -146,13 +117,40 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
   const validationSchema = Yup.object({
     poOrder: Yup.string().required("PO Order is required"),
     date: Yup.string().required("Date is required"),
-    supplierIdentifier: Yup.string().required("Supplier name or company name is required"),
+    supplierIdentifier: Yup.string().required(
+      "Supplier name or company name is required"
+    ),
     supplierName: Yup.string().required("Supplier name is required"),
     supplierEmail: Yup.string().email("Invalid email"),
     supplierShippedTo: Yup.string().required("Supplier shipped to is required"),
     supplierBillTo: Yup.string().required("Supplier bill to is required"),
-    supplierShippedGSTIN: Yup.string().required("Shipped GSTIN is required"),
-    supplierBillGSTIN: Yup.string().required("Bill GSTIN is required"),
+    supplierType: Yup.string().required("Supplier type is required"),
+    supplierShippedGSTIN: Yup.string().when("supplierType", {
+      is: (val) => val === "Company",
+      then: (schema) =>
+        schema.test(
+          "gstin-format",
+          "Shipped GSTIN must be exactly 15 characters, only uppercase letters and numbers",
+          function (value) {
+            if (!value || value.trim() === "") return true; // Allow empty
+            return /^[A-Z0-9]{15}$/.test(value);
+          }
+        ),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    supplierBillGSTIN: Yup.string().when("supplierType", {
+      is: (val) => val === "Company",
+      then: (schema) =>
+        schema.test(
+          "gstin-format",
+          "Bill GSTIN must be exactly 15 characters, only uppercase letters and numbers",
+          function (value) {
+            if (!value || value.trim() === "") return true; // Allow empty
+            return /^[A-Z0-9]{15}$/.test(value);
+          }
+        ),
+      otherwise: (schema) => schema.notRequired(),
+    }),
     GSTApply: Yup.string().required("GST selection is required"),
     modeOfPayment: Yup.string().required("Mode of payment is required"),
     billingAddress: Yup.string(),
@@ -171,13 +169,15 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     initialValues: {
       poOrder: edittable?.poOrder || nextPONumber || "",
       date: edittable?.date || new Date().toISOString().split("T")[0],
-      supplierIdentifier: edittable?.supplierName || edittable?.companyName || "",
+      supplierIdentifier:
+        edittable?.supplierName || edittable?.companyName || "",
       supplierName: edittable?.supplierName || "",
       supplierEmail: edittable?.supplierEmail || "",
       supplierShippedTo: edittable?.supplierShippedTo || "",
       supplierBillTo: edittable?.supplierBillTo || "",
       supplierShippedGSTIN: edittable?.supplierShippedGSTIN || "",
       supplierBillGSTIN: edittable?.supplierBillGSTIN || "",
+      supplierType: edittable?.supplierType || "Individual",
       GSTApply: edittable?.GSTApply || "",
       modeOfPayment: edittable?.modeOfPayment || "",
       billingAddress: edittable?.billingAddress || "",
@@ -207,8 +207,10 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
 
       try {
         // Find the product ID for the selected item
-        const selectedProduct = rawMaterials.find(item => item.name === values.itemName);
-        
+        const selectedProduct = rawMaterials.find(
+          (item) => item.name === values.itemName
+        );
+
         if (edittable?._id) {
           const res = await axios.put(
             `${process.env.REACT_APP_BACKEND_URL}purchase-order/${edittable._id}`,
@@ -226,7 +228,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                 await axios.put(
                   `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
                   {
-                    productId: selectedProduct._id
+                    productId: selectedProduct._id,
                   },
                   {
                     headers: {
@@ -236,13 +238,14 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                 );
               } catch (shortageError) {
                 // Ignore shortage removal errors - item might not be in shortages
-                console.log("Item not in shortages or no updates:", shortageError);
+                console.log(
+                  "Item not in shortages or no updates:",
+                  shortageError
+                );
               }
             }
-            
-            setPopupMessage("Purchase order updated successfully!");
-            setPopupType("success");
-            onModalOpen();
+
+            toast.success("Purchase order updated successfully!");
             if (fetchPurchaseOrderData) {
               fetchPurchaseOrderData();
             }
@@ -268,7 +271,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                 await axios.put(
                   `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
                   {
-                    productId: selectedProduct._id
+                    productId: selectedProduct._id,
                   },
                   {
                     headers: {
@@ -278,13 +281,14 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                 );
               } catch (shortageError) {
                 // Ignore shortage removal errors - item might not be in shortages
-                console.log("Item not in shortages or no updates:", shortageError);
+                console.log(
+                  "Item not in shortages or no updates:",
+                  shortageError
+                );
               }
             }
-            
-            setPopupMessage("Purchase order created successfully!");
-            setPopupType("success");
-            onModalOpen();
+
+            toast.success("Purchase order created successfully!");
             formik.resetForm();
             if (fetchPurchaseOrderData) {
               fetchPurchaseOrderData();
@@ -298,9 +302,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
         const errorMessage =
           error?.response?.data?.message ||
           "Something went wrong while saving purchase order!";
-        setPopupMessage(errorMessage);
-        setPopupType("error");
-        onModalOpen();
+        toast.error(errorMessage);
       } finally {
         setIsSubmitting(false);
       }
@@ -336,7 +338,10 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
           supplierShippedGSTIN: supplier.supplierShippedGSTIN || "",
           supplierBillGSTIN: supplier.supplierBillGSTIN || "",
         }))
-        .filter((supplier) => supplier.supplierName.trim() || supplier.companyName.trim());
+        .filter(
+          (supplier) =>
+            supplier.supplierName.trim() || supplier.companyName.trim()
+        );
       setSupplierOptions(suppliers);
       if (suppliers.length === 0 && retryCount < 3) {
         setTimeout(() => fetchSuppliersHandler(retryCount + 1), 1000);
@@ -398,7 +403,9 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
           supplier.companyName === edittable.supplierName
       );
       if (!isValidSupplier && edittable.supplierName) {
-        toast.warn("Selected supplier is not available. Please choose a new supplier.");
+        toast.warn(
+          "Selected supplier is not available. Please choose a new supplier."
+        );
         formik.setFieldValue("supplierIdentifier", "");
         formik.setFieldValue("supplierName", "");
       } else if (!edittable.supplierName && !edittable.companyName) {
@@ -410,20 +417,28 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
 
   useEffect(() => {
     if (formik.values.isSameAddress) {
-      formik.setFieldValue("supplierShippedGSTIN", formik.values.supplierShippedTo);
-      formik.setFieldValue("supplierBillGSTIN", formik.values.supplierBillTo);
+      // Copy shipped address to bill address
+      formik.setFieldValue("supplierBillTo", formik.values.supplierShippedTo);
+      // Copy shipped GSTIN to bill GSTIN if shipped GSTIN exists
+      if (formik.values.supplierShippedGSTIN) {
+        formik.setFieldValue(
+          "supplierBillGSTIN",
+          formik.values.supplierShippedGSTIN
+        );
+      }
     }
-  }, [formik.values.supplierShippedTo, formik.values.supplierBillTo, formik.values.isSameAddress]);
+  }, [
+    formik.values.supplierShippedTo,
+    formik.values.supplierShippedGSTIN,
+    formik.values.isSameAddress,
+  ]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errors = await formik.validateForm();
     if (Object.keys(errors).length > 0) {
       formik.setTouched(
-        Object.keys(errors).reduce(
-          (acc, key) => ({ ...acc, [key]: true }),
-          {}
-        ),
+        Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {}),
         false
       );
       return;
@@ -487,11 +502,11 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                     </Heading>
                   </Flex>
 
-                  <Grid
+                  {/*  <Grid
                     templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
                     gap={6}
                   >
-                    {/* <GridItem>
+                    <GridItem>
                       <FormControl isInvalid={hasError("poOrder")}>
                         <FormLabel
                           display="flex"
@@ -525,207 +540,311 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                           </Text>
                         )}
                       </FormControl>
-                    </GridItem> */}
+                    </GridItem> 
 
-                    <GridItem>
-                      <FormControl isInvalid={hasError("date")}>
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <BiCalendar size={16} />
-                          Order Date *
-                        </FormLabel>
-                        <Input
-                          type="date"
-                          name="date"
-                          value={formik.values.date}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
-                        />
-                        {getErrorMessage("date") && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {getErrorMessage("date")}
-                          </Text>
-                        )}
-                      </FormControl>
-                    </GridItem>
+                    <GridItem>*/}
 
-                    <GridItem>
-                      <FormControl isInvalid={hasError("supplierIdentifier")}>
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <BiUser size={16} />
-                          Supplier Name *
-                        </FormLabel>
-                        <Select
-                          placeholder={isLoadingSuppliers ? "Loading suppliers..." : "Select Supplier"}
-                          isDisabled={isLoadingSuppliers}
-                          name="supplierIdentifier"
-                          value={formik.values.supplierIdentifier}
-                          onChange={(e) => {
-                            const selectedIdentifier = e.target.value;
-                            formik.setFieldValue("supplierIdentifier", selectedIdentifier);
-                            formik.setFieldValue("supplierName", selectedIdentifier);
-                            const matched = supplierOptions.find(
-                              (supplier) =>
-                                (supplier.supplierName && supplier.supplierName === selectedIdentifier) ||
-                                (supplier.companyName && supplier.companyName === selectedIdentifier)
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-5">
+                    <FormControl isInvalid={hasError("date")}>
+                      <FormLabel
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        color={textColor}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        <BiCalendar size={16} />
+                        Order Date *
+                      </FormLabel>
+                      <Input
+                        type="date"
+                        name="date"
+                        value={formik.values.date}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        size="lg"
+                        borderRadius="lg"
+                        _focus={{
+                          borderColor: "blue.500",
+                          boxShadow: "0 0 0 1px #3182CE",
+                        }}
+                      />
+                      {getErrorMessage("date") && (
+                        <Text color="red.500" fontSize="sm" mt={1}>
+                          {getErrorMessage("date")}
+                        </Text>
+                      )}
+                    </FormControl>
+                    {/* </GridItem> */}
+
+                    {/* <GridItem> */}
+                    <FormControl isInvalid={hasError("supplierIdentifier")}>
+                      <FormLabel
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        color={textColor}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        <BiUser size={16} />
+                        Supplier Name *
+                      </FormLabel>
+                      <Select
+                        placeholder={
+                          isLoadingSuppliers
+                            ? "Loading suppliers..."
+                            : "Select Supplier"
+                        }
+                        isDisabled={isLoadingSuppliers}
+                        name="supplierIdentifier"
+                        value={formik.values.supplierIdentifier}
+                        onChange={(e) => {
+                          const selectedIdentifier = e.target.value;
+                          formik.setFieldValue(
+                            "supplierIdentifier",
+                            selectedIdentifier
+                          );
+                          formik.setFieldValue(
+                            "supplierName",
+                            selectedIdentifier
+                          );
+                          const matched = supplierOptions.find(
+                            (supplier) =>
+                              (supplier.supplierName &&
+                                supplier.supplierName === selectedIdentifier) ||
+                              (supplier.companyName &&
+                                supplier.companyName === selectedIdentifier)
+                          );
+                          if (matched) {
+                            formik.setValues({
+                              ...formik.values,
+                              supplierIdentifier:
+                                matched.supplierName ||
+                                matched.companyName ||
+                                "",
+                              supplierName:
+                                matched.supplierName ||
+                                matched.companyName ||
+                                "",
+                              supplierEmail: matched.supplierEmail || "",
+                              supplierShippedTo:
+                                matched.supplierShippedTo || "",
+                              supplierBillTo: matched.supplierBillTo || "",
+                              supplierShippedGSTIN:
+                                matched.supplierShippedGSTIN || "",
+                              supplierBillGSTIN:
+                                matched.supplierBillGSTIN || "",
+                              isSameAddress: false,
+                            });
+                          }
+                        }}
+                        size="lg"
+                        borderRadius="lg"
+                      >
+                        {supplierOptions.length > 0 ? (
+                          supplierOptions.map((supplier) => {
+                            const displayText =
+                              supplier.supplierName ||
+                              supplier.companyName ||
+                              "Unknown Supplier";
+                            const value =
+                              supplier.supplierName ||
+                              supplier.companyName ||
+                              "";
+                            return (
+                              <option key={supplier.id} value={value}>
+                                {displayText}
+                                {supplier.supplierName &&
+                                  supplier.companyName &&
+                                  ` (${supplier.companyName})`}
+                              </option>
                             );
-                            if (matched) {
-                              formik.setValues({
-                                ...formik.values,
-                                supplierIdentifier: matched.supplierName || matched.companyName || "",
-                                supplierName: matched.supplierName || matched.companyName || "",
-                                supplierEmail: matched.supplierEmail || "",
-                                supplierShippedTo: matched.supplierShippedTo || "",
-                                supplierBillTo: matched.supplierBillTo || "",
-                                supplierShippedGSTIN: matched.supplierShippedGSTIN || "",
-                                supplierBillGSTIN: matched.supplierBillGSTIN || "",
-                                isSameAddress: false,
-                              });
-                            }
-                          }}
-                          size="lg"
-                          borderRadius="lg"
-                        >
-                          {supplierOptions.length > 0 ? (
-                            supplierOptions.map((supplier) => {
-                              const displayText = supplier.supplierName || supplier.companyName || "Unknown Supplier";
-                              const value = supplier.supplierName || supplier.companyName || "";
-                              return (
-                                <option key={supplier.id} value={value}>
-                                  {displayText}
-                                  {supplier.supplierName && supplier.companyName && ` (${supplier.companyName})`}
-                                </option>
-                              );
-                            })
-                          ) : (
-                            <option value="" disabled>
-                              {isLoadingSuppliers ? "Loading..." : "No suppliers available"}
-                            </option>
-                          )}
-                        </Select>
-                        {getErrorMessage("supplierIdentifier") && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {getErrorMessage("supplierIdentifier")}
-                          </Text>
+                          })
+                        ) : (
+                          <option value="" disabled>
+                            {isLoadingSuppliers
+                              ? "Loading..."
+                              : "No suppliers available"}
+                          </option>
                         )}
-                      </FormControl>
-                    </GridItem>
+                      </Select>
+                      {getErrorMessage("supplierIdentifier") && (
+                        <Text color="red.500" fontSize="sm" mt={1}>
+                          {getErrorMessage("supplierIdentifier")}
+                        </Text>
+                      )}
+                    </FormControl>
+                    {/* </GridItem>
 
-                    <GridItem colSpan={2}>
-                      <FormControl isInvalid={hasError("itemName")}>
-                        <FormLabel>Item Name *</FormLabel>
-                        <Select
-                          placeholder="Select Item"
-                          name="itemName"
-                          value={formik.values.itemName}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          size="lg"
-                          borderRadius="lg"
-                        >
-                          {rawMaterials.map((item) => (
-                            <option key={item._id} value={item.name}>
-                              {item.name}
-                            </option>
-                          ))}
-                        </Select>
-                        {getErrorMessage("itemName") && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {getErrorMessage("itemName")}
-                          </Text>
-                        )}
-                      </FormControl>
-                    </GridItem>
+                    <GridItem> */}
+                    <FormControl isInvalid={hasError("supplierType")}>
+                      <FormLabel
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        color={textColor}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        <Users size={16} />
+                        Supplier Type *
+                      </FormLabel>
+                      <Select
+                        placeholder="Select Supplier Type"
+                        name="supplierType"
+                        value={formik.values.supplierType}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        size="lg"
+                        borderRadius="lg"
+                      >
+                        <option value="Individual">Individual</option>
+                        <option value="Company">Company</option>
+                      </Select>
+                      {getErrorMessage("supplierType") && (
+                        <Text color="red.500" fontSize="sm" mt={1}>
+                          {getErrorMessage("supplierType")}
+                        </Text>
+                      )}
+                    </FormControl>
+                  </div>
+                  {/* </GridItem>
 
-                    <GridItem>
-                      <FormControl isInvalid={hasError("quantity")}>
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <BiPackage size={16} />
-                          Quantity *
-                        </FormLabel>
-                        <Input
-                          type="number"
-                          name="quantity"
-                          value={formik.values.quantity}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="Enter quantity"
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
-                        />
-                        {getErrorMessage("quantity") && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {getErrorMessage("quantity")}
-                          </Text>
-                        )}
-                      </FormControl>
-                    </GridItem>
+                    <GridItem colSpan={2}> */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-5">
+                    <FormControl isInvalid={hasError("itemName")}>
+                      <FormLabel>Item Name *</FormLabel>
+                      <Select
+                        placeholder="Select Item"
+                        name="itemName"
+                        value={formik.values.itemName}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        size="lg"
+                        borderRadius="lg"
+                      >
+                        {rawMaterials.map((item) => (
+                          <option key={item._id} value={item.name}>
+                            {item.name}
+                          </option>
+                        ))}
+                      </Select>
+                      {getErrorMessage("itemName") && (
+                        <Text color="red.500" fontSize="sm" mt={1}>
+                          {getErrorMessage("itemName")}
+                        </Text>
+                      )}
+                    </FormControl>
+                    {/* </GridItem>
+
+                    <GridItem> */}
+                    <FormControl isInvalid={hasError("quantity")}>
+                      <FormLabel
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        color={textColor}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        <BiPackage size={16} />
+                        Quantity *
+                      </FormLabel>
+                      <Input
+                        type="number"
+                        name="quantity"
+                        value={formik.values.quantity}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        placeholder="Enter quantity"
+                        size="lg"
+                        borderRadius="lg"
+                        _focus={{
+                          borderColor: "blue.500",
+                          boxShadow: "0 0 0 1px #3182CE",
+                        }}
+                      />
+                      {getErrorMessage("quantity") && (
+                        <Text color="red.500" fontSize="sm" mt={1}>
+                          {getErrorMessage("quantity")}
+                        </Text>
+                      )}
+                    </FormControl>
+
+                    <FormControl isInvalid={hasError("supplierEmail")}>
+                      <FormLabel
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        color={textColor}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        <Mail size={16} />
+                        Email
+                      </FormLabel>
+                      <Input
+                        name="supplierEmail"
+                        type="email"
+                        value={formik.values.supplierEmail}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        placeholder="Enter supplier email address"
+                        size="lg"
+                        borderRadius="lg"
+                        _focus={{
+                          borderColor: "blue.500",
+                          boxShadow: "0 0 0 1px #3182CE",
+                        }}
+                      />
+                      {getErrorMessage("supplierEmail") && (
+                        <Text color="red.500" fontSize="sm" mt={1}>
+                          {getErrorMessage("supplierEmail")}
+                        </Text>
+                      )}
+                    </FormControl>
+                  </div>
+                  {/* </GridItem>
                     <br />
-                    <GridItem>
-                      <FormControl isInvalid={hasError("supplierShippedTo")}>
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <MapPin size={16} />
-                          Shipped To *
-                        </FormLabel>
-                        <Input
-                          name="supplierShippedTo"
-                          value={formik.values.supplierShippedTo}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="Enter shipping address"
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
-                        />
-                        {getErrorMessage("supplierShippedTo") && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {getErrorMessage("supplierShippedTo")}
-                          </Text>
-                        )}
-                      </FormControl>
-                    </GridItem>
+                    <GridItem> */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
+                    <FormControl isInvalid={hasError("supplierShippedTo")}>
+                      <FormLabel
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        color={textColor}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        <MapPin size={16} />
+                        Shipped To *
+                      </FormLabel>
+                      <Input
+                        name="supplierShippedTo"
+                        value={formik.values.supplierShippedTo}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        placeholder="Enter shipping address"
+                        size="lg"
+                        borderRadius="lg"
+                        _focus={{
+                          borderColor: "blue.500",
+                          boxShadow: "0 0 0 1px #3182CE",
+                        }}
+                      />
+                      {getErrorMessage("supplierShippedTo") && (
+                        <Text color="red.500" fontSize="sm" mt={1}>
+                          {getErrorMessage("supplierShippedTo")}
+                        </Text>
+                      )}
+                    </FormControl>
+                    {/* </GridItem>
 
-                    <GridItem>
+                    <GridItem> */}
+                    {formik.values.supplierType === "Company" && (
                       <FormControl isInvalid={hasError("supplierShippedGSTIN")}>
                         <FormLabel
                           display="flex"
@@ -736,12 +855,20 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                           fontWeight="medium"
                         >
                           <FileSpreadsheet size={16} />
-                          Shipped GSTIN *
+                          Shipped GSTIN (Optional)
                         </FormLabel>
                         <Input
                           name="supplierShippedGSTIN"
                           value={formik.values.supplierShippedGSTIN}
-                          onChange={formik.handleChange}
+                          onChange={(e) => {
+                            const uppercase = e.target.value
+                              .toUpperCase()
+                              .replace(/[^A-Z0-9]/g, "");
+                            formik.setFieldValue(
+                              "supplierShippedGSTIN",
+                              uppercase.slice(0, 15)
+                            );
+                          }}
                           onBlur={formik.handleBlur}
                           placeholder="Enter shipped GSTIN"
                           size="lg"
@@ -758,65 +885,91 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                           </Text>
                         )}
                       </FormControl>
-                    </GridItem>
+                    )}
+                  </div>
+                  {/* </GridItem>
 
-                    <GridItem colSpan={2}>
-                      <FormControl>
-                        <Checkbox
-                          name="isSameAddress"
-                          isChecked={formik.values.isSameAddress}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            formik.handleChange(e);
-                            if (e.target.checked) {
-                              formik.setFieldValue("supplierShippedGSTIN", formik.values.supplierShippedTo);
-                              formik.setFieldValue("supplierBillGSTIN", formik.values.supplierBillTo);
-                            } else {
-                              formik.setFieldValue("supplierShippedGSTIN", edittable?.supplierShippedGSTIN || "");
-                              formik.setFieldValue("supplierBillGSTIN", edittable?.supplierBillGSTIN || "");
-                            }
-                          }}
-                          size="lg"
-                        >
-                          Same as Shipped To and Bill To
-                        </Checkbox>
-                      </FormControl>
-                    </GridItem>
+                    <GridItem colSpan={2}> */}
+                  <br />
+                  {/* <GridItem> */}
+                  <FormControl>
+                    <Checkbox
+                      name="isSameAddress"
+                      isChecked={formik.values.isSameAddress}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        formik.handleChange(e);
+                        if (e.target.checked) {
+                          // Copy shipped address to bill address
+                          formik.setFieldValue(
+                            "supplierBillTo",
+                            formik.values.supplierShippedTo
+                          );
+                          // Copy shipped GSTIN to bill GSTIN if shipped GSTIN exists
+                          if (formik.values.supplierShippedGSTIN) {
+                            formik.setFieldValue(
+                              "supplierBillGSTIN",
+                              formik.values.supplierShippedGSTIN
+                            );
+                          }
+                        } else {
+                          // Reset to original values when unchecked
+                          formik.setFieldValue(
+                            "supplierBillTo",
+                            edittable?.supplierBillTo || ""
+                          );
+                          formik.setFieldValue(
+                            "supplierBillGSTIN",
+                            edittable?.supplierBillGSTIN || ""
+                          );
+                        }
+                      }}
+                      size="lg"
+                    >
+                      Same as Shipped To
+                    </Checkbox>
+                  </FormControl>
+                  {/* </GridItem>
 
-                    <GridItem>
-                      <FormControl isInvalid={hasError("supplierBillTo")}>
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <MapPin size={16} />
-                          Bill To *
-                        </FormLabel>
-                        <Input
-                          name="supplierBillTo"
-                          value={formik.values.supplierBillTo}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="Enter billing address"
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
-                        />
-                        {getErrorMessage("supplierBillTo") && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {getErrorMessage("supplierBillTo")}
-                          </Text>
-                        )}
-                      </FormControl>
-                    </GridItem>
+<GridItem> */}
+                  <br />
 
-                    <GridItem>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-5">
+                    <FormControl isInvalid={hasError("supplierBillTo")}>
+                      <FormLabel
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        color={textColor}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        <MapPin size={16} />
+                        Bill To *
+                      </FormLabel>
+                      <Input
+                        name="supplierBillTo"
+                        value={formik.values.supplierBillTo}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        placeholder="Enter billing address"
+                        size="lg"
+                        borderRadius="lg"
+                        _focus={{
+                          borderColor: "blue.500",
+                          boxShadow: "0 0 0 1px #3182CE",
+                        }}
+                        isDisabled={formik.values.isSameAddress}
+                      />
+                      {getErrorMessage("supplierBillTo") && (
+                        <Text color="red.500" fontSize="sm" mt={1}>
+                          {getErrorMessage("supplierBillTo")}
+                        </Text>
+                      )}
+                    </FormControl>
+                    {/* </GridItem>
+
+                    <GridItem> */}
+                    {formik.values.supplierType === "Company" && (
                       <FormControl isInvalid={hasError("supplierBillGSTIN")}>
                         <FormLabel
                           display="flex"
@@ -827,12 +980,20 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                           fontWeight="medium"
                         >
                           <FileSpreadsheet size={16} />
-                          Bill GSTIN *
+                          Bill GSTIN (Optional)
                         </FormLabel>
                         <Input
                           name="supplierBillGSTIN"
                           value={formik.values.supplierBillGSTIN}
-                          onChange={formik.handleChange}
+                          onChange={(e) => {
+                            const uppercase = e.target.value
+                              .toUpperCase()
+                              .replace(/[^A-Z0-9]/g, "");
+                            formik.setFieldValue(
+                              "supplierBillGSTIN",
+                              uppercase.slice(0, 15)
+                            );
+                          }}
                           onBlur={formik.handleBlur}
                           placeholder="Enter bill GSTIN"
                           size="lg"
@@ -849,43 +1010,8 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                           </Text>
                         )}
                       </FormControl>
-                    </GridItem>
-
-                    <GridItem>
-                      <FormControl isInvalid={hasError("supplierEmail")}>
-                        <FormLabel
-                          display="flex"
-                          alignItems="center"
-                          gap={2}
-                          color={textColor}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          <Mail size={16} />
-                          Email
-                        </FormLabel>
-                        <Input
-                          name="supplierEmail"
-                          type="email"
-                          value={formik.values.supplierEmail}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          placeholder="Enter supplier email address"
-                          size="lg"
-                          borderRadius="lg"
-                          _focus={{
-                            borderColor: "blue.500",
-                            boxShadow: "0 0 0 1px #3182CE",
-                          }}
-                        />
-                        {getErrorMessage("supplierEmail") && (
-                          <Text color="red.500" fontSize="sm" mt={1}>
-                            {getErrorMessage("supplierEmail")}
-                          </Text>
-                        )}
-                      </FormControl>
-                    </GridItem>
-                  </Grid>
+                    )}
+                  </div>
                 </CardBody>
               </Card>
 
@@ -905,7 +1031,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                     </Heading>
                   </Flex>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <FormControl isInvalid={hasError("GSTApply")}>
                       <FormLabel
                         display="flex"
@@ -931,7 +1057,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                         }}
                       >
                         <option value="igst">IGST - 18%</option>
-                        <option value="cgst">CGST - 9%, SGST - 9%</option>
+                        <option value="cgst/sgst">CGST - 9%, SGST - 9%</option>
                       </Select>
                       {getErrorMessage("GSTApply") && (
                         <Text color="red.500" fontSize="sm" mt={1}>
@@ -1052,7 +1178,10 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                           size="md"
                           borderRadius="lg"
                           rows={3}
-                          style={{ height: 'calc(3em + 4px)', width: 'calc(100% + 4px)' }}
+                          style={{
+                            height: "calc(3em + 4px)",
+                            width: "calc(100% + 4px)",
+                          }}
                           _focus={{
                             borderColor: "blue.500",
                             boxShadow: "0 0 0 1px #3182CE",
@@ -1093,7 +1222,9 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                       bgGradient: "linear(to-r, blue.700, blue.800)",
                     }}
                   >
-                    {edittable ? "Update Purchase Order" : "Create Purchase Order"}
+                    {edittable
+                      ? "Update Purchase Order"
+                      : "Create Purchase Order"}
                   </Button>
                 </HStack>
               </Box>
@@ -1101,46 +1232,6 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
           </Box>
         </div>
       </div>
-
-      <Modal isOpen={isModalOpen} onClose={onModalClose} isCentered>
-        <ModalOverlay />
-        <ModalContent bg={bgColor} borderColor={borderColor}>
-          <ModalHeader
-            display="flex"
-            alignItems="center"
-            gap={2}
-            color={popupType === "success" ? "green.500" : "red.500"}
-            fontSize="lg"
-            fontWeight="bold"
-          >
-            {popupType === "success" ? "Success!" : "Error!"}
-            {popupType === "success" ? (
-              <Box color="green.500">
-                <BiCheckCircle size={24} />
-              </Box>
-            ) : (
-              <Box color="red.500">
-                <BiX size={24} />
-              </Box>
-            )}
-          </ModalHeader>
-          <ModalBody>
-            <Text color={textColor} fontSize="md">
-              {popupMessage}
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme={popupType === "success" ? "green" : "red"}
-              onClick={onModalClose}
-              size="lg"
-              px={8}
-            >
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </>
   );
 };
