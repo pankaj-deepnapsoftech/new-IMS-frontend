@@ -54,21 +54,10 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
   const [viewOrder, setViewOrder] = useState<PurchaseOrder | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
-  // Auto-refresh setup
+  // Initial setup
   useEffect(() => {
     setLoading(false);
-    const intervalId = setInterval(() => {
-      if (onRefresh) {
-        onRefresh();
-        console.log(
-          "Auto-refresh triggered at",
-          new Date().toLocaleTimeString()
-        );
-      }
-    }, 30000);
-
-    return () => clearInterval(intervalId);
-  }, [onRefresh]);
+  }, []);
 
   // Handle delete purchase order
   const handleDelete = async (id: string) => {
