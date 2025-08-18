@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import Drawer from "../../../ui/Drawer";
@@ -807,7 +807,7 @@ const AddBom: React.FC<AddBomProps> = ({
                           )}
                           <button
                             type="button"
-                            className="px-2 py-1 flex justify-center items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
+                            className="ml-4 px-2 py-1.5 flex justify-center items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors whitespace-nowrap"
                             onClick={() => {
                               setRawMaterials([
                                 ...rawMaterials,
@@ -827,7 +827,7 @@ const AddBom: React.FC<AddBomProps> = ({
                               ]);
                             }}
                           >
-                            <Plus size={16} /> Add
+                            <Plus size={16} /> Add Raw Materials
                           </button>
                         </div>
                       </div>
@@ -893,7 +893,7 @@ const AddBom: React.FC<AddBomProps> = ({
                       className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
                       onClick={() => setProcesses([...processes, ""])}
                     >
-                      <Plus /> Add
+                      <Plus /> Add Processes
                     </button>
                   </div>
                 </div>
@@ -989,7 +989,7 @@ const AddBom: React.FC<AddBomProps> = ({
                           {index === selectedResources.length - 1 && (
                             <button
                               type="button"
-                              className="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
+                              className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
                               onClick={() =>
                                 setSelectedResources([
                                   ...selectedResources,
@@ -997,7 +997,7 @@ const AddBom: React.FC<AddBomProps> = ({
                                 ])
                               }
                             >
-                              + Add
+                              + Add Resources 
                             </button>
                           )}
                         </div>
@@ -1222,7 +1222,7 @@ const AddBom: React.FC<AddBomProps> = ({
                           )}
                           <button
                             type="button"
-                            className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
+                            className="px-3 py-1.5 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 whitespace-nowrap to-blue-500 text-white text-sm rounded transition-colors"
                             onClick={() =>
                               setScrapMaterials([
                                 ...scrapMaterials,
@@ -1237,7 +1237,7 @@ const AddBom: React.FC<AddBomProps> = ({
                               ])
                             }
                           >
-                            <Plus size={16} /> Add
+                            <Plus size={16} /> Add Scarp Material
                           </button>
                         </div>
                       </div>
