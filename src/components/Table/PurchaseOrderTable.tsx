@@ -546,12 +546,12 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                 >
                   Order Date
                 </th>
-                <th
+                {/* <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
                   Item Name
-                </th>
+                </th> */}
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
@@ -686,13 +686,13 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                           ? new Date(order.date).toLocaleDateString()
                           : "N/A"}
                       </td>
-                      <td
+                      {/* <td
                         className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
                         style={{ color: colors.text.primary }}
                         title={order.itemName || "N/A"}
                       >
                         {order.itemName || "N/A"}
-                      </td>
+                      </td> */}
                       <td
                         className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
                         style={{ color: colors.text.primary }}

@@ -908,7 +908,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                         Add Item
                       </Button>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {formik.values.items.map((item, index) => (
                         <Card key={index} mb={4} variant="outline">
                           <CardBody>
@@ -931,7 +931,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                               )}
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                               <FormControl
                                 isInvalid={
                                   formik.touched.items?.[index]?.itemName &&
@@ -967,6 +967,18 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                                       {formik.errors.items[index].itemName}
                                     </Text>
                                   )}
+                              </FormControl>
+
+                              <FormControl>
+                                <FormLabel>Product ID</FormLabel>
+                                <Input
+                                  value={item.productId || ""}
+                                  placeholder="Product ID"
+                                  size="lg"
+                                  borderRadius="lg"
+                                  isReadOnly
+                                  bg="gray.50"
+                                />
                               </FormControl>
 
                               <FormControl
