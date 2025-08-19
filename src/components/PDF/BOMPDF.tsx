@@ -78,7 +78,8 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: "row",
-    borderBottom: "1px solid #000",
+    // borderBottom: "1px solid #000",
+    borderTop: "1px solid #000",
   },
   tableHeader: {
     backgroundColor: "#f0f0f0",

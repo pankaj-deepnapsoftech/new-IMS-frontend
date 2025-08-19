@@ -1011,7 +1011,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                                   )}
                               </FormControl>
 
-                              {/* <FormControl>
+                              <FormControl>
                               <FormLabel>Unit Price</FormLabel>
                               <Input
                                 type="number"
@@ -1042,7 +1042,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                                 borderRadius="lg"
                                 bg="gray.50"
                               />
-                            </FormControl> */}
+                            </FormControl>
                             </div>
                           </CardBody>
                         </Card>
