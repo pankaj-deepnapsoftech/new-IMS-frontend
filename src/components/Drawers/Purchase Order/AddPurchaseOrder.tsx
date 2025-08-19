@@ -61,6 +61,7 @@ interface SupplierApiResponse {
 interface RawMaterial {
   _id: string;
   name: string;
+  product_id?: string;
 }
 
 interface Item {
@@ -68,6 +69,7 @@ interface Item {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  productId?: string; // Add product_id to track the product
 }
 
 interface PurchaseOrderFormValues {
@@ -200,7 +202,10 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
       additionalRemarks: edittable?.additionalRemarks || "",
       additionalImportant: edittable?.additionalImportant || "",
       items:
-        edittable?.items ||
+        edittable?.items?.map((item) => ({
+          ...item,
+          productId: item.productId || "", // Ensure productId field exists
+        })) ||
         (edittable?.itemName
           ? [
               {
@@ -208,6 +213,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                 quantity: edittable.quantity || 1,
                 unitPrice: 0,
                 totalPrice: 0,
+                productId: "",
               },
             ]
           : [
@@ -216,6 +222,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                 quantity: 1,
                 unitPrice: 0,
                 totalPrice: 0,
+                productId: "",
               },
             ]),
       isSameAddress: edittable?.isSameAddress || false,
@@ -597,6 +604,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
         quantity: 1,
         unitPrice: 0,
         totalPrice: 0,
+        productId: "",
       },
     ];
     formik.setFieldValue("items", newItems);
@@ -612,6 +620,16 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
   const updateItem = (index: number, field: keyof Item, value: any) => {
     const newItems = [...formik.values.items];
     newItems[index] = { ...newItems[index], [field]: value };
+
+    // If item name is being updated, also update the product_id
+    if (field === "itemName") {
+      const selectedMaterial = rawMaterials.find(
+        (material) => material.name === value
+      );
+      if (selectedMaterial) {
+        newItems[index].productId = selectedMaterial.product_id;
+      }
+    }
 
     // Auto-calculate total price when quantity or unit price changes
     if (field === "quantity" || field === "unitPrice") {
