@@ -57,6 +57,7 @@ const ProductionStatus: React.FC = () => {
             "moved to inventory",
             "allocated finish goods",
             "received",
+            "dispatched",
             
           ].includes(process.status.toLowerCase())
       );

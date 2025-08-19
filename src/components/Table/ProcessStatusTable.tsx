@@ -262,7 +262,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
       backgroundColor: "#f3e5f5",
       color: "#7b1fa2",
     },
-   " allocated finish goods": {
+   "allocated finish goods": {
       backgroundColor: "#e8f5e8",
       color: "#2e7d32",
     },
