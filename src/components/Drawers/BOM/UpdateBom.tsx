@@ -41,8 +41,8 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
   const [processes, setProcesses] = useState<string[]>([""]);
 
   const [products, setProducts] = useState<any[]>([]);
-   const [remarks, setRemarks] = useState<string>(""); 
-  const [productOptions, setProductOptions] = useState<any[]>([]);
+  const [remarks, setRemarks] = useState<string>("");
+  const [scarpMaterials, setscarpMaterials] = useState<any[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
   const [updateBom] = useUpdateBOMMutation();
 
@@ -57,12 +57,21 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
   // Resources & Manpower states
   const [resources, setResources] = useState<any[]>([]);
   const [resourceOptions, setResourceOptions] = useState<{ value: string; label: string }[]>([]);
-  type OptionType = { value: string; label: string };
-  type ResourceRow = { name: OptionType | null; type: OptionType | null; specification: string };
+  type OptionType = {
+    value: string;
+    label: string;
+    type?: string;
+    specification?: string;
+    customId?: string;
+  };
+
+  type ResourceRow = { name: OptionType | null; type: OptionType | null; specification: string; comment: string, customId: string; };
+
 
   const [selectedResources, setSelectedResources] = useState<ResourceRow[]>([
-    { name: null, type: null, specification: "" },
+    { name: null, type: null, specification: "", comment: "", customId: "" },
   ]);
+
 
   // Manpower rows state
   const [selectedManpower, setSelectedManpower] = useState<
@@ -219,7 +228,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
       );
       const data = await response.json();
       if (!data.success) throw new Error(data.message);
-    // console.log(data)
+      // console.log(data)
       setBomName(data.bom.bom_name);
       setPartsCount(data.bom.parts_count);
       setTotalPartsCost(data.bom.total_cost);
@@ -239,19 +248,14 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
       setSelectedResources(
         data.bom.resources?.length
           ? data.bom.resources.map((r: any) => ({
-            name: r.resource_id
-              ? { value: r.resource_id._id, label: r.resource_id.name }
-              : null,
-            type: r.type
-              ? { value: r.type, label: r.type }
-              : null,
+            name: r.resource_id ? { value: r.resource_id._id, label: r.resource_id.name } : null,
+            type: r.type ? { value: r.type, label: r.type } : null,
             specification: r.specification || "",
+            comment: r.comment || "",
+            customId: r.resource_id?.customId || "",   // <-- add this
           }))
-          : [{ name: null, type: null, specification: "" }]
+          : [{ name: null, type: null, specification: "", comment: "", customId: "" }]
       );
-
-
-
 
       setManpowerCount(data.bom.manpower?.[0]?.number || empData?.length || 0);
 
@@ -416,15 +420,19 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
         electricity_charges: electricityCharges || 0,
         other_charges: otherCharges || 0,
       },
-      remarks:remarks,
+      remarks: remarks,
       manpower: [{ number: String(manpowerInput || manpowerCount) }],
       resources: selectedResources.map((r) => ({
-        resource_id: r.name,
-        type: r.type || r.type,
-        specification: r.specification || r.specification,
+        resource_id: r.name?.value,
+        type: r.type?.value || r.type,
+        specification: r.specification,
+        comment: r.comment || "",
+        customId: r.customId,
       })),
 
-      
+
+
+
 
     };
 
@@ -506,7 +514,13 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
         value: prd._id,
         label: prd.name,
       }));
-
+    const scarpMaterialsOptions = products
+      .filter((prd) => prd.category === "raw materials")
+      .map((prd) => ({
+        value: prd._id,
+        label: prd.name,
+      }));
+    setscarpMaterials(scarpMaterialsOptions)
     setFinishedGoodsOptions(finishedGoodsOptions);
     setRawMaterialsOptions(rawMaterialsOptions);
   }, [products]);
@@ -525,14 +539,16 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
     }
   }, [rawMaterials]);
   useEffect(() => {
-    const options = resources?.map((res: any) => ({
+    const options: OptionType[] = resources?.map((res: any) => ({
       label: res.name,
       value: res._id,
       type: res.type,
       specification: res.specification,
+      customId: res.customId,
     }));
     setResourceOptions(options);
   }, [resources]);
+
 
   // ---------- Styles ----------
 
@@ -965,10 +981,10 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                           </button>
                           <button
                             type="button"
-                            className="px-2 py-1 flex justify-center items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
+                            className="px-2 py-1 whitespace-nowrap flex justify-center items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
                             onClick={addRawMaterial}
                           >
-                            <Plus size={16} /> Add
+                            <Plus size={16} /> Add RM
                           </button>
                         </div>
                       </div>
@@ -1027,80 +1043,152 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                       onClick={() => setProcesses([...processes, ""])}
                       className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
                     >
-                      <Plus size={16} /> Add
+                      <Plus size={16} /> Add Process
                     </button>
                   </div>
                 </div>
               </div>
               {/* Resources */}
               <div className="bg-white border-b px-4 py-4 sm:px-6">
+                {/* Resources Section */}
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Resources</h3>
+                </div>
+
+                {/* Table Header */}
+                <div className="hidden sm:grid grid-cols-6 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                  <div>Resource ID</div>
+                  <div>Name</div>
+                  <div>Type</div>
+                  <div>Specification</div>
+                  <div>Comment</div>
+
+                </div>
+
+                {/* Rows */}
+                {/* Resource Rows */}
+                <div className="border border-t-0 border-gray-300">
+                  {selectedResources.map((res, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-1 sm:grid-cols-6 gap-4 px-3 py-4 items-start sm:items-center bg-white border-b border-gray-200 last:border-b-0"
+                    >
+                      {/* Resource ID */}
+                      <div>
+                        <input
+                          type="text"
+                          value={res.customId || ""}
+                          readOnly
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          placeholder="Resource ID"
+                        />
+                      </div>
+
+                      {/* Resource Name */}
+                      <div>
+                        <Select
+                          options={resourceOptions}
+                          value={res.name}
+                          onChange={(selected) => {
+                            const updated = [...selectedResources];
+                            updated[index] = {
+                              ...updated[index],
+                              name: selected ? { value: selected.value, label: selected.label } : null,
+                              customId: selected?.customId || "",
+                              type: selected?.type
+                                ? { label: selected.type, value: selected.type }
+                                : null,
+                              specification: selected?.specification || "",
+                            };
+                            setSelectedResources(updated);
+                          }}
+                          placeholder="Select Resource"
+                          className="text-sm"
+                        />
+                      </div>
+
+                      {/* Type */}
+                      <div>
+                        <input
+                          type="text"
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          placeholder="Type"
+                          value={res.type?.label || ""}
+                          readOnly
+                        />
+                      </div>
+
+                      {/* Specification */}
+                      <div>
+                        <input
+                          type="text"
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          placeholder="Specification"
+                          value={res.specification}
+                          onChange={(e) => {
+                            const updated = [...selectedResources];
+                            updated[index].specification = e.target.value;
+                            setSelectedResources(updated);
+                          }}
+                        />
+                      </div>
+
+                      {/* Comment */}
+                      <div>
+                        <input
+                          type="text"
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          placeholder="Comment"
+                          value={res.comment}
+                          onChange={(e) => {
+                            const updated = [...selectedResources];
+                            updated[index].comment = e.target.value;
+                            setSelectedResources(updated);
+                          }}
+                        />
+                      </div>
+
+                      {/* Action */}
+                      <div className="flex sm:justify-center items-center gap-2">
+                        {selectedResources.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSelectedResources(selectedResources.filter((_, i) => i !== index))
+                            }
+                            className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add Resource Button — placed BELOW all rows */}
+                <div className="mt-4 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => setSelectedResources([...selectedResources, { name: null, type: null, specification: "" }])}
-                    className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded"
+                    onClick={() =>
+                      setSelectedResources([
+                        ...selectedResources,
+                        { name: null, type: null, specification: "", comment: "", customId: "" },
+                      ])
+                    }
+                    className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded flex items-center gap-2"
                   >
-                    <Plus size={16} /> Add
+                    <Plus size={16} /> Add Resource
                   </button>
                 </div>
 
-                {selectedResources.map((res, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    {/* Resource Name Dropdown */}
-                    <Select
-                      options={resourceOptions}
-                      value={res.name}
-                      onChange={(selected) => {
-                        const updated = [...selectedResources];
-                        updated[index].name = selected;
-                        setSelectedResources(updated);
-                      }}
-                      placeholder="Select Resource"
-                    />
 
-                    {/* Resource Type Dropdown */}
-                    <Select
-                      options={[
-                        { value: "assemble_line", label: "Assemble Line" },
-                        { value: "machine", label: "Machine" },
-                        { value: "tool", label: "Tool" },
-                      ]}
-                      value={res.type}
-                      onChange={(selected) => {
-                        const updated = [...selectedResources];
-                        updated[index].type = selected;
-                        setSelectedResources(updated);
-                      }}
-                      placeholder="Select Type"
-                    />
 
-                    {/* Specification Input */}
-                    <input
-                      type="text"
-                      className="border p-2 rounded"
-                      placeholder="Specification"
-                      value={res.specification}
-                      onChange={(e) => {
-                        const updated = [...selectedResources];
-                        updated[index].specification = e.target.value;
-                        setSelectedResources(updated);
-                      }}
-                    />
 
-                    {/* Remove Button */}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedResources(selectedResources.filter((_, i) => i !== index))}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                ))}
               </div>
 
-          {/* Manpower Data */}
+
+              {/* Manpower Data */}
               <div className="bg-white border-b">
                 <div className="px-4 py-4 sm:px-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Manpower</h3>
@@ -1155,7 +1243,7 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                           <Select
                             styles={customStyles}
                             className="text-sm"
-                            options={productOptions}
+                            options={scarpMaterials}
                             placeholder="Select"
                             value={material.item_name}
                             onChange={(d: any) => {
@@ -1279,10 +1367,10 @@ const UpdateBom: React.FC<UpdateBomProps> = ({
                           </button>
                           <button
                             type="button"
-                            className="px-3 py-1 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
+                            className="px-3 py-1 flex  justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm rounded transition-colors"
                             onClick={addScrapMaterial}
                           >
-                            <Plus size={16} /> Add
+                            <Plus size={16} /> Add SM
                           </button>
                         </div>
                       </div>
