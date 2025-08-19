@@ -209,16 +209,16 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
 
   //  console.log(`process.env.REACT_APP_BACKEND_URL: ${process.env.REACT_APP_BACKEND_URL}`);
   const handleOutAllottedInventory = async (process_id) => {
-    console.log("process_id", process_id);
+    // console.log("process_id", process_id);
 
     try {
       const res = await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}production-process/inventory-in-transit`,
-        { _id: process_id }, // ✅ Correct body
+        { _id: process_id }, 
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies?.access_token}`, // ✅ Correct headers
+            Authorization: `Bearer ${cookies?.access_token}`,
           },
         }
       );

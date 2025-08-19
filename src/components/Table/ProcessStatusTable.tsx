@@ -262,7 +262,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
       backgroundColor: "#f3e5f5",
       color: "#7b1fa2",
     },
-    allocated: {
+   " allocated finish goods": {
       backgroundColor: "#e8f5e8",
       color: "#2e7d32",
     },
@@ -317,7 +317,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
     }
   };
   const openProcessFullDetails = async (data) => {
-    console.log(data);
+   
     try {
       const res = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}production-process/${data._id}`,
@@ -794,7 +794,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                             : "N/A"}
                         </td>
                         <td className="px-4 py-3 text-left">
-                          {row?.original.status === "allocated" && (
+                          {row?.original.status === "allocated finish goods" && (
                             <button
                               onClick={() =>
                                 markOutFinishGoods(row.original?._id)
@@ -841,7 +841,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                             )}
                             <button
                               onClick={() =>
-                               {  openProcessFullDetails(row.original);setCloseModal(!closeModal)}
+                               {  openProcessFullDetails(row.original);}
                               }
                               className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
                               style={{
@@ -1261,7 +1261,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
         </div>
       )}
 
-      {selectedProcess && !closeModal  &&(
+      {selectedProcess  &&(
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-6 overflow-y-auto max-h-[90vh] border border-gray-200">
             {/* Header */}
@@ -1357,7 +1357,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                       <span className="text-gray-800">{step.process}</span>
                     </div>
                     <span className="text-sm font-medium text-gray-500">
-                      {step.work_done}% done
+                      {step.work_done} done
                     </span>
                   </li>
                 ))}
@@ -1390,13 +1390,18 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                       {selectedProcess.finished_good?.produced_quantity || 0}
                     </td>
                     <td className="p-3 text-gray-800">
-                      ₹{selectedProcess.finished_good?.unit_price || 0}
+                      ₹{selectedProcess.finished_good?.item?.price || 0}
                     </td>
                     <td className="p-3 text-gray-800">
-                      ₹{selectedProcess.finished_good?.total_cost || 0}
+                      ₹
+                      {(
+                        (selectedProcess.finished_good?.estimated_quantity || 0) *
+                        (selectedProcess.finished_good?.item?.price || 0)
+                      ).toFixed(2)}
                     </td>
                   </tr>
                 </tbody>
+
               </table>
             </section>
 
@@ -1433,10 +1438,14 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                         {rm.used_quantity || 0}
                       </td>
                       <td className="p-3 text-gray-800">
-                        ₹{rm.unit_price || 0}
+                        ₹{rm.item?.price || 0}
                       </td>
                       <td className="p-3 text-gray-800">
-                        ₹{rm.total_part_cost || 0}
+                        ₹
+                        {(
+                          (rm?.estimated_quantity || 0) *
+                          (rm?.item?.price || 0)
+                        ).toFixed(2)}
                       </td>
                     </tr>
                   ))}
@@ -1479,10 +1488,15 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                           .produced_quantity || 0}
                       </td>
                       <td className="p-3 text-gray-800">
-                        ₹{sm.unit_price || 0}
+                        ₹{sm.item?.price || 0}
                       </td>
                       <td className="p-3 text-gray-800">
-                        ₹{sm.total_part_cost || 0}
+                        ₹
+                        {(
+                          (selectedProcess?.scrap_materials[0]
+                            .estimated_quantity || 0) *
+                          (sm?.item?.price || 0)
+                        ).toFixed(2)}
                       </td>
                     </tr>
                   ))}
