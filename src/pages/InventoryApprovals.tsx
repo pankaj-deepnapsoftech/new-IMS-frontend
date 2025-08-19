@@ -127,7 +127,7 @@ const InventoryApprovals: React.FC = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ processId: id, status: "allocated" }), // fixed
+          body: JSON.stringify({ processId: id, status: "allocated finish goods" }), // fixed
         }
       );
       window.location.reload()

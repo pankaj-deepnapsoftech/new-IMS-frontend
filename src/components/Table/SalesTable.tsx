@@ -124,6 +124,8 @@ const SalesTable = ({
   const fetchSalesOrderStatus = async (salesOrderId) => {
     if (!salesOrderId) return;
     
+    console.log("Fetching status for sales order:", salesOrderId);
+    
     // Always fetch fresh data for real-time updates
     setLoadingStatuses(prev => ({ ...prev, [salesOrderId]: true }));
     
@@ -138,6 +140,8 @@ const SalesTable = ({
           }
         }
       );
+      
+      console.log("Individual status response:", response.status);
       
       if (response.ok) {
         const data = await response.json();
@@ -344,13 +348,7 @@ const SalesTable = ({
 
   // Fetch all sales orders status when component mounts or purchases change
   useEffect(() => {
-    if (filteredPurchases && filteredPurchases.length > 0) {
-      fetchAllSalesOrdersStatus();
-    }
-  }, [filteredPurchases]);
-
-  // Initial load of sales orders status
-  useEffect(() => {
+    console.log("useEffect triggered, filteredPurchases length:", filteredPurchases?.length);
     if (filteredPurchases && filteredPurchases.length > 0) {
       fetchAllSalesOrdersStatus();
     }
@@ -402,6 +400,7 @@ const SalesTable = ({
 
   // Function to fetch all sales orders status at once
   const fetchAllSalesOrdersStatus = async () => {
+    console.log("Fetching all sales orders status...");
     setLoadingStatuses(prev => ({ ...prev, all: true }));
     
     try {
@@ -416,15 +415,19 @@ const SalesTable = ({
         }
       );
       
+      console.log("Response status:", response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log("Response data:", data);
         
         if (data.success && data.salesOrdersStatus) {
           const allStatuses = {};
           data.salesOrdersStatus.forEach(status => {
             allStatuses[status.salesOrderId] = status;
           });
-          setSalesOrderStatuses(prev => ({ ...prev, ...allStatuses }));
+          console.log("Setting statuses:", allStatuses);
+          // setSalesOrderStatuses(prev => ({...allStatuses, ...prev }));
           
           // Calculate summary data
           const approvedBOMs = data.salesOrdersStatus.filter(status => status.bomStatus === "Approved").length;
@@ -491,7 +494,7 @@ const SalesTable = ({
   return (
     <div className="w-full">
       {/* Summary Section */}
-      {Object.keys(salesOrderStatuses).length > 0 && (
+      {/* {Object.keys(salesOrderStatuses).length > 0 && (
         <div className="mb-4 p-4 rounded-lg border" style={{ 
           backgroundColor: colors.background.secondary,
           borderColor: colors.border.light 
@@ -526,37 +529,36 @@ const SalesTable = ({
              </div>
           </div>
           
-          {/* Additional Summary Details */}
           <div className="mt-4 pt-4 border-t" style={{ borderColor: colors.border.light }}>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="text-center">
-                {/* <div className="text-lg font-semibold" style={{ color: colors.secondary[500] }}>
+                <div className="text-lg font-semibold" style={{ color: colors.secondary[500] }}>
                   {summaryData.totalPreProductionProcesses}
                 </div>
                 <div className="text-xs" style={{ color: colors.text.secondary }}>
                   Pre-Production Processes
-                </div> */}
+                </div>
               </div>
               <div className="text-center">
-                {/* <div className="text-lg font-semibold" style={{ color: colors.gray[500] }}>
+                <div className="text-lg font-semibold" style={{ color: colors.gray[500] }}>
                   {summaryData.totalBOMs}
                 </div>
                 <div className="text-xs" style={{ color: colors.text.secondary }}>
                   Total BOMs
-                </div> */}
+                </div>
               </div>
               <div className="text-center">
-                {/* <div className="text-lg font-semibold" style={{ color: colors.error[500] }}>
+                <div className="text-lg font-semibold" style={{ color: colors.error[500] }}>
                   {summaryData.totalRawMaterials}
                 </div>
                 <div className="text-xs" style={{ color: colors.text.secondary }}>
                   Raw Materials
-                </div> */}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="overflow-x-auto">
         <div className="space-y-4 bg-[#f8f9fa]">
@@ -924,15 +926,16 @@ const SalesTable = ({
               </div> */}
 
               {/* Comprehensive Status Section */}
-              <div className="space-y-3 pt-3 mt-3 border-t" style={{ borderColor: colors.border.light }}>
+              {/* <div className="space-y-3 pt-3 mt-3 border-t" style={{ borderColor: colors.border.light }}>
                 
-                {/* Overall Status */}
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium" style={{ color: colors.text.secondary }}>
                     Overall Status:
                   </span>
                   {loadingStatuses[purchase._id] ? (
                     <span className="text-sm text-gray-500">Loading...</span>
+                  ) : !salesOrderStatuses[purchase._id] ? (
+                    <span className="text-sm text-red-500">No Status Data</span>
                   ) : (
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
@@ -957,7 +960,6 @@ const SalesTable = ({
                   )}
                 </div>
 
-                {/* BOM Status */}
                 <div className="flex justify-between items-center">
                   <span className="text-sm" style={{ color: colors.text.secondary }}>
                     BOM Status:
@@ -988,7 +990,6 @@ const SalesTable = ({
                   </div>
                 </div>
 
-                {/* Inventory Status */}
                 <div className="flex justify-between items-center">
                   <span className="text-sm" style={{ color: colors.text.secondary }}>
                     Inventory Status:
@@ -1011,7 +1012,6 @@ const SalesTable = ({
                         {salesOrderStatuses[purchase._id]?.inventoryStatus || "Pending"}
                       </span>
                       
-                      {/* View Inventory Details Button */}
                       {salesOrderStatuses[purchase._id]?.inventoryDetails && 
                        salesOrderStatuses[purchase._id]?.inventoryDetails.length > 0 && (
                         <button
@@ -1030,7 +1030,6 @@ const SalesTable = ({
                   )}
                 </div>
 
-                {/* Production Status */}
                 <div className="flex justify-between items-center">
                   <span className="text-sm" style={{ color: colors.text.secondary }}>
                     Production Status:
@@ -1062,22 +1061,6 @@ const SalesTable = ({
                         {salesOrderStatuses[purchase._id]?.productionStatus || "Not Started"}
                       </span>
                       
-                      {/* Production Process Name - Removed to hide IDs */}
-                      {/* {salesOrderStatuses[purchase._id]?.productionProcessName && 
-                       salesOrderStatuses[purchase._id]?.productionProcessName !== "N/A" && (
-                        <span className="text-xs px-2 py-1 rounded bg-purple-100 text-purple-800">
-                          {salesOrderStatuses[purchase._id]?.productionProcessName}
-                        </span>
-                      )} */}
-                      
-                      {/* Production Process ID */}
-                      {/* {salesOrderStatuses[purchase._id]?.productionProcessId && (
-                        <span className="text-xs px-2 py-1 rounded bg-indigo-100 text-indigo-800">
-                          {salesOrderStatuses[purchase._id]?.productionProcessId}
-                        </span>
-                      )} */}
-                      
-                      {/* View Production Details Button */}
                       {salesOrderStatuses[purchase._id]?.productionDetails && (
                         <button
                           onClick={() => toggleProductionDetails(purchase._id)}
@@ -1095,7 +1078,6 @@ const SalesTable = ({
                   )}
                 </div>
 
-                {/* Inventory Details Section */}
                 {showInventoryDetails[purchase._id] && 
                  salesOrderStatuses[purchase._id]?.inventoryDetails && 
                  salesOrderStatuses[purchase._id]?.inventoryDetails.length > 0 && (
@@ -1117,32 +1099,12 @@ const SalesTable = ({
                               {material.inventory_category} • {material.uom} • Stock: {material.current_stock || 0}
                             </div>
                           </div>
-                          {/* <div className="flex items-center gap-2">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                material.approved
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {material.approved ? "Approved" : "Pending"}
-                            </span>
-                            {!material.approved && salesOrderStatuses[purchase._id]?.canApproveInventory && (
-                              <button
-                                onClick={() => handleApproveInventory(material._id)}
-                                className="px-2 py-1 text-xs rounded bg-green-500 text-white hover:bg-green-600"
-                              >
-                                Approve
-                              </button>
-                            )}
-                          </div> */}
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Production Details Section */}
                 {showProductionDetails[purchase._id] && 
                  salesOrderStatuses[purchase._id]?.productionDetails && (
                   <div className="mt-3 p-3 rounded-lg border" style={{ 
@@ -1194,7 +1156,7 @@ const SalesTable = ({
                     </div>
                   </div>
                 )}
-              </div>
+              </div> */}
 
               {/* Action Buttons for Status Management */}
               <div className="flex flex-wrap gap-3 pt-4 mt-3 border-t" style={{ borderColor: colors.border.light }}>
@@ -1214,8 +1176,8 @@ const SalesTable = ({
                   </button>
                 )} */}
 
-                {/* Request Inventory Allocation Button */}
-                {salesOrderStatuses[purchase._id]?.canRequestInventory && (
+                {/* Request Inventory Allocation Button - Commented out */}
+                {/* {salesOrderStatuses[purchase._id]?.canRequestInventory && (
                   <button
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
                     style={{
@@ -1227,10 +1189,10 @@ const SalesTable = ({
                     <FaCheckCircle size="16px" />
                     Request Inventory Allocation
                   </button>
-                )}
+                )} */}
 
-                {/* Out Allotted Inventory Button */}
-                {salesOrderStatuses[purchase._id]?.canOutAllotInventory && (
+                {/* Out Allotted Inventory Button - Commented out */}
+                {/* {salesOrderStatuses[purchase._id]?.canOutAllotInventory && (
                   <button
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
                     style={{
@@ -1241,7 +1203,7 @@ const SalesTable = ({
                   >
                     Out Allotted Inventory
                   </button>
-                )}
+                )} */}
 
                 {/* Start Production Button - Commented out */}
                 {/* {salesOrderStatuses[purchase._id]?.canStartProduction && (
@@ -1271,7 +1233,7 @@ const SalesTable = ({
                   Refresh
                 </button> */}
 
-                {/* Load All Status Button - Commented out */}
+                {/* Load All Status Button */}
                 {/* <button
                   onClick={fetchAllSalesOrdersStatus}
                   disabled={loadingStatuses.all}
@@ -1286,8 +1248,8 @@ const SalesTable = ({
                   {loadingStatuses.all ? "Loading..." : "Load All Status"}
                 </button> */}
 
-                {/* Legacy Approve Button (for backward compatibility) */}
-                {!salesOrderStatuses[purchase._id] && (
+                {/* Legacy Approve Button (for backward compatibility) - Commented out */}
+                {/* {!salesOrderStatuses[purchase._id] && (
                   <button
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
                     style={{
@@ -1321,7 +1283,7 @@ const SalesTable = ({
                       ? "Approved"
                       : "Approve"}
                   </button>
-                )}
+                )} */}
               </div>
             </div>
           ))}

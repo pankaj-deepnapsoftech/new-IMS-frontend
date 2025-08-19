@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import { Button, FormControl, FormLabel, Input, Checkbox } from "@chakra-ui/react";
 import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import Loading from "../../../ui/Loading";
 import { colors } from "../../../theme/colors";
+import axios from "axios";
 
 interface UpdateProductProps {
   closeDrawerHandler: () => void;
@@ -53,14 +54,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
   >([]);
 
   const [cookies] = useCookies();
-  const [inventoryCategory, setInventoryCategory] = useState<
-    { value: string; label: string } | undefined
-  >();
-
-  const inventoryCategoryOptions = [
-    { value: "direct", label: "Direct" },
-    { value: "indirect", label: "Indirect" },
-  ];
 
   const categoryOptions = [
     { value: "finished goods", label: "Finished Goods" },
@@ -85,6 +78,8 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
   const [updateProduct] = useUpdateProductMutation();
   const [isLoadingProduct, setIsLoadingProduct] = useState<boolean>(false);
   const [isUpdatingProduct, setIsUpdatingProduct] = useState<boolean>(false);
+  const [useShortageAdjustment, setUseShortageAdjustment] = useState<boolean>(true);
+  const [originalStock, setOriginalStock] = useState<number>(0);
 
   const updateProductHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,9 +99,51 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
         throw new Error("Please fill all the fileds");
       }
 
+      // Check if stock has changed and if shortage adjustment is enabled
+      const newStockValue = parseInt(currentStock);
+      const stockChanged = newStockValue !== originalStock;
+
+      if (stockChanged && useShortageAdjustment) {
+        // Use the new stock and shortage adjustment endpoint
+        try {
+          const stockResponse = await axios.put(
+            `${process.env.REACT_APP_BACKEND_URL}product/update-stock-and-shortages`,
+            {
+              productId: productId,
+              newStock: newStockValue
+            },
+            {
+              headers: { Authorization: `Bearer ${cookies?.access_token}` },
+            }
+          );
+
+          if (stockResponse.data.success) {
+            const { stockChange, shortageUpdate } = stockResponse.data;
+            
+            let message = `Stock updated from ${stockChange.oldStock} to ${stockChange.newStock}`;
+            
+            if (shortageUpdate) {
+              if (shortageUpdate.removedShortages > 0) {
+                message += `. ${shortageUpdate.removedShortages} shortage(s) resolved and removed.`;
+              } else if (shortageUpdate.activeShortages > 0) {
+                message += `. ${shortageUpdate.activeShortages} shortage(s) updated.`;
+              }
+              if (shortageUpdate.createdShortages > 0) {
+                message += `. ${shortageUpdate.createdShortages} new shortage(s) created.`;
+              }
+            }
+            
+            toast.success(message);
+          }
+        } catch (stockError: any) {
+          console.error("Error updating stock with shortages:", stockError);
+          toast.error(stockError?.response?.data?.message || "Failed to update stock with shortages");
+        }
+      }
+
+      // Update other product details using the regular endpoint
       const response = await updateProduct({
         _id: productId,
-        inventory_category: inventoryCategory?.value,
         name,
         product_id: id,
         uom: uom?.value,
@@ -125,7 +162,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
         distributor_price: distributorPrice,
         store: store?.value || undefined,
       }).unwrap();
-      toast.success(response.message);
+      
+      if (!stockChanged || !useShortageAdjustment) {
+        toast.success(response.message);
+      }
+      
       fetchProductsHandler();
       closeDrawerHandler();
     } catch (err: any) {
@@ -160,6 +201,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
       setUom({ value: data.product.uom, label: data.product.uom });
       setPrice(data.product.price);
       setCurrentStock(data.product.current_stock);
+      setOriginalStock(data.product.current_stock);
       setMinStock(data.product?.min_stock);
       setMaxStock(data.product?.max_stock);
       setHsn(data.product?.hsn);
@@ -175,10 +217,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
           label: data.product.store.name,
         });
       }
-      setInventoryCategory({
-        value: data.product.inventory_category,
-        label: data.product.inventory_category,
-      });
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally {
@@ -307,18 +345,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
         {!isLoadingProduct && (
           <form onSubmit={updateProductHandler}>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <FormControl isRequired>
-                <FormLabel fontWeight="bold" color="black">
-                  Inventory Category
-                </FormLabel>
-                <Select
-                  styles={customStyles}
-                  value={inventoryCategory}
-                  options={inventoryCategoryOptions}
-                  onChange={(e: any) => setInventoryCategory(e)}
-                  required={true}
-                />
-              </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
                 <FormLabel fontWeight="bold" color="black">
                   Product ID
@@ -460,6 +486,18 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                   type="number"
                   placeholder="Current Stock"
                 />
+                <div className="mt-2">
+                  <Checkbox
+                    isChecked={useShortageAdjustment}
+                    onChange={(e) => setUseShortageAdjustment(e.target.checked)}
+                    colorScheme="blue"
+                    size="sm"
+                  >
+                    <span className="text-sm text-gray-600">
+                      Auto-adjust shortages when stock changes
+                    </span>
+                  </Checkbox>
+                </div>
               </FormControl>
               <FormControl className="mt-3 mb-5">
                 <FormLabel fontWeight="bold" color="black">
@@ -510,6 +548,9 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
                 />
               </FormControl>
             </div>
+            
+
+            
             <div className="flex flex-col flex-1">
               <Button
                 isLoading={isUpdatingProduct}

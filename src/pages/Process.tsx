@@ -49,9 +49,16 @@ const Process: React.FC = () => {
     }
 
     // Filter out processes with status "production started"
-    const filteredProcesses = data.production_processes.filter(
-      (process: any) => process.status.toLowerCase() !== "production started"
-    );
+    const filteredProcesses = data.production_processes.filter((process: any) => {
+      const status = process.status?.toLowerCase();
+      return status !== "production started" &&
+        status !== "production in progress" &&
+        status !== "completed" &&
+        status !== "moved to inventory" &&
+        status !== "allocated finish goods" &&
+        status !== "out finish goods"	
+    });
+
 
     console.log("filtered processes (excluding production started)", filteredProcesses);
     setData(filteredProcesses);
