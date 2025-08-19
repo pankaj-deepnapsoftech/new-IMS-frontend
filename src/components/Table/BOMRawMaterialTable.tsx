@@ -71,6 +71,7 @@ interface BOMRawMaterialTableProps {
   openProductDetailsDrawerHandler?: (id: string) => void;
   deleteProductHandler?: (id: string) => void;
   approveProductHandler?: (id: string) => void;
+  isApproved:boolean,
 }
 //newwww
 const updateProcessStatus = async (id, status) => {
@@ -112,6 +113,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
   openProductDetailsDrawerHandler,
   deleteProductHandler,
   approveProductHandler,
+  isApproved
 }) => {
   const columns: Column<{
     name: string;
@@ -204,7 +206,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
     []
   );
   const [cookies] = useCookies();
-  const [isApproved, setIsApproved] = useState(false);
+
   //  console.log(`process.env.REACT_APP_BACKEND_URL: ${process.env.REACT_APP_BACKEND_URL}`);
   const handleOutAllottedInventory = async (process_id) => {
     console.log("process_id", process_id);
@@ -220,7 +222,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
           },
         }
       );
-
+      window.location.reload()
       if (!res.data.success) {
         throw new Error(res.data.message);
       }
@@ -553,7 +555,7 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                               cursor:
                                 isApproved ||
                                   original.bom_status !== "raw material approval pending" ||
-                                  original.isInventoryApprovalClicked // ✅ also here
+                                  original.isInventoryApprovalClicked
                                   ? "not-allowed"
                                   : "pointer",
                             }}
@@ -561,24 +563,24 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                               bg:
                                 isApproved ||
                                   original.bom_status !== "raw material approval pending" ||
-                                  original.isInventoryApprovalClicked // ✅ also here
+                                  original.isInventoryApprovalClicked
                                   ? colors.success[700]
                                   : colors.success[600],
                             }}
                             onClick={() => {
                               approveProductHandler(original._id);
-                              setIsApproved(true);
+                              ;
                             }}
                             leftIcon={<FaCheckCircle />}
                             disabled={
                               isApproved ||
                               original.bom_status !== "raw material approval pending" ||
-                              original.isInventoryApprovalClicked // ✅ also here
+                              original.isInventoryApprovalClicked
                             }
                           >
                             {isApproved ||
                               original.bom_status !== "raw material approval pending" ||
-                              original.isInventoryApprovalClicked // ✅ also here
+                              original.isInventoryApprovalClicked
                               ? "Approved"
                               : "Approve"}
                           </Button>

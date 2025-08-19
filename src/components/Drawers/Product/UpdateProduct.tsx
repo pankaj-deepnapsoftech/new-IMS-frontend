@@ -54,14 +54,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
   >([]);
 
   const [cookies] = useCookies();
-  const [inventoryCategory, setInventoryCategory] = useState<
-    { value: string; label: string } | undefined
-  >();
-
-  const inventoryCategoryOptions = [
-    { value: "direct", label: "Direct" },
-    { value: "indirect", label: "Indirect" },
-  ];
 
   const categoryOptions = [
     { value: "finished goods", label: "Finished Goods" },
@@ -152,7 +144,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
       // Update other product details using the regular endpoint
       const response = await updateProduct({
         _id: productId,
-        inventory_category: inventoryCategory?.value,
         name,
         product_id: id,
         uom: uom?.value,
@@ -226,10 +217,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
           label: data.product.store.name,
         });
       }
-      setInventoryCategory({
-        value: data.product.inventory_category,
-        label: data.product.inventory_category,
-      });
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally {
@@ -358,18 +345,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
         {!isLoadingProduct && (
           <form onSubmit={updateProductHandler}>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <FormControl isRequired>
-                <FormLabel fontWeight="bold" color="black">
-                  Inventory Category
-                </FormLabel>
-                <Select
-                  styles={customStyles}
-                  value={inventoryCategory}
-                  options={inventoryCategoryOptions}
-                  onChange={(e: any) => setInventoryCategory(e)}
-                  required={true}
-                />
-              </FormControl>
               <FormControl className="mt-3 mb-5" isRequired>
                 <FormLabel fontWeight="bold" color="black">
                   Product ID

@@ -85,7 +85,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
   const [selectedProcess, setSelectedProcess] = useState(null);
-
+  const [closeModal,setCloseModal] =  useState(false)
   const [selectedProcesses, setSelectedProcesses] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
@@ -181,7 +181,6 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
       );
     }
   };
-
   const handleMoveToDispatch = async (id) => {
     try {
       const baseURL = process.env.REACT_APP_BACKEND_URL || "";
@@ -196,10 +195,11 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
         }
       );
 
-      alert(res.data.message || "Finished goods marked out!");
+      toast.success(res.data.message || "Moved to Dispatch successfully");
+      setCloseModal(true); 
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Error marking finished goods");
+      toast.error(err.response?.data?.message || "Error moving to dispatch");
     }
   };
 
@@ -390,6 +390,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
       const data = await res.json();
       if (data.success) {
         toast.success("Moved to inventory successfully");
+        setCloseModal(true); 
       } else {
         toast.error("Failed to move to inventory");
       }
@@ -840,7 +841,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                             )}
                             <button
                               onClick={() =>
-                                openProcessFullDetails(row.original)
+                               {  openProcessFullDetails(row.original);setCloseModal(!closeModal)}
                               }
                               className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
                               style={{
@@ -1260,7 +1261,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
         </div>
       )}
 
-      {selectedProcess && (
+      {selectedProcess && !closeModal  &&(
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-6 overflow-y-auto max-h-[90vh] border border-gray-200">
             {/* Header */}
@@ -1492,7 +1493,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
             {/* Action Buttons */}
             <div className="flex justify-end gap-4">
               <button
-                onClick={() => moveToInventory(selectedProcess?._id)}
+                onClick={() => {moveToInventory(selectedProcess?._id); }}
                 className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-md transition"
               >
                 Move to Inventory
