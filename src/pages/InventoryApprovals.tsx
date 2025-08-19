@@ -20,7 +20,7 @@ import FinishedGoodsTable from "../components/Table/FinishGoodsApprovalTable";
 const InventoryApprovals: React.FC = () => {
   const { isSuper, allowedroutes } = useSelector((state: any) => state.auth);
   const isAllowed = isSuper || allowedroutes.includes("inventory");
-
+  const [isApproved, setIsApproved] = useState(false);
   const [cookies] = useCookies();
   const token = cookies?.access_token;
 
@@ -75,12 +75,14 @@ const InventoryApprovals: React.FC = () => {
           body: JSON.stringify({ _id: id }),
         }
       );
+      window.location.reload()
+      setIsApproved(true)
       const data = await response.json();
       if (!data.success) {
         throw new Error(data.message);
       }
       toast.success("Raw material approved successfully!");
-      fetchInventoryHandler();
+
       if (!data?.success) throw new Error(data?.message || "Approval failed");
       toast.success("Raw material approved successfully!");
       // Optimistically remove from list
@@ -324,6 +326,7 @@ const InventoryApprovals: React.FC = () => {
                 products={rmFiltered}
                 isLoadingProducts={isLoadingRM}
                 approveProductHandler={approveRM}
+                isApproved={isApproved}
               />
             ) : (
               <FinishedGoodsTable

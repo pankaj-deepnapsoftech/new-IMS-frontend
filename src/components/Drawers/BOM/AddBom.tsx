@@ -54,7 +54,7 @@ const AddBom: React.FC<AddBomProps> = ({
   const supportingDoc = useRef<HTMLInputElement | null>(null);
   const [comments, setComments] = useState<string | undefined>();
   const [cost, setCost] = useState<number | undefined>();
-  const [unitCost, setUnitCost] = useState<string | undefined>(); 
+  const [unitCost, setUnitCost] = useState<string | undefined>();
   const [processes, setProcesses] = useState<string[]>([""]);
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
   const [products, setProducts] = useState<any[]>([]);
@@ -71,7 +71,7 @@ const AddBom: React.FC<AddBomProps> = ({
   const [electricityCharges, setElectricityCharges] = useState<
     number | undefined
   >();
- 
+
   const [otherCharges, setOtherCharges] = useState<number | undefined>();
   const [resources, setResources] = useState<any[]>([]);
   const [empData, setEmpData] = useState<any[]>([]);
@@ -205,7 +205,7 @@ const AddBom: React.FC<AddBomProps> = ({
         machinery_charges: machineryCharges || 0,
         electricity_charges: electricityCharges || 0,
         other_charges: otherCharges || 0,
-      }, 
+      },
       manpower: [
         {
           number: String(manpowerInput || manpowerCount),
@@ -220,11 +220,14 @@ const AddBom: React.FC<AddBomProps> = ({
         resource_id: r.name?.value,
         type: r.type?.value || r.type,
         specification: r.specification?.value || r.specification,
+        comment: r.comment || "",
+        customId: r.customId,
       }))
 
 
+
     };
- console.log(body)
+    // console.log(body)
     try {
       const response = await addBom(body).unwrap();
       toast.success(response?.message);
@@ -239,6 +242,8 @@ const AddBom: React.FC<AddBomProps> = ({
       toast.error(error?.data?.message || "Something went wrong");
     }
   };
+
+  console.log(resources)
 
   const fetchProductsHandler = async () => {
     try {
@@ -444,6 +449,7 @@ const AddBom: React.FC<AddBomProps> = ({
       value: res._id,
       type: res.type,
       specification: res.specification,
+      customId: res.customId,
     }));
 
 
@@ -690,7 +696,7 @@ const AddBom: React.FC<AddBomProps> = ({
                             Quantity
                           </label>
                           <input
-                          required
+                            required
                             type="number"
                             value={material.quantity || ""}
                             onChange={(e) => {
@@ -827,7 +833,7 @@ const AddBom: React.FC<AddBomProps> = ({
                               ]);
                             }}
                           >
-                            <Plus size={16} /> Add Raw Materials
+                            <Plus size={16} /> Add RM
                           </button>
                         </div>
                       </div>
@@ -898,6 +904,7 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
                 </div>
               </div>
+              {/* Resources Section */}
               <div className="bg-white border-b">
                 <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between mb-4">
@@ -905,10 +912,12 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
 
                   {/* Table Header */}
-                  <div className="hidden sm:grid grid-cols-4 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                  <div className="hidden sm:grid grid-cols-6 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                    <div>Resource ID</div>
                     <div>Name</div>
                     <div>Type</div>
                     <div>Specification</div>
+                    <div>Comment</div>
                     <div>Action</div>
                   </div>
 
@@ -917,22 +926,37 @@ const AddBom: React.FC<AddBomProps> = ({
                     {selectedResources.map((resource, index) => (
                       <div
                         key={index}
-                        className="grid grid-cols-1 sm:grid-cols-4 gap-4 px-3 py-4 items-start sm:items-center bg-white border-b border-gray-200 last:border-b-0"
+                        className="grid grid-cols-1 sm:grid-cols-6 gap-4 px-3 py-4 items-start sm:items-center bg-white border-b border-gray-200 last:border-b-0"
                       >
-                        {/* Name Dropdown */}
+                        {/* Resource ID */}
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Resource ID
+                          </label>
+                          <input
+                            type="text"
+                            value={resource?.customId || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
+
+                       
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             Resource Name
                           </label>
                           <Select
                             options={resourceOptions}
-                            value={resource.name}
+                            value={resource.name} 
                             placeholder="Select Resource Name"
                             className="text-sm"
                             onChange={(selectedOption) => {
                               setSelectedResources((prev) => {
                                 const updated = [...prev];
                                 updated[index] = {
+                                  ...updated[index],
+                                  customId: selectedOption.customId,
                                   name: selectedOption,
                                   type: { label: selectedOption.type, value: selectedOption.type },
                                   specification: {
@@ -948,9 +972,6 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Type */}
                         <div>
-                          <label className="sm:hidden text-xs font-semibold text-gray-700">
-                            Type
-                          </label>
                           <input
                             value={resource.type?.value || ""}
                             placeholder="Resource Type"
@@ -961,9 +982,6 @@ const AddBom: React.FC<AddBomProps> = ({
 
                         {/* Specification */}
                         <div>
-                          <label className="sm:hidden text-xs font-semibold text-gray-700">
-                            Specification
-                          </label>
                           <input
                             value={resource.specification?.value || ""}
                             placeholder="Resource Specification"
@@ -972,8 +990,23 @@ const AddBom: React.FC<AddBomProps> = ({
                           />
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex sm:justify-start items-center gap-2">
+                        {/* Comment */}
+                        <div>
+                          <input
+                            type="text"
+                            value={resource.comment || ""}
+                            onChange={(e) => {
+                              const updated = [...selectedResources];
+                              updated[index].comment = e.target.value;
+                              setSelectedResources(updated);
+                            }}
+                            placeholder="Comment"
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
+
+                        {/* Action */}
+                        <div className="flex sm:justify-center items-center gap-2">
                           {selectedResources.length > 1 && (
                             <button
                               type="button"
@@ -993,11 +1026,11 @@ const AddBom: React.FC<AddBomProps> = ({
                               onClick={() =>
                                 setSelectedResources([
                                   ...selectedResources,
-                                  { name: null, type: null, specification: null },
+                                  { name: null, type: null, specification: null, comment: "" },
                                 ])
                               }
                             >
-                              + Add Resources 
+                              + Add Resources
                             </button>
                           )}
                         </div>
@@ -1006,6 +1039,7 @@ const AddBom: React.FC<AddBomProps> = ({
                   </div>
                 </div>
               </div>
+
 
               {/* Manpower Section */}
               <div className="bg-white border-b">
@@ -1047,9 +1081,9 @@ const AddBom: React.FC<AddBomProps> = ({
                   {/* Table Header (Desktop Only) */}
                   <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 whitespace-nowrap to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
                     <div>Product Name</div>
-                    <div>Comment</div>
                     <div>Estimated Quantity</div>
-                    <div>UOM</div>
+                    <div className="ml-5">UOM</div>
+                    <div>Comment</div>
                     <div>Unit Cost</div>
                     <div>Total Part Cost</div>
                     <div>Action</div>
@@ -1092,23 +1126,7 @@ const AddBom: React.FC<AddBomProps> = ({
                           />
                         </div>
 
-                        {/* Comment */}
-                        <div>
-                          <label className="sm:hidden text-xs font-semibold text-gray-700">
-                            Comment
-                          </label>
-                          <input
-                            type="text"
-                            value={material.description || ""}
-                            onChange={(e) => {
-                              const newMaterials = [...scrapMaterials];
-                              newMaterials[index].description = e.target.value;
-                              setScrapMaterials(newMaterials);
-                            }}
-                            placeholder="Comment"
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                          />
-                        </div>
+
 
                         {/* Estimated Quantity */}
                         <div>
@@ -1132,10 +1150,11 @@ const AddBom: React.FC<AddBomProps> = ({
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                           />
                         </div>
+                        {/* Comment */}
 
                         {/* UOM */}
                         <div>
-                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          <label className="sm:hidden  text-xs font-semibold text-gray-700">
                             UOM
                           </label>
                           <input
@@ -1145,7 +1164,22 @@ const AddBom: React.FC<AddBomProps> = ({
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />
                         </div>
-
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Comment
+                          </label>
+                          <input
+                            type="text"
+                            value={material.description || ""}
+                            onChange={(e) => {
+                              const newMaterials = [...scrapMaterials];
+                              newMaterials[index].description = e.target.value;
+                              setScrapMaterials(newMaterials);
+                            }}
+                            placeholder="Comment"
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
                         {/* Unit Cost */}
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
@@ -1237,7 +1271,7 @@ const AddBom: React.FC<AddBomProps> = ({
                               ])
                             }
                           >
-                            <Plus size={16} /> Add Scarp Material
+                            <Plus size={16} /> Add SM
                           </button>
                         </div>
                       </div>
