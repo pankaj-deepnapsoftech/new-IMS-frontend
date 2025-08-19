@@ -44,6 +44,8 @@ interface InventoryShortage {
   price_change?: number;
   price_change_percentage?: number;
   updated_at: string;
+  remaining_shortage?: number;
+  is_fully_resolved?: boolean;
 }
 
 interface ProductInventory {
@@ -71,14 +73,20 @@ interface InventoryUpdateForm {
 const ProductInventoryRow: React.FC<{
   product: ProductInventory;
   onUpdate: (productId: string, newStock: number) => void;
+  onUpdateWithShortages: (productId: string, newStock: number) => void;
   isUpdating: boolean;
-}> = ({ product, onUpdate, isUpdating }) => {
+}> = ({ product, onUpdate, onUpdateWithShortages, isUpdating }) => {
   const [newStock, setNewStock] = useState(product.currentStock);
   const [isEditing, setIsEditing] = useState(false);
+  const [useShortageAdjustment, setUseShortageAdjustment] = useState(true);
 
   const handleSave = () => {
     if (newStock !== product.currentStock) {
-      onUpdate(product._id, newStock);
+      if (useShortageAdjustment) {
+        onUpdateWithShortages(product._id, newStock);
+      } else {
+        onUpdate(product._id, newStock);
+      }
     }
     setIsEditing(false);
   };
@@ -97,28 +105,42 @@ const ProductInventoryRow: React.FC<{
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.unit}</td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
         {isEditing ? (
-          <div className="flex items-center space-x-2">
-            <input
-              type="number"
-              value={newStock}
-              onChange={(e) => setNewStock(Number(e.target.value))}
-              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-              min="0"
-            />
-            <button
-              onClick={handleSave}
-              disabled={isUpdating}
-              className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs disabled:opacity-50"
-            >
-              {isUpdating ? 'Saving...' : 'Save'}
-            </button>
-            <button
-              onClick={handleCancel}
-              disabled={isUpdating}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs disabled:opacity-50"
-            >
-              Cancel
-            </button>
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-center space-x-2">
+              <input
+                type="number"
+                value={newStock}
+                onChange={(e) => setNewStock(Number(e.target.value))}
+                className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                min="0"
+              />
+              <button
+                onClick={handleSave}
+                disabled={isUpdating}
+                className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs disabled:opacity-50"
+              >
+                {isUpdating ? 'Saving...' : 'Save'}
+              </button>
+              <button
+                onClick={handleCancel}
+                disabled={isUpdating}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id={`shortage-adj-${product._id}`}
+                checked={useShortageAdjustment}
+                onChange={(e) => setUseShortageAdjustment(e.target.checked)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <label htmlFor={`shortage-adj-${product._id}`} className="text-xs text-gray-600">
+                Auto-adjust shortages
+              </label>
+            </div>
           </div>
         ) : (
           <button
@@ -144,10 +166,7 @@ const PurchaseOrder: React.FC = () => {
   // New state for inventory management
   const [activeTab, setActiveTab] = useState<'purchase-orders' | 'inventory-shortages' | 'update-inventory'>('purchase-orders');
   const [inventoryShortages, setInventoryShortages] = useState<InventoryShortage[]>([]);
-  const [products, setProducts] = useState<ProductInventory[]>([]);
   const [isLoadingShortages, setIsLoadingShortages] = useState(false);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
-  const [updatingProductId, setUpdatingProductId] = useState<string | null>(null);
   
   // Modal states
   const [showInventoryShortagesModal, setShowInventoryShortagesModal] = useState(false);
@@ -259,27 +278,7 @@ const PurchaseOrder: React.FC = () => {
     }
   };
 
-  // Fetch products for inventory update
-  const fetchProducts = async () => {
-    setIsLoadingProducts(true);
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}product/all`,
-        {
-          headers: { Authorization: `Bearer ${cookies?.access_token}` },
-        }
-      );
-      if (response.data.success) {
-        setProducts(response.data.products || []);
-      } else {
-        toast.error(response.data.message || "Failed to fetch products");
-      }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to fetch products");
-    } finally {
-      setIsLoadingProducts(false);
-    }
-  };
+
 
   // Fetch update inventory form data
   const fetchUpdateInventoryForm = async () => {
@@ -377,37 +376,7 @@ const PurchaseOrder: React.FC = () => {
     }
   };
 
-  // Update product inventory
-  const updateProductInventory = async (productId: string, newStock: number) => {
-    setUpdatingProductId(productId);
-    try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}product/update-inventory`,
-        {
-          productId,
-          newStock
-        },
-        {
-          headers: { Authorization: `Bearer ${cookies?.access_token}` },
-        }
-      );
-      if (response.data.success) {
-        toast.success("Inventory updated successfully");
-        // Refresh all data to sync across components
-        await Promise.all([
-          fetchInventoryShortages(),
-          fetchProducts(),
-          fetchUpdateInventoryForm()
-        ]);
-      } else {
-        toast.error(response.data.message || "Failed to update inventory");
-      }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to update inventory");
-    } finally {
-      setUpdatingProductId(null);
-    }
-  };
+
 
   // Handle form input changes
   const handleFormInputChange = (index: number, field: keyof InventoryUpdateForm, value: number) => {
@@ -437,11 +406,16 @@ const PurchaseOrder: React.FC = () => {
     const updatedShortages = [...inventoryShortages];
     const item = updatedShortages[index];
     
-    // Update UI immediately for better user experience
     // newStock represents the additional stock to be added
+    // Calculate remaining shortage after adding this stock
+    const remainingShortage = Math.max(0, item.shortage_quantity - newStock);
+    
+    // Update UI immediately for better user experience
     updatedShortages[index] = {
       ...item,
-      updated_stock: newStock
+      updated_stock: newStock,
+      remaining_shortage: remainingShortage, // Add this field to track remaining shortage
+      is_fully_resolved: remainingShortage === 0 // Add this field to track if shortage is fully resolved
     };
     setInventoryShortages(updatedShortages);
   };
@@ -495,25 +469,13 @@ const PurchaseOrder: React.FC = () => {
     try {
       console.log("Total inventory shortages:", inventoryShortages.length);
       
-      // Validate that all stock updates are sufficient to cover shortages
-      const insufficientItems = inventoryShortages.filter(item => 
-        item.updated_stock && item.updated_stock !== null && item.updated_stock > 0 && 
-        item.updated_stock < item.shortage_quantity
-      );
-      
-      if (insufficientItems.length > 0) {
-        const itemNames = insufficientItems.map(item => `${item.item_name} (${item.updated_stock}/${item.shortage_quantity})`).join(', ');
-        toast.error(`❌ Submission blocked! Insufficient quantities: ${itemNames}.`);
-        return;
-      }
-      
       // Find items that have been modified
       const itemsWithPriceChanges = inventoryShortages.filter(item => 
         item.updated_price && item.updated_price !== null && item.updated_price !== item.current_price
       );
       
       const itemsWithStockChanges = inventoryShortages.filter(item => 
-        item.updated_stock && item.updated_stock !== null && item.updated_stock !== 0
+        item.updated_stock && item.updated_stock !== null && item.updated_stock > 0
       );
 
       console.log("All inventory shortages:", inventoryShortages);
@@ -567,13 +529,17 @@ const PurchaseOrder: React.FC = () => {
       
       toast.success(`Successfully updated ${uniqueItemsUpdated} items (${itemsWithPriceChanges.length} price updates, ${itemsWithStockChanges.length} stock updates)`);
       
-      // Automatically remove updated items from inventory shortages
-      const allUpdatedItems = [...itemsWithPriceChanges, ...itemsWithStockChanges];
-      const uniqueUpdatedItems = allUpdatedItems.filter((item, index, self) => 
-        index === self.findIndex(t => t.item === item.item)
+      // Handle partial and full shortage resolution
+      const fullyResolvedItems = itemsWithStockChanges.filter(item => 
+        item.is_fully_resolved === true
       );
       
-      const removalPromises = uniqueUpdatedItems.map(item => 
+      const partiallyResolvedItems = itemsWithStockChanges.filter(item => 
+        item.is_fully_resolved === false && (item.remaining_shortage || 0) > 0
+      );
+      
+      // Only remove fully resolved items from shortages
+      const removalPromises = fullyResolvedItems.map(item => 
         axios.put(
           `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
           {
@@ -591,12 +557,36 @@ const PurchaseOrder: React.FC = () => {
       
       await Promise.all(removalPromises);
       
-      toast.success(`Automatically removed ${uniqueUpdatedItems.length} updated items from shortages list`);
+      // Update shortage quantities for partially resolved items
+      const updateShortagePromises = partiallyResolvedItems.map(item => 
+        axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}product/update-shortage-quantity`,
+          {
+            productId: item.item,
+            newShortageQuantity: item.remaining_shortage
+          },
+          {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          }
+        ).catch(error => {
+          console.log(`Failed to update shortage quantity for ${item.item_name}:`, error);
+          return null;
+        })
+      );
+      
+      await Promise.all(updateShortagePromises);
+      
+      if (fullyResolvedItems.length > 0) {
+        toast.success(`✅ Fully resolved and removed ${fullyResolvedItems.length} items from shortages`);
+      }
+      
+      if (partiallyResolvedItems.length > 0) {
+        toast.success(`📝 Partially resolved ${partiallyResolvedItems.length} items - shortages updated`);
+      }
       
       // Refresh all data to sync across components
       await Promise.all([
         fetchInventoryShortages(),
-        fetchProducts(),
         fetchUpdateInventoryForm()
       ]);
 
@@ -623,7 +613,6 @@ const PurchaseOrder: React.FC = () => {
         // Refresh all data to sync across components
         await Promise.all([
           fetchInventoryShortages(),
-          fetchProducts(),
           fetchUpdateInventoryForm()
         ]);
       } else {
@@ -652,7 +641,6 @@ const PurchaseOrder: React.FC = () => {
         // Refresh all data to sync across components
         await Promise.all([
           fetchInventoryShortages(),
-          fetchProducts(),
           fetchUpdateInventoryForm()
         ]);
       } else {
@@ -681,7 +669,6 @@ const PurchaseOrder: React.FC = () => {
         // Refresh all data to sync across components
         await Promise.all([
           fetchInventoryShortages(),
-          fetchProducts(),
           fetchUpdateInventoryForm()
         ]);
       } else {
@@ -711,7 +698,6 @@ const PurchaseOrder: React.FC = () => {
         // Refresh all data to sync across components
         await Promise.all([
           fetchInventoryShortages(),
-          fetchProducts(),
           fetchUpdateInventoryForm()
         ]);
       } else {
@@ -891,10 +877,12 @@ const PurchaseOrder: React.FC = () => {
             
             <button
               className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-lg border border-gray-300 transition-all duration-200 hover:shadow-md flex items-center justify-center gap-2"
-              onClick={refreshTableData}
+              onClick={() => {
+                refreshTableData();
+              }}
             >
               <MdOutlineRefresh className="text-base" />
-              Refresh
+              Refresh All
             </button>
           </div>
         </div>
@@ -928,6 +916,10 @@ const PurchaseOrder: React.FC = () => {
         />
       </div>
 
+
+
+
+
       {/* Inventory Shortages Modal */}
       {showInventoryShortagesModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -947,7 +939,6 @@ const PurchaseOrder: React.FC = () => {
                    onClick={async () => {
                      await Promise.all([
                        fetchInventoryShortages(),
-                       fetchProducts(),
                        fetchUpdateInventoryForm()
                      ]);
                      toast.success("All data synchronized successfully!");
@@ -1020,11 +1011,11 @@ const PurchaseOrder: React.FC = () => {
                       </div>
                       <p className="text-blue-700 text-xs mt-3">
                         💡 <strong>Tip:</strong> "Total Available Stock" shows Current Stock + Updated Stock. Update prices in "Updated Price" and additional stocks in "Updated Stock" columns. 
-                        <strong>Important:</strong> Updated Stock must be equal to or greater than the Shortage Quantity to submit successfully. 
-                        You can enter any value, but submission will be blocked if insufficient. Input fields will show red if insufficient, green if sufficient. 
-                        Click "Save Changes" to store updates and automatically remove items from shortages. 
+                        <strong>New Feature:</strong> You can now partially fill shortages! Enter any stock value and the system will calculate the remaining shortage. 
+                        Items with remaining shortages will stay in the list until fully resolved. 
+                        Input fields show red if insufficient, green if sufficient, and orange for partial fills. 
+                        Click "Save Changes" to store updates - fully resolved items will be removed automatically. 
                         Current prices and stocks remain unchanged.
-                        Use "Remove from Shortages" for manual removal if needed.
                       </p>
                     </div>
                    
@@ -1037,12 +1028,12 @@ const PurchaseOrder: React.FC = () => {
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Available Stock</th>
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated Stock</th>
                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shortage Quantity</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remaining Shortage</th>
                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated Price</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latest Price</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price Change</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remove from Shortages</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
+                                                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price Change</th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
                        </tr>
                      </thead>
                      <tbody className="bg-white divide-y divide-gray-200">
@@ -1058,7 +1049,7 @@ const PurchaseOrder: React.FC = () => {
                                 onChange={(e) => handleStockUpdate(idx, Number(e.target.value))}
                                 className={`w-20 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                   item.updated_stock && item.updated_stock > 0 && item.updated_stock < item.shortage_quantity
-                                    ? 'border-red-500 bg-red-50'
+                                    ? 'border-orange-500 bg-orange-50'
                                     : item.updated_stock && item.updated_stock >= item.shortage_quantity
                                     ? 'border-green-500 bg-green-50'
                                     : 'border-gray-300'
@@ -1070,17 +1061,28 @@ const PurchaseOrder: React.FC = () => {
                               {item.updated_stock && item.updated_stock > 0 && (
                                 <div className={`text-xs mt-1 ${
                                   item.updated_stock < item.shortage_quantity
-                                    ? 'text-red-600'
+                                    ? 'text-orange-600'
                                     : 'text-green-600'
                                 }`}>
                                   {item.updated_stock < item.shortage_quantity 
-                                    ? `Need ${item.shortage_quantity - item.updated_stock} more`
-                                    : `+${item.updated_stock}`
+                                    ? `Partial: ${item.remaining_shortage || 0} remaining`
+                                    : `Complete: +${item.updated_stock}`
                                   }
                                 </div>
                               )}
                             </td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">{item.shortage_quantity}</td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm">
+                             {item.updated_stock && item.updated_stock > 0 ? (
+                               <span className={`font-semibold ${
+                                 (item.remaining_shortage || 0) > 0 ? 'text-orange-600' : 'text-green-600'
+                               }`}>
+                                 {item.remaining_shortage || 0}
+                               </span>
+                             ) : (
+                               <span className="text-red-600 font-semibold">{item.shortage_quantity}</span>
+                             )}
+                           </td>
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{item.current_price}</td>
                                                        <td className="px-6 py-4 whitespace-nowrap">
                               <input
@@ -1109,14 +1111,6 @@ const PurchaseOrder: React.FC = () => {
                            </td>
                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {new Date(item.updated_at).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              <button
-                                onClick={() => openEditRawMaterialModal(item)}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
-                              >
-                                Edit
-                              </button>
                             </td>
                           </tr>
                        ))}
@@ -1165,7 +1159,6 @@ const PurchaseOrder: React.FC = () => {
                    onClick={async () => {
                      await Promise.all([
                        fetchInventoryShortages(),
-                       fetchProducts(),
                        fetchUpdateInventoryForm()
                      ]);
                      toast.success("All data synchronized successfully!");
