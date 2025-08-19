@@ -78,7 +78,8 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: "row",
-    borderBottom: "1px solid #000",
+    // borderBottom: "1px solid #000",
+    borderTop: "1px solid #000",
   },
   tableHeader: {
     backgroundColor: "#f0f0f0",
@@ -327,7 +328,6 @@ const BOMPDF = ({ bom }: any) => {
           </View>
         )}
 
-        {/* Raw Materials Table */}
         {rawMaterials.length > 0 && (
           <View style={styles.table}>
             <Text
@@ -370,7 +370,6 @@ const BOMPDF = ({ bom }: any) => {
           </View>
         )}
 
-        {/* Scrap Materials Table */}
         {scrapMaterials.length > 0 && (
           <View style={[styles.table, { marginTop: 15 }]}>
             <Text
@@ -381,7 +380,9 @@ const BOMPDF = ({ bom }: any) => {
             >
               SCRAP MATERIALS
             </Text>
-            <View style={[styles.tableRow, styles.tableHeader]}>
+
+            {/* Fixed Header */}
+            <View style={[styles.tableRow, styles.tableHeader]} fixed>
               <Text style={styles.col1}>S. No.</Text>
               <Text style={styles.col2}>Material Name</Text>
               <Text style={styles.col4}>Quantity</Text>
@@ -390,6 +391,7 @@ const BOMPDF = ({ bom }: any) => {
               <Text style={styles.col7}>Total Cost</Text>
             </View>
 
+            {/* Body Rows */}
             {scrapMaterials.map((material: any, index: number) => (
               <View key={index} style={styles.tableRow}>
                 <Text style={styles.col1}>{index + 1}</Text>
@@ -401,13 +403,9 @@ const BOMPDF = ({ bom }: any) => {
                     material?.item?.price || material?.unit_cost || 0
                   ).toFixed(2)}
                 </Text>
-                {cookies?.role === "admin" ? (
-                  <Text style={[styles.col7, { width: "10%" }]}>
-                    {Number(material?.total_part_cost || 0).toFixed(2)}
-                  </Text>
-                ) : (
-                  <Text style={[styles.col7, { width: "10%" }]}>*****</Text>
-                )}
+                <Text style={styles.col7}>
+                  {Number(material?.total_part_cost || 0).toFixed(2)}
+                </Text>
               </View>
             ))}
           </View>
@@ -450,37 +448,6 @@ const BOMPDF = ({ bom }: any) => {
           </View>
         )}
 
-        {/* Manpower Table */}
-        {/* {manpower.length > 0 && (
-          <View style={[styles.table, { marginTop: 15 }]}>
-            <Text
-              style={[
-                styles.sectionLabel,
-                { marginBottom: 5, fontSize: 12, fontWeight: "bold" },
-              ]}
-            >
-              MANPOWER
-            </Text>
-            <View style={[styles.tableRow, styles.tableHeader]}>
-              <Text style={[styles.col1, { width: "15%" }]}>S. No.</Text>
-              <Text style={[styles.col2, { width: "40%" }]}>Employee Name</Text>
-            </View>
-
-            {manpower.map((person: any, index: number) => (
-
-
-              <View key={index} style={styles.tableRow}>
-                <Text style={[styles.col1, { width: "15%" }]}>{index + 1}</Text>
-                <Text style={[styles.col2, { width: "40%" }]}>
-                  {`${person?.user?.first_name || ""} ${person?.user?.last_name || ""
-                    }`.trim() || "N/A"}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )} */}
-
-        {/* Manpower Table */}
         {process.length > 0 && (
           <View style={[styles.table, { marginTop: 15 }]}>
             <Text
@@ -507,93 +474,7 @@ const BOMPDF = ({ bom }: any) => {
           </View>
         )}
 
-        {/* Cost Breakdown */}
-        {/* <View style={[styles.table, { marginTop: 15 }]}>
-          <Text
-            style={[
-              styles.sectionLabel,
-              { marginBottom: 5, fontSize: 12, fontWeight: "bold" },
-            ]}
-          >
-            COST BREAKDOWN
-          </Text>
-          <View style={styles.tableRow}>
-            <Text style={[styles.col2, { width: "60%" }]}>
-              Raw Materials Total
-            </Text>
-            {cookies?.role === "admin" ? (
-              <Text style={[styles.col3, { width: "40%" }]}>
-                {rawMaterials
-                  .reduce(
-                    (sum: number, material: any) =>
-                      sum + Number(material?.total_part_cost || 0),
-                    0
-                  )
-                  .toFixed(2)}
-              </Text>
-            ) : (
-              <Text style={[styles.col7, { width: "10%" }]}>*****</Text>
-            )}
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.col2, { width: "60%" }]}>
-              Scrap Materials Total
-            </Text>
-            {cookies?.role === "admin" ? (
-              <Text style={[styles.col3, { width: "40%" }]}>
-                {scrapMaterials
-                  .reduce(
-                    (sum: number, material: any) =>
-                      sum + Number(material?.total_part_cost || 0),
-                    0
-                  )
-                  .toFixed(2)}
-              </Text>
-            ) : (
-              <Text style={[styles.col7, { width: "10%" }]}>*****</Text>
-            )}
-          </View> */}
-        {/* <View style={styles.tableRow}>
-            <Text style={[styles.col2, { width: "60%" }]}>Labour Charges</Text>
-            <Text style={[styles.col3, { width: "40%" }]}>
-              {Number(otherCharges?.labour_charges || 0).toFixed(2)}
-            </Text>
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.col2, { width: "60%" }]}>
-              Machinery Charges
-            </Text>
-            <Text style={[styles.col3, { width: "40%" }]}>
-              {Number(otherCharges?.machinery_charges || 0).toFixed(2)}
-            </Text>
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.col2, { width: "60%" }]}>
-              Electricity Charges
-            </Text>
-            <Text style={[styles.col3, { width: "40%" }]}>
-              {Number(otherCharges?.electricity_charges || 0).toFixed(2)}
-            </Text>
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.col2, { width: "60%" }]}>Other Charges</Text>
-            <Text style={[styles.col3, { width: "40%" }]}>
-              {Number(otherCharges?.other_charges || 0).toFixed(2)}
-            </Text>
-          </View> */}
-        {/* <View style={[styles.tableRow, styles.totalRow]}>
-            <Text style={[styles.col2, { width: "60%" }]}>TOTAL BOM COST</Text>
-            {cookies?.role === "admin" ? (
-              <Text style={[styles.col3, { width: "40%" }]}>
-                {Number(totalCost).toFixed(2)}
-              </Text>
-            ) : (
-              <Text style={[styles.col7, { width: "10%" }]}>*****</Text>
-            )}
-          </View>
-        </View> */}
-
-        {/* Total Cost in Words */}
+        
         <View style={styles.amountInWords}>
           <Text style={styles.amountLabel}>Total Cost in Words:</Text>
           {cookies?.role === "admin" ? (
@@ -605,7 +486,6 @@ const BOMPDF = ({ bom }: any) => {
           )}
         </View>
 
-        {/* Notes/Remarks Section */}
         {bom?.remarks && (
           <View style={styles.notesSection}>
             <Text style={styles.notesLabel}>Remarks:</Text>
@@ -613,34 +493,18 @@ const BOMPDF = ({ bom }: any) => {
           </View>
         )}
 
-        {/* Approval and Signature */}
         <View style={styles.signatureContainer}>
           <View style={styles.approvalBox}>
             <Text style={styles.signatureLabel}>Approved By</Text>
             <Text style={{ marginTop: 30, fontSize: 10 }}>
               _________________________
             </Text>
-            {/* <Text style={{ marginTop: 5, fontSize: 9 }}>
-              Engineering Manager
-            </Text>
-            <Text style={{ marginTop: 10, fontSize: 9 }}>
-              Date:{" "}
-              {bom?.approval_date
-                ? new Date(bom.approval_date).toLocaleDateString()
-                : "___________"}
-            </Text> */}
           </View>
           <View style={styles.signatureBox}>
             <Text style={styles.signatureLabel}>Authorized Signature</Text>
             <Text style={{ marginTop: 30, fontSize: 10 }}>
               _________________________
             </Text>
-            {/* <Text style={{ marginTop: 5, fontSize: 9 }}>
-              Production Manager
-            </Text>
-            <Text style={{ marginTop: 10, fontSize: 9 }}>
-              Date: {new Date().toLocaleDateString()}
-            </Text> */}
           </View>
         </View>
       </Page>

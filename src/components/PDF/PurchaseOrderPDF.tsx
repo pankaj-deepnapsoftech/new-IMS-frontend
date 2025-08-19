@@ -251,9 +251,31 @@ const toWords = new ToWords({
 });
 
 const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
-  const itemRate = 100;
-  const quantity = 10;
-  const baseAmount = itemRate * quantity;
+  // Handle both new items array structure and legacy single item structure
+  const items =
+    purchaseOrder?.items && purchaseOrder.items.length > 0
+      ? purchaseOrder.items
+      : [
+          {
+            itemName:
+              purchaseOrder?.itemName ||
+              purchaseOrder?.product?.name ||
+              "Sample Item",
+            quantity: purchaseOrder?.quantity || 1,
+            unitPrice: purchaseOrder?.unitPrice || 100,
+            totalPrice:
+              purchaseOrder?.totalPrice ||
+              (purchaseOrder?.quantity || 1) *
+                (purchaseOrder?.unitPrice || 100),
+            productId: purchaseOrder?.product?.product_id || "ITM001",
+          },
+        ];
+
+  // Calculate totals from actual items
+  const baseAmount = items.reduce(
+    (sum, item) => sum + (item.totalPrice || item.quantity * item.unitPrice),
+    0
+  );
 
   // Dynamic GST calculation based on GSTApply value
   const isIGST = purchaseOrder?.GSTApply === "igst";
@@ -389,41 +411,44 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             <Text style={styles.colSno}>S. No.</Text>
             <Text style={styles.colItem}>ITEM</Text>
             <Text style={styles.colItemCode}>ITEM CODE</Text>
-            <Text style={styles.colHsnCode}>HSN CODE</Text>
+            {/* <Text style={styles.colHsnCode}>HSN CODE</Text> */}
             <Text style={styles.colQty}>QTY</Text>
             <Text style={styles.colRate}>Rate</Text>
             <Text style={styles.colAmount}>Amount</Text>
           </View>
 
-          <View style={styles.tableRow}>
-            <Text style={styles.colSno}>1</Text>
-            <Text style={styles.colItem}>
-              {purchaseOrder?.product?.name ||
-                purchaseOrder?.itemName ||
-                "Sample Item"}
-            </Text>
-            <Text style={styles.colItemCode}>
-              {purchaseOrder?.product?.product_id ||
-                purchaseOrder?.product?.item_code ||
-                "ITM001"}
-            </Text>
-            <Text style={styles.colHsnCode}>
-              {purchaseOrder?.product?.hsn_code ||
-                purchaseOrder?.product?.hsn ||
-                "1234"}
-            </Text>
-            <Text style={styles.colQty}>{quantity}</Text>
-            <Text style={styles.colRate}>{itemRate.toFixed(2)}</Text>
-            <Text style={styles.colAmount}>{baseAmount.toFixed(2)}</Text>
-          </View>
+          {/* Dynamic Items Rows */}
+          {items.map((item, index) => (
+            <View key={index} style={styles.tableRow}>
+              <Text style={styles.colSno}>{index + 1}</Text>
+              <Text style={styles.colItem}>
+                {item.itemName || "Sample Item"}
+              </Text>
+              <Text style={styles.colItemCode}>
+                {item.productId || "ITM001"}
+              </Text>
+              {/* <Text style={styles.colHsnCode}>{item.hsn_code || "1234"}</Text> */}
+              <Text style={styles.colQty}>{item.quantity || 1}</Text>
+              <Text style={styles.colRate}>
+                {(item.unitPrice || 0).toFixed(2)}
+              </Text>
+              <Text style={styles.colAmount}>
+                {(
+                  item.totalPrice ||
+                  item.quantity * item.unitPrice ||
+                  0
+                ).toFixed(2)}
+              </Text>
+            </View>
+          ))}
 
-          {/* Empty rows for spacing */}
-          {[...Array(3)].map((_, i) => (
-            <View key={i} style={styles.tableRow}>
+          {/* Empty rows for spacing - adjust based on items count */}
+          {[...Array(Math.max(0, 4 - items.length))].map((_, i) => (
+            <View key={`empty-${i}`} style={styles.tableRow}>
               <Text style={styles.colSno}></Text>
               <Text style={styles.colItem}></Text>
               <Text style={styles.colItemCode}></Text>
-              <Text style={styles.colHsnCode}></Text>
+              {/* <Text style={styles.colHsnCode}></Text> */}
               <Text style={styles.colQty}></Text>
               <Text style={styles.colRate}></Text>
               <Text style={styles.colAmount}></Text>
@@ -435,7 +460,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             <Text style={styles.colSno}></Text>
             <Text style={styles.colItem}></Text>
             <Text style={styles.colItemCode}></Text>
-            <Text style={styles.colHsnCode}></Text>
+            {/* <Text style={styles.colHsnCode}></Text> */}
             <Text style={styles.colQty}></Text>
             <Text style={styles.colRate}>TOTAL</Text>
             <Text style={styles.colAmount}>{baseAmount.toFixed(2)}</Text>
@@ -448,7 +473,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
               <Text style={styles.colSno}></Text>
               <Text style={styles.colItem}></Text>
               <Text style={styles.colItemCode}></Text>
-              <Text style={styles.colHsnCode}></Text>
+              {/* <Text style={styles.colHsnCode}></Text> */}
               <Text style={styles.colQty}></Text>
               <Text style={styles.colRate}>IGST @ {igstRate}%</Text>
               <Text style={styles.colAmount}>{igst.toFixed(2)}</Text>
@@ -460,7 +485,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
                 <Text style={styles.colSno}></Text>
                 <Text style={styles.colItem}></Text>
                 <Text style={styles.colItemCode}></Text>
-                <Text style={styles.colHsnCode}></Text>
+                {/* <Text style={styles.colHsnCode}></Text> */}
                 <Text style={styles.colQty}></Text>
                 <Text style={styles.colRate}>CGST @ {cgstRate}%</Text>
                 <Text style={styles.colAmount}>{cgst.toFixed(2)}</Text>
@@ -470,7 +495,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
                 <Text style={styles.colSno}></Text>
                 <Text style={styles.colItem}></Text>
                 <Text style={styles.colItemCode}></Text>
-                <Text style={styles.colHsnCode}></Text>
+                {/* <Text style={styles.colHsnCode}></Text> */}
                 <Text style={styles.colQty}></Text>
                 <Text style={styles.colRate}>SGST @ {sgstRate}%</Text>
                 <Text style={styles.colAmount}>{sgst.toFixed(2)}</Text>
@@ -482,7 +507,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             <Text style={styles.colSno}></Text>
             <Text style={styles.colItem}></Text>
             <Text style={styles.colItemCode}></Text>
-            <Text style={styles.colHsnCode}></Text>
+            {/* <Text style={styles.colHsnCode}></Text> */}
             <Text style={styles.colQty}></Text>
             <Text style={styles.colRate}>GRAND TOTAL</Text>
             <Text style={styles.colAmount}>{grandTotal.toFixed(2)}</Text>
