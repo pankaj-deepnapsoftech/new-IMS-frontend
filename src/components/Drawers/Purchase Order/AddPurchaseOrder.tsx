@@ -62,6 +62,7 @@ interface RawMaterial {
   _id: string;
   name: string;
   product_id?: string;
+  uom: string;
 }
 
 interface Item {
@@ -70,6 +71,7 @@ interface Item {
   unitPrice: number;
   totalPrice: number;
   productId?: string; // Add product_id to track the product
+  uom?: string; // Add uom field for unit of measure
 }
 
 interface PurchaseOrderFormValues {
@@ -214,6 +216,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                 unitPrice: 0,
                 totalPrice: 0,
                 productId: "",
+                uom: "",
               },
             ]
           : [
@@ -223,6 +226,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                 unitPrice: 0,
                 totalPrice: 0,
                 productId: "",
+                uom: "",
               },
             ]),
       isSameAddress: edittable?.isSameAddress || false,
@@ -439,7 +443,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     fetchData();
     formik.setTouched({}, false); // Reset touched state on mount
   }, []);
-
+  
   useEffect(() => {
     if (edittable && supplierOptions.length > 0) {
       const isValidSupplier = supplierOptions.some(
@@ -599,15 +603,19 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
   const addItem = () => {
     const newItems = [
       ...formik.values.items,
+
       {
         itemName: "",
         quantity: 1,
         unitPrice: 0,
         totalPrice: 0,
         productId: "",
+        uom: "",
       },
     ];
     formik.setFieldValue("items", newItems);
+
+    // console.log(newItems)
   };
 
   const removeItem = (index: number) => {
@@ -621,15 +629,16 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     const newItems = [...formik.values.items];
     newItems[index] = { ...newItems[index], [field]: value };
 
-    // If item name is being updated, also update the product_id
-    if (field === "itemName") {
-      const selectedMaterial = rawMaterials.find(
-        (material) => material.name === value
-      );
-      if (selectedMaterial) {
-        newItems[index].productId = selectedMaterial.product_id;
-      }
-    }
+ if (field === "itemName") {
+   const selectedMaterial = rawMaterials.find(
+     (material) => material.name === value
+   );
+   if (selectedMaterial) {
+     newItems[index].productId = selectedMaterial.product_id;
+     newItems[index].uom = selectedMaterial.uom || ""; // Auto-fetch UOM
+   }
+ }
+
 
     // Auto-calculate total price when quantity or unit price changes
     if (field === "quantity" || field === "unitPrice") {
@@ -910,6 +919,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {formik.values.items.map((item, index) => (
+                        console.log("Rendering item:", item),
                         <Card key={index} mb={4} variant="outline">
                           <CardBody>
                             <div className="flex items-center justify-between mb-4">
@@ -1010,39 +1020,50 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                                     </Text>
                                   )}
                               </FormControl>
+                              <FormControl>
+                                <FormLabel>UOM</FormLabel>
+                                <Input
+                                  value={item.uom || ""}
+                                  placeholder="Unit of Measure"
+                                  size="lg"
+                                  borderRadius="lg"
+                                  isReadOnly
+                                  bg="gray.50"
+                                />
+                              </FormControl>
 
                               <FormControl>
-                              <FormLabel>Unit Price</FormLabel>
-                              <Input
-                                type="number"
-                                value={item.unitPrice}
-                                onChange={(e) =>
-                                  updateItem(
-                                    index,
-                                    "unitPrice",
-                                    parseFloat(e.target.value) || 0
-                                  )
-                                }
-                                placeholder="Enter unit price"
-                                size="lg"
-                                borderRadius="lg"
-                                min="0"
-                                step="0.01"
-                              />
-                            </FormControl>
+                                <FormLabel>Unit Price</FormLabel>
+                                <Input
+                                  type="number"
+                                  value={item.unitPrice}
+                                  onChange={(e) =>
+                                    updateItem(
+                                      index,
+                                      "unitPrice",
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
+                                  placeholder="Enter unit price"
+                                  size="lg"
+                                  borderRadius="lg"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </FormControl>
 
-                            <FormControl>
-                              <FormLabel>Total Price</FormLabel>
-                              <Input
-                                type="number"
-                                value={item.totalPrice}
-                                isReadOnly
-                                placeholder="Auto-calculated"
-                                size="lg"
-                                borderRadius="lg"
-                                bg="gray.50"
-                              />
-                            </FormControl>
+                              <FormControl>
+                                <FormLabel>Total Price</FormLabel>
+                                <Input
+                                  type="number"
+                                  value={item.totalPrice}
+                                  isReadOnly
+                                  placeholder="Auto-calculated"
+                                  size="lg"
+                                  borderRadius="lg"
+                                  bg="gray.50"
+                                />
+                              </FormControl>
                             </div>
                           </CardBody>
                         </Card>
