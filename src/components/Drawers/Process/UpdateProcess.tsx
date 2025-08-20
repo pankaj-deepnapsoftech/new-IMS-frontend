@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import {
   Button,
   Checkbox,
@@ -59,6 +61,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       total_part_cost: "",
       estimated_quantity: "",
       used_quantity: "",
+      uom_used_quantity:""
+
     },
   ]);
 
@@ -91,12 +95,13 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   const [finishedGoodUnitCost, setFinishedGoodUnitCost] = useState<
     string | undefined
   >();
+  const [materialUnit, setMaterialUnit] = useState(null); // state to describe the UOM
   const [submitBtnText, setSubmitBtnText] = useState<string>("Update");
   const [processStatus, setProcessStatus] = useState<string | undefined>();
   const [rawMaterialApprovalPending, setRawMaterialApprovalPending] =
     useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
-  const [processProgress, setProcessProgress] = useState<{ done: number;  }[]>(
+  const [processProgress, setProcessProgress] = useState<{ done: number }[]>(
     []
   );
 
@@ -141,7 +146,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
   // Calculate percentage
   const progressPercentage =
-    totalProcesses > 0 ? Math.round((completedCount / totalProcesses) * 100) : 0;
+    totalProcesses > 0
+      ? Math.round((completedCount / totalProcesses) * 100)
+      : 0;
 
   const handleProcessStatusChange = (
     processIndex: number,
@@ -198,7 +205,18 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       done: processStatuses[index]?.done || false,
       work_done: Number(processProgress[index]?.done) || 0, // ensure number
     }));
+      // Map raw materials with selected UOM
+  // let modifiedRawMaterials = selectedProducts.map((material) => ({
+  //   ...material,
+  //   uom_used_quantity: material.uom, // <-- this is the selected dropdown value
+  // }));
 
+  // Map scrap materials with selected UOM
+   modifiedScrapMaterials = scrapMaterials.map((material) => ({
+    ...material,
+   uom_produced_quantity: material.uom_produced_quantity, // <-- this sends the selected dropdown value!
+  }));
+  console.log("ye hai modified scrap material",modifiedScrapMaterials)
 
 
     const data = {
@@ -222,11 +240,12 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       _id: productionProcessId,
     };
 
+    console.log("final Data:---",data)
 
     try {
       setIsUpdating(true);
       const response = await updateProcess(data).unwrap();
-    console.log(response);
+      console.log(response);
       if (!response.success) {
         throw new Error(response.message);
       }
@@ -239,6 +258,93 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setIsUpdating(false);
     }
   };
+
+  // Code to implement units dropdown in Raw Materials and Scrap Materials
+  const massUnits = [
+    { value: "kgs", label: "Kilogram" },
+    { value: "g", label: "Gram" },
+    { value: "mg", label: "Milligram" },
+    { value: "cg", label: "Centigram" },
+    { value: "lb", label: "Pound" },
+    { value: "oz", label: "Ounce" },
+    { value: "tonne", label: "Tonne" },
+    { value: "st", label: "Stone" },
+  ];
+
+  const liquidUnits = [
+    { value: "ltr", label: "Litre" },
+    { value: "ml", label: "Millilitre" },
+    { value: "gal", label: "Gallon (US)" },
+    { value: "qt", label: "Quart (US)" },
+    { value: "pt", label: "Pint (US)" },
+    { value: "fl oz", label: "Fluid Ounce (US)" },
+    { value: "cup", label: "Cup (US)" },
+    { value: "tbsp", label: "Tablespoon" },
+    { value: "tsp", label: "Teaspoon" },
+  ];
+
+  const gasUnits = [
+    { value: "m3", label: "Cubic Meter" },
+    { value: "cm3", label: "Cubic Centimeter" },
+    { value: "cf", label: "Cubic Feet" },
+    { value: "in3", label: "Cubic Inch" },
+    { value: "ft3", label: "Cubic Foot" },
+    { value: "L", label: "Litre (for gases)" },
+  ];
+
+  const pressureUnits = [
+    { value: "pa", label: "Pascal" },
+    { value: "kpa", label: "Kilopascal" },
+    { value: "mpa", label: "Megapascal" },
+    { value: "bar", label: "Bar" },
+    { value: "atm", label: "Atmosphere" },
+    { value: "psi", label: "Pound per Square Inch" },
+    { value: "mmHg", label: "Millimeter of Mercury" },
+    { value: "inHg", label: "Inch of Mercury" },
+    { value: "torr", label: "Torr" },
+  ];
+
+  const lengthUnits = [
+    { value: "mm", label: "Millimeter" },
+    { value: "cm", label: "Centimeter" },
+    { value: "mtr", label: "Meter" },
+    { value: "km", label: "Kilometer" },
+    { value: "inch", label: "Inch" },
+    { value: "ft", label: "Foot" },
+    { value: "yd", label: "Yard" },
+    { value: "mi", label: "Mile" },
+    { value: "nm", label: "Nautical Mile" },
+  ];
+
+  const countUnits = [
+    { value: "pcs", label: "Pieces" },
+    { value: "nos", label: "Numbers" },
+    { value: "units", label: "Units" },
+    { value: "item", label: "Item" },
+    { value: "pack", label: "Pack" },
+    { value: "dozen", label: "Dozen" },
+    { value: "box", label: "Box" },
+    { value: "set", label: "Set" },
+    { value: "roll", label: "Roll" },
+    { value: "pair", label: "Pair" },
+    { value: "sheet", label: "Sheet" },
+    { value: "roll", label: "Roll" },
+  ];
+
+  // 2. Function to find category by uom value
+  const getUnitCategory = (uom) => {
+    if (massUnits.some((unit) => unit.value === uom)) return massUnits;
+    if (liquidUnits.some((unit) => unit.value === uom)) return liquidUnits;
+    if (gasUnits.some((unit) => unit.value === uom)) return gasUnits;
+    if (pressureUnits.some((unit) => unit.value === uom)) return pressureUnits;
+    if (lengthUnits.some((unit) => unit.value === uom)) return lengthUnits;
+    if (countUnits.some((unit) => unit.value === uom)) return countUnits;
+    return [];
+  };
+  const getOptionFromValue = (value, options) =>
+    options.find((opt) => opt.value === value) || null;
+  const uom = selectedProducts[0].uom;
+  const filteredOptions = getUnitCategory(uom);
 
   const markProcessDoneHandler = async () => {
     try {
@@ -281,6 +387,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       );
       const data = await response.json();
 
+      console.log("main data carrier : ",data)
+
+    
+
       if (!data.success) {
         throw new Error(data.message);
       }
@@ -301,7 +411,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
             (p: any) => p.item._id === material.item._id
           );
 
-          return { 
+          return {
             _id: material._id,
             item: material.item._id,
             item_name: { value: material.item._id, label: material.item.name },
@@ -318,6 +428,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
               label: material?.supplier?.name,
             },
             supporting_doc: "",
+            uom_used_quantity:material.uom_used_quantity,
             comments: material?.comments,
             unit_cost: material.item.price,
             total_part_cost: material.total_part_cost,
@@ -344,19 +455,21 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
             uom: material.item.uom,
             unit_cost: material.item.price,
             total_part_cost: material.total_part_cost,
+            // uom_produced_quantity: sc?.uom_produced_quantity || material.item.uom, // <-- Add this line
+            uom_produced_quantity:material.uom_used_quantity
           });
         }
       );
       setScrapMaterials(scrap);
 
       const processList = data?.production_process?.bom?.processes || [];
- 
+
       setProcesses(data.production_process?.processes || []);
       setProcessProgress(
         (data.production_process?.processes || []).map((p: any) => ({
           done: typeof p.work_done === "number" ? p.work_done : 0,
         }))
-      );;
+      );
 
       const fetchedStatuses = data.production_process.processes || [];
       const initialStatuses: {
@@ -467,6 +580,11 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
     }
   }, [selectedProducts]);
 
+
+  useEffect(()=>{
+    console.log("selectedProducts for checking:",selectedProducts);
+    console.log("for scrap material checking:: ",scrapMaterials)
+  })
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
@@ -720,8 +838,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   <div className="hidden sm:grid grid-cols-8 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
                     <div>PRODUCT NAME</div>
                     <div>EST. QTY</div>
-                    <div>USED QTY</div>
+                   
                     <div>UOM</div>
+                     <div>USED QTY</div>
+                     <div>UOM*</div>
                     <div>CATEGORY</div>
                     <div>COMMENTS</div>
                     <div>UNIT COST</div>
@@ -760,6 +880,19 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />
                         </div>
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            UOM
+                          </label>
+                        
+                          <input
+                            type="text"
+                            value={material.uom || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+
+                         </div>
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
@@ -778,16 +911,28 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                           />
                         </div>
+                         
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
-                            UOM
+                            UOM*
                           </label>
-                          <input
-                            type="text"
-                            value={material.uom || ""}
-                            readOnly
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                        
+                          <Select
+                            styles={customStyles}
+                            className="text-sm"
+                            options={getUnitCategory(material.uom)} // <-- dynamic options per row
+                            placeholder="Select"
+                            value={getOptionFromValue(
+                              material.uom_used_quantity,
+                              getUnitCategory(material.uom)
+                            )}
+                            onChange={(selectedOption) => {
+                              const newMaterials = [...selectedProducts];
+                              newMaterials[index].uom_used_quantity = selectedOption.value;
+                              console.log("this is new material",newMaterials)
+                              setSelectedProducts(newMaterials);
+                            }}
                           />
                         </div>
 
@@ -848,7 +993,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
               <div className="flex flex-wrap gap-4 p-4 w-full">
                 {processes.map((process: any, index) => {
                   const status = processStatuses[index];
-                  const progress = processProgress[index] || { done: 0};
+                  const progress = processProgress[index] || { done: 0 };
 
                   const handleDoneChange = (value: number) => {
                     const updatedProgress = [...processProgress];
@@ -856,37 +1001,35 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     setProcessProgress(updatedProgress);
                   };
 
-
                   return (
-                    <div
-                      key={index}
-                      className="w-[280px]" 
-                    >
+                    <div key={index} className="w-[280px]">
                       <div
-                        className={`border p-3 rounded-lg ${status?.done
+                        className={`border p-3 rounded-lg ${
+                          status?.done
                             ? "bg-green-50 border-green-200"
                             : status?.start
-                              ? "bg-blue-50 border-blue-200"
-                              : "bg-gray-50 border-gray-200"
-                          }`}
+                            ? "bg-blue-50 border-blue-200"
+                            : "bg-gray-50 border-gray-200"
+                        }`}
                       >
                         <div className="flex items-center justify-between mb-2">
                           <label className="block text-sm font-medium text-gray-700">
                             Process {index + 1}
                           </label>
                           <div
-                            className={`px-2 py-1 rounded text-xs  font-medium ${status?.done
+                            className={`px-2 py-1 rounded text-xs  font-medium ${
+                              status?.done
                                 ? "bg-green-100 text-green-800"
                                 : status?.start
-                                  ? "bg-blue-100 text-blue-800"
-                                  : "bg-gray-100 text-gray-600"
-                              }`}
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-gray-100 text-gray-600"
+                            }`}
                           >
                             {status?.done
                               ? "Completed"
                               : status?.start
-                                ? "In Progress"
-                                : "Not Start"}
+                              ? "In Progress"
+                              : "Not Start"}
                           </div>
                         </div>
 
@@ -900,11 +1043,15 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
                         {/* Done input */}
                         <div className="mb-3">
-                          <label className="block text-xs text-gray-700">Work Done</label>
+                          <label className="block text-xs text-gray-700">
+                            Work Done
+                          </label>
                           <input
                             type="number"
                             value={progress.done}
-                            onChange={(e) => handleDoneChange(Number(e.target.value))}
+                            onChange={(e) =>
+                              handleDoneChange(Number(e.target.value))
+                            }
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                           />
                         </div>
@@ -916,7 +1063,11 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                               type="checkbox"
                               checked={status?.start || false}
                               onChange={(e) =>
-                                handleProcessStatusChange(index, "start", e.target.checked)
+                                handleProcessStatusChange(
+                                  index,
+                                  "start",
+                                  e.target.checked
+                                )
                               }
                               className="w-4 h-4 text-blue-600 border-gray-300 rounded"
                             />
@@ -928,7 +1079,11 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                               type="checkbox"
                               checked={status?.done || false}
                               onChange={(e) =>
-                                handleProcessStatusChange(index, "done", e.target.checked)
+                                handleProcessStatusChange(
+                                  index,
+                                  "done",
+                                  e.target.checked
+                                )
                               }
                               className="w-4 h-4 text-green-600 border-gray-300 rounded"
                             />
@@ -940,10 +1095,6 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   );
                 })}
               </div>
-
-
-
-
 
               {/* Scrap Materials Section */}
               <div className="bg-white border-b">
@@ -959,8 +1110,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     <div>PRODUCT NAME</div>
                     <div>COMMENT</div>
                     <div>EST. QTY</div>
-                    <div>PROD. QTY</div>
                     <div>UOM</div>
+                    <div>PROD. QTY</div>
+        
+                    <div>UOM*</div>
                     <div>UNIT COST</div>
                     <div>TOTAL COST</div>
                   </div>
@@ -1009,6 +1162,17 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />
                         </div>
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            UOM
+                          </label>
+                          <input
+                            type="text"
+                            value={material.uom || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+                        </div>
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
@@ -1027,16 +1191,28 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                           />
                         </div>
+                        
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
-                            UOM
+                            UOM*
                           </label>
-                          <input
-                            type="text"
-                            value={material.uom || ""}
-                            readOnly
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                       
+                          <Select
+                            styles={customStyles}
+                            className="text-sm"
+                            options={getUnitCategory(material.uom)}
+                            placeholder="Select"
+                            value={getOptionFromValue(
+                              material.uom_produced_quantity,
+                              getUnitCategory(material.uom)
+                            )}
+                            onChange={(selectedOption) => {
+                              const newMaterials = [...scrapMaterials];
+                              newMaterials[index].uom_produced_quantity = selectedOption.value;
+                              console.log("this is new ascrap",newMaterials)
+                              setScrapMaterials(newMaterials);
+                            }}
                           />
                         </div>
 

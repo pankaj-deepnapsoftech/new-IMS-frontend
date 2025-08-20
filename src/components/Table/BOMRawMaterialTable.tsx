@@ -543,7 +543,6 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                           )}
 
                           {/* Approve Inventory Button */}
-
                           <Button
                             size="sm"
                             style={{
@@ -591,9 +590,9 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                               : "Approve"}
                           </Button>
 
+
                           {/* Out Allotted Inventory Button */}
-                          {original.bom_status ===
-                            "request for allow inventory" && (
+                          {/* {original.bom_status === "request for allow inventory" && (
                             <Button
                               size="sm"
                               style={{
@@ -601,14 +600,39 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                                 color: colors.text.inverse,
                               }}
                               _hover={{ bg: colors.warning[600] }}
-                              onClick={() =>
-                                handleOutAllottedInventory(
-                                  original.production_process_id
-                                )
-                              }
+                              onClick={() => handleOutAllottedInventory(original._id)}
                             >
                               Out Allotted Inventory
                             </Button>
+                          )} */}
+
+                          {original.bom_status === "request for allow inventory" && (
+                            !original.isOutForInventoryClicked ? (
+                              <Button
+                                size="sm"
+                                style={{
+                                  backgroundColor: colors.warning[500],
+                                  color: colors.text.inverse,
+                                }}
+                                _hover={{ bg: colors.warning[600] }}
+                                onClick={() => handleOutAllottedInventory(original._id)}
+                              >
+                                Out Allotted Inventory
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                style={{
+                                  backgroundColor: colors.gray[300],
+                                  color: colors.text.primary,
+                                  cursor: "not-allowed",
+                                  opacity: 0.7,
+                                }}
+                                isDisabled
+                              >
+                                Inventory Out
+                              </Button>
+                            )
                           )}
 
                           {deleteProductHandler && (
