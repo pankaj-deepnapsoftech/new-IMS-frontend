@@ -447,8 +447,8 @@ const SalesTable = ({
           });
           
           // Show summary with all counts
-          const summary = `Loaded: ${data.totalSalesOrders} Sales Orders, ${data.totalPreProductionProcesses} Pre-Production Processes, ${data.totalBOMs} BOMs, ${data.totalRawMaterials} Raw Materials`;
-          toast.success(summary);
+          // const summary = `Loaded: ${data.totalSalesOrders} Sales Orders, ${data.totalPreProductionProcesses} Pre-Production Processes, ${data.totalBOMs} BOMs, ${data.totalRawMaterials} Raw Materials`;
+          // toast.success(summary);
         }
       } else {
         console.error('Failed to fetch all sales orders status');
