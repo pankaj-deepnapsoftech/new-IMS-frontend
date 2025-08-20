@@ -46,6 +46,7 @@ interface BOMTableProps {
   openBomDetailsDrawerHandler?: (id: string) => void;
   deleteBomHandler?: (id: string) => void;
   approveBomHandler?: (id: string) => void;
+  refreshBoms?: () => void; // Add refresh function prop
 }
 
 const BOMTable: React.FC<BOMTableProps> = ({
@@ -55,6 +56,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
   openBomDetailsDrawerHandler,
   deleteBomHandler,
   approveBomHandler,
+  refreshBoms,
 }) => {
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
@@ -170,30 +172,47 @@ const BOMTable: React.FC<BOMTableProps> = ({
   };
 
   const handleBulkDelete = async () => {
-    if (isBulkDeleting || selectedBoms.length === 0 || !deleteBomHandler)
-      return;
+    if (isBulkDeleting || selectedBoms.length === 0) return;
     setIsBulkDeleting(true);
 
     try {
-      // Call the delete handler for each selected BOM
-      const deletePromises = selectedBoms.map((bomId) =>
-        deleteBomHandler(bomId)
+      // Call the bulk delete API endpoint
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}bom/bulk-delete`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+          body: JSON.stringify({ ids: selectedBoms }),
+        }
       );
 
-      await Promise.all(deletePromises);
+      const data = await response.json();
 
-      // Success feedback
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to delete BOMs");
+      }
+
+      // Single success toast message
       toast.success(
-        `Successfully deleted ${selectedBoms.length} BOM${
-          selectedBoms.length > 1 ? "s" : ""
-        }`
+        data.message ||
+          `Successfully deleted ${selectedBoms.length} BOM${
+            selectedBoms.length > 1 ? "s" : ""
+          }`
       );
+
+      // Refresh the BOMs list
+      if (refreshBoms) {
+        refreshBoms();
+      }
 
       setSelectedBoms([]);
       setShowBulkDeleteModal(false);
     } catch (error) {
       console.error("Error in bulk delete:", error);
-      toast.error("Failed to delete some BOMs. Please try again.");
+      toast.error(error.message || "Failed to delete BOMs. Please try again.");
     } finally {
       setIsBulkDeleting(false);
     }
@@ -278,7 +297,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
               </div>
 
               {/* Bulk Actions */}
-              {selectedBoms.length > 0 &&  (
+              {selectedBoms.length > 0 && (
                 <div className="flex items-center gap-3">
                   {deleteBomHandler && (
                     <button
@@ -364,24 +383,26 @@ const BOMTable: React.FC<BOMTableProps> = ({
                   <tr
                     style={{ borderBottom: `1px solid ${colors.table.border}` }}
                   >
-                   { cookies?.role === "admin" &&  <th
-                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{
-                        color: colors.table.headerText,
-                        width: "60px",
-                        minWidth: "60px",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isAllSelected}
-                        ref={(el) => {
-                          if (el) el.indeterminate = isIndeterminate;
+                    {cookies?.role === "admin" && (
+                      <th
+                        className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
+                        style={{
+                          color: colors.table.headerText,
+                          width: "60px",
+                          minWidth: "60px",
                         }}
-                        onChange={(e) => handleSelectAll(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                      />
-                    </th>}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isAllSelected}
+                          ref={(el) => {
+                            if (el) el.indeterminate = isIndeterminate;
+                          }}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                      </th>
+                    )}
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -425,7 +446,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                       Actions
                     </th>
                   </tr>
-                </thead>  
+                </thead>
                 <tbody>
                   {page.map((row: any, index) => {
                     prepareRow(row);
@@ -451,26 +472,28 @@ const BOMTable: React.FC<BOMTableProps> = ({
                               : colors.table.stripe;
                         }}
                       >
-                 {   cookies?.role === "admin" &&   <td
-                          className="px-4 py-3 text-sm whitespace-nowrap"
-                          style={{
-                            color: colors.text.secondary,
-                            width: "60px",
-                            minWidth: "60px",
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedBoms.includes(row.original._id)}
-                            onChange={(e) =>
-                              handleSelectBom(
-                                row.original._id,
-                                e.target.checked
-                              )
-                            }
-                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                          />
-                        </td>}
+                        {cookies?.role === "admin" && (
+                          <td
+                            className="px-4 py-3 text-sm whitespace-nowrap"
+                            style={{
+                              color: colors.text.secondary,
+                              width: "60px",
+                              minWidth: "60px",
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedBoms.includes(row.original._id)}
+                              onChange={(e) =>
+                                handleSelectBom(
+                                  row.original._id,
+                                  e.target.checked
+                                )
+                              }
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                            />
+                          </td>
+                        )}
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap font-mono"
                           style={{ color: colors.text.secondary }}
@@ -504,7 +527,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                           style={{ color: colors.success[600] }}
                         >
                           {cookies?.role === "admin"
-                            ? `₹${row.original.total_cost}` 
+                            ? `₹${row.original.total_cost}`
                             : "₹*****"}
                         </td>
                         <td
@@ -575,7 +598,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                                 <MdEdit size={16} />
                               </button>
                             )}
-                            {deleteBomHandler &&  cookies?.role === "admin" && (
+                            {deleteBomHandler && cookies?.role === "admin" && (
                               <button
                                 onClick={() => {
                                   setdeleteId(row.original._id);

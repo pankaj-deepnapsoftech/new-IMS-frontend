@@ -582,7 +582,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         <td className="px-4 py-3 text-sm whitespace-nowrap">
                           <div className="flex flex-col">
                             <span style={{ color: colors.text.secondary }}>
-                              {row.original.current_stock || "0"}
+                              {(row.original.current_stock || 0) +
+                                (row.original.updated_stock || 0) -
+                                (row.original.updated_stock || 0)}
                             </span>
                             {row.original.updated_stock &&
                               row.original.updated_stock !== null && (

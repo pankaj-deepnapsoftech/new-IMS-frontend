@@ -19,7 +19,7 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
   closeDrawerHandler,
   fetchUserRolesHandler,
   roleId,
-}) => {  
+}) => {
   const [cookies, setCookie] = useCookies();
   const [isLoadingRole, setIsLoadingRole] = useState<boolean>(false);
   const [isUpdatingRole, setIsUpdatingRole] = useState<boolean>(false);
@@ -31,9 +31,10 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
 
   const permissionOptions = [
     { value: "inventory", label: "Inventory" },
+    { value: "direct", label: "Direct" },
     { value: "store", label: "Store" },
     { value: "approval", label: "Approval" },
-    { value: "agent", label: "Agent" }, 
+    { value: "agent", label: "Agent" },
     { value: "production", label: "Production" },
     { value: "parties", label: "Parties" },
     { value: "sales", label: "Sales" },
@@ -114,7 +115,7 @@ const UpdateUserRole: React.FC<UpdateUserRoleProps> = ({
           label: permission.charAt(0).toUpperCase() + permission.slice(1),
         })
       );
-      
+
       setPermissions(modifiedPermissions);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");

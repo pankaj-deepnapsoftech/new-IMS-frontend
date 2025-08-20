@@ -14,8 +14,7 @@ import {
   closeUpdateBomDrawer,
   openAddBomDrawer,
   openBomDetailsDrawer,
-  openUpdateBomDrawer,  
-  
+  openUpdateBomDrawer,
 } from "../redux/reducers/drawersSlice";
 import AddBom from "../components/Drawers/BOM/AddBom";
 import BomDetails from "../components/Drawers/BOM/BomDetails";
@@ -411,6 +410,7 @@ const BOM: React.FC = () => {
             openBomDetailsDrawerHandler={openBomDetailsDrawerHandler}
             openUpdateBomDrawerHandler={openUpdateBomDrawerHandler}
             deleteBomHandler={deleteBomHandler}
+            refreshBoms={fetchBomsHandler}
           />
         </div>
       </div>

@@ -16,19 +16,16 @@ import { colors } from "../../theme/colors";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 
-
-const statusColorMap = { 
-  "completed": "bg-green-100 text-green-800",
+const statusColorMap = {
+  completed: "bg-green-100 text-green-800",
   "production started": "bg-blue-100 text-blue-800",
   "request for allow inventory": "bg-yellow-100 text-yellow-800",
   "raw material approval pending": "bg-red-100 text-red-800",
-  "inventory in transit": "bg-orange-100 text-orange-800", 
+  "inventory in transit": "bg-orange-100 text-orange-800",
   "Inventory Allocated": "bg-purple-100 text-purple-800",
 };
 
-
 const defaultStatusClass = "bg-gray-100 text-gray-700";
-
 
 interface ProcessTableProps {
   proces: Array<{
@@ -48,7 +45,8 @@ interface ProcessTableProps {
   fetchProcessHandler?: (id: string) => void;
 }
 
-const updateProcessStatus = async (id, status) => { //new
+const updateProcessStatus = async (id, status) => {
+  //new
   try {
     const res = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}production-process/update-status`,
@@ -78,17 +76,14 @@ const updateProcessStatus = async (id, status) => { //new
   }
 };
 
-
-
 const ProcessTable: React.FC<ProcessTableProps> = ({
   proces,
   isLoadingProcess,
   openUpdateProcessDrawerHandler,
   openProcessDetailsDrawerHandler,
   deleteProcessHandler,
-  fetchProcessHandler
+  fetchProcessHandler,
 }) => {
-
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
 
@@ -127,20 +122,23 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
 
   const RequestForAllocated = async (id) => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}production-process/allocation?_id=${id}`,
+      const res = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}production-process/allocation?_id=${id}`,
         {
           headers: {
             Authorization: `Bearer ${cookies?.access_token}`,
-          }
+          },
         }
-      )
+      );
       fetchProcessHandler();
       // console.log(cookies?.access_token);
     } catch (error) {
       console.error("Error requesting for allocated inventory:", error);
-      toast.error("Failed to request for allocated inventory. Please try again.");
+      toast.error(
+        "Failed to request for allocated inventory. Please try again."
+      );
     }
-  }
+  };
 
   const columns = useMemo(
     () => [
@@ -207,11 +205,6 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
 
   // Bulk selection functions
 
-
-
-
-
-
   const handleSelectAll = (checked) => {
     if (checked) {
       setSelectedProcesses(page.map((row) => row.original._id));
@@ -229,40 +222,50 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
   };
 
   const handleBulkDelete = async () => {
-    if (
-      isBulkDeleting ||
-      selectedProcesses.length === 0 ||
-      !deleteProcessHandler
-    )
-      return;
+    if (isBulkDeleting || selectedProcesses.length === 0) return;
     setIsBulkDeleting(true);
 
     try {
-      // Call the delete handler for each selected process
-      const deletePromises = selectedProcesses.map((processId) =>
-        deleteProcessHandler(processId)
+      // Use bulk delete endpoint
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}production-process/bulk-delete`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+          body: JSON.stringify({ ids: selectedProcesses }),
+        }
       );
 
-      await Promise.all(deletePromises);
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
 
       // Success feedback
-      toast.success(
-        `Successfully deleted ${selectedProcesses.length} process${selectedProcesses.length > 1 ? "es" : ""
-        }`
-      );
+      toast.success(data.message);
+
+      // Refresh the data
+      if (fetchProcessHandler) {
+        fetchProcessHandler();
+      }
 
       setSelectedProcesses([]);
       setShowBulkDeleteModal(false);
     } catch (error) {
       console.error("Error in bulk delete:", error);
-      toast.error("Failed to delete some processes. Please try again.");
+      toast.error(
+        error.message || "Failed to delete processes. Please try again."
+      );
     } finally {
       setIsBulkDeleting(false);
     }
   };
 
-
-  console.log(page)
+  console.log(page);
 
   const isAllSelected =
     page.length > 0 && selectedProcesses.length === page.length;
@@ -330,8 +333,7 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                   className="text-lg font-semibold"
                   style={{ color: colors.text.primary }}
                 >
-                  {proces.length} Process{proces.length !== 1 ? "es" : ""}{" "}
-                  Found
+                  {proces.length} Process{proces.length !== 1 ? "es" : ""} Found
                 </h3>
                 {selectedProcesses.length > 0 && (
                   <p
@@ -346,27 +348,25 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
               {/* Bulk Actions */}
               {selectedProcesses.length > 0 && (
                 <div className="flex items-center gap-3">
-                  {deleteProcessHandler && (
-                    <button
-                      onClick={() => setShowBulkDeleteModal(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
+                  <button
+                    onClick={() => setShowBulkDeleteModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                      Delete Selected ({selectedProcesses.length})
-                    </button>
-                  )}
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                    Delete Selected ({selectedProcesses.length})
+                  </button>
                   <button
                     onClick={() => setSelectedProcesses([])}
                     className="flex items-center gap-2 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white text-sm font-medium rounded-lg transition-colors"
@@ -515,15 +515,17 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
-                      {page.some(row => row.original.status === "Inventory Allocated")
+                      {page.some(
+                        (row) => row.original.status === "Inventory Allocated"
+                      )
                         ? "Request Allow"
-                        : page.some(row => row.original.status === "inventory in transit")
-                          ? "Inventory Received"
-                          : ""}
+                        : page.some(
+                            (row) =>
+                              row.original.status === "inventory in transit"
+                          )
+                        ? "Inventory Received"
+                        : ""}
                     </th>
-
-
-
 
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
@@ -607,12 +609,11 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                           }}
                         >
                           {row.original.creator
-                            ? `${row.original.creator.first_name || ""} ${row.original.creator.last_name || ""
+                            ? `${row.original.creator.first_name || ""} ${
+                                row.original.creator.last_name || ""
                               }`.trim() || "N/A"
                             : "N/A"}
                         </td>
-
-
 
                         <td
                           className="px-4 py-3 text-sm whitespace-nowrap"
@@ -644,8 +645,8 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                         >
                           {row.original.createdAt
                             ? moment(row.original.createdAt).format(
-                              "DD/MM/YYYY"
-                            )
+                                "DD/MM/YYYY"
+                              )
                             : "N/A"}
                         </td>
                         <td
@@ -654,8 +655,8 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                         >
                           {row.original.updatedAt
                             ? moment(row.original.updatedAt).format(
-                              "DD/MM/YYYY"
-                            )
+                                "DD/MM/YYYY"
+                              )
                             : "N/A"}
                         </td>
                         <td
@@ -664,7 +665,12 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                         >
                           {row.original.status === "Inventory Allocated" && (
                             <button
-                              onClick={() => RequestForAllocated(row.original._id, "request for allow")}
+                              onClick={() =>
+                                RequestForAllocated(
+                                  row.original._id,
+                                  "request for allow"
+                                )
+                              }
                               className="px-3 py-1 text-sm font-medium rounded-md"
                               style={{
                                 backgroundColor: colors.error[200],
@@ -779,7 +785,6 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                                 <MdDeleteOutline size={16} />
                               </button>
                             )}
-
                           </div>
                         </td>
                       </tr>
@@ -1105,7 +1110,8 @@ const ProcessTable: React.FC<ProcessTableProps> = ({
                       Deleting...
                     </>
                   ) : (
-                    `Delete ${selectedProcesses.length} Process${selectedProcesses.length > 1 ? "es" : ""
+                    `Delete ${selectedProcesses.length} Process${
+                      selectedProcesses.length > 1 ? "es" : ""
                     }`
                   )}
                 </button>

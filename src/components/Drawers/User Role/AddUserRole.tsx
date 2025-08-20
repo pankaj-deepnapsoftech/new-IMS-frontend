@@ -27,6 +27,7 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
 
   const permissionOptions = [
     { value: "inventory", label: "Inventory" },
+    { value: "direct", label: "Direct" },
     { value: "store", label: "Store" },
     { value: "approval", label: "Approval" },
     { value: "agent", label: "Agent" },
@@ -37,10 +38,11 @@ const AddUserRole: React.FC<AddUserRoleProps> = ({
     { value: "task", label: "Task" },
     { value: "bom", label: "Bom" },
     { value: "merchant", label: "Merchant" }, 
+    
   ];
 
   const [addRole] = useAddRoleMutation();
-  
+
   const addRoleHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 

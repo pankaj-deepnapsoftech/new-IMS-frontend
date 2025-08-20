@@ -44,6 +44,7 @@ interface SupplierOption {
   id: string;
   supplierName: string;
   companyName: string;
+  supplierType?: string;
   supplierEmail?: string;
   supplierShippedTo?: string;
   supplierBillTo?: string;
@@ -60,6 +61,17 @@ interface SupplierApiResponse {
 interface RawMaterial {
   _id: string;
   name: string;
+  product_id?: string;
+  uom: string;
+}
+
+interface Item {
+  itemName: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  productId?: string; // Add product_id to track the product
+  uom?: string; // Add uom field for unit of measure
 }
 
 interface PurchaseOrderFormValues {
@@ -79,8 +91,7 @@ interface PurchaseOrderFormValues {
   paymentTerms: string;
   additionalRemarks: string;
   additionalImportant: string;
-  itemName: string;
-  quantity: number;
+  items: Item[];
   isSameAddress: boolean;
 }
 
@@ -155,11 +166,19 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     modeOfPayment: Yup.string().required("Mode of payment is required"),
     billingAddress: Yup.string(),
     paymentTerms: Yup.string(),
-    itemName: Yup.string().required("Item name is required"),
-    quantity: Yup.number()
-      .required("Quantity is required")
-      .min(1, "Quantity must be at least 1")
-      .integer("Quantity must be an integer"),
+    items: Yup.array()
+      .of(
+        Yup.object({
+          itemName: Yup.string().required("Item name is required"),
+          quantity: Yup.number()
+            .required("Quantity is required")
+            .min(1, "Quantity must be at least 1")
+            .integer("Quantity must be an integer"),
+          unitPrice: Yup.number().min(0, "Unit price must be positive"),
+          totalPrice: Yup.number().min(0, "Total price must be positive"),
+        })
+      )
+      .min(1, "At least one item is required"),
     additionalRemarks: Yup.string(),
     additionalImportant: Yup.string(),
     isSameAddress: Yup.boolean(),
@@ -184,8 +203,32 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
       paymentTerms: edittable?.paymentTerms || "",
       additionalRemarks: edittable?.additionalRemarks || "",
       additionalImportant: edittable?.additionalImportant || "",
-      itemName: edittable?.itemName || "",
-      quantity: edittable?.quantity || 1,
+      items:
+        edittable?.items?.map((item) => ({
+          ...item,
+          productId: item.productId || "", // Ensure productId field exists
+        })) ||
+        (edittable?.itemName
+          ? [
+              {
+                itemName: edittable.itemName,
+                quantity: edittable.quantity || 1,
+                unitPrice: 0,
+                totalPrice: 0,
+                productId: "",
+                uom: "",
+              },
+            ]
+          : [
+              {
+                itemName: "",
+                quantity: 1,
+                unitPrice: 0,
+                totalPrice: 0,
+                productId: "",
+                uom: "",
+              },
+            ]),
       isSameAddress: edittable?.isSameAddress || false,
     },
     validationSchema,
@@ -206,11 +249,6 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
       };
 
       try {
-        // Find the product ID for the selected item
-        const selectedProduct = rawMaterials.find(
-          (item) => item.name === values.itemName
-        );
-
         if (edittable?._id) {
           const res = await axios.put(
             `${process.env.REACT_APP_BACKEND_URL}purchase-order/${edittable._id}`,
@@ -222,26 +260,31 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
             }
           );
           if (res.data.success) {
-            // Remove item from inventory shortages if it has updates
-            if (selectedProduct?._id) {
-              try {
-                await axios.put(
-                  `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
-                  {
-                    productId: selectedProduct._id,
-                  },
-                  {
-                    headers: {
-                      Authorization: `Bearer ${cookies?.access_token}`,
+            // Remove items from inventory shortages if they have updates
+            for (const item of values.items) {
+              const selectedProduct = rawMaterials.find(
+                (material) => material.name === item.itemName
+              );
+              if (selectedProduct?._id) {
+                try {
+                  await axios.put(
+                    `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
+                    {
+                      productId: selectedProduct._id,
                     },
-                  }
-                );
-              } catch (shortageError) {
-                // Ignore shortage removal errors - item might not be in shortages
-                console.log(
-                  "Item not in shortages or no updates:",
-                  shortageError
-                );
+                    {
+                      headers: {
+                        Authorization: `Bearer ${cookies?.access_token}`,
+                      },
+                    }
+                  );
+                } catch (shortageError) {
+                  // Ignore shortage removal errors - item might not be in shortages
+                  console.log(
+                    "Item not in shortages or no updates:",
+                    shortageError
+                  );
+                }
               }
             }
 
@@ -265,26 +308,31 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
           );
 
           if (res.data.success) {
-            // Remove item from inventory shortages if it has updates
-            if (selectedProduct?._id) {
-              try {
-                await axios.put(
-                  `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
-                  {
-                    productId: selectedProduct._id,
-                  },
-                  {
-                    headers: {
-                      Authorization: `Bearer ${cookies?.access_token}`,
+            // Remove items from inventory shortages if they have updates
+            for (const item of values.items) {
+              const selectedProduct = rawMaterials.find(
+                (material) => material.name === item.itemName
+              );
+              if (selectedProduct?._id) {
+                try {
+                  await axios.put(
+                    `${process.env.REACT_APP_BACKEND_URL}product/remove-from-shortages`,
+                    {
+                      productId: selectedProduct._id,
                     },
-                  }
-                );
-              } catch (shortageError) {
-                // Ignore shortage removal errors - item might not be in shortages
-                console.log(
-                  "Item not in shortages or no updates:",
-                  shortageError
-                );
+                    {
+                      headers: {
+                        Authorization: `Bearer ${cookies?.access_token}`,
+                      },
+                    }
+                  );
+                } catch (shortageError) {
+                  // Ignore shortage removal errors - item might not be in shortages
+                  console.log(
+                    "Item not in shortages or no updates:",
+                    shortageError
+                  );
+                }
               }
             }
 
@@ -332,6 +380,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
           id: supplier.id,
           supplierName: supplier.supplierName || "",
           companyName: supplier.companyName || "",
+          supplierType: supplier.supplierType || "Individual",
           supplierEmail: supplier.supplierEmail || "",
           supplierShippedTo: supplier.supplierShippedTo || "",
           supplierBillTo: supplier.supplierBillTo || "",
@@ -394,7 +443,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     fetchData();
     formik.setTouched({}, false); // Reset touched state on mount
   }, []);
-
+  
   useEffect(() => {
     if (edittable && supplierOptions.length > 0) {
       const isValidSupplier = supplierOptions.some(
@@ -432,6 +481,173 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
     formik.values.supplierShippedGSTIN,
     formik.values.isSameAddress,
   ]);
+
+  // Function to fetch supplier details and auto-fill form
+  const handleSupplierSelection = async (supplierIdentifier: string) => {
+    const selectedSupplier = supplierOptions.find(
+      (supplier) =>
+        supplier.supplierName === supplierIdentifier ||
+        supplier.companyName === supplierIdentifier
+    );
+
+    console.log("Selected supplier from list:", selectedSupplier);
+
+    if (selectedSupplier) {
+      // First set the basic data from the initial supplier list
+      formik.setFieldValue(
+        "supplierName",
+        selectedSupplier.supplierName || selectedSupplier.companyName
+      );
+      formik.setFieldValue(
+        "supplierEmail",
+        selectedSupplier.supplierEmail || ""
+      );
+      formik.setFieldValue(
+        "supplierShippedTo",
+        selectedSupplier.supplierShippedTo || ""
+      );
+      formik.setFieldValue(
+        "supplierBillTo",
+        selectedSupplier.supplierBillTo || ""
+      );
+      formik.setFieldValue(
+        "supplierShippedGSTIN",
+        selectedSupplier.supplierShippedGSTIN || ""
+      );
+      formik.setFieldValue(
+        "supplierBillGSTIN",
+        selectedSupplier.supplierBillGSTIN || ""
+      );
+      formik.setFieldValue(
+        "supplierType",
+        selectedSupplier.supplierType || "Individual"
+      );
+
+      // Then fetch detailed supplier information from the API
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}purchase-order/supplier/${selectedSupplier.id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${cookies?.access_token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+        console.log("API response data:", data);
+
+        if (data.success && data.supplier) {
+          const supplier = data.supplier;
+          console.log("Supplier details from API:", supplier);
+
+          // Override with detailed data from API
+          formik.setFieldValue(
+            "supplierName",
+            supplier.supplierName ||
+              supplier.companyName ||
+              selectedSupplier.supplierName ||
+              selectedSupplier.companyName
+          );
+          formik.setFieldValue(
+            "supplierEmail",
+            supplier.supplierEmail || selectedSupplier.supplierEmail || ""
+          );
+          formik.setFieldValue(
+            "supplierShippedTo",
+            supplier.supplierShippedTo ||
+              selectedSupplier.supplierShippedTo ||
+              ""
+          );
+          formik.setFieldValue(
+            "supplierBillTo",
+            supplier.supplierBillTo || selectedSupplier.supplierBillTo || ""
+          );
+          formik.setFieldValue(
+            "supplierShippedGSTIN",
+            supplier.supplierShippedGSTIN ||
+              selectedSupplier.supplierShippedGSTIN ||
+              ""
+          );
+          formik.setFieldValue(
+            "supplierBillGSTIN",
+            supplier.supplierBillGSTIN ||
+              selectedSupplier.supplierBillGSTIN ||
+              ""
+          );
+          formik.setFieldValue(
+            "supplierType",
+            supplier.supplierType ||
+              selectedSupplier.supplierType ||
+              "Individual"
+          );
+
+          console.log("Form values after setting:", {
+            supplierEmail: formik.values.supplierEmail,
+            supplierShippedTo: formik.values.supplierShippedTo,
+            supplierBillTo: formik.values.supplierBillTo,
+            supplierType: formik.values.supplierType,
+            supplierShippedGSTIN: formik.values.supplierShippedGSTIN,
+            supplierBillGSTIN: formik.values.supplierBillGSTIN,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching supplier details:", error);
+        toast.error("Failed to fetch supplier details");
+      }
+    }
+  };
+
+  // Functions to manage items
+  const addItem = () => {
+    const newItems = [
+      ...formik.values.items,
+
+      {
+        itemName: "",
+        quantity: 1,
+        unitPrice: 0,
+        totalPrice: 0,
+        productId: "",
+        uom: "",
+      },
+    ];
+    formik.setFieldValue("items", newItems);
+
+    // console.log(newItems)
+  };
+
+  const removeItem = (index: number) => {
+    if (formik.values.items.length > 1) {
+      const newItems = formik.values.items.filter((_, i) => i !== index);
+      formik.setFieldValue("items", newItems);
+    }
+  };
+
+  const updateItem = (index: number, field: keyof Item, value: any) => {
+    const newItems = [...formik.values.items];
+    newItems[index] = { ...newItems[index], [field]: value };
+
+ if (field === "itemName") {
+   const selectedMaterial = rawMaterials.find(
+     (material) => material.name === value
+   );
+   if (selectedMaterial) {
+     newItems[index].productId = selectedMaterial.product_id;
+     newItems[index].uom = selectedMaterial.uom || ""; // Auto-fetch UOM
+   }
+ }
+
+
+    // Auto-calculate total price when quantity or unit price changes
+    if (field === "quantity" || field === "unitPrice") {
+      newItems[index].totalPrice =
+        newItems[index].quantity * newItems[index].unitPrice;
+    }
+
+    formik.setFieldValue("items", newItems);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -606,38 +822,8 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                             "supplierIdentifier",
                             selectedIdentifier
                           );
-                          formik.setFieldValue(
-                            "supplierName",
-                            selectedIdentifier
-                          );
-                          const matched = supplierOptions.find(
-                            (supplier) =>
-                              (supplier.supplierName &&
-                                supplier.supplierName === selectedIdentifier) ||
-                              (supplier.companyName &&
-                                supplier.companyName === selectedIdentifier)
-                          );
-                          if (matched) {
-                            formik.setValues({
-                              ...formik.values,
-                              supplierIdentifier:
-                                matched.supplierName ||
-                                matched.companyName ||
-                                "",
-                              supplierName:
-                                matched.supplierName ||
-                                matched.companyName ||
-                                "",
-                              supplierEmail: matched.supplierEmail || "",
-                              supplierShippedTo:
-                                matched.supplierShippedTo || "",
-                              supplierBillTo: matched.supplierBillTo || "",
-                              supplierShippedGSTIN:
-                                matched.supplierShippedGSTIN || "",
-                              supplierBillGSTIN:
-                                matched.supplierBillGSTIN || "",
-                              isSameAddress: false,
-                            });
+                          if (selectedIdentifier) {
+                            handleSupplierSelection(selectedIdentifier);
                           }
                         }}
                         size="lg"
@@ -713,66 +899,179 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                   {/* </GridItem>
 
                     <GridItem colSpan={2}> */}
+                  {/* Items Section */}
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3
+                        className="text-lg font-semibold"
+                        style={{ color: colors.text.primary }}
+                      >
+                        Items
+                      </h3>
+                      <Button
+                        onClick={addItem}
+                        colorScheme="blue"
+                        size="sm"
+                        leftIcon={<BiPackage />}
+                      >
+                        Add Item
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {formik.values.items.map((item, index) => (
+                        console.log("Rendering item:", item),
+                        <Card key={index} mb={4} variant="outline">
+                          <CardBody>
+                            <div className="flex items-center justify-between mb-4">
+                              <h4
+                                className="font-medium"
+                                style={{ color: colors.text.secondary }}
+                              >
+                                Item {index + 1}
+                              </h4>
+                              {formik.values.items.length > 1 && (
+                                <IconButton
+                                  aria-label="Remove item"
+                                  icon={<BiX />}
+                                  size="sm"
+                                  colorScheme="red"
+                                  variant="ghost"
+                                  onClick={() => removeItem(index)}
+                                />
+                              )}
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                              <FormControl
+                                isInvalid={
+                                  formik.touched.items?.[index]?.itemName &&
+                                  formik.errors.items?.[index]?.itemName
+                                }
+                              >
+                                <FormLabel>Item Name *</FormLabel>
+                                <Select
+                                  placeholder="Select Item"
+                                  value={item.itemName}
+                                  onChange={(e) =>
+                                    updateItem(
+                                      index,
+                                      "itemName",
+                                      e.target.value
+                                    )
+                                  }
+                                  size="lg"
+                                  borderRadius="lg"
+                                >
+                                  {rawMaterials.map((material) => (
+                                    <option
+                                      key={material._id}
+                                      value={material.name}
+                                    >
+                                      {material.name}
+                                    </option>
+                                  ))}
+                                </Select>
+                                {formik.touched.items?.[index]?.itemName &&
+                                  formik.errors.items?.[index]?.itemName && (
+                                    <Text color="red.500" fontSize="sm" mt={1}>
+                                      {formik.errors.items[index].itemName}
+                                    </Text>
+                                  )}
+                              </FormControl>
+
+                              <FormControl>
+                                <FormLabel>Product ID</FormLabel>
+                                <Input
+                                  value={item.productId || ""}
+                                  placeholder="Product ID"
+                                  size="lg"
+                                  borderRadius="lg"
+                                  isReadOnly
+                                  bg="gray.50"
+                                />
+                              </FormControl>
+
+                              <FormControl
+                                isInvalid={
+                                  formik.touched.items?.[index]?.quantity &&
+                                  formik.errors.items?.[index]?.quantity
+                                }
+                              >
+                                <FormLabel>Quantity *</FormLabel>
+                                <Input
+                                  type="number"
+                                  value={item.quantity}
+                                  onChange={(e) =>
+                                    updateItem(
+                                      index,
+                                      "quantity",
+                                      parseInt(e.target.value) || 0
+                                    )
+                                  }
+                                  placeholder="Enter quantity"
+                                  size="lg"
+                                  borderRadius="lg"
+                                  min="1"
+                                />
+                                {formik.touched.items?.[index]?.quantity &&
+                                  formik.errors.items?.[index]?.quantity && (
+                                    <Text color="red.500" fontSize="sm" mt={1}>
+                                      {formik.errors.items[index].quantity}
+                                    </Text>
+                                  )}
+                              </FormControl>
+                              <FormControl>
+                                <FormLabel>UOM</FormLabel>
+                                <Input
+                                  value={item.uom || ""}
+                                  placeholder="Unit of Measure"
+                                  size="lg"
+                                  borderRadius="lg"
+                                  isReadOnly
+                                  bg="gray.50"
+                                />
+                              </FormControl>
+
+                              <FormControl>
+                                <FormLabel>Unit Price</FormLabel>
+                                <Input
+                                  type="number"
+                                  value={item.unitPrice}
+                                  onChange={(e) =>
+                                    updateItem(
+                                      index,
+                                      "unitPrice",
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
+                                  placeholder="Enter unit price"
+                                  size="lg"
+                                  borderRadius="lg"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </FormControl>
+
+                              <FormControl>
+                                <FormLabel>Total Price</FormLabel>
+                                <Input
+                                  type="number"
+                                  value={item.totalPrice}
+                                  isReadOnly
+                                  placeholder="Auto-calculated"
+                                  size="lg"
+                                  borderRadius="lg"
+                                  bg="gray.50"
+                                />
+                              </FormControl>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-5">
-                    <FormControl isInvalid={hasError("itemName")}>
-                      <FormLabel>Item Name *</FormLabel>
-                      <Select
-                        placeholder="Select Item"
-                        name="itemName"
-                        value={formik.values.itemName}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        size="lg"
-                        borderRadius="lg"
-                      >
-                        {rawMaterials.map((item) => (
-                          <option key={item._id} value={item.name}>
-                            {item.name}
-                          </option>
-                        ))}
-                      </Select>
-                      {getErrorMessage("itemName") && (
-                        <Text color="red.500" fontSize="sm" mt={1}>
-                          {getErrorMessage("itemName")}
-                        </Text>
-                      )}
-                    </FormControl>
-                    {/* </GridItem>
-
-                    <GridItem> */}
-                    <FormControl isInvalid={hasError("quantity")}>
-                      <FormLabel
-                        display="flex"
-                        alignItems="center"
-                        gap={2}
-                        color={textColor}
-                        fontSize="sm"
-                        fontWeight="medium"
-                      >
-                        <BiPackage size={16} />
-                        Quantity *
-                      </FormLabel>
-                      <Input
-                        type="number"
-                        name="quantity"
-                        value={formik.values.quantity}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        placeholder="Enter quantity"
-                        size="lg"
-                        borderRadius="lg"
-                        _focus={{
-                          borderColor: "blue.500",
-                          boxShadow: "0 0 0 1px #3182CE",
-                        }}
-                      />
-                      {getErrorMessage("quantity") && (
-                        <Text color="red.500" fontSize="sm" mt={1}>
-                          {getErrorMessage("quantity")}
-                        </Text>
-                      )}
-                    </FormControl>
-
                     <FormControl isInvalid={hasError("supplierEmail")}>
                       <FormLabel
                         display="flex"
@@ -1102,7 +1401,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                       )}
                     </FormControl>
 
-                    <FormControl isInvalid={hasError("billingAddress")}>
+                    {/* <FormControl isInvalid={hasError("billingAddress")}>
                       <FormLabel
                         display="flex"
                         alignItems="center"
@@ -1131,7 +1430,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
                           {getErrorMessage("billingAddress")}
                         </Text>
                       )}
-                    </FormControl>
+                    </FormControl> */}
                   </div>
                 </CardBody>
               </Card>

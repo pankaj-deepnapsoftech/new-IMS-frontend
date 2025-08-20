@@ -425,7 +425,7 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                     : "N/A"}
                 </p>
               </div>
-              <div>
+              {/* <div>
                 <label
                   className="block text-sm font-medium"
                   style={{ color: colors.text.secondary }}
@@ -438,7 +438,7 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                 >
                   {viewOrder.billingAddress || "N/A"}
                 </p>
-              </div>
+              </div> */}
               <div>
                 <label
                   className="block text-sm font-medium"
@@ -546,12 +546,12 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                 >
                   Order Date
                 </th>
-                <th
+                {/* <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
                   Item Name
-                </th>
+                </th> */}
                 <th
                   className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
@@ -600,12 +600,12 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                 >
                   GST Apply
                 </th>
-                <th
+                {/* <th
                   className="px-4 py-3 text-left text-sm font-medium whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
                 >
                   Billing Address
-                </th>
+                </th> */}
                 <th
                   className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
                   style={{ color: colors.table.headerText }}
@@ -686,13 +686,13 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                           ? new Date(order.date).toLocaleDateString()
                           : "N/A"}
                       </td>
-                      <td
+                      {/* <td
                         className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
                         style={{ color: colors.text.primary }}
                         title={order.itemName || "N/A"}
                       >
                         {order.itemName || "N/A"}
-                      </td>
+                      </td> */}
                       <td
                         className="px-4 py-3 text-sm font-medium whitespace-nowrap truncate max-w-xs"
                         style={{ color: colors.text.primary }}
@@ -759,13 +759,13 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                             : "N/A"}
                         </span>
                       </td>
-                      <td
+                      {/* <td
                         className="px-4 py-3 text-sm max-w-xs truncate whitespace-nowrap"
                         style={{ color: colors.text.secondary }}
                         title={order.billingAddress || "N/A"}
                       >
                         {order.billingAddress || "N/A"}
-                      </td>
+                      </td> */}
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center justify-center gap-2">
                           <button

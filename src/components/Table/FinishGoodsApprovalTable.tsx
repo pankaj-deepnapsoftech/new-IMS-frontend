@@ -52,7 +52,7 @@ const FinishedGoodsTable = ({
           },
         }
       );
-      window.location.reload()
+      window.location.reload()  
       toast.success(res.data.message || "Goods received by inventory!");
     } catch (err) {
       console.error(err);
@@ -163,7 +163,7 @@ const FinishedGoodsTable = ({
                   {/* Request for Finish Goods button */}
                   {row?.status !== "out finish goods" && (
                     <button
-                      disabled={row?.status === "allocated"}
+                      disabled={row?.status === "allocated finish goods"}
                       onClick={() => onApprove(row?._id)}
                       className="px-3 py-2 text-xs font-medium rounded-md border transition-all mr-2 whitespace-nowrap"
                       style={{
@@ -171,7 +171,7 @@ const FinishedGoodsTable = ({
                         borderColor: colors.primary[200],
                         color: colors.primary[700],
                         minWidth: "fit-content",
-                        opacity: row?.status === "allocated" ? 0.5 : 1,  // Adjust opacity when disabled
+                        opacity: row?.status === "allocated finish goods" ? 0.5 : 1,  // Adjust opacity when disabled
                       }}
                     >
                       Request for Finish Goods
@@ -183,7 +183,7 @@ const FinishedGoodsTable = ({
                   {row?.status === "out finish goods" && (
                     <button
                       onClick={() => receiveByInventory(row?._id)}
-                      className="px-3 py-2 text-xs font-medium rounded-md border transition-all whitespace-nowrap"
+                      className="px-3 py-2 text-xs font-medium rounded-md border transition-all whitespace-nowrap cursor-pointer"
                       style={{
                         backgroundColor: colors.primary[50],
                         borderColor: colors.primary[200],
