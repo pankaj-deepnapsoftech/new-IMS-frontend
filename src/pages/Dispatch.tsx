@@ -14,6 +14,7 @@ import Loading from "../ui/Loading";
 import EmptyData from "../ui/emptyData";
 import Pagination from "./Pagination";
 import { colors } from "../theme/colors";
+import { MdAdd, MdOutlineRefresh } from "react-icons/md";
 
 const Dispatch = () => {
   const [paymentFilter, setPaymentFilter] = useState("All");
@@ -104,14 +105,13 @@ const Dispatch = () => {
       );
 
       setData(response?.data?.data);
-
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
     }
   };
-console.log(data)
+  console.log(data);
   useEffect(() => {
     GetDispatch(page);
   }, [page]);
@@ -226,12 +226,33 @@ console.log(data)
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => {
+                  onClick = { openAddDispatchDrawerHandler };
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors"
+                style={{
+                  backgroundColor: colors.button.primary,
+                  color: colors.text.inverse,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    colors.button.primaryHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.button.primary;
+                }}
+              >
+                <MdAdd size="16px" />
+                Add Dispatch
+              </button>
+
+              <button
+                onClick={() => {
                   setPaymentFilter("All");
                   setProductFilter("All");
                   setSearchTerm("");
                   GetDispatch();
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium border transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium border transition-colors"
                 style={{
                   borderColor: colors.border.medium,
                   color: colors.text.primary,
@@ -245,7 +266,7 @@ console.log(data)
                     colors.background.card;
                 }}
               >
-                <RefreshCw size="20px" />
+                <MdOutlineRefresh size="16px" />
                 Refresh
               </button>
             </div>
@@ -394,30 +415,41 @@ console.log(data)
                           >
                             {new Date(acc?.createdAt).toLocaleDateString()}
                           </span>
-
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <div className="flex items-center gap-2">
-                                <span className="font-medium" style={{ color: colors.text.primary }}>
+                                <span
+                                  className="font-medium"
+                                  style={{ color: colors.text.primary }}
+                                >
                                   Party:
                                 </span>
                                 <span style={{ color: colors.text.secondary }}>
-                                  {acc?.[0]?.customer_id?.[0]?.full_name || "N/A"}
+                                  {acc?.[0]?.customer_id?.[0]?.full_name ||
+                                    "N/A"}
                                 </span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="font-medium" style={{ color: colors.text.primary }}>
+                                <span
+                                  className="font-medium"
+                                  style={{ color: colors.text.primary }}
+                                >
                                   Product:
                                 </span>
                                 <span style={{ color: colors.text.secondary }}>
-                                  {acc?.[0]?.product_id?.[0]?.name || acc?.Product || "N/A"}
+                                  {acc?.[0]?.product_id?.[0]?.name ||
+                                    acc?.Product ||
+                                    "N/A"}
                                 </span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="font-medium" style={{ color: colors.text.primary }}>
+                                <span
+                                  className="font-medium"
+                                  style={{ color: colors.text.primary }}
+                                >
                                   Quantity:
                                 </span>
                                 <span style={{ color: colors.text.secondary }}>
@@ -425,7 +457,10 @@ console.log(data)
                                 </span>
                               </div>
                               <div className="flex items-center whitespace-nowrap gap-2">
-                                <span className="font-medium" style={{ color: colors.text.primary }}>
+                                <span
+                                  className="font-medium"
+                                  style={{ color: colors.text.primary }}
+                                >
                                   Bom Name:
                                 </span>
                                 <span style={{ color: colors.text.secondary }}>
@@ -434,7 +469,6 @@ console.log(data)
                               </div>
                             </div>
                           </div>
-
 
                           <div className="space-y-2">
                             {(role === "Accountant" ||
@@ -448,10 +482,7 @@ console.log(data)
                                   Total:
                                 </span>
                                 <span style={{ color: colors.text.secondary }}>
-                                  ₹
-                                  {(
-                                    acc?.Total
-                                  )}
+                                  ₹{acc?.Total}
                                 </span>
                               </div>
                             )}
