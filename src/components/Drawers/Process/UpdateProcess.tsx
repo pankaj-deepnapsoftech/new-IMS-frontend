@@ -75,6 +75,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   const [finishedGoodQuantity, setFinishedGoodQuantity] = useState<
     number | undefined
   >();
+  const [finishedGoodRemainingQty, setFinishedGoodRemainingQty] = useState<number | undefined>();
+
   const [finishedGoodProducedQuantity, setFinishedGoodProducedQuantity] =
     useState<number | undefined>();
   const [finishedGoodUom, setFinishedGoodUom] = useState<string | undefined>();
@@ -96,9 +98,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   const [rawMaterialApprovalPending, setRawMaterialApprovalPending] =
     useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
-  const [processProgress, setProcessProgress] = useState<{ done: number;  }[]>(
-    []
-  );
+  const [processProgress, setProcessProgress] = useState<{ done: string; }[]>([]);
+
 
   const [scrapMaterials, setScrapMaterials] = useState<any[]>([
     {
@@ -173,7 +174,14 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   // console.log("All Product", products)
   const updateProcessHandler = async (e: React.FormEvent) => {
     e.preventDefault();
+    const updatedProducts = selectedProducts.map((m) => ({
+      ...m,
+      remaining_quantity:
+        (Number(m.estimated_quantity) || 0) - (Number(m.used_quantity) || 0),
+    }));
 
+    const updatedFinishedGoodRemaining =
+      (Number(finishedGoodQuantity) || 0) - (Number(finishedGoodProducedQuantity) || 0);
     let modifiedScrapMaterials =
       scrapMaterials?.[0]?.item_name &&
       scrapMaterials?.map((material) => {
@@ -196,7 +204,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       process: (proc as any)?.process ?? proc,
       start: processStatuses[index]?.start || false,
       done: processStatuses[index]?.done || false,
-      work_done: Number(processProgress[index]?.done) || 0, // ensure number
+      work_done: processProgress[index]?.done || "", // string or number allowed
+
     }));
 
 
@@ -204,7 +213,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
     const data = {
       bom: {
         _id: bomId,
-        raw_materials: selectedProducts,
+        raw_materials: updatedProducts,
         scrap_materials: modifiedScrapMaterials,
         processes: updatedProcesses,
         finished_good: {
@@ -212,6 +221,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
           description: finishedGoodDescription,
           estimated_quantity: finishedGoodQuantity,
           produced_quantity: finishedGoodProducedQuantity,
+          remaining_quantity: updatedFinishedGoodRemaining, // yaha set hoga
           comments: finishedGoodComments,
           cost: finishedGoodCost,
         },
@@ -222,15 +232,18 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       _id: productionProcessId,
     };
 
-
     try {
       setIsUpdating(true);
       const response = await updateProcess(data).unwrap();
-    console.log(response);
-      if (!response.success) {
-        throw new Error(response.message);
-      }
+
+      if (!response.success) throw new Error(response.message);
+
       toast.success(response.message);
+
+
+      setSelectedProducts(updatedProducts);
+      setFinishedGoodRemainingQty(updatedFinishedGoodRemaining);
+
       closeDrawerHandler();
       fetchProcessHandler();
     } catch (error: any) {
@@ -240,12 +253,13 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
     }
   };
 
+
   const markProcessDoneHandler = async () => {
     try {
       setIsUpdating(true);
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL +
-          `production-process/done/${productionProcessId}`,
+        `production-process/done/${productionProcessId}`,
         {
           headers: {
             Authorization: `Bearer ${cookies?.access_token}`,
@@ -291,8 +305,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setTotalCost(data.production_process.bom.total_cost);
       setCreatedBy(
         (data.production_process.bom?.creator?.first_name || "") +
-          " " +
-          (data.production_process.bom?.creator?.last_name || "")
+        " " +
+        (data.production_process.bom?.creator?.last_name || "")
       );
 
       const modifiedRawMaterials =
@@ -301,7 +315,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
             (p: any) => p.item._id === material.item._id
           );
 
-          return { 
+          return {
             _id: material._id,
             item: material.item._id,
             item_name: { value: material.item._id, label: material.item.name },
@@ -323,6 +337,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
             total_part_cost: material.total_part_cost,
             estimated_quantity: prod.estimated_quantity,
             used_quantity: prod.used_quantity,
+            remaining_quantity: prod.remaining_quantity,
           };
         });
 
@@ -350,13 +365,14 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setScrapMaterials(scrap);
 
       const processList = data?.production_process?.bom?.processes || [];
- 
+
       setProcesses(data.production_process?.processes || []);
       setProcessProgress(
         (data.production_process?.processes || []).map((p: any) => ({
-          done: typeof p.work_done === "number" ? p.work_done : 0,
+          done: p.work_done || "",   // string ya number dono rakhega
         }))
-      );;
+      );
+
 
       const fetchedStatuses = data.production_process.processes || [];
       const initialStatuses: {
@@ -396,7 +412,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setFinishedGoodProducedQuantity(
         data.production_process.finished_good.produced_quantity
       );
-
+      setFinishedGoodRemainingQty(
+        data.production_process.finished_good.remaining_quantity // ✅ Add this
+      );
       if (data.production_process.status === "raw materials approved") {
         setSubmitBtnText("Start Production");
         setProcessStatus("work in progress");
@@ -466,6 +484,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setTotalCost(cost);
     }
   }, [selectedProducts]);
+
 
   const customStyles = {
     control: (provided: any) => ({
@@ -590,6 +609,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     <div>FINISHED GOODS</div>
                     <div>EST. QTY</div>
                     <div>PROD. QTY</div>
+                    <div>REMAIN. QTY</div>
                     <div>UOM</div>
                     <div>CATEGORY</div>
                     <div>COMMENTS</div>
@@ -636,12 +656,33 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         <input
                           type="number"
                           value={finishedGoodProducedQuantity || ""}
-                          onChange={(e) =>
-                            setFinishedGoodProducedQuantity(+e.target.value)
-                          }
+                          onChange={(e) => {
+                            const value = +e.target.value;
+                            const maxAllowed = Number(finishedGoodQuantity) || 0;
+
+                            if (value > maxAllowed) {
+                              toast.error("Produced Qty cannot be more than Estimated Qty");
+                              return;
+                            }
+
+                            setFinishedGoodProducedQuantity(value);
+                          }}
                           placeholder="Produced Quantity"
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                         />
+
+                      </div>
+                      <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          REMAIN. QTY
+                        </label>
+                        <input
+                          type="number"
+                          value={finishedGoodRemainingQty || ""}
+                          readOnly
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                        />
+
                       </div>
                       <div>
                         <label className="sm:hidden text-xs font-semibold text-gray-700">
@@ -721,6 +762,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     <div>PRODUCT NAME</div>
                     <div>EST. QTY</div>
                     <div>USED QTY</div>
+                    <div>REMAIN. QTY</div>
                     <div>UOM</div>
                     <div>CATEGORY</div>
                     <div>COMMENTS</div>
@@ -769,16 +811,37 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                             type="number"
                             value={material.used_quantity || ""}
                             onChange={(e) => {
+                              const value = +e.target.value;
+                              const maxAllowed = Number(material.estimated_quantity) || 0;
+
+                              if (value > maxAllowed) {
+                                toast.error("Used Qty cannot be more than Estimated Qty");
+                                return;
+                              }
+
                               const newMaterials = [...selectedProducts];
-                              newMaterials[index].used_quantity =
-                                e.target.value;
+                              newMaterials[index].used_quantity = value;
                               setSelectedProducts(newMaterials);
                             }}
                             placeholder="Used Quantity"
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                           />
-                        </div>
 
+
+                        </div>
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            REMAIN. QTY
+                          </label>
+                          <input
+                            type="number"
+                            value={material.remaining_quantity || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                          />
+
+
+                        </div>
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             UOM
@@ -848,11 +911,11 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
               <div className="flex flex-wrap gap-4 p-4 w-full">
                 {processes.map((process: any, index) => {
                   const status = processStatuses[index];
-                  const progress = processProgress[index] || { done: 0};
+                  const progress = processProgress[index] || { done: 0 };
 
-                  const handleDoneChange = (value: number) => {
+                  const handleDoneChange = (value: string) => {
                     const updatedProgress = [...processProgress];
-                    updatedProgress[index] = { done: Number(value) };
+                    updatedProgress[index] = { done: value };
                     setProcessProgress(updatedProgress);
                   };
 
@@ -860,14 +923,14 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   return (
                     <div
                       key={index}
-                      className="w-[280px]" 
+                      className="w-[280px]"
                     >
                       <div
                         className={`border p-3 rounded-lg ${status?.done
-                            ? "bg-green-50 border-green-200"
-                            : status?.start
-                              ? "bg-blue-50 border-blue-200"
-                              : "bg-gray-50 border-gray-200"
+                          ? "bg-green-50 border-green-200"
+                          : status?.start
+                            ? "bg-blue-50 border-blue-200"
+                            : "bg-gray-50 border-gray-200"
                           }`}
                       >
                         <div className="flex items-center justify-between mb-2">
@@ -876,10 +939,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           </label>
                           <div
                             className={`px-2 py-1 rounded text-xs  font-medium ${status?.done
-                                ? "bg-green-100 text-green-800"
-                                : status?.start
-                                  ? "bg-blue-100 text-blue-800"
-                                  : "bg-gray-100 text-gray-600"
+                              ? "bg-green-100 text-green-800"
+                              : status?.start
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-gray-100 text-gray-600"
                               }`}
                           >
                             {status?.done
@@ -902,11 +965,13 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         <div className="mb-3">
                           <label className="block text-xs text-gray-700">Work Done</label>
                           <input
-                            type="number"
+                            type="text"
                             value={progress.done}
-                            onChange={(e) => handleDoneChange(Number(e.target.value))}
+                            onChange={(e) => handleDoneChange(e.target.value)}
+                            placeholder="Enter work done (e.g. 50% completed, 20 pcs)"
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                           />
+
                         </div>
 
                         {/* Start / Done checkboxes */}
