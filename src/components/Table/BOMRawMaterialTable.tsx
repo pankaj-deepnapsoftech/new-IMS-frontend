@@ -71,7 +71,7 @@ interface BOMRawMaterialTableProps {
   openProductDetailsDrawerHandler?: (id: string) => void;
   deleteProductHandler?: (id: string) => void;
   approveProductHandler?: (id: string) => void;
-  isApproved:boolean,
+  isApproved: boolean,
 }
 //newwww
 const updateProcessStatus = async (id, status) => {
@@ -208,13 +208,13 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
   const [cookies] = useCookies();
 
   //  console.log(`process.env.REACT_APP_BACKEND_URL: ${process.env.REACT_APP_BACKEND_URL}`);
-  const handleOutAllottedInventory = async (process_id) => {
+  const handleOutAllottedInventory = async (_id) => {
     // console.log("process_id", process_id);
 
     try {
       const res = await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}production-process/inventory-in-transit`,
-        { _id: process_id }, 
+        { _id: _id },
         {
           headers: {
             "Content-Type": "application/json",
@@ -541,7 +541,6 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                           )}
 
                           {/* Approve Inventory Button */}
-
                           <Button
                             size="sm"
                             style={{
@@ -586,12 +585,8 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                           </Button>
 
 
-
-
-
-
                           {/* Out Allotted Inventory Button */}
-                          {original.bom_status === "request for allow inventory" && (
+                          {/* {original.bom_status === "request for allow inventory" && (
                             <Button
                               size="sm"
                               style={{
@@ -599,10 +594,39 @@ const BOMRawMaterialTable: React.FC<BOMRawMaterialTableProps> = ({
                                 color: colors.text.inverse,
                               }}
                               _hover={{ bg: colors.warning[600] }}
-                              onClick={() => handleOutAllottedInventory(original.production_process_id)}
+                              onClick={() => handleOutAllottedInventory(original._id)}
                             >
                               Out Allotted Inventory
                             </Button>
+                          )} */}
+
+                          {original.bom_status === "request for allow inventory" && (
+                            !original.isOutForInventoryClicked ? (
+                              <Button
+                                size="sm"
+                                style={{
+                                  backgroundColor: colors.warning[500],
+                                  color: colors.text.inverse,
+                                }}
+                                _hover={{ bg: colors.warning[600] }}
+                                onClick={() => handleOutAllottedInventory(original._id)}
+                              >
+                                Out Allotted Inventory
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                style={{
+                                  backgroundColor: colors.gray[300],
+                                  color: colors.text.primary,
+                                  cursor: "not-allowed",
+                                  opacity: 0.7,
+                                }}
+                                isDisabled
+                              >
+                                Inventory Out
+                              </Button>
+                            )
                           )}
 
 
