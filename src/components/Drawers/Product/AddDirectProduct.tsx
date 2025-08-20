@@ -298,6 +298,7 @@ const AddProduct: React.FC<AddProductProps> = ({
       color: "#374151",
     }),
   };
+  
   return (
     <div
       className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
