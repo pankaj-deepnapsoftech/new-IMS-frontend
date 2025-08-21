@@ -36,6 +36,8 @@ interface InventoryShortage {
   item_name: string;
   item: string;
   shortage_quantity: number;
+  total_required?: number;
+  available_stock?: number;
   current_stock: number;
   updated_stock?: number | null;
   original_stock: number;
@@ -46,6 +48,7 @@ interface InventoryShortage {
   updated_at: string;
   remaining_shortage?: number;
   is_fully_resolved?: boolean;
+  is_grouped?: boolean;
 }
 
 interface ProductInventory {
@@ -1190,20 +1193,7 @@ const PurchaseOrder: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    <p className="text-blue-700 text-xs mt-3">
-                      💡 <strong>Tip:</strong> "Total Available Stock" shows
-                      Current Stock + Updated Stock. Update prices in "Updated
-                      Price" and additional stocks in "Updated Stock" columns.
-                      <strong>New Feature:</strong> You can now partially fill
-                      shortages! Enter any stock value and the system will
-                      calculate the remaining shortage. Items with remaining
-                      shortages will stay in the list until fully resolved.
-                      Input fields show red if insufficient, green if
-                      sufficient, and orange for partial fills. Click "Save
-                      Changes" to store updates - fully resolved items will be
-                      removed automatically. Current prices and stocks remain
-                      unchanged.
-                    </p>
+                   
                   </div>
 
                   <div className="overflow-x-auto">

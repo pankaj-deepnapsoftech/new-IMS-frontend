@@ -835,6 +835,72 @@ const AddBom: React.FC<AddBomProps> = ({
                 </div>
               </div>
 
+              {/* Raw Materials Summary Section - Commented Out */}
+              {/* {(() => {
+                // Group raw materials by name and calculate totals
+                const groupedMaterials = {};
+                rawMaterials.forEach((material, index) => {
+                  if (material.item_name?.label) {
+                    const itemName = material.item_name.label;
+                    if (!groupedMaterials[itemName]) {
+                      groupedMaterials[itemName] = {
+                        name: itemName,
+                        totalQuantity: 0,
+                        totalCost: 0,
+                        materials: []
+                      };
+                    }
+                    const quantity = parseFloat(material.quantity) || 0;
+                    const cost = parseFloat(material.total_part_cost) || 0;
+                    groupedMaterials[itemName].totalQuantity += quantity;
+                    groupedMaterials[itemName].totalCost += cost;
+                    groupedMaterials[itemName].materials.push({ index, quantity, cost });
+                  }
+                });
+
+                const hasDuplicates = Object.values(groupedMaterials).some(group => group.materials.length > 1);
+                
+                if (hasDuplicates) {
+                  return (
+                    <div className="bg-yellow-50 border-b border-yellow-200">
+                      <div className="px-4 py-4 sm:px-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-semibold text-yellow-800">
+                            📊 Raw Materials Summary (Same Name Items Combined)
+                          </h3>
+                        </div>
+                        
+                        <div className="bg-white rounded-lg border border-yellow-300 p-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-sm">
+                            {Object.values(groupedMaterials).map((group, idx) => (
+                              <div key={idx} className="bg-yellow-100 p-3 rounded border border-yellow-400">
+                                <div className="font-semibold text-yellow-900">{group.name}</div>
+                                <div className="text-yellow-800">
+                                  <div>Total Quantity: <span className="font-bold">{group.totalQuantity}</span></div>
+                                  {cookies?.role === "admin" && (
+                                    <div>Total Cost: <span className="font-bold">₹{group.totalCost.toFixed(2)}</span></div>
+                                  )}
+                                  <div className="text-xs text-yellow-700 mt-1">
+                                    {group.materials.length > 1 ? 
+                                      `${group.materials.length} entries combined` : 
+                                      'Single entry'
+                                    }
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="mt-3 text-xs text-yellow-700 bg-yellow-200 p-2 rounded">
+                            💡 <strong>Note:</strong> Items with the same name will be combined and their quantities will be added together for stock checking.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()} */}
+
               {/* Process Section */}
               <div className="bg-white border-b">
                 <div className="px-4 py-4 sm:px-6">
