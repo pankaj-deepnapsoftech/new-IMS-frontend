@@ -36,6 +36,8 @@ interface InventoryShortage {
   item_name: string;
   item: string;
   shortage_quantity: number;
+  total_required?: number;
+  available_stock?: number;
   current_stock: number;
   updated_stock?: number | null;
   original_stock: number;
@@ -46,6 +48,7 @@ interface InventoryShortage {
   updated_at: string;
   remaining_shortage?: number;
   is_fully_resolved?: boolean;
+  is_grouped?: boolean;
 }
 
 interface ProductInventory {
@@ -581,7 +584,7 @@ const PurchaseOrder: React.FC = () => {
       }
       
       if (partiallyResolvedItems.length > 0) {
-        toast.success(`📝 Partially resolved ${partiallyResolvedItems.length} items - shortages updated`);
+        // toast.success(`📝 Partially resolved ${partiallyResolvedItems.length} items - shortages updated`);
       }
       
       // Refresh all data to sync across components
@@ -1038,10 +1041,31 @@ const PurchaseOrder: React.FC = () => {
                      </thead>
                      <tbody className="bg-white divide-y divide-gray-200">
                        {inventoryShortages.map((item, idx) => (
-                         <tr key={idx} className="hover:bg-gray-50">
-                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.bom_name || "-"}</td>
-                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.item_name || "-"}</td>
-                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.current_stock + (item.updated_stock || 0)}</td>
+                         <tr key={idx} className={`hover:bg-gray-50 ${item.is_grouped ? 'bg-yellow-50 border-l-4 border-yellow-400' : ''}`}>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                             {item.bom_name || "-"}
+                             {item.is_grouped && (
+                               <div className="text-xs text-yellow-700 mt-1">
+                                 📊 Combined Items
+                               </div>
+                             )}
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                             {item.item_name || "-"}
+                             {item.is_grouped && item.total_required && (
+                               <div className="text-xs text-yellow-700 mt-1">
+                                 Total Required: {item.total_required}
+                               </div>
+                             )}
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                             {item.available_stock !== undefined ? item.available_stock : (item.current_stock + (item.updated_stock || 0))}
+                             {item.is_grouped && (
+                               <div className="text-xs text-yellow-700 mt-1">
+                                 Available: {item.available_stock || item.current_stock}
+                               </div>
+                             )}
+                           </td>
                            <td className="px-6 py-4 whitespace-nowrap">
                               <input
                                 type="number"
