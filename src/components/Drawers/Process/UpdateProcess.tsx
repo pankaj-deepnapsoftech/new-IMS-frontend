@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import Process from "../../Dynamic Add Components/ProductionProcess";
 
+
 interface UpdateProcess {
   closeDrawerHandler: () => void;
   fetchProcessHandler: () => void;
@@ -181,11 +182,26 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   // console.log("All Product", products)
   const updateProcessHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedProducts = selectedProducts.map((m) => ({
-      ...m,
-      remaining_quantity:
-        (Number(m.estimated_quantity) || 0) - (Number(m.used_quantity) || 0),
-    }));
+    const updatedProducts = selectedProducts.map((m) => {
+      const est = Number(m.estimated_quantity) || 0;
+      const itemUom = m.uom; // estimated ka base UOM (example: "kgs")
+      const usedUom = m.uom_used_quantity || itemUom; // user selected (example: "g")
+      const used = Number(m.used_quantity) || 0;
+
+      // ✅ convert used qty into base UOM
+      const usedInItemUom = convertUOM(used, usedUom, itemUom);
+
+      return {
+        ...m,
+        used_quantity: usedInItemUom, 
+        uom_used_quantity: itemUom,   
+        remaining_quantity: est - usedInItemUom,
+      };
+
+    });
+
+
+
 
     const updatedFinishedGoodRemaining =
       (Number(finishedGoodQuantity) || 0) - (Number(finishedGoodProducedQuantity) || 0);
@@ -273,6 +289,50 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       setIsUpdating(false);
     }
   };
+
+  // ===== UOM conversion helpers =====
+  const UNIT_FACTORS: Record<string, Record<string, number>> = {
+    // base: grams
+    mass: { mg: 0.001, cg: 0.01, g: 1, kgs: 1000, lb: 453.59237, oz: 28.349523125, tonne: 1_000_000, st: 6350.29318 },
+    // base: millilitres
+    liquid: { ml: 1, ltr: 1000, gal: 3785.411784, qt: 946.352946, pt: 473.176473, "fl oz": 29.5735295625, cup: 240, tbsp: 15, tsp: 5 },
+    // base: cubic meter
+    gas: { m3: 1, cm3: 1e-6, cf: 0.028316846592, in3: 1.6387064e-5, ft3: 0.028316846592, L: 0.001 },
+    // base: pascal
+    pressure: { pa: 1, kpa: 1000, mpa: 1_000_000, bar: 100000, atm: 101325, psi: 6894.757293168, mmHg: 133.3223684211, inHg: 3386.38815789, torr: 133.3223684211 },
+    // base: meter
+    length: { mm: 0.001, cm: 0.01, mtr: 1, km: 1000, inch: 0.0254, ft: 0.3048, yd: 0.9144, mi: 1609.344, nm: 1852 },
+    // count units (no conversion)
+    count: { pcs: 1, nos: 1, units: 1, item: 1, pack: 1, dozen: 12, box: 1, set: 1, roll: 1, pair: 1, sheet: 1 },
+  };
+
+  const detectCategoryKey = (uom: string) => {
+    if (UNIT_FACTORS.mass[uom] !== undefined) return "mass";
+    if (UNIT_FACTORS.liquid[uom] !== undefined) return "liquid";
+    if (UNIT_FACTORS.gas[uom] !== undefined) return "gas";
+    if (UNIT_FACTORS.pressure[uom] !== undefined) return "pressure";
+    if (UNIT_FACTORS.length[uom] !== undefined) return "length";
+    if (UNIT_FACTORS.count[uom] !== undefined) return "count";
+    return null;
+  };
+
+  const convertUOM = (value: number, fromUom: string, toUom: string) => {
+    if (!fromUom || !toUom || fromUom === toUom) return value;
+    const fromCat = detectCategoryKey(fromUom);
+    const toCat = detectCategoryKey(toUom);
+    if (!fromCat || !toCat || fromCat !== toCat) {
+      // different/unknown categories → no conversion, return original
+      return value;
+    }
+    const baseFactors = UNIT_FACTORS[fromCat];
+    const fromFactor = baseFactors[fromUom];
+    const toFactor = baseFactors[toUom];
+    if (fromFactor === undefined || toFactor === undefined) return value;
+    // convert to base, then to target
+    const inBase = value * fromFactor;
+    return inBase / toFactor;
+  };
+
 
   // Code to implement units dropdown in Raw Materials and Scrap Materials
   const massUnits = [
@@ -643,7 +703,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
     }),
   };
 
-  console.log(processStatuses);
+  // console.log(processStatuses);
   return (
     <>
       {/* Backdrop */}
@@ -879,7 +939,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     <div>EST. QTY</div>
                     <div>UOM</div>
                     <div>USED QTY</div>
-                    {/* <div>UOM*</div> */}
+                    <div>UOM*</div>
                     <div>REMAIN. QTY</div>
                     <div>CATEGORY</div>
                     <div>COMMENTS</div>
@@ -941,47 +1001,65 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                             type="number"
                             value={material.used_quantity || ""}
                             onChange={(e) => {
-                              const value = +e.target.value;
-                              const maxAllowed = Number(material.estimated_quantity) || 0;
+                              const raw = e.target.value === "" ? "" : +e.target.value;
+                              const newMaterials = [...selectedProducts];
 
-                              if (value > maxAllowed) {
-                                toast.error("Used Qty cannot be more than Estimated Qty");
+                              if (raw === "") {
+                                newMaterials[index].used_quantity = "";
+                                newMaterials[index].remaining_quantity = material.estimated_quantity; // reset
+                                setSelectedProducts(newMaterials);
                                 return;
                               }
 
-                              const newMaterials = [...selectedProducts];
-                              newMaterials[index].used_quantity = value;
+                              const est = Number(material.estimated_quantity) || 0;
+                              const itemUom = material.uom;
+                              const usedUom = material.uom_used_quantity || itemUom;
+
+                              const usedInItemUom = convertUOM(Number(raw) || 0, usedUom, itemUom);
+                              const remain = est - usedInItemUom;
+
+                              if (usedInItemUom > est) {
+                                toast.error("Used Qty (after conversion) cannot exceed Estimated Qty");
+                                return;
+                              }
+
+                              newMaterials[index].used_quantity = raw;
+                              newMaterials[index].remaining_quantity = remain < 0 ? 0 : remain;
                               setSelectedProducts(newMaterials);
                             }}
+
                             placeholder="Used Quantity"
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                           />
 
 
+
                         </div>
 
-                        {/* <div>
+                        <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             UOM*
                           </label>
-
-                          <Select
-                            styles={customStyles}
-                            className="text-sm"
-                            options={getUnitCategory(material.uom)} // <-- dynamic options per row
-                            placeholder="Select"
-                            value={getOptionFromValue(
-                              material.uom_used_quantity,
-                              getUnitCategory(material.uom)
-                            )}
-                            onChange={(selectedOption) => {
+                          <select
+                            value={material.uom_used_quantity || ""}
+                            onChange={(e) => {
+                              const value = e.target.value;
                               const newMaterials = [...selectedProducts];
-                              newMaterials[index].uom_used_quantity = selectedOption.value;
-                              console.log("this is new material", newMaterials)
+                              newMaterials[index].uom_used_quantity = value;
                               setSelectedProducts(newMaterials);
                             }}
-                          />
-                        </div> */}
+                            className="w-full h-8 px-2 py-1 text-sm border border-gray-300 rounded"
+                          >
+                            <option value="">Select UOM</option>
+                            {getUnitCategory(material.uom).map((unit) => (
+                              <option key={unit.value} value={unit.value}>
+                                {unit.label}
+                              </option>
+                            ))}
+                          </select>
+
+
+                        </div>
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
