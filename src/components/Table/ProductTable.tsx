@@ -416,12 +416,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     >
                       Last Updated Stock
                     </th>
-                    <th
+                    {/* <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
                       Total Available Stocks
-                    </th>
+                    </th> */}
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -597,13 +597,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
                               )}
                           </div>
                         </td>
-                        <td
+                        {/* <td
                           className="px-4 py-3 text-sm whitespace-nowrap font-semibold"
                           style={{ color: colors.success[600] }}
                         >
                           {(row.original.current_stock || 0) +
                             (row.original.updated_stock || 0)}
-                        </td>
+                        </td> */}
                         <td className="px-4 py-3 text-sm whitespace-nowrap">
                           {row.original.change_type && (
                             <div className="flex gap-1 items-center whitespace-nowrap">

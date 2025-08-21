@@ -1245,7 +1245,7 @@ const PurchaseOrder: React.FC = () => {
                               {item.item_name || "-"}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {item.current_stock + (item.updated_stock || 0)}
+                              {item.current_stock}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <input
