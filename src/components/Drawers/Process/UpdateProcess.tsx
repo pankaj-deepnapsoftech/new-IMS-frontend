@@ -879,7 +879,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     <div>EST. QTY</div>
                     <div>UOM</div>
                     <div>USED QTY</div>
-                    <div>UOM*</div>
+                    {/* <div>UOM*</div> */}
                     <div>REMAIN. QTY</div>
                     <div>CATEGORY</div>
                     <div>COMMENTS</div>
@@ -960,7 +960,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
                         </div>
 
-                        <div>
+                        {/* <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             UOM*
                           </label>
@@ -981,7 +981,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                               setSelectedProducts(newMaterials);
                             }}
                           />
-                        </div>
+                        </div> */}
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
@@ -1174,7 +1174,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     <div>EST. QTY</div>
                     <div>UOM</div>
                     <div>PROD. QTY</div>
-                    <div>UOM*</div>
+                    {/* <div>UOM*</div> */}
                     <div>COMMENT</div>
                     <div>UNIT COST</div>
                     <div>TOTAL COST</div>
@@ -1245,7 +1245,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         </div>
 
 
-                        <div>
+                        {/* <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             UOM*
                           </label>
@@ -1266,7 +1266,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                               setScrapMaterials(newMaterials);
                             }}
                           />
-                        </div>
+                        </div> */}
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
