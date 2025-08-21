@@ -274,9 +274,13 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
       backgroundColor: "#e1f5fe",
       color: "#0097a7",
     },
+    "out finish goods":{
+      backgroundColor: "#84dcc647",
+      color: "#1e5d4e",
+    },
     Received: {
       backgroundColor: "#e1f5fe",
-      color: "#0097a7",
+      color: "#144539",
     },
   };
 
@@ -650,7 +654,11 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                     </th>
 
                     <th className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap">
-                      Button
+                      {page.some(
+                        (row) => row.original.status === "allocated finish goods"
+                      )
+                      && " Out Finish Goods"
+                        }
                     </th>
                     <th
                       className="px-4 py-3 text-center text-sm font-semibold whitespace-nowrap"
@@ -1357,7 +1365,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                       <span className="text-gray-800">{step.process}</span>
                     </div>
                     <span className="text-sm font-medium text-gray-500">
-                      {step.work_done} done
+                      {step.work_done} 
                     </span>
                   </li>
                 ))}
@@ -1512,12 +1520,12 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
               >
                 Move to Inventory
               </button>
-              <button
+              {/* <button
                 onClick={() => handleMoveToDispatch(selectedProcess._id)}
                 className="px-5 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 shadow-md transition"
               >
                 Move to Dispatch
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

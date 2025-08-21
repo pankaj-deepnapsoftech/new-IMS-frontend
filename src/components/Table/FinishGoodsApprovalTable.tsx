@@ -1,8 +1,8 @@
 //@ts-nocheck
 import React from "react";
-import toast from "react-hot-toast";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { toast } from "react-toastify";
 
 const colors = {
   border: { light: "#e5e7eb" },
@@ -35,6 +35,7 @@ const FinishedGoodsTable = ({
   isLoading,
   fetchFinishedGoods,
   onApprove,
+  onRefresh,
 }) => {
   const [cookies] = useCookies();
 
@@ -52,8 +53,11 @@ const FinishedGoodsTable = ({
           },
         }
       );
-      window.location.reload()  
-      toast.success(res.data.message || "Goods received by inventory!");
+      if(onRefresh){
+        onRefresh()
+      }      
+      // window.location.reload()  
+      toast.success(res?.data?.message || "Goods received by inventory!");
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Error receiving goods");

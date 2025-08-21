@@ -61,7 +61,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       total_part_cost: "",
       estimated_quantity: "",
       used_quantity: "",
-      uom_used_quantity:""
+      uom_used_quantity: ""
 
     },
   ]);
@@ -214,18 +214,18 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       work_done: processProgress[index]?.done || "", // string or number allowed
 
     }));
-      // Map raw materials with selected UOM
-  // let modifiedRawMaterials = selectedProducts.map((material) => ({
-  //   ...material,
-  //   uom_used_quantity: material.uom, // <-- this is the selected dropdown value
-  // }));
+    // Map raw materials with selected UOM
+    // let modifiedRawMaterials = selectedProducts.map((material) => ({
+    //   ...material,
+    //   uom_used_quantity: material.uom, // <-- this is the selected dropdown value
+    // }));
 
-  // Map scrap materials with selected UOM
-   modifiedScrapMaterials = scrapMaterials.map((material) => ({
-    ...material,
-   uom_produced_quantity: material.uom_produced_quantity, // <-- this sends the selected dropdown value!
-  }));
-  console.log("ye hai modified scrap material",modifiedScrapMaterials)
+    // Map scrap materials with selected UOM
+    modifiedScrapMaterials = scrapMaterials.map((material) => ({
+      ...material,
+      uom_produced_quantity: material.uom_produced_quantity, // <-- this sends the selected dropdown value!
+    }));
+    console.log("ye hai modified scrap material", modifiedScrapMaterials)
 
 
     const data = {
@@ -250,7 +250,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       _id: productionProcessId,
     };
 
-    console.log("final Data:---",data)
+    console.log("final Data:---", data)
 
     try {
       setIsUpdating(true);
@@ -402,9 +402,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       );
       const data = await response.json();
 
-      console.log("main data carrier : ",data)
+      console.log("main data carrier : ", data)
 
-    
+
 
       if (!data.success) {
         throw new Error(data.message);
@@ -443,7 +443,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
               label: material?.supplier?.name,
             },
             supporting_doc: "",
-            uom_used_quantity:material.uom_used_quantity,
+            uom_used_quantity: material.uom_used_quantity,
             comments: material?.comments,
             unit_cost: material.item.price,
             total_part_cost: material.total_part_cost,
@@ -472,7 +472,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
             unit_cost: material.item.price,
             total_part_cost: material.total_part_cost,
             // uom_produced_quantity: sc?.uom_produced_quantity || material.item.uom, // <-- Add this line
-            uom_produced_quantity:material.uom_used_quantity
+            uom_produced_quantity: material.uom_used_quantity
           });
         }
       );
@@ -721,9 +721,9 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   <div className="hidden sm:grid grid-cols-9 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
                     <div>FINISHED GOODS</div>
                     <div>EST. QTY</div>
+                    <div>UOM</div>
                     <div>PROD. QTY</div>
                     <div>REMAIN. QTY</div>
-                    <div>UOM</div>
                     <div>CATEGORY</div>
                     <div>COMMENTS</div>
                     <div>UNIT COST</div>
@@ -762,6 +762,20 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           readOnly
                         />
                       </div>
+
+                      <div>
+                        <label className="sm:hidden text-xs font-semibold text-gray-700">
+                          UOM
+                        </label>
+                        <input
+                          type="text"
+                          value={finishedGoodUom || ""}
+                          readOnly
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
+                        />
+                      </div>
+
+
                       <div>
                         <label className="sm:hidden text-xs font-semibold text-gray-700">
                           Prod. Qty
@@ -796,17 +810,6 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                         />
 
-                      </div>
-                      <div>
-                        <label className="sm:hidden text-xs font-semibold text-gray-700">
-                          UOM
-                        </label>
-                        <input
-                          type="text"
-                          value={finishedGoodUom || ""}
-                          readOnly
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                        />
                       </div>
                       <div>
                         <label className="sm:hidden text-xs font-semibold text-gray-700">
@@ -874,12 +877,10 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   <div className="hidden sm:grid grid-cols-10 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
                     <div>PRODUCT NAME</div>
                     <div>EST. QTY</div>
-                    <div>USED QTY</div>
-                    <div>REMAIN. QTY</div>
-                   
                     <div>UOM</div>
-               
-                     <div>UOM*</div>
+                    <div>USED QTY</div>
+                    <div>UOM*</div>
+                    <div>REMAIN. QTY</div>
                     <div>CATEGORY</div>
                     <div>COMMENTS</div>
                     <div>UNIT COST</div>
@@ -922,7 +923,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             UOM
                           </label>
-                        
+
                           <input
                             type="text"
                             value={material.uom || ""}
@@ -930,7 +931,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />
 
-                         </div>
+                        </div>
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
@@ -958,6 +959,30 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
 
                         </div>
+
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            UOM*
+                          </label>
+
+                          <Select
+                            styles={customStyles}
+                            className="text-sm"
+                            options={getUnitCategory(material.uom)} // <-- dynamic options per row
+                            placeholder="Select"
+                            value={getOptionFromValue(
+                              material.uom_used_quantity,
+                              getUnitCategory(material.uom)
+                            )}
+                            onChange={(selectedOption) => {
+                              const newMaterials = [...selectedProducts];
+                              newMaterials[index].uom_used_quantity = selectedOption.value;
+                              console.log("this is new material", newMaterials)
+                              setSelectedProducts(newMaterials);
+                            }}
+                          />
+                        </div>
+
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             REMAIN. QTY
@@ -971,28 +996,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
 
                         </div>
-                        <div>
-                          <label className="sm:hidden text-xs font-semibold text-gray-700">
-                            UOM*
-                          </label>
-                        
-                          <Select
-                            styles={customStyles}
-                            className="text-sm"
-                            options={getUnitCategory(material.uom)} // <-- dynamic options per row
-                            placeholder="Select"
-                            value={getOptionFromValue(
-                              material.uom_used_quantity,
-                              getUnitCategory(material.uom)
-                            )}
-                            onChange={(selectedOption) => {
-                              const newMaterials = [...selectedProducts];
-                              newMaterials[index].uom_used_quantity = selectedOption.value;
-                              console.log("this is new material",newMaterials)
-                              setSelectedProducts(newMaterials);
-                            }}
-                          />
-                        </div>
+
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
@@ -1087,8 +1091,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                             {status?.done
                               ? "Completed"
                               : status?.start
-                              ? "In Progress"
-                              : "Not Start"}
+                                ? "In Progress"
+                                : "Not Start"}
                           </div>
                         </div>
 
@@ -1167,12 +1171,11 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   {/* Header (desktop) */}
                   <div className="hidden sm:grid grid-cols-8 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
                     <div>PRODUCT NAME</div>
-                    <div>COMMENT</div>
                     <div>EST. QTY</div>
                     <div>UOM</div>
                     <div>PROD. QTY</div>
-        
                     <div>UOM*</div>
+                    <div>COMMENT</div>
                     <div>UNIT COST</div>
                     <div>TOTAL COST</div>
                   </div>
@@ -1198,17 +1201,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                           />
                         </div>
 
-                        <div>
-                          <label className="sm:hidden text-xs font-semibold text-gray-700">
-                            Comment
-                          </label>
-                          <input
-                            type="text"
-                            value={material.description || ""}
-                            readOnly
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                          />
-                        </div>
+
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
@@ -1250,13 +1243,13 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                           />
                         </div>
-                        
+
 
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             UOM*
                           </label>
-                       
+
                           <Select
                             styles={customStyles}
                             className="text-sm"
@@ -1269,9 +1262,21 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                             onChange={(selectedOption) => {
                               const newMaterials = [...scrapMaterials];
                               newMaterials[index].uom_produced_quantity = selectedOption.value;
-                              console.log("this is new ascrap",newMaterials)
+                              console.log("this is new ascrap", newMaterials)
                               setScrapMaterials(newMaterials);
                             }}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="sm:hidden text-xs font-semibold text-gray-700">
+                            Comment
+                          </label>
+                          <input
+                            type="text"
+                            value={material.description || ""}
+                            readOnly
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
                           />
                         </div>
 
