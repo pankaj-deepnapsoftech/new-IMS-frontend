@@ -80,8 +80,8 @@ const InventoryApprovals: React.FC = () => {
 
       toast.success("Raw material approved successfully!");
       setIsApproved(true);
-
-      await fetchRM();
+ window.location.reload()
+     fetchRM();
     } catch (err: any) {
       toast.error(err?.message || "Something went wrong");
     }
@@ -149,6 +149,8 @@ const InventoryApprovals: React.FC = () => {
     if (activeTab === "raw" && rmData.length === 0) fetchRM();
     if (activeTab === "fg" && fgData.length === 0) fetchFG();
   }, [activeTab, token]);
+
+
 
   // Search across whichever tab is open
   useEffect(() => {

@@ -869,7 +869,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                               <MdInfoOutline size={16} />
                             </button>
 
-                            {openUpdateProcessDrawerHandler && (
+                            {openUpdateProcessDrawerHandler && row?.original?.status !== "completed" && (
                               <button
                                 onClick={() =>
                                   openUpdateProcessDrawerHandler(
@@ -896,7 +896,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                               </button>
                             )}
 
-                            <button
+                            {row?.original?.status !== "completed" && <button
                               className="p-2 rounded-lg transition-all duration-200 hover:shadow-md"
                               onClick={() =>
                                 handlePauseProcess(row.original?._id)
@@ -908,7 +908,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                             >
                               Pause
                             </button>
-
+}
                             {deleteProcessHandler && (
                               <button
                                 onClick={() => {
