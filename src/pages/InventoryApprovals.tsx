@@ -92,7 +92,7 @@ const InventoryApprovals: React.FC = () => {
       setIsLoadingFG(true);
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL +
-          "production-process/moved-to-inventory",
+        "production-process/moved-to-inventory",
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -163,19 +163,19 @@ const InventoryApprovals: React.FC = () => {
         const role = emp?.role?.role?.toString().toLowerCase() || "";
         const createdAt = emp?.createdAt
           ? new Date(emp.createdAt)
-              .toISOString()
-              .substring(0, 10)
-              .split("-")
-              .reverse()
-              .join("")
+            .toISOString()
+            .substring(0, 10)
+            .split("-")
+            .reverse()
+            .join("")
           : "";
         const updatedAt = emp?.updatedAt
           ? new Date(emp.updatedAt)
-              .toISOString()
-              .substring(0, 10)
-              .split("-")
-              .reverse()
-              .join("")
+            .toISOString()
+            .substring(0, 10)
+            .split("-")
+            .reverse()
+            .join("")
           : "";
         return (
           firstName.includes(q) ||
@@ -205,11 +205,11 @@ const InventoryApprovals: React.FC = () => {
           "";
         const createdAt = row?.createdAt
           ? new Date(row.createdAt)
-              .toISOString()
-              .substring(0, 10)
-              .split("-")
-              .reverse()
-              .join("")
+            .toISOString()
+            .substring(0, 10)
+            .split("-")
+            .reverse()
+            .join("")
           : "";
         return (
           name.includes(q) ||
@@ -358,9 +358,8 @@ const InventoryApprovals: React.FC = () => {
                   />
                   <input
                     type="text"
-                    placeholder={`Search ${
-                      activeTab === "raw" ? "raw materials" : "finished goods"
-                    }...`}
+                    placeholder={`Search ${activeTab === "raw" ? "raw materials" : "finished goods"
+                      }...`}
                     value={searchKey}
                     onChange={(e) => setSearchKey(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 text-sm border rounded-lg transition-colors focus:outline-none focus:ring-2"
@@ -410,6 +409,7 @@ const InventoryApprovals: React.FC = () => {
                 items={fgFiltered}
                 isLoading={isLoadingFG}
                 onApprove={approveFG}
+                  onRefresh={fetchFG}
               />
             )}
           </div>
