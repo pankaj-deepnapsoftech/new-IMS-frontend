@@ -71,9 +71,9 @@ const SalesTable = ({
 
       toast.success(data.message || "Status updated");
       // Refresh the specific sales order status instead of full page reload
-      if (filteredPurchases && filteredPurchases.length > 0) {
-        fetchAllSalesOrdersStatus();
-      }
+      // if (filteredPurchases && filteredPurchases.length > 0) {
+      //   // fetchAllSalesOrdersStatus();
+      // }
     } catch (err) {
       toast.error(err.message || "Failed to update status");
     }
@@ -101,9 +101,9 @@ const SalesTable = ({
 
       toast.success("Status updated to Inventory in Transit");
       // Refresh the specific sales order status instead of full page reload
-      if (filteredPurchases && filteredPurchases.length > 0) {
-        fetchAllSalesOrdersStatus();
-      }
+      // if (filteredPurchases && filteredPurchases.length > 0) {
+      //   // fetchAllSalesOrdersStatus();
+      // }
     } catch (err) {
       toast.error(err.message || "Something went wrong");
     }
@@ -347,12 +347,12 @@ const SalesTable = ({
   };
 
   // Fetch all sales orders status when component mounts or purchases change
-  useEffect(() => {
-    console.log("useEffect triggered, filteredPurchases length:", filteredPurchases?.length);
-    if (filteredPurchases && filteredPurchases.length > 0) {
-      fetchAllSalesOrdersStatus();
-    }
-  }, [filteredPurchases]);
+  // useEffect(() => {
+  //   console.log("useEffect triggered, filteredPurchases length:", filteredPurchases?.length);
+  //   if (filteredPurchases && filteredPurchases.length > 0) {
+  //     // fetchAllSalesOrdersStatus();
+  //   }
+  // }, [filteredPurchases]);
 
   // Update summary data when salesOrderStatuses changes
   useEffect(() => {
@@ -399,71 +399,71 @@ const SalesTable = ({
   });
 
   // Function to fetch all sales orders status at once
-  const fetchAllSalesOrdersStatus = async () => {
-    console.log("Fetching all sales orders status...");
-    setLoadingStatuses(prev => ({ ...prev, all: true }));
+  // const fetchAllSalesOrdersStatus = async () => {
+  //   console.log("Fetching all sales orders status...");
+  //   setLoadingStatuses(prev => ({ ...prev, all: true }));
     
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}bom/sales-order-status/all`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${cookies?.access_token}`
-          }
-        }
-      );
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.REACT_APP_BACKEND_URL}bom/sales-order-status/all`,
+  //       {
+  //         method: 'GET',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': `Bearer ${cookies?.access_token}`
+  //         }
+  //       }
+  //     );
       
-      console.log("Response status:", response.status);
+  //     console.log("Response status:", response.status);
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Response data:", data);
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log("Response data:", data);
         
-        if (data.success && data.salesOrdersStatus) {
-          const allStatuses = {};
-          data.salesOrdersStatus.forEach(status => {
-            allStatuses[status.salesOrderId] = status;
-          });
-          console.log("Setting statuses:", allStatuses);
-          // setSalesOrderStatuses(prev => ({...allStatuses, ...prev }));
+  //       if (data.success && data.salesOrdersStatus) {
+  //         const allStatuses = {};
+  //         data.salesOrdersStatus.forEach(status => {
+  //           allStatuses[status.salesOrderId] = status;
+  //         });
+  //         console.log("Setting statuses:", allStatuses);
+  //         // setSalesOrderStatuses(prev => ({...allStatuses, ...prev }));
           
-          // Calculate summary data
-          const approvedBOMs = data.salesOrdersStatus.filter(status => status.bomStatus === "Approved").length;
-          const activeProductions = data.salesOrdersStatus.filter(status => 
-            status.productionStatus === "production started" || 
-            status.productionStatus === "production in progress"
-          ).length;
-          const completedOrders = data.salesOrdersStatus.filter(status => 
-            status.overallStatus === "Completed"
-          ).length;
+  //         // Calculate summary data
+  //         const approvedBOMs = data.salesOrdersStatus.filter(status => status.bomStatus === "Approved").length;
+  //         const activeProductions = data.salesOrdersStatus.filter(status => 
+  //           status.productionStatus === "production started" || 
+  //           status.productionStatus === "production in progress"
+  //         ).length;
+  //         const completedOrders = data.salesOrdersStatus.filter(status => 
+  //           status.overallStatus === "Completed"
+  //         ).length;
           
-          setSummaryData({
-            totalSalesOrders: data.totalSalesOrders,
-            totalPreProductionProcesses: data.totalPreProductionProcesses,
-            totalBOMs: data.totalBOMs,
-            totalRawMaterials: data.totalRawMaterials,
-            approvedBOMs,
-            activeProductions,
-            completedOrders
-          });
+  //         setSummaryData({
+  //           totalSalesOrders: data.totalSalesOrders,
+  //           totalPreProductionProcesses: data.totalPreProductionProcesses,
+  //           totalBOMs: data.totalBOMs,
+  //           totalRawMaterials: data.totalRawMaterials,
+  //           approvedBOMs,
+  //           activeProductions,
+  //           completedOrders
+  //         });
           
-          // Show summary with all counts
-          // const summary = `Loaded: ${data.totalSalesOrders} Sales Orders, ${data.totalPreProductionProcesses} Pre-Production Processes, ${data.totalBOMs} BOMs, ${data.totalRawMaterials} Raw Materials`;
-          // toast.success(summary);
-        }
-      } else {
-        console.error('Failed to fetch all sales orders status');
-        toast.error('Failed to fetch all sales orders status');
-      }
-    } catch (error) {
-      console.error('Error fetching all sales orders status:', error);
-      toast.error('Error fetching all sales orders status');
-    } finally {
-      setLoadingStatuses(prev => ({ ...prev, all: false }));
-    }
-  };
+  //         // Show summary with all counts
+  //         // const summary = `Loaded: ${data.totalSalesOrders} Sales Orders, ${data.totalPreProductionProcesses} Pre-Production Processes, ${data.totalBOMs} BOMs, ${data.totalRawMaterials} Raw Materials`;
+  //         // toast.success(summary);
+  //       }
+  //     } else {
+  //       console.error('Failed to fetch all sales orders status');
+  //       toast.error('Failed to fetch all sales orders status');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching all sales orders status:', error);
+  //     toast.error('Error fetching all sales orders status');
+  //   } finally {
+  //     setLoadingStatuses(prev => ({ ...prev, all: false }));
+  //   }
+  // };
 
   const handleSampleDesign = (designFile) => {
     if (designFile) {

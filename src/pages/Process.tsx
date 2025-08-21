@@ -295,7 +295,7 @@ const Process: React.FC = () => {
         </div>
 
         {/* Process Table */}
-        <div
+        <div 
           className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
           style={{
             backgroundColor: colors.background.card,

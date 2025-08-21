@@ -42,7 +42,9 @@ const AddBom: React.FC<AddBomProps> = ({
   const [rawMaterialsOptions, setRawMaterialsOptions] = useState<
     { value: string; label: string }[]
   >([]);
-  const [manPowerOptions, setManPowerOptions] = useState<{ value: string; label: string }[]>([]);
+  const [manPowerOptions, setManPowerOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
   const [finishedGood, setFinishedGood] = useState<
     { value: string; label: string } | undefined
@@ -75,13 +77,16 @@ const AddBom: React.FC<AddBomProps> = ({
   const [otherCharges, setOtherCharges] = useState<number | undefined>();
   const [resources, setResources] = useState<any[]>([]);
   const [empData, setEmpData] = useState<any[]>([]);
-  const [resourceOptions, setResourceOptions] = useState<{ value: string; label: string }[]>([]);
+  const [resourceOptions, setResourceOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
   const [selectedResources, setSelectedResources] = useState([
     { name: null, type: null, specification: "" },
   ]);
   // NEW: user-entered manpower (string) and auto-calculated available count
   const [manpowerInput, setManpowerInput] = useState<string>("");
   const [manpowerCount, setManpowerCount] = useState<number>(0);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [addBom] = useAddBomMutation();
 
@@ -131,12 +136,11 @@ const AddBom: React.FC<AddBomProps> = ({
     { value: "mtr", label: "mtr" },
   ];
 
-
-
-
-
   const addBomHandler = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     const fileInput = supportingDoc.current as HTMLInputElement;
     let pdfUrl;
@@ -161,6 +165,7 @@ const AddBom: React.FC<AddBomProps> = ({
         pdfUrl = uploadedFile[0];
       } catch (err: any) {
         toast.error(err.message || "Something went wrong during file upload");
+        setIsSubmitting(false);
         return;
       }
     }
@@ -212,9 +217,6 @@ const AddBom: React.FC<AddBomProps> = ({
         },
       ],
 
-
-
-
       remarks: remarks,
       resources: selectedResources.map((r) => ({
         resource_id: r.name?.value,
@@ -222,10 +224,7 @@ const AddBom: React.FC<AddBomProps> = ({
         specification: r.specification?.value || r.specification,
         comment: r.comment || "",
         customId: r.customId,
-      }))
-
-
-
+      })),
     };
     // console.log(body)
     try {
@@ -240,10 +239,12 @@ const AddBom: React.FC<AddBomProps> = ({
         closeDrawerHandler();
       }
       toast.error(error?.data?.message || "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  console.log(resources)
+  console.log(resources);
 
   const fetchProductsHandler = async () => {
     try {
@@ -268,7 +269,6 @@ const AddBom: React.FC<AddBomProps> = ({
       setIsLoadingProducts(false);
     }
   };
-
 
   const fetchResourceHandler = async () => {
     try {
@@ -310,13 +310,11 @@ const AddBom: React.FC<AddBomProps> = ({
       if (!results.success) {
         throw new Error(results?.message);
       }
-      const manPowerUsers = results?.users?.filter(
-        (user: any) =>
-          user.role?.role?.toLowerCase().includes("man power")
+      const manPowerUsers = results?.users?.filter((user: any) =>
+        user.role?.role?.toLowerCase().includes("man power")
       );
 
       setEmpData(manPowerUsers);
-
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
@@ -372,7 +370,6 @@ const AddBom: React.FC<AddBomProps> = ({
     // empData ko fetchEmployeeHandler me already filtered man-power users ke saath set kiya ja raha tha
     setManpowerCount(empData?.length || 0);
   }, [empData]);
-
 
   useEffect(() => {
     fetchProductsHandler();
@@ -452,7 +449,6 @@ const AddBom: React.FC<AddBomProps> = ({
       customId: res.customId,
     }));
 
-
     setResourceOptions(resourceOptions);
   }, [resources]);
 
@@ -470,8 +466,6 @@ const AddBom: React.FC<AddBomProps> = ({
 
     setManPowerOptions(options);
   }, [empData]);
-
-
 
   return (
     <>
@@ -530,7 +524,6 @@ const AddBom: React.FC<AddBomProps> = ({
                           // isSearchable={true} // <-- Make sure this is set
                           required
                         />
-
                       </div>
 
                       {/* Quantity */}
@@ -601,8 +594,8 @@ const AddBom: React.FC<AddBomProps> = ({
                             cookies?.role === "admin"
                               ? unitCost || ""
                               : unitCost
-                                ? "*****"
-                                : ""
+                              ? "*****"
+                              : ""
                           }
                           readOnly
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -620,8 +613,8 @@ const AddBom: React.FC<AddBomProps> = ({
                             cookies?.role === "admin"
                               ? cost || ""
                               : cost
-                                ? "*****"
-                                : ""
+                              ? "*****"
+                              : ""
                           }
                           readOnly
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -768,8 +761,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.unit_cost || ""
                                 : material.unit_cost
-                                  ? "*****"
-                                  : ""
+                                ? "*****"
+                                : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -787,8 +780,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.total_part_cost || ""
                                 : material.total_part_cost
-                                  ? "*****"
-                                  : ""
+                                ? "*****"
+                                : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -974,7 +967,9 @@ const AddBom: React.FC<AddBomProps> = ({
               <div className="bg-white border-b">
                 <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Resources</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Resources
+                    </h3>
                   </div>
 
                   {/* Table Header */}
@@ -1007,14 +1002,13 @@ const AddBom: React.FC<AddBomProps> = ({
                           />
                         </div>
 
-                       
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
                             Resource Name
                           </label>
                           <Select
                             options={resourceOptions}
-                            value={resource.name} 
+                            value={resource.name}
                             placeholder="Select Resource Name"
                             className="text-sm"
                             onChange={(selectedOption) => {
@@ -1024,7 +1018,10 @@ const AddBom: React.FC<AddBomProps> = ({
                                   ...updated[index],
                                   customId: selectedOption.customId,
                                   name: selectedOption,
-                                  type: { label: selectedOption.type, value: selectedOption.type },
+                                  type: {
+                                    label: selectedOption.type,
+                                    value: selectedOption.type,
+                                  },
                                   specification: {
                                     label: selectedOption.specification,
                                     value: selectedOption.specification,
@@ -1078,7 +1075,9 @@ const AddBom: React.FC<AddBomProps> = ({
                               type="button"
                               className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
                               onClick={() => {
-                                const updated = selectedResources.filter((_, i) => i !== index);
+                                const updated = selectedResources.filter(
+                                  (_, i) => i !== index
+                                );
                                 setSelectedResources(updated);
                               }}
                             >
@@ -1092,7 +1091,12 @@ const AddBom: React.FC<AddBomProps> = ({
                               onClick={() =>
                                 setSelectedResources([
                                   ...selectedResources,
-                                  { name: null, type: null, specification: null, comment: "" },
+                                  {
+                                    name: null,
+                                    type: null,
+                                    specification: null,
+                                    comment: "",
+                                  },
                                 ])
                               }
                             >
@@ -1106,16 +1110,18 @@ const AddBom: React.FC<AddBomProps> = ({
                 </div>
               </div>
 
-
               {/* Manpower Section */}
               <div className="bg-white border-b">
                 <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Manpower</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Manpower
+                    </h3>
                   </div>
 
                   <div className="text-sm text-gray-600 mb-2">
-                    Available manpower: <span className="font-medium">{manpowerCount}</span>
+                    Available manpower:{" "}
+                    <span className="font-medium">{manpowerCount}</span>
                   </div>
 
                   <div className="flex items-center gap-4">
@@ -1126,14 +1132,12 @@ const AddBom: React.FC<AddBomProps> = ({
                       placeholder={manpowerCount?.toString() || "0"}
                       className="w-40 px-2 py-1 border border-gray-300 rounded text-sm"
                     />
-                    <span className="text-sm text-gray-500">(Leave empty to send available count)</span>
+                    <span className="text-sm text-gray-500">
+                      (Leave empty to send available count)
+                    </span>
                   </div>
                 </div>
               </div>
-
-
-
-
 
               {/* Scrap Materials Section */}
               <div className="bg-white border-b">
@@ -1191,8 +1195,6 @@ const AddBom: React.FC<AddBomProps> = ({
                             }}
                           />
                         </div>
-
-
 
                         {/* Estimated Quantity */}
                         <div>
@@ -1257,8 +1259,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.unit_cost || ""
                                 : material.unit_cost
-                                  ? "*****"
-                                  : ""
+                                ? "*****"
+                                : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -1276,8 +1278,8 @@ const AddBom: React.FC<AddBomProps> = ({
                               cookies?.role === "admin"
                                 ? material.total_part_cost || ""
                                 : material.total_part_cost
-                                  ? "*****"
-                                  : ""
+                                ? "*****"
+                                : ""
                             }
                             readOnly
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
@@ -1456,8 +1458,8 @@ const AddBom: React.FC<AddBomProps> = ({
                           cookies?.role === "admin"
                             ? totalPartsCost || ""
                             : totalPartsCost
-                              ? "*****"
-                              : ""
+                            ? "*****"
+                            : ""
                         }
                         readOnly
                         className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
@@ -1486,9 +1488,17 @@ const AddBom: React.FC<AddBomProps> = ({
                   <div className="mt-6">
                     <button
                       type="submit"
-                      className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white rounded transition-colors duration-200 text-sm"
+                      disabled={isSubmitting}
+                      className={`px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-500 text-white rounded transition-colors duration-200 text-sm flex items-center gap-2 ${
+                        isSubmitting
+                          ? "opacity-70 cursor-not-allowed"
+                          : "hover:from-blue-600 hover:to-blue-600"
+                      }`}
                     >
-                      Submit
+                      {isSubmitting && (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      )}
+                      {isSubmitting ? "Creating BOM..." : "Submit"}
                     </button>
                   </div>
                 </div>
