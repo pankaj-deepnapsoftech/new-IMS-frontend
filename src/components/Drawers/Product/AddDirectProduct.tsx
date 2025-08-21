@@ -298,6 +298,7 @@ const AddProduct: React.FC<AddProductProps> = ({
       color: "#374151",
     }),
   };
+  
   return (
     <div
       className="absolute overflow-auto h-[100vh] w-[100vw]  bg-white right-0 top-0 z-50 py-3 border-l border-gray-200"
@@ -525,13 +526,13 @@ const AddProduct: React.FC<AddProductProps> = ({
 
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
-                Current Stock
+                Last Updated Stock
               </FormLabel>
               <Input
                 value={currentStock}
                 onChange={(e) => setCurrentStock(e.target.value)}
                 type="number"
-                placeholder="Current Stock"
+                placeholder="Last Updated Stock"
                 bg="white"
                 borderColor="gray.300"
                 _focus={{

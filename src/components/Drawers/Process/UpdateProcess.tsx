@@ -718,7 +718,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   </h3>
 
                   {/* Header (desktop) */}
-                  <div className="hidden sm:grid grid-cols-8 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                  <div className="hidden sm:grid grid-cols-9 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
                     <div>FINISHED GOODS</div>
                     <div>EST. QTY</div>
                     <div>PROD. QTY</div>
@@ -732,7 +732,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
                   {/* Row */}
                   <div className="border border-t-0 border-gray-300">
-                    <div className="grid grid-cols-1 sm:grid-cols-8 gap-4 px-3 py-4 items-center bg-white">
+                    <div className="grid grid-cols-1 sm:grid-cols-9 gap-4 px-3 py-4 items-center bg-white">
                       <div>
                         <label className="sm:hidden text-xs font-semibold text-gray-700">
                           Finished Goods
@@ -871,7 +871,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   </div>
 
                   {/* Header (desktop) */}
-                  <div className="hidden sm:grid grid-cols-8 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                  <div className="hidden sm:grid grid-cols-10 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
                     <div>PRODUCT NAME</div>
                     <div>EST. QTY</div>
                     <div>USED QTY</div>
@@ -891,7 +891,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     {selectedProducts.map((material, index) => (
                       <div
                         key={index}
-                        className="grid grid-cols-1 sm:grid-cols-8 gap-4 px-3 py-4 items-center bg-white border-b border-gray-200 last:border-b-0"
+                        className="grid grid-cols-1 sm:grid-cols-10 gap-4 px-3 py-4 items-center bg-white border-b border-gray-200 last:border-b-0"
                       >
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
@@ -1165,7 +1165,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                   </div>
 
                   {/* Header (desktop) */}
-                  <div className="hidden sm:grid grid-cols-7 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
+                  <div className="hidden sm:grid grid-cols-8 gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-sm font-semibold uppercase tracking-wider px-3 py-2">
                     <div>PRODUCT NAME</div>
                     <div>COMMENT</div>
                     <div>EST. QTY</div>
@@ -1182,7 +1182,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     {scrapMaterials.map((material, index) => (
                       <div
                         key={index}
-                        className="grid grid-cols-1 sm:grid-cols-7 gap-4 px-3 py-4 items-center bg-white border-b border-gray-200 last:border-b-0"
+                        className="grid grid-cols-1 sm:grid-cols-8 gap-4 px-3 py-4 items-center bg-white border-b border-gray-200 last:border-b-0"
                       >
                         <div>
                           <label className="sm:hidden text-xs font-semibold text-gray-700">
