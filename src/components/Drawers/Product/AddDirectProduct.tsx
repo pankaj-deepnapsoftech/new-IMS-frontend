@@ -526,13 +526,13 @@ const AddProduct: React.FC<AddProductProps> = ({
 
             <FormControl className="mt-3 mb-5" isRequired>
               <FormLabel fontWeight="bold" color="gray.700">
-                Last Updated Stock
+                Current Stock
               </FormLabel>
               <Input
                 value={currentStock}
                 onChange={(e) => setCurrentStock(e.target.value)}
                 type="number"
-                placeholder="Last Updated Stock"
+                placeholder="Current Stock"
                 bg="white"
                 borderColor="gray.300"
                 _focus={{
