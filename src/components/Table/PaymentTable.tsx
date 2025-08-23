@@ -49,7 +49,7 @@ const PaymentTable: React.FC<AgentTableProps> = ({
   openUpdatePaymentDrawer,
 }) => {
 
-  
+
 
 
   const columns = useMemo(
@@ -210,6 +210,13 @@ const PaymentTable: React.FC<AgentTableProps> = ({
                               cell.column.id !== "creator" &&
                               cell.column.id !== "customer" &&
                               cell.render("Cell")}
+                            {cell.column.id === "customer" && (
+                              <span>
+                                {row.original?.invoice?.buyer?.company_name
+                                  ? row.original?.invoice?.buyer?.company_name
+                                  : row.original?.invoice?.buyer?.consignee_name?.[0] || "N/A"}
+                              </span>
+                            )}
 
                             {cell.column.id === "createdAt" &&
                               row.original?.createdAt && (

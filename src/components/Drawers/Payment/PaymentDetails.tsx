@@ -20,12 +20,22 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
   const [mode, setMode] = useState<string | undefined>();
   const [amount, setAmount] = useState<string | undefined>();
   const [description, setDescription] = useState<string | undefined>();
+  const [subtotal, setSubtotal] = useState<number | undefined>();
+  const [taxAmount, setTaxAmount] = useState<number | undefined>();
+  const [taxName, setTaxName] = useState<string | undefined>();
+  const [total, setTotal] = useState<number | undefined>();
+  const [balance, setBalance] = useState<number | undefined>();
+
+  const [buyerEmail, setBuyerEmail] = useState<string | undefined>();
+  const [buyerContact, setBuyerContact] = useState<string | undefined>();
+  const [buyerCompany, setBuyerCompany] = useState<string | undefined>();
+  const [buyerConsigneeNames, setBuyerConsigneeNames] = useState<string[]>([]);
 
   const fetchPaymentDetails = async (id: string) => {
     try {
       setIsLoading(true);
-      // @ts-ignore
-      const response = await fetch(process.env.REACT_APP_BACKEND_URL + `payment/${id}`,
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + `payment/${id}`,
         {
           method: "GET",
           headers: {
@@ -37,16 +47,37 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
       if (!data.success) {
         throw new Error(data.message);
       }
-      setInvoiceNo(data.payment.invoice.invoice_no);
-      setMode(data.payment.mode);
-      setDescription(data.payment?.description);
-      setAmount(data.payment.amount);
+
+      const payment = data.payment;
+      const invoice = payment.invoice;
+      const buyer = invoice.buyer;
+
+      // Set payment details
+      setInvoiceNo(invoice.invoice_no);
+      setMode(payment.mode);
+      setDescription(payment?.description);
+      setAmount(payment.amount);
+
+      // Set buyer details
+      setBuyerEmail(buyer.email_id?.[0]);
+      setBuyerContact(buyer.contact_number?.[0]);
+      setBuyerCompany(buyer.company_name);
+      setBuyerConsigneeNames(buyer.consignee_name || []);
+
+      // Set invoice summary
+      setSubtotal(invoice.subtotal);
+      setTaxAmount(invoice.tax?.tax_amount);
+      setTaxName(invoice.tax?.tax_name);
+      setTotal(invoice.total);
+      setBalance(invoice.balance);
+
     } catch (error: any) {
-      toast.error(error.messsage || "Something went wrong");
-    } finally{
+      toast.error(error.message || "Something went wrong");
+    } finally {
       setIsLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchPaymentDetails(id || "");
@@ -75,12 +106,13 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
         {isLoading && <Loading />}
         {!isLoading && (
           <div>
+            {/* Existing Payment Info */}
             <div className="mt-3 mb-5">
               <p className="font-semibold">Invoice No.</p>
               <p>{invoiceNo}</p>
             </div>
             <div className="mt-3 mb-5">
-              <p className="font-semibold">Amount</p>
+              <p className="font-semibold">Paid  Amount</p>
               <p>₹ {amount}/-</p>
             </div>
             <div className="mt-3 mb-5">
@@ -91,10 +123,67 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
               <p className="font-semibold">Description</p>
               <p>{description || 'N/A'}</p>
             </div>
+
+            {/* New Buyer Info */}
+            <h2 className="text-xl font-semibold py-3 mt-6 border-b">
+              Buyer Details
+            </h2>
+
+            {/* <div className="mt-3 mb-5">
+              <p className="font-semibold">Contact Person</p>
+              <p>{buyerName || 'N/A'}</p>
+            </div> */}
+            <div className="mt-3 mb-5">
+              <p className="font-semibold">Email</p>
+              <p>{buyerEmail || 'N/A'}</p>
+            </div>
+            <div className="mt-3 mb-5">
+              <p className="font-semibold">Contact Number</p>
+              <p>{buyerContact || 'N/A'}</p>
+            </div>
+            {buyerCompany ? (
+              <div className="mt-3 mb-5">
+                <p className="font-semibold">Company</p>
+                <p>{buyerCompany}</p>
+              </div>
+            ) : buyerConsigneeNames && buyerConsigneeNames.length > 0 ? (
+              <div className="mt-3 mb-5">
+                <p className="font-semibold">Consignee Name</p>
+                {buyerConsigneeNames.map((name, index) => (
+                  <p key={index}>{name}</p>
+                ))}
+              </div>
+
+
+            ) : null}
+            <h2 className="text-xl font-semibold py-3 mt-6 border-b">
+              Invoice Summary
+            </h2>
+
+            <div className="mt-3 mb-5">
+              <p className="font-semibold">Subtotal</p>
+              <p>₹ {subtotal?.toFixed(2) || '0.00'}</p>
+            </div>
+            {taxName && (
+              <div className="mt-3 mb-5">
+                <p className="font-semibold">Tax ({taxName})</p>
+                <p>₹ {(subtotal && taxAmount) ? (subtotal * taxAmount).toFixed(2) : '0.00'}</p>
+              </div>
+            )}
+            <div className="mt-3 mb-5">
+              <p className="font-semibold">Total</p>
+              <p>₹ {total?.toFixed(2) || '0.00'}</p>
+            </div>
+            <div className="mt-3 mb-5">
+              <p className="font-semibold">Balance (Remaining)</p>
+              <p>₹ {balance?.toFixed(2) || '0.00'}</p>
+            </div>
+
           </div>
         )}
       </div>
-    </div> 
+
+    </div>
   );
 };
 

@@ -217,7 +217,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
     try {
       setIsLoadingBuyers(true);
       const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}parties/get?page=1&limit=1000`,
+        `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=1&limit=1000`,
         {
           method: "GET",
           headers: {
@@ -231,13 +231,11 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
       }
 
       // Filter for buyers and map to dropdown options
-      const buyers = data.data
-        .filter((party: any) => party.parties_type === "Buyer")
-        .map((buyer: any) => ({
-          value: buyer._id,
-          label: buyer.consignee_name?.[0] || buyer.company_name || "Unknown",
-          data: buyer, // Store full data for later use
-        }));
+      const buyers = data?.data.map((buyer: any) => ({
+        value: buyer?.party._id,
+        label: buyer?.party?.consignee_name?.[0] || buyer?.party.company_name,
+        data: buyer, // Store full data for later use
+      }));
 
       setBuyerOptions(buyers);
     } catch (error: any) {
@@ -251,22 +249,41 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
   const handleBuyerSelect = (buyerId: string) => {
     const selectedBuyer = buyerOptions.find((buyer) => buyer.value === buyerId);
     if (selectedBuyer && selectedBuyer.data) {
+      const party = selectedBuyer.data.party;
+      const products = selectedBuyer.data.product_id || [];
+
+      // Auto set buyer + addresses
       formik.setValues({
         ...formik.values,
         consigneeShipTo: buyerId,
-        // Ship To fields
-        address: selectedBuyer.data.shipped_to || "",
-        gstin: selectedBuyer.data.shipped_gst_to || "",
-        // Bill To fields - auto-fill from the same buyer's bill_to data
-        billerAddress:
-          selectedBuyer.data.bill_to || selectedBuyer.data.shipped_to || "",
-        billerGSTIN:
-          selectedBuyer.data.bill_gst_to ||
-          selectedBuyer.data.shipped_gst_to ||
-          "",
+        address: party?.ship_to || party?.bill_to || "",
+        gstin: party?.bill_gst_to || "",
+        billerAddress: party?.bill_to || "",
+        billerGSTIN: party?.shipped_gst_to || "",
+        buyersOrderNo: selectedBuyer.data.order_id || "",
+        modeTermsOfPayment: selectedBuyer.data.mode_of_payment || "",
+        termsOfDelivery: selectedBuyer.data.terms_of_delivery || "",
       });
+
+      // Auto add product list to items
+      if (products.length > 0) {
+        const mappedItems = products.map((p: any) => ({
+          item: { value: p._id, label: p.name },
+          quantity: selectedBuyer.data.product_qty || 1,
+          price: p.price,
+          uom: p.uom || "PCS",
+        }));
+        setItems(mappedItems);
+      }
+
+      // Set Total from sales API
+      if (selectedBuyer.data.total_price) {
+        setSubtotal(selectedBuyer.data.total_price / (1 + (selectedBuyer.data.GST || 0) / 100));
+        setTotal(selectedBuyer.data.total_price);
+      }
     }
   };
+
 
   useEffect(() => {
     fetchBuyersHandler();
@@ -288,166 +305,6 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
     }
   }, [tax, subtotal]);
 
-  // const addInvoiceHandler = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   const data = {
-  //     invoice_no: invoiceNo,
-  //     document_date: documentDate,
-  //     sales_order_date: salesOrderDate,
-  //     note: note,
-  //     tax: { tax_amount: tax?.value, tax_name: tax?.label },
-  //     subtotal: subtotal,
-  //     total: total,
-  //     store: store?.value,
-  //     items: inputs.map((item: any) => ({
-  //       item: item.item.value,
-  //       quantity: item.quantity,
-  //       amount: item.price,
-  //     })),
-  //     category: category?.value,
-  //     buyer: buyer?.value,
-  //     supplier: supplier?.value,
-  //   };
-
-  //   try {
-  //     setIsAdding(true);
-  //     const response = await addInvoice(data).unwrap();
-  //     if (!response.success) {
-  //       throw new Error(response.message);
-  //     }
-  //     toast.success(response.message);
-  //     closeDrawerHandler();
-  //     fetchInvoicesHandler();
-  //   } catch (error: any) {
-  //     toast.error(error?.message || "Something went wrong");
-  //   } finally {
-  //     setIsAdding(false);
-  //   }
-  // };
-
-  // const fetchBuyersHandler = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       process.env.REACT_APP_BACKEND_URL + "agent/buyers",
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: `Bearer ${cookies?.access_token}`,
-  //         },
-  //       }
-  //     );
-  //     const data = await response.json();
-  //     if (!data.success) {
-  //       throw new Error(data.message);
-  //     }
-
-  //     const buyers = data.agents.map((buyer: any) => ({
-  //       value: buyer._id,
-  //       label: buyer.name,
-  //     }));
-  //     setBuyerOptions(buyers);
-  //   } catch (error: any) {
-  //     toast.error(error?.message || "Something went wrong");
-  //   }
-  // };
-
-  // const fetchSuppliersHandler = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       process.env.REACT_APP_BACKEND_URL + "agent/suppliers",
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: `Bearer ${cookies?.access_token}`,
-  //         },
-  //       }
-  //     );
-  //     const data = await response.json();
-  //     if (!data.success) {
-  //       throw new Error(data.message);
-  //     }
-
-  //     const suppliers = data.agents.map((supplier: any) => ({
-  //       value: supplier._id,
-  //       label: supplier.name,
-  //     }));
-  //     setSupplierOptions(suppliers);
-  //   } catch (error: any) {
-  //     toast.error(error?.message || "Something went wrong");
-  //   }
-  // };
-
-  // const fetchItemsHandler = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       process.env.REACT_APP_BACKEND_URL + "product/all",
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: `Bearer ${cookies?.access_token}`,
-  //         },
-  //       }
-  //     );
-  //     const results = await response.json();
-  //     if (!results.success) {
-  //       throw new Error(results?.message);
-  //     }
-  //     const products = results.products.map((product: any) => ({
-  //       value: product._id,
-  //       label: product.name,
-  //     }));
-  //     setItemOptions(products);
-  //     setAllItems(results.products);
-  //   } catch (error: any) {
-  //     toast.error(error?.message || "Something went wrong");
-  //   }
-  // };
-
-  // const fetchStoresHandler = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       process.env.REACT_APP_BACKEND_URL + "store/all",
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: `Bearer ${cookies?.access_token}`,
-  //         },
-  //       }
-  //     );
-  //     const data = await response.json();
-  //     if (!data.success) {
-  //       throw new Error(data.message);
-  //     }
-  //     const stores = data.stores.map((store: any) => ({
-  //       value: store._id,
-  //       label: store.name,
-  //     }));
-  //     setStoreOptions(stores);
-  //   } catch (error: any) {
-  //     toast.error(error?.message || "Something went wrong");
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (tax && subtotal) {
-  //     setTotal(subtotal + tax?.value * subtotal);
-  //   }
-  // }, [tax, subtotal]);
-
-  // useEffect(() => {
-  //   const price = inputs.reduce((acc: number, curr: any) => {
-  //     return acc + (curr?.price * curr?.quantity || 0);
-  //   }, 0);
-  //   setSubtotal(price);
-  // }, [inputs]);
-
-  // useEffect(() => {
-  //   fetchBuyersHandler();
-  //   fetchItemsHandler();
-  //   fetchStoresHandler();
-  //   fetchSuppliersHandler();
-  // }, []);
 
   return (
     <div
@@ -489,116 +346,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
       {/* Form */}
       <div className="p-6">
         <form onSubmit={formik.handleSubmit} className="space-y-6">
-          {/* Invoice Basic Details Section */}
-          {/* <div
-            className="p-6 rounded-xl border"
-            style={{
-              backgroundColor: colors.background.card,
-              borderColor: colors.border.light,
-            }}
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div
-                className="p-2 rounded-lg"
-                style={{ backgroundColor: colors.primary[50] }}
-              >
-                <BiPackage size={20} style={{ color: colors.primary[500] }} />
-              </div>
-              <h3
-                className="text-lg font-semibold"
-                style={{ color: colors.text.primary }}
-              >
-                Invoice Details
-              </h3>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.text.primary }}
-                >
-                  Invoice Number *
-                </label>
-                <input
-                  type="text"
-                  name="invoiceNo"
-                  value={formik.values.invoiceNo}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor:
-                      formik.touched.invoiceNo && formik.errors.invoiceNo
-                        ? "#ef4444"
-                        : colors.input.border,
-                    color: colors.text.primary,
-                  }}
-                  placeholder="Enter invoice number"
-                />
-                {formik.touched.invoiceNo && formik.errors.invoiceNo && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {formik.errors.invoiceNo}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div> */}
-
-          {/* Seller Details Section */}
-          {/* <div
-            className="p-6 rounded-xl border"
-            style={{
-              backgroundColor: colors.background.card,
-              borderColor: colors.border.light,
-            }}
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div
-                className="p-2 rounded-lg"
-                style={{ backgroundColor: colors.primary[50] }}
-              >
-                <BiUser size={20} style={{ color: colors.primary[500] }} />
-              </div>
-              <h3
-                className="text-lg font-semibold"
-                style={{ color: colors.text.primary }}
-              >
-                Seller Details
-              </h3>
-            </div>
-
-            <div>
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Seller Address *
-              </label>
-              <input
-                name="sellerAddress"
-                value={formik.values.sellerAddress}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200 resize-none"
-                style={{
-                  backgroundColor: colors.input.background,
-                  borderColor:
-                    formik.touched.sellerAddress && formik.errors.sellerAddress
-                      ? "#ef4444"
-                      : colors.input.border,
-                  color: colors.text.primary,
-                }}
-                placeholder="Enter seller address"
-              />
-              {formik.touched.sellerAddress && formik.errors.sellerAddress && (
-                <p className="text-red-500 text-xs mt-1">
-                  {formik.errors.sellerAddress}
-                </p>
-              )}
-            </div>
-          </div> */}
 
           {/* Consignee Ship To Section */}
           <div
@@ -647,7 +395,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     backgroundColor: colors.input.background,
                     borderColor:
                       formik.touched.consigneeShipTo &&
-                      formik.errors.consigneeShipTo
+                        formik.errors.consigneeShipTo
                         ? "#ef4444"
                         : colors.input.border,
                     color: colors.text.primary,
@@ -731,68 +479,6 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                   </p>
                 )}
               </div>
-
-              {/*<div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.text.primary }}
-                >
-                  Pincode *
-                </label>
-                <input
-                  type="text"
-                  name="pincode"
-                  value={formik.values.pincode}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor:
-                      formik.touched.pincode && formik.errors.pincode
-                        ? "#ef4444"
-                        : colors.input.border,
-                    color: colors.text.primary,
-                  }}
-                  placeholder="Enter pincode"
-                />
-                {formik.touched.pincode && formik.errors.pincode && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {formik.errors.pincode}
-                  </p>
-                )}
-              </div>*/}
-
-              {/* <div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.text.primary }}
-                >
-                  State *
-                </label>
-                <input
-                  type="text"
-                  name="state"
-                  value={formik.values.state}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full px-4 py-2 text-sm rounded-lg border transition-colors duration-200"
-                  style={{
-                    backgroundColor: colors.input.background,
-                    borderColor:
-                      formik.touched.state && formik.errors.state
-                        ? "#ef4444"
-                        : colors.input.border,
-                    color: colors.text.primary,
-                  }}
-                  placeholder="Enter state"
-                />
-                {formik.touched.state && formik.errors.state && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {formik.errors.state}
-                  </p>
-                )}
-              </div> */}
             </div>
           </div>
 
@@ -902,7 +588,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     backgroundColor: colors.input.background,
                     borderColor:
                       formik.touched.billerAddress &&
-                      formik.errors.billerAddress
+                        formik.errors.billerAddress
                         ? "#ef4444"
                         : colors.input.border,
                     color: colors.text.primary,
@@ -1047,7 +733,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     backgroundColor: colors.input.background,
                     borderColor:
                       formik.touched.modeTermsOfPayment &&
-                      formik.errors.modeTermsOfPayment
+                        formik.errors.modeTermsOfPayment
                         ? "#ef4444"
                         : colors.input.border,
                     color: colors.text.primary,
@@ -1132,7 +818,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     backgroundColor: colors.input.background,
                     borderColor:
                       formik.touched.buyersOrderNo &&
-                      formik.errors.buyersOrderNo
+                        formik.errors.buyersOrderNo
                         ? "#ef4444"
                         : colors.input.border,
                     color: colors.text.primary,

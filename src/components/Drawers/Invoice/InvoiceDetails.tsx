@@ -60,6 +60,8 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
       if (!data.success) {
         throw new Error(data.message);
       }
+      // console.log(data)
+
       setInvoiceNo(data.invoice.invoice_no);
       setDocumentDate(data.invoice.document_date);
       setSalesOrderDate(data.invoice.sales_order_date);
@@ -69,16 +71,21 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
       setBalance(data.invoice.balance);
       setTax(data.invoice.tax);
       setItems(data.invoice.items);
-      setStore(data.invoice.store.name);
-      setCategory(data.invoice.category);
-      setBuyer(data.invoice?.buyer?.name);
+
+      setCategory(data?.invoice?.category);
+      setBuyer(
+        data?.invoice?.buyer?.company_name ||
+        data?.invoice?.buyer?.consignee_name?.[0] ||
+        "Not Available"
+      );
+      setStore(data?.invoice?.store?.name || "Not Available");
       setSupplier(data.invoice?.supplier?.name);
       setCreator(data.invoice.creator);
     } catch (error: any) {
       toast.error(error.messsage || "Something went wrong");
     }
   };
-
+  console.log(buyer)
   useEffect(() => {
     fetchInvoiceDetails(id || "");
   }, [id]);
@@ -211,8 +218,8 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
               </div>
             </div>
 
-            {/* Customer Information */}
-            {(buyer || supplier) && (
+            {/* Buyer Information */}
+            {buyer && (
               <div
                 className="p-4 rounded-lg"
                 style={{
@@ -220,31 +227,31 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                   border: `1px solid ${colors.secondary[200]}`,
                 }}
               >
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-3 mb-2">
                   <div
                     className="p-2 rounded-lg"
                     style={{ backgroundColor: colors.secondary[100] }}
                   >
-                    <MdPerson
-                      size={20}
-                      style={{ color: colors.secondary[600] }}
-                    />
+                    <MdPerson size={20} style={{ color: colors.secondary[600] }} />
                   </div>
-                  <h3
-                    className="font-semibold"
-                    style={{ color: colors.text.primary }}
-                  >
-                    {buyer ? "Buyer" : "Supplier"}
+                  <h3 className="font-semibold" style={{ color: colors.text.primary }}>
+                    Buyer
                   </h3>
                 </div>
-                <p
-                  className="text-lg font-medium"
-                  style={{ color: colors.text.primary }}
-                >
-                  {buyer || supplier}
+
+                <p className="text-lg font-medium" style={{ color: colors.text.primary }}>
+                  {buyer}
                 </p>
+
+                {/* <p className="text-sm" style={{ color: colors.text.secondary }}>
+                  GSTIN: {buyer?.gstin || "N/A"}
+                </p>
+                <p className="text-sm" style={{ color: colors.text.secondary }}>
+                  Address: {buyer?.address || "N/A"}
+                </p> */}
               </div>
             )}
+
 
             {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

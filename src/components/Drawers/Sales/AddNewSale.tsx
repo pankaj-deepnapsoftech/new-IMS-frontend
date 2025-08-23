@@ -110,7 +110,7 @@ const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
           bompdf: bomImageUrl,
         };
 
-        console.log(payload);
+
 
         if (editTable?._id) {
           const response = await axios.put(
@@ -122,7 +122,7 @@ const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
               },
             }
           );
-          console.log(response.data); 
+          console.log(response.data);
         } else {
           const res = await axios.post(
             `${process.env.REACT_APP_BACKEND_URL}sale/create`,
@@ -134,7 +134,7 @@ const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
             }
           );
 
-          await PostDataAutoCreateBom(value.product_id, value.product_qty);
+          console.log(res)
         }
 
         // Refresh data before closing modal to ensure updated data is displayed
@@ -171,6 +171,10 @@ const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
       const filteredProducts = (productRes.data.products || []).filter(
         (product: any) => product?.category === "finished goods"
       );
+
+
+
+
       setpartiesData(partiesRes?.data?.data || []);
       setProducts(filteredProducts || []);
     } catch (error) {
@@ -178,22 +182,22 @@ const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
       toast.error("Failed to fetch data for dropdowns.");
     }
   };
-
-  const PostDataAutoCreateBom = async (productId, quantity) => {
-    console.log("product Id", productId);
-    console.log("product quantity", quantity);
-    try {
-      const res = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}bom/autobom?product_id=${productId}&quantity=${quantity}&`,
-        {
-          headers: { Authorization: `Bearer ${cookies?.access_token}` },
-        }
-      );
-      console.log("Auto BOM created:", res?.data);
-    } catch (error) {
-      console.log("Auto BOM creation failed:", error);
-    }
-  };
+  console.log(partiesData)
+  // const PostDataAutoCreateBom = async (productId, quantity) => {
+  //   console.log("product Id", productId);
+  //   console.log("product quantity", quantity);
+  //   try {
+  //     const res = await axios.get(
+  //       `${process.env.REACT_APP_BACKEND_URL}bom/autobom?product_id=${productId}&quantity=${quantity}&`,
+  //       {
+  //         headers: { Authorization: `Bearer ${cookies?.access_token}` },
+  //       }
+  //     );
+  //     console.log("Auto BOM created:", res?.data);
+  //   } catch (error) {
+  //     console.log("Auto BOM creation failed:", error);
+  //   }
+  // };
 
   useEffect(() => {
     fetchDropdownData();
@@ -221,9 +225,8 @@ const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
 
       {/* Drawer */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full  sm:w-[55vw] md:w-[35vw] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
-          show ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-y-0 right-0 z-50 w-full  sm:w-[55vw] md:w-[35vw] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${show ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="h-full flex flex-col">
           {/* Header */}
@@ -263,13 +266,16 @@ const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
                 >
                   <option value="">Select a Merchant</option>
-                  {partiesData.map((party: any) => (
-                    <option key={party?._id} value={party?._id}>
-                      {party?.company_name?.length > 0
-                        ? `Company Name - ${party.company_name}`
-                        : `Merchant Name - ${party.consignee_name}`}
-                    </option>
-                  ))}
+                  {partiesData
+                    .filter((party: any) => party.parties_type === "Buyer"
+                    )
+                    .map((party: any) => (
+                      <option key={party?._id} value={party?._id}>
+                        {party?.company_name?.length > 0
+                          ? `Company Name - ${party.company_name}`
+                          : `Merchant Name - ${party.consignee_name}`}
+                      </option>
+                    ))}
                 </select>
                 {touched.party && errors.party && (
                   <p className="text-red-500 text-sm">{errors.party}</p>
@@ -467,11 +473,10 @@ const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
                   {[18, 12, 5].map((rate) => (
                     <label
                       key={rate}
-                      className={`flex items-center justify-center p-2 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                        values.GST === String(rate)
+                      className={`flex items-center justify-center p-2 border-2 rounded-lg cursor-pointer transition-all duration-200 ${values.GST === String(rate)
                           ? "border-blue-500 bg-blue-50 text-blue-700"
                           : "border-gray-300 hover:border-gray-400"
-                      }`}
+                        }`}
                     >
                       <input
                         type="radio"
@@ -569,11 +574,10 @@ const AddNewSale = ({ show, setShow, fetchPurchases, editTable }) => {
                 type="submit"
                 disabled={isSubmitting}
                 onClick={handleSubmit}
-                className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
-                  isSubmitting
+                className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${isSubmitting
                     ? "bg-gray-400 text-white cursor-not-allowed"
                     : "bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md"
-                }`}
+                  }`}
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-2">
