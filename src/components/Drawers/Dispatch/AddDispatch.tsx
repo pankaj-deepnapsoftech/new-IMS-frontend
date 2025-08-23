@@ -688,11 +688,10 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                         productStocks[firstProductId]?.product?.current_stock ||
                         productStocks[firstProductId]?.quantity_changed ||
                         0;
-                        const productId = product._id || product.product_id;
+                        
                       return (
                         parseInt(values.dispatch_qty) > availableStock ||
-                        parseInt(values.dispatch_qty) <= 0,
-                        productId
+                        parseInt(values.dispatch_qty) <= 0
                       );
                     })()
                       ? colors.gray[400]
