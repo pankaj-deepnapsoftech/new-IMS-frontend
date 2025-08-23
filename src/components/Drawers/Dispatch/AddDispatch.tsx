@@ -116,6 +116,9 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
             selectedOrder?.party?.consignee_name?.[0] ||
             selectedOrder?.party?.company_name,
           item_name: selectedOrder?.product_id?.[0]?.name,
+          product_id:
+            selectedOrder?.product_id?.[0]?._id ||
+            selectedOrder?.product_id?.[0]?.product_id,
           quantity: selectedOrder?.product_qty,
           total_amount: selectedOrder?.total_price,
           order_id: selectedOrder?.order_id,
@@ -685,9 +688,11 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                         productStocks[firstProductId]?.product?.current_stock ||
                         productStocks[firstProductId]?.quantity_changed ||
                         0;
+                        const productId = product._id || product.product_id;
                       return (
                         parseInt(values.dispatch_qty) > availableStock ||
-                        parseInt(values.dispatch_qty) <= 0
+                        parseInt(values.dispatch_qty) <= 0,
+                        productId
                       );
                     })()
                       ? colors.gray[400]
