@@ -692,11 +692,11 @@ const PurchaseOrder: React.FC = () => {
         );
       }
 
-      if (partiallyResolvedItems.length > 0) {
-        toast.success(
-          `📝 Partially resolved ${partiallyResolvedItems.length} items - shortages updated`
-        );
-      }
+      // if (partiallyResolvedItems.length > 0) {
+      //   toast.success(
+      //     `📝 Partially resolved ${partiallyResolvedItems.length} items - shortages updated`
+      //   );
+      // }
 
       // Refresh all data to sync across components
       await Promise.all([

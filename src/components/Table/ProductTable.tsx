@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 
 import {
@@ -10,6 +11,8 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import { FaHistory } from "react-icons/fa"; // Importing the icon
+import { useEffect, useRef } from "react";
 import moment from "moment";
 import { useMemo, useState } from "react";
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
@@ -92,6 +95,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
 
+  // State for latest price history update
+  const [isLatestPriceModalOpen, setIsLatestPriceModalOpen] = useState<string | null>(null); // Track product ID for open modal
+  // const [priceHistory, setPriceHistory] = useState([]);
+  const modalRef = useRef<HTMLDivElement>(null); // Ref for positioning
+
   // Bulk selection states
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
@@ -139,6 +147,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
     }
   };
 
+  // Function to toggle the price history modal for a specific product
+  const toggleModal = (productId: string) => {
+    setIsLatestPriceModalOpen(isLatestPriceModalOpen === productId ? null : productId);
+  };
+
   const handleBulkDelete = async () => {
     if (
       isBulkDeleting ||
@@ -149,9 +162,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
     setIsBulkDeleting(true);
 
     try {
-      // Use the new bulk delete handler
       await bulkDeleteProductsHandler(selectedProducts);
-
       setSelectedProducts([]);
       setShowBulkDeleteModal(false);
     } catch (error) {
@@ -161,6 +172,23 @@ const ProductTable: React.FC<ProductTableProps> = ({
       setIsBulkDeleting(false);
     }
   };
+
+  // Close modal when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        setIsLatestPriceModalOpen(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log("This to check the products::::---", products);
+  });
 
   const isAllSelected =
     page.length > 0 && selectedProducts.length === page.length;
@@ -231,14 +259,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   {products.length} Product{products.length !== 1 ? "s" : ""}{" "}
                   Found
                 </h3>
-                {/* {selectedProducts.length > 0 && (
-                  <p className="text-sm mt-1" style={{ color: colors.text.secondary }}>
-                    {selectedProducts.length} selected
-                  </p>
-                )} */}
               </div>
 
-              {/* Bulk Actions */}
               {selectedProducts.length > 0 && (
                 <div className="flex items-center gap-3">
                   {bulkDeleteProductsHandler && (
@@ -294,7 +316,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
               </span>
               <Select
                 onChange={(e) => setPageSize(Number(e.target.value))}
-                value={pageSize} // this keeps the default value selected
+                value={pageSize}
                 size="sm"
                 width="auto"
                 borderRadius="lg"
@@ -313,7 +335,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
             </div>
           </div>
 
-          {/* Enhanced Table */}
           <div
             className="rounded-xl shadow-sm overflow-hidden"
             style={{
@@ -358,13 +379,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{
                         color: colors.table.headerText,
-                        width: "160px", // Fixed width
+                        width: "160px",
                         minWidth: "160px",
                       }}
                     >
                       Product Id
                     </th>
-
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{
@@ -414,14 +434,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
                     >
-                      Last Updated Stock
+                      Current Stock 
                     </th>
-                    {/* <th
-                      className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
-                      style={{ color: colors.table.headerText }}
-                    >
-                      Total Available Stocks
-                    </th> */}
                     <th
                       className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap"
                       style={{ color: colors.table.headerText }}
@@ -501,7 +515,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         >
                           {row.original.product_id || "N/A"}
                         </td>
-
                         <td
                           className="px-4 py-3 text-sm font-medium whitespace-nowrap max-w-xs truncate"
                           style={{
@@ -557,7 +570,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         >
                           {row.original.uom || "N/A"}
                         </td>
-                        <td className="px-4 py-3 text-sm whitespace-nowrap">
+                        <td className="px-4 py-3 text-sm whitespace-nowrap relative">
                           <div className="flex flex-col">
                             <span
                               className="font-medium"
@@ -568,17 +581,72 @@ const ProductTable: React.FC<ProductTableProps> = ({
                             {row.original.latest_price &&
                               row.original.latest_price !==
                                 row.original.price && (
-                                <span
-                                  className="text-xs font-medium"
-                                  style={{ color: colors.primary[600] }}
-                                >
-                                  Latest: ₹
-                                  {row.original.latest_price.toFixed(2)}
-                                </span>
+                                <div className="flex items-center">
+                                  <FaHistory
+                                    onClick={() => toggleModal(row.original._id)}
+                                    style={{
+                                      marginRight: "3px",
+                                      marginTop: "1px",
+                                      fontSize: "12px",
+                                      cursor: "pointer",
+                                    }}
+                                  />
+                                  <span
+                                    className="text-xs font-medium"
+                                    style={{ color: colors.primary[600] }}
+                                  >
+                                    Latest: ₹
+                                    {row.original.latest_price.toFixed(2)}
+                                  </span>
+                                  {isLatestPriceModalOpen === row.original._id && (
+                                    <div
+                                      ref={modalRef}
+                                      className="absolute top-full left-0 mt-1 bg-white p-4 rounded-lg shadow-lg w-64 z-50"
+                                      style={{
+                                        border: `1px solid ${colors.border.light}`,
+                                      }}
+                                    >
+                                      <h3
+                                        className="text-sm font-semibold mb-1"
+                                        style={{ color: colors.text.primary }}
+                                      >
+                                        Recent Price History
+                                      </h3>
+                                      <ul className="text-sm">
+                                        {row.original.price_history &&
+                                        row.original.price_history.length > 0 ? (
+                                          row.original.price_history
+                                            .slice(0, 5)
+                                            .map((history, index) => (
+                                              <li key={index} className="mb-1">
+                                                <span
+                                                  className="font-medium"
+                                                  style={{
+                                                    color: colors.text.secondary,
+                                                  }}
+                                                >
+                                                  {moment(history.updated_at).format(
+                                                    "DD/MM/YYYY HH:mm"
+                                                  )}
+                                                  :
+                                                </span>{" "}
+                                                ₹{Math.round(history.price).toFixed(2)}
+                                              </li>
+                                            ))
+                                        ) : (
+                                          <li
+                                            style={{ color: colors.text.muted }}
+                                          >
+                                            No price history available
+                                          </li>
+                                        )}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </div>
                               )}
                           </div>
                         </td>
-
                         <td className="px-4 py-3 text-sm whitespace-nowrap">
                           <div className="flex flex-col">
                             <span style={{ color: colors.text.secondary }}>
@@ -597,13 +665,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
                               )}
                           </div>
                         </td>
-                        {/* <td
-                          className="px-4 py-3 text-sm whitespace-nowrap font-semibold"
-                          style={{ color: colors.success[600] }}
-                        >
-                          {(row.original.current_stock || 0) +
-                            (row.original.updated_stock || 0)}
-                        </td> */}
                         <td className="px-4 py-3 text-sm whitespace-nowrap">
                           {row.original.change_type && (
                             <div className="flex gap-1 items-center whitespace-nowrap">
@@ -693,7 +754,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                 <MdEdit size={16} />
                               </button>
                             )}
-
                             {deleteProductHandler &&
                               cookies?.role === "admin" && (
                                 <button
@@ -752,7 +812,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
             </div>
           </div>
 
-          {/* Enhanced Pagination */}
           <div
             className="flex items-center justify-center px-6 py-4 border-t mt-4"
             style={{
@@ -846,7 +905,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
         </>
       )}
 
-      {/* Enhanced Delete Modal */}
       {showDeletePage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
@@ -933,7 +991,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
         </div>
       )}
 
-      {/* Bulk Delete Confirmation Modal */}
       {showBulkDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
@@ -1009,34 +1066,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     </div>
                   </div>
                 </div>
-
-                {/* {isBulkDeleting && (
-                  <div
-                    className="rounded-lg p-4 mb-4"
-                    style={{ backgroundColor: colors.primary[50] }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="animate-spin rounded-full h-5 w-5 border-2 border-b-transparent"
-                        style={{ borderColor: colors.primary[500] }}
-                      ></div>
-                      <div>
-                        <p
-                          className="font-medium text-sm"
-                          style={{ color: colors.primary[800] }}
-                        >
-                          Deleting products...
-                        </p>
-                        <p
-                          className="text-xs"
-                          style={{ color: colors.primary[600] }}
-                        >
-                          Please wait while we process your request.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )} */}
               </div>
 
               <div className="flex gap-3">

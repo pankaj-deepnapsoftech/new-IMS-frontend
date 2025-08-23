@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { TbTruckDelivery } from "react-icons/tb";
 import { HiOutlinePaperClip } from "react-icons/hi";
 import { FiEye } from "react-icons/fi";
-import { RefreshCw, Filter, Search } from "lucide-react";
+import { RefreshCw, Filter, Search, Pencil } from "lucide-react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
@@ -15,17 +15,20 @@ import EmptyData from "../ui/emptyData";
 import Pagination from "./Pagination";
 import { colors } from "../theme/colors";
 import { MdAdd, MdOutlineRefresh } from "react-icons/md";
+import AddDispatch from "../components/Drawers/Dispatch/AddDispatch";
 
 const Dispatch = () => {
   const [paymentFilter, setPaymentFilter] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
   const [productFilter, setProductFilter] = useState("All");
   const [showModal, setShowModal] = useState(false);
+  const [showAddDispatch, setShowAddDispatch] = useState(false);
   const [siteLink, setSiteLink] = useState("");
   const [trackingId, setTrackingId] = useState("");
   const [cookies] = useCookies();
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
+  const [editDispatch, setEditDispatch] = useState(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showattachment, setShowAttachment] = useState(false);
@@ -40,7 +43,6 @@ const Dispatch = () => {
     if (file) {
       setFileName(file.name);
 
-      // Create preview for images
       if (file.type.startsWith("image/")) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -71,8 +73,8 @@ const Dispatch = () => {
       if (isSubmitting) return;
       setIsSubmitting(true);
       try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_BACKEND_URL}dispatch/createDispatch`,
+        const response = await axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}dispatch/update/${trackingId}`,
           values,
           {
             headers: {
@@ -82,10 +84,13 @@ const Dispatch = () => {
           }
         );
 
+        toast.success("Tracking information updated successfully");
         resetForm();
         setShowModal(false);
+        GetDispatch(); // Refresh the data
       } catch (error) {
         console.log(error);
+        toast.error("Failed to update tracking information");
       } finally {
         setIsSubmitting(false);
       }
@@ -96,7 +101,7 @@ const Dispatch = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}dispatch/get-Dispatch?page=${page}&&limit=2`,
+        `${process.env.REACT_APP_BACKEND_URL}dispatch/getAll?page=${page}&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${cookies.access_token}`,
@@ -104,24 +109,18 @@ const Dispatch = () => {
         }
       );
 
-      setData(response?.data?.data);
+      setData(response?.data?.data || []);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching dispatch data:", error);
+      toast.error("Failed to fetch dispatch data");
     } finally {
       setIsLoading(false);
     }
   };
-  console.log(data);
-  useEffect(() => {
-    GetDispatch(page);
-  }, [page]);
 
-  const calculateTotal = (price: number, qty: number, gst: number) => {
-    const basePrice = price * qty;
-    const gstval = (basePrice * gst) / 100;
-    const totalPrice = basePrice + gstval;
-    return totalPrice;
-  };
+  useEffect(() => {
+    GetDispatch();
+  }, [page]);
 
   if (isLoading) {
     return (
@@ -136,56 +135,213 @@ const Dispatch = () => {
     );
   }
 
-  if (!data || data.length === 0) {
-    return (
-      <div
-        className="min-h-screen"
-        style={{ backgroundColor: colors.background.page }}
-      >
-        <div className="p-2 lg:p-3">
-          {/* Header Section */}
-          <div
-            className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
-            style={{
-              backgroundColor: colors.background.card,
-              borderColor: colors.border.light,
-            }}
-          >
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl shadow-lg">
-                <TbTruckDelivery className="text-white" size={24} />
-              </div>
-              <div>
-                <h1
-                  className="text-2xl md:text-3xl font-bold"
-                  style={{ color: colors.text.primary }}
-                >
-                  Dispatch Management
-                </h1>
-                <p
-                  className="text-sm mt-1"
-                  style={{ color: colors.text.secondary }}
-                >
-                  Manage dispatch operations and track deliveries
-                </p>
-              </div>
-            </div>
-          </div>
+  // if (!data || data.length === 0) {
+  //   return (
+  //     <div
+  //       className="min-h-screen"
+  //       style={{ backgroundColor: colors.background.page }}
+  //     >
+  //       <div className="p-2 lg:p-3">
+  //         {/* Header Section */}
+  //         <div
+  //           className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
+  //           style={{
+  //             backgroundColor: colors.background.card,
+  //             borderColor: colors.border.light,
+  //           }}
+  //         >
+  //           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+  //             <div className="flex items-center gap-4">
+  //               <div className="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl shadow-lg">
+  //                 <TbTruckDelivery className="text-white" size={24} />
+  //               </div>
+  //               <div>
+  //                 <h1
+  //                   className="text-2xl lg:text-3xl font-bold"
+  //                   style={{ color: colors.text.primary }}
+  //                 >
+  //                   Dispatch Management
+  //                 </h1>
+  //                 <p
+  //                   className="text-sm mt-1"
+  //                   style={{ color: colors.text.secondary }}
+  //                 >
+  //                   Manage dispatch operations and track deliveries
+  //                 </p>
+  //               </div>
+  //             </div>
 
-          {/* Empty State */}
-          <div
-            className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
-            style={{
-              backgroundColor: colors.background.card,
-              borderColor: colors.border.light,
-            }}
-          >
-            <EmptyData />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  //             {/* Action Buttons */}
+  //             <div className="flex flex-col sm:flex-row gap-3">
+  //               <button
+  //                 onClick={() => setShowAddDispatch(true)}
+  //                 className="inline-flex items-center gap-1.5 px-3 py-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors"
+  //                 style={{
+  //                   backgroundColor: colors.button.primary,
+  //                   color: colors.text.inverse,
+  //                 }}
+  //                 onMouseEnter={(e) => {
+  //                   e.currentTarget.style.backgroundColor =
+  //                     colors.button.primaryHover;
+  //                 }}
+  //                 onMouseLeave={(e) => {
+  //                   e.currentTarget.style.backgroundColor =
+  //                     colors.button.primary;
+  //                 }}
+  //               >
+  //                 <MdAdd size="16px" />
+  //                 Add Dispatch
+  //               </button>
+
+  //               <button
+  //                 onClick={() => {
+  //                   setPaymentFilter("All");
+  //                   setProductFilter("All");
+  //                   setSearchTerm("");
+  //                   GetDispatch();
+  //                 }}
+  //                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium border transition-colors"
+  //                 style={{
+  //                   borderColor: colors.border.medium,
+  //                   color: colors.text.primary,
+  //                   backgroundColor: colors.background.card,
+  //                 }}
+  //                 onMouseEnter={(e) => {
+  //                   e.currentTarget.style.backgroundColor = colors.gray[50];
+  //                 }}
+  //                 onMouseLeave={(e) => {
+  //                   e.currentTarget.style.backgroundColor =
+  //                     colors.background.card;
+  //                 }}
+  //               >
+  //                 <MdOutlineRefresh size="16px" />
+  //                 Refresh
+  //               </button>
+  //             </div>
+  //           </div>
+
+  //           {/* Search and Filters Row */}
+  //           <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
+  //             {/* Search Input */}
+  //             <div className="flex-1 max-w-md">
+  //               <label
+  //                 className="block text-sm font-medium mb-2"
+  //                 style={{ color: colors.text.primary }}
+  //               >
+  //                 Search Dispatch
+  //               </label>
+  //               <div className="relative">
+  //                 <Search
+  //                   className="absolute left-3 top-1/2 transform -translate-y-1/2"
+  //                   style={{ color: colors.text.secondary }}
+  //                 />
+  //                 <input
+  //                   className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+  //                   style={{
+  //                     backgroundColor: colors.input.background,
+  //                     borderColor: colors.input.border,
+  //                     color: colors.text.primary,
+  //                   }}
+  //                   onFocus={(e) => {
+  //                     e.currentTarget.style.borderColor =
+  //                       colors.input.borderFocus;
+  //                     e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+  //                   }}
+  //                   onBlur={(e) => {
+  //                     e.currentTarget.style.borderColor = colors.input.border;
+  //                     e.currentTarget.style.boxShadow = "none";
+  //                   }}
+  //                   placeholder="Search by party name, product..."
+  //                   value={searchTerm}
+  //                   onChange={(e) => setSearchTerm(e.target.value)}
+  //                 />
+  //               </div>
+  //             </div>
+
+  //             {/* Payment Filter */}
+  //             <div className="w-full lg:w-48">
+  //               <label
+  //                 className="block text-sm font-medium mb-2"
+  //                 style={{ color: colors.text.primary }}
+  //               >
+  //                 Payment Status
+  //               </label>
+  //               <select
+  //                 className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+  //                 style={{
+  //                   backgroundColor: colors.input.background,
+  //                   borderColor: colors.input.border,
+  //                   color: colors.text.primary,
+  //                 }}
+  //                 onFocus={(e) => {
+  //                   e.currentTarget.style.borderColor =
+  //                     colors.input.borderFocus;
+  //                   e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+  //                 }}
+  //                 onBlur={(e) => {
+  //                   e.currentTarget.style.borderColor = colors.input.border;
+  //                   e.currentTarget.style.boxShadow = "none";
+  //                 }}
+  //                 value={paymentFilter}
+  //                 onChange={(e) => setPaymentFilter(e.target.value)}
+  //               >
+  //                 <option value="All">All Payment Status</option>
+  //                 <option value="Paid">Paid</option>
+  //                 <option value="Unpaid">Unpaid</option>
+  //               </select>
+  //             </div>
+
+  //             {/* Product Filter */}
+  //             <div className="w-full lg:w-48">
+  //               <label
+  //                 className="block text-sm font-medium mb-2"
+  //                 style={{ color: colors.text.primary }}
+  //               >
+  //                 Product Status
+  //               </label>
+  //               <select
+  //                 className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+  //                 style={{
+  //                   backgroundColor: colors.input.background,
+  //                   borderColor: colors.input.border,
+  //                   color: colors.text.primary,
+  //                 }}
+  //                 onFocus={(e) => {
+  //                   e.currentTarget.style.borderColor =
+  //                     colors.input.borderFocus;
+  //                   e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+  //                 }}
+  //                 onBlur={(e) => {
+  //                   e.currentTarget.style.borderColor = colors.input.border;
+  //                   e.currentTarget.style.boxShadow = "none";
+  //                 }}
+  //                 value={productFilter}
+  //                 onChange={(e) => setProductFilter(e.target.value)}
+  //               >
+  //                 <option value="All">All Product Status</option>
+  //                 <option value="Dispatch">Dispatch</option>
+  //                 <option value="Delivered">Delivered</option>
+  //               </select>
+  //             </div>
+  //           </div>
+  //         </div>
+
+  //         {/* Empty State */}
+  //         <div
+  //           className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+  //           style={{
+  //             backgroundColor: colors.background.card,
+  //             borderColor: colors.border.light,
+  //           }}
+  //         >
+  //           <EmptyData />
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  console.log("daaaaata", data);
 
   return (
     <div
@@ -193,7 +349,6 @@ const Dispatch = () => {
       style={{ backgroundColor: colors.background.page }}
     >
       <div className="p-2 lg:p-3">
-        {/* Header Section */}
         <div
           className="rounded-xl shadow-sm border border-gray-100 p-6 mb-6"
           style={{
@@ -222,11 +377,11 @@ const Dispatch = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => {
-                  onClick = { openAddDispatchDrawerHandler };
+                  setShowAddDispatch(true);
+                  setEditDispatch(null);
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors"
                 style={{
@@ -272,9 +427,7 @@ const Dispatch = () => {
             </div>
           </div>
 
-          {/* Search and Filters Row */}
           <div className="mt-6 flex flex-col lg:flex-row gap-4 items-end">
-            {/* Search Input */}
             <div className="flex-1 max-w-md">
               <label
                 className="block text-sm font-medium mb-2"
@@ -310,8 +463,7 @@ const Dispatch = () => {
               </div>
             </div>
 
-            {/* Payment Filter */}
-            <div className="w-full lg:w-48">
+            {/* <div className="w-full lg:w-48">
               <label
                 className="block text-sm font-medium mb-2"
                 style={{ color: colors.text.primary }}
@@ -340,9 +492,8 @@ const Dispatch = () => {
                 <option value="Paid">Paid</option>
                 <option value="Unpaid">Unpaid</option>
               </select>
-            </div>
+            </div> */}
 
-            {/* Product Filter */}
             <div className="w-full lg:w-48">
               <label
                 className="block text-sm font-medium mb-2"
@@ -375,8 +526,6 @@ const Dispatch = () => {
             </div>
           </div>
         </div>
-
-        {/* Dispatch Cards Section */}
         <div
           className="rounded-xl shadow-sm border border-gray-100 overflow-hidden"
           style={{
@@ -386,202 +535,376 @@ const Dispatch = () => {
         >
           <div className="p-6">
             <div className="space-y-6">
-              {data?.map((acc: any) => (
-                <div
-                  key={acc?._id}
-                  className="border rounded-xl border-l-4 transition-all duration-200 hover:shadow-md"
-                  style={{
-                    backgroundColor: colors.background.card,
-                    borderLeftColor: colors.success[500],
-                    borderColor: colors.border.light,
-                  }}
-                >
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="space-y-3 flex-1">
-                        <div className="flex items-center gap-4">
-                          <span
-                            className="px-3 py-1 rounded-full text-xs font-medium"
-                            style={{
-                              backgroundColor: colors.primary[100],
-                              color: colors.primary[800],
-                            }}
-                          >
-                            Order #{acc?._id?.slice(-6).toUpperCase()}
-                          </span>
-                          <span
-                            className="text-sm"
-                            style={{ color: colors.text.secondary }}
-                          >
-                            {new Date(acc?.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
+              {!data || data.length === 0 ? (
+                <EmptyData />
+              ) : (
+                data?.map((dispatch: any) => (
+                  <div
+                    key={dispatch?._id}
+                    className="border rounded-xl border-l-4 transition-all duration-200 hover:shadow-md"
+                    style={{
+                      backgroundColor: colors.background.card,
+                      borderLeftColor: colors.success[500],
+                      borderColor: colors.border.light,
+                    }}
+                  >
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="space-y-3 flex-1">
+                          <div className="flex items-center gap-4">
+                            <span
+                              className="px-3 py-1 rounded-full text-xs font-medium"
+                              style={{
+                                backgroundColor: colors.primary[100],
+                                color: colors.primary[800],
+                              }}
+                            >
+                              Dispatch #{dispatch?._id?.slice(-6).toUpperCase()}
+                            </span>
+                            <span
+                              className="text-sm"
+                              style={{ color: colors.text.secondary }}
+                            >
+                              {new Date(
+                                dispatch?.createdAt
+                              ).toLocaleDateString()}
+                            </span>
+                            {/* Dispatch Status Badge */}
+                            {/* {(() => {
+                              const orderQty =
+                                parseInt(dispatch?.quantity) || 0;
+                              const dispatchQty =
+                                parseInt(dispatch?.dispatch_qty) || 0;
+                              const percentage =
+                                orderQty > 0
+                                  ? Math.round((dispatchQty / orderQty) * 100)
+                                  : 0;
+                              const isComplete = percentage >= 100;
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
+                              return (
                                 <span
-                                  className="font-medium"
-                                  style={{ color: colors.text.primary }}
+                                  className="px-2 py-1 rounded-full text-xs font-medium"
+                                  style={{
+                                    backgroundColor: isComplete
+                                      ? colors.success[100]
+                                      : colors.warning[100],
+                                    color: isComplete
+                                      ? colors.success[800]
+                                      : colors.warning[800],
+                                  }}
                                 >
-                                  Party:
+                                  {isComplete
+                                    ? "Complete"
+                                    : `${percentage}% Dispatched`}
                                 </span>
-                                <span style={{ color: colors.text.secondary }}>
-                                  {acc?.[0]?.customer_id?.[0]?.full_name ||
-                                    "N/A"}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className="font-medium"
-                                  style={{ color: colors.text.primary }}
-                                >
-                                  Product:
-                                </span>
-                                <span style={{ color: colors.text.secondary }}>
-                                  {acc?.[0]?.product_id?.[0]?.name ||
-                                    acc?.Product ||
-                                    "N/A"}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className="font-medium"
-                                  style={{ color: colors.text.primary }}
-                                >
-                                  Quantity:
-                                </span>
-                                <span style={{ color: colors.text.secondary }}>
-                                  {acc?.product_qty || acc?.Quantity || "N/A"}
-                                </span>
-                              </div>
-                              <div className="flex items-center whitespace-nowrap gap-2">
-                                <span
-                                  className="font-medium"
-                                  style={{ color: colors.text.primary }}
-                                >
-                                  Bom Name:
-                                </span>
-                                <span style={{ color: colors.text.secondary }}>
-                                  {acc?.Bom_name || "N/A"}
-                                </span>
-                              </div>
-                            </div>
+                              );
+                            })()} */}
                           </div>
 
-                          <div className="space-y-2">
-                            {(role === "Accountant" ||
-                              role === "Sales" ||
-                              role === "admin") && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="font-medium"
+                                    style={{ color: colors.text.primary }}
+                                  >
+                                    Party:
+                                  </span>
+                                  <span
+                                    style={{ color: colors.text.secondary }}
+                                  >
+                                    {dispatch?.merchant_name || "N/A"}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="font-medium"
+                                    style={{ color: colors.text.primary }}
+                                  >
+                                    Product:
+                                  </span>
+                                  <span
+                                    style={{ color: colors.text.secondary }}
+                                  >
+                                    {dispatch?.item_name || "N/A"}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="font-medium"
+                                    style={{ color: colors.text.primary }}
+                                  >
+                                    Order Qty:
+                                  </span>
+                                  <span
+                                    style={{ color: colors.text.secondary }}
+                                  >
+                                    {dispatch?.quantity || "N/A"}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="font-medium"
+                                    style={{ color: colors.text.primary }}
+                                  >
+                                    Dispatch Qty:
+                                  </span>
+                                  <span
+                                    style={{ color: colors.text.secondary }}
+                                  >
+                                    {dispatch?.dispatch_qty || "N/A"}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="font-medium"
+                                    style={{ color: colors.text.primary }}
+                                  >
+                                    Remaining Qty:
+                                  </span>
+                                  <span
+                                    style={{
+                                      color: (() => {
+                                        const orderQty =
+                                          parseInt(dispatch?.quantity) || 0;
+                                        const dispatchQty =
+                                          parseInt(dispatch?.dispatch_qty) || 0;
+                                        const remaining =
+                                          orderQty - dispatchQty;
+                                        return remaining > 0
+                                          ? colors.text.secondary
+                                          : colors.text.secondary;
+                                      })(),
+                                    }}
+                                  >
+                                    {(() => {
+                                      const orderQty =
+                                        parseInt(dispatch?.quantity) || 0;
+                                      const dispatchQty =
+                                        parseInt(dispatch?.dispatch_qty) || 0;
+                                      const remaining = orderQty - dispatchQty;
+                                      return remaining >= 0 ? remaining : "N/A";
+                                    })()}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              {(role === "Accountant" ||
+                                role === "Sales" ||
+                                role === "admin") && (
+                                <>
+                                  <div className="flex items-center whitespace-nowrap gap-2">
+                                    <span
+                                      className="font-medium"
+                                      style={{ color: colors.text.primary }}
+                                    >
+                                      Sales Order:
+                                    </span>
+                                    <span
+                                      style={{ color: colors.text.secondary }}
+                                    >
+                                      {dispatch?.order_id ||
+                                        dispatch?.sales_order_id ||
+                                        "N/A"}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className="font-medium"
+                                      style={{ color: colors.text.primary }}
+                                    >
+                                      Order Amount:
+                                    </span>
+                                    <span
+                                      style={{ color: colors.text.secondary }}
+                                    >
+                                      ₹{dispatch?.total_amount || "N/A"}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className="font-medium"
+                                      style={{ color: colors.text.primary }}
+                                    >
+                                      Dispatch Amount:
+                                    </span>
+                                    <span
+                                      style={{ color: colors.text.secondary }}
+                                    >
+                                      {(() => {
+                                        const orderQty =
+                                          parseInt(dispatch?.quantity) || 0;
+                                        const dispatchQty =
+                                          parseInt(dispatch?.dispatch_qty) || 0;
+                                        const totalAmount =
+                                          parseFloat(dispatch?.total_amount) ||
+                                          0;
+                                        const dispatchAmount =
+                                          orderQty > 0
+                                            ? (dispatchQty / orderQty) *
+                                              totalAmount
+                                            : 0;
+                                        return dispatchAmount > 0
+                                          ? `₹${Math.round(dispatchAmount)}`
+                                          : "N/A";
+                                      })()}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className="font-medium"
+                                      style={{ color: colors.text.primary }}
+                                    >
+                                      Remaining Amount:
+                                    </span>
+                                    <span
+                                      style={{
+                                        color: (() => {
+                                          const orderQty =
+                                            parseInt(dispatch?.quantity) || 0;
+                                          const dispatchQty =
+                                            parseInt(dispatch?.dispatch_qty) ||
+                                            0;
+                                          const totalAmount =
+                                            parseFloat(
+                                              dispatch?.total_amount
+                                            ) || 0;
+                                          const dispatchAmount =
+                                            orderQty > 0
+                                              ? (dispatchQty / orderQty) *
+                                                totalAmount
+                                              : 0;
+                                          const remainingAmount =
+                                            totalAmount - dispatchAmount;
+                                          return remainingAmount > 0
+                                            ? colors.text.secondary
+                                            : colors.text.secondary;
+                                        })(),
+                                      }}
+                                    >
+                                      {(() => {
+                                        const orderQty =
+                                          parseInt(dispatch?.quantity) || 0;
+                                        const dispatchQty =
+                                          parseInt(dispatch?.dispatch_qty) || 0;
+                                        const totalAmount =
+                                          parseFloat(dispatch?.total_amount) ||
+                                          0;
+                                        const dispatchAmount =
+                                          orderQty > 0
+                                            ? (dispatchQty / orderQty) *
+                                              totalAmount
+                                            : 0;
+                                        const remainingAmount =
+                                          totalAmount - dispatchAmount;
+                                        return remainingAmount >= 0
+                                          ? `₹${Math.round(remainingAmount)}`
+                                          : "N/A";
+                                      })()}
+                                    </span>
+                                  </div>
+                                </>
+                              )}
                               <div className="flex items-center gap-2">
                                 <span
                                   className="font-medium"
                                   style={{ color: colors.text.primary }}
                                 >
-                                  Total:
+                                  Payment Status:
                                 </span>
-                                <span style={{ color: colors.text.secondary }}>
-                                  ₹{acc?.Total}
+                                <span
+                                  className="px-2 py-1 rounded-full text-xs font-medium"
+                                  style={{
+                                    backgroundColor:
+                                      dispatch?.payment_status === "Paid"
+                                        ? colors.success[100]
+                                        : colors.warning[100],
+                                    color:
+                                      dispatch?.payment_status === "Paid"
+                                        ? colors.success[800]
+                                        : colors.warning[800],
+                                  }}
+                                >
+                                  {dispatch?.payment_status === "Paid"
+                                    ? "Paid"
+                                    : "Unpaid"}
                                 </span>
                               </div>
-                            )}
-                            <div className="flex items-center gap-2">
-                              <span
-                                className="font-medium"
-                                style={{ color: colors.text.primary }}
-                              >
-                                Status:
-                              </span>
-                              <span
-                                className="px-2 py-1 rounded-full text-xs font-medium"
-                                style={{
-                                  backgroundColor: acc?.Sale_id[0]
-                                    ?.payment_verify
-                                    ? colors.success[100]
-                                    : colors.warning[100],
-                                  color: acc?.Sale_id[0]?.payment_verify
-                                    ? colors.success[800]
-                                    : colors.warning[800],
-                                }}
-                              >
-                                {acc?.Sale_id[0]?.payment_verify
-                                  ? "Paid"
-                                  : "Unpaid"}
-                              </span>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Action Buttons */}
-                    <div
-                      className="flex gap-3 justify-end pt-4 border-t"
-                      style={{ borderColor: colors.border.light }}
-                    >
-                      {acc?.Sale_id[0]?.payment_verify === true && (
+                      <div
+                        className="flex gap-3 justify-end pt-4 border-t"
+                        style={{ borderColor: colors.border.light }}
+                      >
                         <button
-                          onClick={() => setShowModal(true)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                          onClick={() => {
+                            setShowAddDispatch(true);
+                            setEditDispatch(dispatch);
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
                           style={{
-                            backgroundColor: colors.primary[600],
-                            color: colors.text.inverse,
+                            backgroundColor: colors.background.card,
+                            borderColor: colors.border.medium,
+                            color: colors.text.secondary,
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor =
-                              colors.primary[700];
+                              colors.gray[50];
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor =
-                              colors.primary[600];
+                              colors.background.card;
                           }}
                         >
-                          <TbTruckDelivery size={16} />
-                          Dispatch
+                          <Pencil size={16} />
+                          Update Dispatch
                         </button>
-                      )}
 
-                      <button
-                        onClick={() => setShowAttachment(true)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
-                        style={{
-                          backgroundColor: colors.background.card,
-                          borderColor: colors.border.medium,
-                          color: colors.text.secondary,
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.gray[50];
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            colors.background.card;
-                        }}
-                      >
-                        <HiOutlinePaperClip size={16} />
-                        Attachment
-                      </button>
+                        <button
+                          onClick={() => setShowAttachment(true)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                          style={{
+                            backgroundColor: colors.background.card,
+                            borderColor: colors.border.medium,
+                            color: colors.text.secondary,
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              colors.gray[50];
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              colors.background.card;
+                          }}
+                        >
+                          <HiOutlinePaperClip size={16} />
+                          Attachment
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
 
-        {/* Pagination */}
         <div className="mt-6">
           <Pagination
             page={page}
             setPage={setPage}
-            hasNextPage={data.length === 2}
+            hasNextPage={data.length === 10}
           />
         </div>
       </div>
 
-      {/* Dispatch Modal */}
-      {showModal && (
+      {/* {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
             className="w-full max-w-md mx-4 rounded-xl shadow-xl"
@@ -593,7 +916,7 @@ const Dispatch = () => {
                   className="text-lg font-semibold mb-4"
                   style={{ color: colors.text.primary }}
                 >
-                  Dispatch Details
+                  Update Tracking Details
                 </h3>
 
                 <div className="space-y-4">
@@ -616,6 +939,7 @@ const Dispatch = () => {
                         borderColor: colors.input.border,
                         color: colors.text.primary,
                       }}
+                      placeholder="Enter tracking ID"
                     />
                   </div>
 
@@ -627,7 +951,7 @@ const Dispatch = () => {
                       Tracking Website
                     </label>
                     <input
-                      type="text"
+                      type="url"
                       name="tracking_web"
                       value={values.tracking_web}
                       onChange={handleChange}
@@ -638,6 +962,7 @@ const Dispatch = () => {
                         borderColor: colors.input.border,
                         color: colors.text.primary,
                       }}
+                      placeholder="Enter tracking website URL"
                     />
                   </div>
                 </div>
@@ -652,11 +977,14 @@ const Dispatch = () => {
                       color: colors.text.inverse,
                     }}
                   >
-                    {isSubmitting ? "Submitting..." : "Submit"}
+                    {isSubmitting ? "Updating..." : "Update"}
                   </button>
                   <button
                     type="button"
-                    onClick={() => setShowModal(false)}
+                    onClick={() => {
+                      setShowModal(false);
+                      resetForm();
+                    }}
                     className="flex-1 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200"
                     style={{
                       backgroundColor: colors.background.card,
@@ -671,9 +999,8 @@ const Dispatch = () => {
             </form>
           </div>
         </div>
-      )}
+      )} */}
 
-      {/* File Upload Modal */}
       {showattachment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
@@ -744,6 +1071,13 @@ const Dispatch = () => {
           </div>
         </div>
       )}
+
+      <AddDispatch
+        show={showAddDispatch}
+        setShow={setShowAddDispatch}
+        fetchDispatch={GetDispatch}
+        editDispatch={editDispatch}
+      />
     </div>
   );
 };
