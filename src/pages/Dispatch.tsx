@@ -87,7 +87,7 @@ const Dispatch = () => {
         toast.success("Tracking information updated successfully");
         resetForm();
         setShowModal(false);
-        GetDispatch(); // Refresh the data
+        GetDispatch();
       } catch (error) {
         console.log(error);
         toast.error("Failed to update tracking information");
@@ -1074,7 +1074,12 @@ const Dispatch = () => {
 
       <AddDispatch
         show={showAddDispatch}
-        setShow={setShowAddDispatch}
+        setShow={(show) => {
+          setShowAddDispatch(show);
+          if (!show) {
+            setEditDispatch(null); // Clear edit data when modal closes
+          }
+        }}
         fetchDispatch={GetDispatch}
         editDispatch={editDispatch}
       />
