@@ -24,6 +24,11 @@ interface UpdateInvoiceProps {
   fetchInvoicesHandler: () => void;
   id: string | undefined;
 }
+interface BuyerOption {
+  value: string;
+  label: string;
+  data: any; // if you know the buyer structure, replace `any` with correct type
+}
 
 const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
   closeDrawerHandler,
@@ -51,9 +56,8 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
     { value: string; label: string }[] | []
   >([]);
   const [buyers, setBuyers] = useState<any[] | []>([]);
-  const [buyerOptions, setBuyerOptions] = useState<
-    { value: string; label: string }[] | []
-  >([]);
+  const [buyerOptions, setBuyerOptions] = useState<BuyerOption[]>([]);
+
   const [suppliers, setSuppliers] = useState<any[] | []>([]);
   const [supplierOptions, setSupplierOptions] = useState<
     { value: string; label: string }[] | []
@@ -106,8 +110,8 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
       backgroundColor: state.isSelected
         ? colors.primary[500]
         : state.isFocused
-        ? colors.primary[50]
-        : "white",
+          ? colors.primary[50]
+          : "white",
       color: state.isSelected ? "white" : colors.gray[900],
       padding: "12px",
       cursor: "pointer",
@@ -168,6 +172,10 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
     }
   };
 
+
+
+
+
   const fetchInvoiceDetailsHandler = useCallback(
     async (id: string) => {
       try {
@@ -190,7 +198,7 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
         if (data.invoice.buyer) {
           setBuyer({
             value: data.invoice?.buyer?._id,
-            label: data.invoice?.buyer?.name,
+            label: data.invoice?.buyer?.consignee_name[0] || data.invoice?.buyer?.company_name,
           });
         } else if (data.invoice.supplier) {
           setSupplier({
@@ -261,7 +269,7 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
   const fetchBuyersHandler = useCallback(async () => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "agent/buyers",
+        `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=1&limit=1000`,
         {
           method: "GET",
           headers: {
@@ -270,19 +278,23 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
         }
       );
       const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
+      if (!data?.data) {
+        throw new Error("Failed to fetch buyers");
       }
 
-      const buyers = data.agents.map((buyer: any) => ({
-        value: buyer._id,
-        label: buyer.name,
+      // Map same way as AddInvoice
+      const buyers = data.data.map((buyer: any) => ({
+        value: buyer?.party._id,
+        label: buyer?.party?.consignee_name?.[0] || buyer?.party.company_name,
+        data: buyer, // keep full data for later use
       }));
+
       setBuyerOptions(buyers);
     } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
+      toast.error(error?.message || "Failed to fetch buyers");
     }
   }, [cookies?.access_token]);
+
 
   const fetchSuppliersHandler = useCallback(async () => {
     try {
@@ -360,6 +372,40 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
       toast.error(error?.message || "Something went wrong");
     }
   }, [cookies?.access_token]);
+
+
+  const handleBuyerSelect = (buyerId: string) => {
+    const selectedBuyer = buyerOptions.find((b) => b.value === buyerId);
+    if (selectedBuyer && selectedBuyer.data) {
+      const party = selectedBuyer.data.party;
+      const products = selectedBuyer.data.product_id || [];
+
+      setBuyer({ value: buyerId, label: selectedBuyer.label });
+      setInvoiceNo(selectedBuyer.data.order_id || invoiceNo);
+      setNote(selectedBuyer.data.terms_of_delivery || note);
+
+      if (products.length > 0) {
+        const mappedItems = products.map((p: any) => ({
+          item: { value: p._id, label: p.name },
+          quantity: selectedBuyer.data.product_qty || 1,
+          price: p.price,
+        }));
+        setInputs(mappedItems);
+      }
+
+      if (selectedBuyer.data.total_price) {
+        setSubtotal(
+          selectedBuyer.data.total_price /
+          (1 + (selectedBuyer.data.GST || 0) / 100)
+        );
+        setTotal(selectedBuyer.data.total_price);
+      }
+    }
+
+    console.log(selectedBuyer);
+  };
+
+
 
   useEffect(() => {
     if (tax && subtotal) {
@@ -447,49 +493,54 @@ const UpdateInvoice: React.FC<UpdateInvoiceProps> = ({
                   {/* Customer/Supplier Section */}
                   {(category?.value === "sale" ||
                     category?.value === "purchase") && (
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <FaUser className="h-5 w-5 text-green-600" />
-                        {category?.value === "sale"
-                          ? "Customer Details"
-                          : "Supplier Details"}
-                      </h3>
+                      <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                          <FaUser className="h-5 w-5 text-green-600" />
+                          {category?.value === "sale"
+                            ? "Customer Details"
+                            : "Supplier Details"}
+                        </h3>
 
-                      {category.value === "sale" && (
-                        <div className="space-y-2">
-                          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                            <FaUser className="h-4 w-4 text-gray-500" />
-                            Buyer *
-                          </label>
-                          <Select
-                            styles={customSelectStyles}
-                            isDisabled
-                            value={buyer}
-                            options={buyerOptions}
-                            placeholder="Select buyer"
-                            className="text-sm"
-                          />
-                        </div>
-                      )}
+                        {category.value === "sale" && (
+                          <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                              <FaUser className="h-4 w-4 text-gray-500" />
+                              Buyer *
+                            </label>
+                            <Select
+                              styles={customSelectStyles}
+                              value={buyer}
+                              options={buyerOptions}
+                              onChange={(selected: any) => {
+                                setBuyer(selected);
+                                if (selected?.value) {
+                                  handleBuyerSelect(selected.value);
+                                }
+                              }}
+                              placeholder="Select buyer"
+                              className="text-sm"
+                            />
+                          </div>
+                        )}
 
-                      {category.value === "purchase" && (
-                        <div className="space-y-2">
-                          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                            <FaUser className="h-4 w-4 text-gray-500" />
-                            Supplier *
-                          </label>
-                          <Select
-                            styles={customSelectStyles}
-                            isDisabled
-                            value={supplier}
-                            options={supplierOptions}
-                            placeholder="Select supplier"
-                            className="text-sm"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        {category.value === "purchase" && (
+                          <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                              <FaUser className="h-4 w-4 text-gray-500" />
+                              Supplier *
+                            </label>
+                            <Select
+                              styles={customSelectStyles}
+                              isDisabled
+                              value={supplier}
+                              options={supplierOptions}
+                              placeholder="Select supplier"
+                              className="text-sm"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
                 </div>
                 {/* Invoice Details Section */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">

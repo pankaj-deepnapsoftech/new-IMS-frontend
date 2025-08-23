@@ -41,7 +41,7 @@ const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPayme
   const updatePaymentHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if((invoiceBalance || 0) < (amount || 0)){
+    if ((invoiceBalance || 0) < (amount || 0)) {
       toast.error('Amount must be less than the balance amount');
       return;
     }
@@ -61,6 +61,7 @@ const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPayme
       }
       toast.success(response.message);
       closeDrawerHandler();
+      fetchPaymentsHandler()
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
@@ -87,12 +88,12 @@ const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPayme
       setInvoiceBalance(data.payment.invoice.balance);
       setInvoiceTotal(data.payment.invoice.total);
       setPaymentId(data.payment._id);
-      setMode({value: data.payment.mode, label: data.payment.mode});
+      setMode({ value: data.payment.mode, label: data.payment.mode });
       setDescription(data.payment?.description);
       setAmount(data.payment.amount);
     } catch (error: any) {
       toast.error(error.messsage || "Something went wrong");
-    } finally{
+    } finally {
       setIsLoading(false);
     }
   };
