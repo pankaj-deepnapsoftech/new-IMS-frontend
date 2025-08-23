@@ -28,6 +28,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
   const [isLoadingSalesOrders, setIsLoadingSalesOrders] = useState(false);
   const [productStocks, setProductStocks] = useState({});
   const [isLoadingStocks, setIsLoadingStocks] = useState(false);
+  // const [stockError, setStockError] = useState(""); // Commented out - reverting to toast warnings
 
   const fetchSalesOrders = async () => {
     try {
@@ -190,6 +191,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
     const order = salesOrders.find((o) => o._id === orderId);
     setSelectedOrder(order);
     setFieldValue("sales_order_id", orderId);
+    // setStockError(""); // Commented out - reverting to toast warnings
 
     if (order?.product_id && order.product_id.length > 0) {
       const productIds = order.product_id.map(
@@ -202,6 +204,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
   useEffect(() => {
     if (show) {
       fetchSalesOrders();
+      // setStockError(""); // Commented out - reverting to toast warnings
     }
   }, [show]);
 
@@ -334,7 +337,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
                 >
-                  Tracking ID *
+                  Tracking ID
                 </label>
                 <input
                   type="text"
@@ -368,7 +371,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
                 >
-                  Tracking Website *
+                  Tracking Website
                 </label>
                 <input
                   type="url"
@@ -467,6 +470,27 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                   name="dispatch_qty"
                   value={values.dispatch_qty}
                   onChange={(e) => {
+                    // Commented out form validation approach - reverting to toast warnings
+                    // const value = parseInt(e.target.value) || 0;
+                    // const firstProductId =
+                    //   selectedOrder?.product_id?.[0]?._id ||
+                    //   selectedOrder?.product_id?.[0]?.product_id;
+                    // const maxStock =
+                    //   productStocks[firstProductId]?.current_stock ||
+                    //   productStocks[firstProductId]?.stock ||
+                    //   productStocks[firstProductId]?.product?.current_stock ||
+                    //   productStocks[firstProductId]?.quantity_changed ||
+                    //   0;
+
+                    // if (value > maxStock) {
+                    //   setStockError(
+                    //     `Dispatch quantity cannot exceed available stock (${maxStock} units)`
+                    //   );
+                    // } else {
+                    //   setStockError("");
+                    // }
+
+                    // Original toast warning approach
                     const value = parseInt(e.target.value) || 0;
                     const firstProductId =
                       selectedOrder?.product_id?.[0]?._id ||
@@ -482,7 +506,6 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                       toast.warning(
                         `Dispatch quantity cannot exceed available stock (${maxStock} units)`
                       );
-                      return;
                     }
 
                     handleChange(e);
@@ -527,18 +550,9 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                         0;
                       const dispatchQty = parseInt(values.dispatch_qty);
 
-                      if (dispatchQty > availableStock) {
-                        return (
-                          <p className="text-sm text-red-600 flex items-center gap-1">
-                            <span>⚠️</span>
-                            Dispatch quantity exceeds available stock (
-                            {availableStock} units)
-                          </p>
-                        );
-                      } else if (dispatchQty > 0) {
+                      if (dispatchQty > 0 && dispatchQty <= availableStock) {
                         return (
                           <p className="text-sm text-green-600 flex items-center gap-1">
-                            <span>✅</span>
                             Valid quantity - {availableStock - dispatchQty}{" "}
                             units will remain in stock
                           </p>
@@ -548,6 +562,17 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                     })()}
                   </div>
                 )}
+
+                {/* Commented out Stock Error Message - reverting to toast warnings */}
+                {/* {stockError && (
+                  <p
+                    className="mt-1 text-sm flex items-center gap-1"
+                    style={{ color: colors.error[500] }}
+                  >
+                    <span>⚠️</span>
+                    {stockError}
+                  </p>
+                )} */}
 
                 {errors.dispatch_qty && touched.dispatch_qty && (
                   <p
@@ -626,6 +651,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                   isSubmitting ||
                   !selectedOrder ||
                   !values.dispatch_qty ||
+                  // stockError || // Commented out - reverting to toast warnings
                   (() => {
                     const firstProductId =
                       selectedOrder?.product_id?.[0]?._id ||
@@ -648,6 +674,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                     isSubmitting ||
                     !selectedOrder ||
                     !values.dispatch_qty ||
+                    // stockError || // Commented out - reverting to toast warnings
                     (() => {
                       const firstProductId =
                         selectedOrder?.product_id?.[0]?._id ||
