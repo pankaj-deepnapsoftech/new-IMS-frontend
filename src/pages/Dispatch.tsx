@@ -31,7 +31,8 @@ const Dispatch = () => {
   const [editDispatch, setEditDispatch] = useState(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showattachment, setShowAttachment] = useState(false);
+  const [showDeliveryProof, setShowDeliveryProof] = useState(false);
+  const [showInvoice, setShowInvoice] = useState(false);
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -867,7 +868,7 @@ const Dispatch = () => {
                         </button>
 
                         <button
-                          onClick={() => setShowAttachment(true)}
+                          onClick={() => setShowDeliveryProof(true)}
                           className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
                           style={{
                             backgroundColor: colors.background.card,
@@ -884,7 +885,28 @@ const Dispatch = () => {
                           }}
                         >
                           <HiOutlinePaperClip size={16} />
-                          Attachment
+                          Delivery Proof
+                        </button>
+
+                        <button
+                          onClick={() => setShowInvoice(true)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                          style={{
+                            backgroundColor: colors.background.card,
+                            borderColor: colors.border.medium,
+                            color: colors.text.secondary,
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              colors.gray[50];
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              colors.background.card;
+                          }}
+                        >
+                          <HiOutlinePaperClip size={16} />
+                          Invoice
                         </button>
                       </div>
                     </div>
@@ -1001,7 +1023,7 @@ const Dispatch = () => {
         </div>
       )} */}
 
-      {showattachment && (
+      {showDeliveryProof && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
             className="w-full max-w-md mx-4 rounded-xl shadow-xl"
@@ -1013,10 +1035,10 @@ const Dispatch = () => {
                   className="text-lg font-semibold"
                   style={{ color: colors.text.primary }}
                 >
-                  Upload Attachment
+                  Upload Delivery Proof
                 </h3>
                 <button
-                  onClick={() => setShowAttachment(false)}
+                  onClick={() => setShowDeliveryProof(false)}
                   className="p-2 rounded-lg transition-colors"
                   style={{ color: colors.text.secondary }}
                 >
@@ -1056,7 +1078,78 @@ const Dispatch = () => {
                   Upload
                 </button>
                 <button
-                  onClick={() => setShowAttachment(false)}
+                  onClick={() => setShowDeliveryProof(false)}
+                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200"
+                  style={{
+                    backgroundColor: colors.background.card,
+                    borderColor: colors.border.medium,
+                    color: colors.text.secondary,
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showInvoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-md mx-4 rounded-xl shadow-xl"
+            style={{ backgroundColor: colors.background.card }}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: colors.text.primary }}
+                >
+                  Upload Delivery Proof
+                </h3>
+                <button
+                  onClick={() => setShowInvoice(false)}
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ color: colors.text.secondary }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  style={{
+                    backgroundColor: colors.input.background,
+                    borderColor: colors.input.border,
+                    color: colors.text.primary,
+                  }}
+                />
+                {fileName && (
+                  <p
+                    className="mt-2 text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Selected: {fileName}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                  style={{
+                    backgroundColor: colors.primary[600],
+                    color: colors.text.inverse,
+                  }}
+                >
+                  Upload
+                </button>
+                <button
+                  onClick={() => setShowInvoice(false)}
                   className="flex-1 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200"
                   style={{
                     backgroundColor: colors.background.card,

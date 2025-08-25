@@ -337,7 +337,18 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                         {editDispatch?.quantity || "N/A"}
                       </p>
                     </div>
-                    {editDispatch && (
+
+                    <div>
+                      <label className="block text-sm font-medium text-yellow-700">
+                        Total Dispatch Quantity
+                      </label>
+                      <p className="text-sm text-yellow-900">
+                        {parseInt(editDispatch.dispatch_qty || 0) +
+                          parseInt(values.dispatch_qty || 0)}
+                      </p>
+                    </div>
+
+                    {/* {editDispatch && (
                       <div className="bg-yellow-50 p-4 rounded-lg space-y-3 border border-yellow-200">
                         <h3 className="font-medium text-yellow-900">
                           Current Dispatch Information
@@ -346,7 +357,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                           Total Dispatch Quantity:{" "}
                           <strong>
                             {parseInt(editDispatch.dispatch_qty || 0) +
-                              parseInt(values.dispatch_qty || 0)}
+                              parseInt(values.dispatch_qty || 0)} 
                           </strong>
                         </p>
                         <p>
@@ -356,7 +367,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                               parseInt(values.dispatch_qty || 0))}
                         </p>
                       </div>
-                    )}
+                    )} */}
 
                     <div>
                       <label className="block text-sm font-medium text-yellow-700">
@@ -537,7 +548,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                                   {editDispatch.item_name}:
                                 </span>
                                 <span className="text-green-900 font-semibold">
-                                  {currentStock} units in stock
+                                  {currentStock} units
                                 </span>
                               </div>
                               <div className="flex justify-between items-center text-sm">
