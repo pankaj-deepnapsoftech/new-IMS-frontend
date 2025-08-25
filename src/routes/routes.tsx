@@ -167,7 +167,7 @@ const routes = [
   },
 
   {
-    name: "procurement",
+    name: "Procurement",
     icon: <Box />,
     path: "procurement",
     sublink: [

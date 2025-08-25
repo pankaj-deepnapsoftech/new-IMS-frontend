@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React from "react";
+import React ,{useState} from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { ToWords } from "to-words";
 import { useCookies } from "react-cookie";
@@ -224,7 +224,7 @@ const toWords = new ToWords({
   },
 });
 
-const BOMPDF = ({ bom }: any) => {
+const BOMPDF = ({ bom,userData }: any) => {
   const totalCost = bom?.total_cost || 0;
   const partsCount = bom?.parts_count || 0;
   const rawMaterials = bom?.raw_materials || [];
@@ -233,6 +233,9 @@ const BOMPDF = ({ bom }: any) => {
   const manpower = bom?.manpower || [];
   const otherCharges = bom?.other_charges || {};
   const process = bom?.processes || [];
+
+  
+  console.log("the bom user data is:::",userData)
 
   const [cookies] = useCookies();
   console.log(bom);
@@ -247,7 +250,7 @@ const BOMPDF = ({ bom }: any) => {
           <View style={styles.headerRow}>
             <View style={styles.companySection}>
               <Text style={styles.sectionLabel}>Company Name</Text>
-              <Text style={styles.sectionValue}>Deepnap Softech</Text>
+              <Text style={styles.sectionValue}>{userData?.cpny_name}</Text>
             </View>
             <View style={styles.bomDetailsSection}>
               <Text style={styles.sectionLabel}>BOM ID</Text>

@@ -230,10 +230,11 @@ const toWords = new ToWords({
   },
 });
 
-const SalesOrderPDF = ({ sale }: any) => {
+const SalesOrderPDF = ({ sale,userData }: any) => {
   const subtotal = sale.price * sale.product_qty;
   const gstAmount = (subtotal * sale.GST) / 100;
   const total = subtotal + gstAmount;
+  console.log("the sale user data is:::",userData)
 
   return (
     <Document>
@@ -264,7 +265,8 @@ const SalesOrderPDF = ({ sale }: any) => {
           <View style={styles.headerRow}>
             <View style={styles.companySection}>
               <Text style={styles.sectionLabel}>Company Name</Text>
-              <Text style={styles.sectionValue}>Deepnap Softech</Text>
+              <Text style={styles.sectionValue}>{userData?.cpny_name
+}</Text>
             </View>
             <View style={styles.paymentSection}>
               <Text style={styles.sectionLabel}>Mode of Payment</Text>
@@ -343,9 +345,9 @@ const SalesOrderPDF = ({ sale }: any) => {
           <View style={styles.bankDetailsAboveSignature}>
             <Text style={styles.bankLabel}>Company Bank Details:</Text>
             <Text style={styles.bankDetails}>
-              Bank Name: HDFC Bank{"\n"}
-              Account No.: 123456789123456{"\n"}
-              IFSC Code: F4H5ED08
+              Bank Name: {userData.Bank_Name}{"\n"}
+              Account No.: {userData.Account_No}{"\n"}
+              IFSC Code: {userData.IFSC_Code}
             </Text>
           </View>
           <View style={styles.signatureBox}>

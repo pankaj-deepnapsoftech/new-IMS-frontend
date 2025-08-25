@@ -119,6 +119,31 @@ const SalesTable = ({
   const [paymentshow, setPaymentshow] = useState(false);
   const [isOpen, setViewDesign] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [userData, setUserData] = useState<PurchaseOrder | null>(null);
+      
+         // NEW: Function to fetch purchase order data from API
+        const fetchUserData = async () => {
+          try {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/user`, {
+              headers: { Authorization: `Bearer ${cookies?.access_token}` },
+            });
+      
+            if (response.data.success) {
+              setUserData(response.data.user); // Assuming API returns data in `data` field
+            } else {
+              console.error("Failed to fetch user data:", response.data.message);
+              toast.error("Failed to fetch user data");
+            }
+          } catch (error: any) {
+            console.error("Error fetching user data:", error);
+            toast.error(error.message || "Failed to fetch user data");
+          }
+        };
+      
+        // NEW: useEffect to fetch user data on component mount
+        useEffect(() => {
+          fetchUserData();
+        }, []); // Empty dependency array ensures it runs only on mount
 
   // Function to fetch comprehensive sales order status
   const fetchSalesOrderStatus = async (salesOrderId) => {
@@ -639,7 +664,7 @@ const SalesTable = ({
                   </button>
 
                   <PDFDownloadLink
-                    document={<SalesOrderPDF sale={purchase} />}
+                    document={<SalesOrderPDF sale={purchase} userData={userData} />}
                     fileName={`SalesOrder_${purchase.order_id}.pdf`}
                   >
                     {({ loading }) =>

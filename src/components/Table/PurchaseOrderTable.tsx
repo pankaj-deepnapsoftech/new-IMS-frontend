@@ -61,6 +61,38 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState<string>("");
 
+// NEW: State to store fetched user data
+  const [userData, setUserData] = useState<PurchaseOrder | null>(null);
+
+   // NEW: Function to fetch purchase order data from API
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/user`, {
+        headers: { Authorization: `Bearer ${cookies?.access_token}` },
+      });
+
+      if (response.data.success) {
+        setUserData(response.data.user); // Assuming API returns data in `data` field
+      } else {
+        console.error("Failed to fetch user data:", response.data.message);
+        toast.error("Failed to fetch user data");
+      }
+      console.log("ggggggggggggggggggggggggggg",response.data)
+    } catch (error: any) {
+      console.error("Error fetching user data:", error);
+      toast.error(error.message || "Failed to fetch user data");
+    }
+  };
+
+  // NEW: useEffect to fetch user data on component mount
+  useEffect(() => {
+    fetchUserData();
+  }, []); // Empty dependency array ensures it runs only on mount
+
+  useEffect(() => {
+    console.log("The user data is ::: ",userData)
+  },[]);
+
   // Auto-refresh setup
   useEffect(() => {
     setLoading(false);
@@ -182,6 +214,7 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
     const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
     return dateB - dateA;
   });
+
 
   // Selection state helpers
   const isAllSelected =
@@ -839,7 +872,7 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                           </button>
                           <PDFDownloadLink
                             document={
-                              <PurchaseOrderPDF purchaseOrder={order} />
+                              <PurchaseOrderPDF purchaseOrder={userData || order} />
                             }
                             fileName={`purchase_order_${
                               order.poOrder || order._id
