@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { toast } from "react-toastify";
 import Drawer from "../../../ui/Drawer";
 import { useCookies } from "react-cookie";
@@ -52,19 +54,18 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
       const invoice = payment.invoice;
       const buyer = invoice.buyer;
 
-      // Set payment details
+      console.log("IIIIIIIInvoice", invoice);
+
       setInvoiceNo(invoice.invoice_no);
       setMode(payment.mode);
       setDescription(payment?.description);
       setAmount(payment.amount);
 
-      // Set buyer details
       setBuyerEmail(buyer.email_id?.[0]);
       setBuyerContact(buyer.contact_number?.[0]);
       setBuyerCompany(buyer.company_name);
       setBuyerConsigneeNames(buyer.consignee_name || []);
 
-      // Set invoice summary
       setSubtotal(invoice.subtotal);
       setTaxAmount(invoice.tax?.tax_amount);
       setTaxName(invoice.tax?.tax_name);

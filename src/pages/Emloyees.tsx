@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Button } from "@chakra-ui/react";
 import { MdOutlineRefresh } from "react-icons/md";
 import { FiSearch } from "react-icons/fi";

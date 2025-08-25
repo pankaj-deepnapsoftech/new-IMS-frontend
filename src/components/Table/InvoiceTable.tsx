@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import moment from "moment";
-import { useMemo, useState,useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { FaCaretDown, FaCaretUp, FaFilePdf } from "react-icons/fa";
 import {
   MdDeleteOutline,
@@ -27,7 +27,6 @@ import { colors } from "../../theme/colors";
 import InvoicePDF from "../PDF/InvoicePDF";
 import axios from "axios";
 import { useCookies } from "react-cookie";
-
 
 interface InvoiceTableProps {
   invoices: Array<{
@@ -65,39 +64,38 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
 }) => {
   const [deleteModalId, setDeleteModalId] = useState<string | null>(null);
   const [userData, setUserData] = useState<PurchaseOrder | null>(null);
-    const [cookies] = useCookies();
-     
-  
-    // NEW: Function to fetch purchase order data from API
-    const fetchUserData = async () => {
-      try {
-        console.log("INside try")
-        const response = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}auth/user`,
-          {
-            headers: { Authorization: `Bearer ${cookies?.access_token}` },
-          }
-        );
-        console.log("Inside Proforma Function ::", response.data);
-  
-        if (response.data.success) {
-          setUserData(response.data.user); // Assuming API returns data in `data` field
-        } else {
-          console.error("Failed to fetch user data:", response.data.message);
-          // toast.error("Failed to fetch user data");
+  const [cookies] = useCookies();
+
+  // NEW: Function to fetch purchase order data from API
+  const fetchUserData = async () => {
+    try {
+      console.log("INside try");
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}auth/user`,
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
         }
-  
-        console.log("Inside Proforma Function ::", response.data);
-      } catch (error: any) {
-        console.error("Error fetching user data:", error);
-        // toast.error(error.message || "Failed to fetch user data");
+      );
+      console.log("Inside Proforma Function ::", response.data);
+
+      if (response.data.success) {
+        setUserData(response.data.user); // Assuming API returns data in `data` field
+      } else {
+        console.error("Failed to fetch user data:", response.data.message);
+        // toast.error("Failed to fetch user data");
       }
-    };
-  
-    // NEW: useEffect to fetch user data on component mount
-    useEffect(() => {
-      fetchUserData();
-    }, []); // Empty dependency array ensures it runs only on mount
+
+      console.log("Inside Proforma Function ::", response.data);
+    } catch (error: any) {
+      console.error("Error fetching user data:", error);
+      // toast.error(error.message || "Failed to fetch user data");
+    }
+  };
+
+  // NEW: useEffect to fetch user data on component mount
+  useEffect(() => {
+    fetchUserData();
+  }, []); // Empty dependency array ensures it runs only on mount
 
   const columns = useMemo(
     () => [
@@ -381,7 +379,12 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           {/* PDF Download Button */}
                           <Tooltip label="Download Invoice PDF" placement="top">
                             <PDFDownloadLink
-                              document={<InvoicePDF invoice={row.original} userData = {userData}/>}
+                              document={
+                                <InvoicePDF
+                                  invoice={row.original}
+                                  userData={userData}
+                                />
+                              }
                               fileName={`Invoice-${row.original.invoice_no}.pdf`}
                               style={{ textDecoration: "none" }}
                             >
@@ -436,7 +439,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           )}
 
                           {openPaymentDrawer && (
-                            <Tooltip label="Add Payment" placement="top">
+                            <Tooltip label="Manage Payment" placement="top">
                               <button
                                 onClick={() =>
                                   openPaymentDrawer(row.original._id)

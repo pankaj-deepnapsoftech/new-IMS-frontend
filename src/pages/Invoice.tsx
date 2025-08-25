@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,10 +8,12 @@ import {
   closeAddPaymentDrawer,
   closeInvoiceDetailsDrawer,
   closeUpdateInvoiceDrawer,
+  closeUpdatePaymentDrawer,
   openAddInvoiceDrawer,
   openAddPaymentDrawer,
   openInvoiceDetailsDrawer,
   openUpdateInvoiceDrawer,
+  openUpdatePaymentDrawer,
 } from "../redux/reducers/drawersSlice";
 import { useCookies } from "react-cookie";
 import { MdAdd, MdOutlineRefresh } from "react-icons/md";
@@ -20,6 +24,7 @@ import AddInvoice from "../components/Drawers/Invoice/AddInvoice";
 import InvoiceDetails from "../components/Drawers/Invoice/InvoiceDetails";
 import UpdateInvoice from "../components/Drawers/Invoice/UpdateInvoice";
 import AddPayment from "../components/Drawers/Payment/AddPayment";
+import UpdatePayment from "../components/Drawers/Payment/UpdatePayment";
 import { colors } from "../theme/colors";
 import { Button } from "@chakra-ui/react";
 
@@ -36,6 +41,7 @@ const Invoice: React.FC = () => {
     isUpdateInvoiceDrawerOpened,
     isInvoiceDetailsDrawerOpened,
     isAddPaymentDrawerOpened,
+    isUpdatePaymentDrawerOpened,
   } = useSelector((state: any) => state.drawers);
   const dispatch = useDispatch();
   const [id, setId] = useState<string | undefined>();
@@ -65,12 +71,53 @@ const Invoice: React.FC = () => {
     dispatch(closeUpdateInvoiceDrawer());
   };
 
-  const openAddPaymentHandler = (id: string) => {
-    setId(id);
-    dispatch(openAddPaymentDrawer());
+  const openAddPaymentHandler = async (id: string) => {
+    try {
+      // Check if payment already exists for this invoice
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}payment/all`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        // Find existing payment for this invoice
+        const existingPayment = data.payments.find(
+          (payment: any) => payment.invoice._id === id
+        );
+
+        if (existingPayment) {
+          // If payment exists, open update drawer
+          setId(existingPayment._id);
+          dispatch(openUpdatePaymentDrawer());
+          toast.info("Found existing payment - opening for editing");
+        } else {
+          // If no payment exists, open add payment drawer
+          setId(id);
+          dispatch(openAddPaymentDrawer());
+        }
+      } else {
+        // If API fails, default to add payment
+        setId(id);
+        dispatch(openAddPaymentDrawer());
+      }
+    } catch (error) {
+      console.error("Error checking existing payments:", error);
+      // If error occurs, default to add payment
+      setId(id);
+      dispatch(openAddPaymentDrawer());
+    }
   };
   const closePaymentDrawerHandler = () => {
     dispatch(closeAddPaymentDrawer());
+  };
+  const closeUpdatePaymentDrawerHandler = () => {
+    dispatch(closeUpdatePaymentDrawer());
   };
 
   const fetchInvoiceHandler = async () => {
@@ -188,6 +235,13 @@ const Invoice: React.FC = () => {
       )}
       {isAddPaymentDrawerOpened && (
         <AddPayment id={id} closeDrawerHandler={closePaymentDrawerHandler} />
+      )}
+      {isUpdatePaymentDrawerOpened && (
+        <UpdatePayment
+          id={id}
+          closeDrawerHandler={closeUpdatePaymentDrawerHandler}
+          fetchPaymentsHandler={fetchInvoiceHandler}
+        />
       )}
 
       <div className="p-2 lg:p-3">

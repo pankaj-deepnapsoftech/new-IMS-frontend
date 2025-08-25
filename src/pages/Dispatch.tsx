@@ -42,6 +42,79 @@ const Dispatch = () => {
 
   const role = cookies?.role;
 
+  const calculatePaymentStatus = (dispatch) => {
+    if (!dispatch?.invoice) return "Unpaid";
+
+    const invoiceTotal = parseFloat(dispatch.invoice.total) || 0;
+    const invoiceBalance = parseFloat(dispatch.invoice.balance) || 0;
+
+    let totalPaid = 0;
+    if (dispatch.invoice.payments && Array.isArray(dispatch.invoice.payments)) {
+      totalPaid = dispatch.invoice.payments.reduce((sum, payment) => {
+        return sum + (parseFloat(payment.amount) || 0);
+      }, 0);
+    } else {
+      totalPaid = invoiceTotal - invoiceBalance;
+    }
+
+    totalPaid = Math.max(0, totalPaid);
+
+    const remainingBalance = invoiceTotal - totalPaid;
+
+    // if (dispatch.invoice.invoice_no) {
+    //   console.log(`Invoice ${dispatch.invoice.invoice_no}:`, {
+    //     total: invoiceTotal,
+    //     balance: invoiceBalance,
+    //     totalPaid: totalPaid,
+    //     remainingBalance: remainingBalance,
+    //     paymentsArray: dispatch.invoice.payments,
+    //     status: totalPaid === 0 ? "Unpaid" : remainingBalance <= 0.01 ? "Paid" : "Partial Paid"
+    //   });
+    // }
+
+    if (invoiceTotal === 0) {
+      return "Unpaid";
+    }
+
+    if (totalPaid === 0) {
+      return "Unpaid";
+    } else if (remainingBalance <= 0.01) {
+      return "Paid";
+    } else if (totalPaid > 0 && remainingBalance > 0.01) {
+      return "Partial Paid";
+    } else {
+      return "Unpaid";
+    }
+  };
+
+  const getPaymentBreakdown = (dispatch) => {
+    if (!dispatch?.invoice) return null;
+
+    const invoiceTotal = parseFloat(dispatch.invoice.total) || 0;
+    const invoiceBalance = parseFloat(dispatch.invoice.balance) || 0;
+
+    let totalPaid = 0;
+    if (dispatch.invoice.payments && Array.isArray(dispatch.invoice.payments)) {
+      totalPaid = dispatch.invoice.payments.reduce((sum, payment) => {
+        return sum + (parseFloat(payment.amount) || 0);
+      }, 0);
+    } else {
+      totalPaid = invoiceTotal - invoiceBalance;
+    }
+
+    totalPaid = Math.max(0, totalPaid);
+    const remainingBalance = Math.max(0, invoiceTotal - totalPaid);
+
+    return {
+      total: invoiceTotal,
+      paid: totalPaid,
+      remaining: remainingBalance,
+      paymentsCount: dispatch.invoice.payments
+        ? dispatch.invoice.payments.length
+        : 0,
+    };
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -93,8 +166,8 @@ const Dispatch = () => {
 
       toast.success(
         `${
-          uploadType === "delivery" 
-            ? "Delivery proof uploaded successfully! Status changed to Delivered." 
+          uploadType === "delivery"
+            ? "Delivery proof uploaded successfully! Status changed to Delivered."
             : "Invoice uploaded successfully"
         }`
       );
@@ -164,26 +237,23 @@ const Dispatch = () => {
   const GetDispatch = async () => {
     try {
       setIsLoading(true);
-      
-      // Build query parameters
+
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '10'
+        limit: "10",
       });
 
-      // Add filters if not "All"
       if (productFilter !== "All") {
-        params.append('dispatch_status', productFilter);
-      }
-      if (paymentFilter !== "All") {
-        params.append('payment_status', paymentFilter);
+        params.append("dispatch_status", productFilter);
       }
       if (searchTerm) {
-        params.append('search', searchTerm);
+        params.append("search", searchTerm);
       }
 
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}dispatch/getAll?${params.toString()}`,
+        `${
+          process.env.REACT_APP_BACKEND_URL
+        }dispatch/getAll?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${cookies.access_token}`,
@@ -191,7 +261,62 @@ const Dispatch = () => {
         }
       );
 
-      setData(response?.data?.data || []);
+      let dispatchData = response?.data?.data || [];
+
+      // Fetch sales data to get price information
+      try {
+        const salesResponse = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=1&limit=1000`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies.access_token}`,
+            },
+          }
+        );
+
+        const salesData = salesResponse?.data?.data || [];
+
+        // Enrich dispatch data with sales price information
+        dispatchData = dispatchData.map((dispatch) => {
+          // Find matching sales order by order_id or sales_order_id
+          const matchingSale = salesData.find(
+            (sale) =>
+              sale.order_id === dispatch.order_id ||
+              sale.order_id === dispatch.sales_order_id ||
+              sale._id === dispatch.sale_id
+          );
+
+          if (matchingSale) {
+            return {
+              ...dispatch,
+              // Override with sales price data
+              total_amount: matchingSale.total_price || dispatch.total_amount,
+              sales_price: matchingSale.price || 0,
+              sales_quantity: matchingSale.product_qty || dispatch.quantity,
+              sales_gst: matchingSale.GST || 0,
+              sales_subtotal:
+                matchingSale.price && matchingSale.product_qty
+                  ? matchingSale.price * matchingSale.product_qty
+                  : 0,
+              sales_data: matchingSale, // Store full sales data for reference
+            };
+          }
+
+          return dispatch;
+        });
+      } catch (salesError) {
+        console.error("Error fetching sales data:", salesError);
+        // Continue with original dispatch data if sales fetch fails
+      }
+
+      if (paymentFilter !== "All") {
+        dispatchData = dispatchData.filter((dispatch) => {
+          const calculatedStatus = calculatePaymentStatus(dispatch);
+          return calculatedStatus === paymentFilter;
+        });
+      }
+
+      setData(dispatchData);
     } catch (error) {
       console.error("Error fetching dispatch data:", error);
       toast.error("Failed to fetch dispatch data");
@@ -356,8 +481,7 @@ const Dispatch = () => {
   //                   color: colors.text.primary,
   //                 }}
   //                 onFocus={(e) => {
-  //                   e.currentTarget.style.borderColor =
-  //                     colors.input.borderFocus;
+  //                   e.currentTarget.style.borderColor = colors.input.borderFocus;
   //                   e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
   //                 }}
   //                 onBlur={(e) => {
@@ -389,8 +513,7 @@ const Dispatch = () => {
   //                   color: colors.text.primary,
   //                 }}
   //                 onFocus={(e) => {
-  //                   e.currentTarget.style.borderColor =
-  //                     colors.input.borderFocus;
+  //                   e.currentTarget.style.borderColor = colors.input.borderFocus;
   //                   e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
   //                 }}
   //                 onBlur={(e) => {
@@ -623,8 +746,7 @@ const Dispatch = () => {
                   color: colors.text.primary,
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor =
-                    colors.input.borderFocus;
+                  e.currentTarget.style.borderColor = colors.input.borderFocus;
                   e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
                 }}
                 onBlur={(e) => {
@@ -832,12 +954,19 @@ const Dispatch = () => {
                                       className="font-medium"
                                       style={{ color: colors.text.primary }}
                                     >
-                                      Order Amount:
+                                      Sales Amount:
                                     </span>
                                     <span
                                       style={{ color: colors.text.secondary }}
                                     >
-                                      ₹{dispatch?.total_amount || "N/A"}
+                                      {dispatch?.sales_data ? (
+                                        <span className="flex items-center gap-1">
+                                          ₹{dispatch?.total_amount || "N/A"}
+                                          
+                                        </span>
+                                      ) : (
+                                        `₹${dispatch?.total_amount || "N/A"}`
+                                      )}
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-2">
@@ -852,7 +981,9 @@ const Dispatch = () => {
                                     >
                                       {(() => {
                                         const orderQty =
-                                          parseInt(dispatch?.quantity) || 0;
+                                          parseInt(dispatch?.quantity) ||
+                                          parseInt(dispatch?.sales_quantity) ||
+                                          0;
                                         const dispatchQty =
                                           parseInt(dispatch?.dispatch_qty) || 0;
                                         const totalAmount =
@@ -863,9 +994,15 @@ const Dispatch = () => {
                                             ? (dispatchQty / orderQty) *
                                               totalAmount
                                             : 0;
-                                        return dispatchAmount > 0
-                                          ? `₹${Math.round(dispatchAmount)}`
-                                          : "N/A";
+
+                                        return dispatchAmount > 0 ? (
+                                          <span className="flex items-center gap-1">
+                                            ₹{Math.round(dispatchAmount)}
+                                            
+                                          </span>
+                                        ) : (
+                                          "N/A"
+                                        );
                                       })()}
                                     </span>
                                   </div>
@@ -880,7 +1017,11 @@ const Dispatch = () => {
                                       style={{
                                         color: (() => {
                                           const orderQty =
-                                            parseInt(dispatch?.quantity) || 0;
+                                            parseInt(dispatch?.quantity) ||
+                                            parseInt(
+                                              dispatch?.sales_quantity
+                                            ) ||
+                                            0;
                                           const dispatchQty =
                                             parseInt(dispatch?.dispatch_qty) ||
                                             0;
@@ -903,7 +1044,9 @@ const Dispatch = () => {
                                     >
                                       {(() => {
                                         const orderQty =
-                                          parseInt(dispatch?.quantity) || 0;
+                                          parseInt(dispatch?.quantity) ||
+                                          parseInt(dispatch?.sales_quantity) ||
+                                          0;
                                         const dispatchQty =
                                           parseInt(dispatch?.dispatch_qty) || 0;
                                         const totalAmount =
@@ -916,14 +1059,21 @@ const Dispatch = () => {
                                             : 0;
                                         const remainingAmount =
                                           totalAmount - dispatchAmount;
-                                        return remainingAmount >= 0
-                                          ? `₹${Math.round(remainingAmount)}`
-                                          : "N/A";
+
+                                        return remainingAmount >= 0 ? (
+                                          <span className="flex items-center gap-1">
+                                            ₹{Math.round(remainingAmount)}
+                                            
+                                          </span>
+                                        ) : (
+                                          "N/A"
+                                        );
                                       })()}
                                     </span>
                                   </div>
                                 </>
                               )}
+
                               <div className="flex items-center gap-2">
                                 <span
                                   className="font-medium"
@@ -934,21 +1084,102 @@ const Dispatch = () => {
                                 <span
                                   className="px-2 py-1 rounded-full text-xs font-medium"
                                   style={{
-                                    backgroundColor:
-                                      dispatch?.payment_status === "Paid"
-                                        ? colors.success[100]
-                                        : colors.warning[100],
-                                    color:
-                                      dispatch?.payment_status === "Paid"
-                                        ? colors.success[800]
-                                        : colors.warning[800],
+                                    backgroundColor: (() => {
+                                      const calculatedStatus =
+                                        calculatePaymentStatus(dispatch);
+                                      if (calculatedStatus === "Paid")
+                                        return colors.success[100];
+                                      if (calculatedStatus === "Partial Paid")
+                                        return colors.warning[100];
+                                      return colors.error[100];
+                                    })(),
+                                    color: (() => {
+                                      const calculatedStatus =
+                                        calculatePaymentStatus(dispatch);
+                                      if (calculatedStatus === "Paid")
+                                        return colors.success[800];
+                                      if (calculatedStatus === "Partial Paid")
+                                        return colors.warning[800];
+                                      return colors.error[800];
+                                    })(),
                                   }}
                                 >
-                                  {dispatch?.payment_status === "Paid"
-                                    ? "Paid"
-                                    : "Unpaid"}
+                                  {calculatePaymentStatus(dispatch)}
                                 </span>
                               </div>
+
+                              {/* Payment Breakdown */}
+                              {(() => {
+                                const breakdown = getPaymentBreakdown(dispatch);
+                                if (!breakdown || breakdown.total === 0)
+                                  return null;
+
+                                return (
+                                  <div
+                                    className="text-xs space-y-1 mt-2 p-2 rounded-lg"
+                                    style={{ backgroundColor: colors.gray[50] }}
+                                  >
+                                    <div className="flex justify-between">
+                                      <span
+                                        style={{ color: colors.text.secondary }}
+                                      >
+                                        Invoice Total:
+                                      </span>
+                                      <span
+                                        style={{ color: colors.text.primary }}
+                                      >
+                                        ₹{breakdown.total.toFixed(2)}
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span
+                                        style={{ color: colors.text.secondary }}
+                                      >
+                                        Amount Paid:
+                                      </span>
+                                      <span
+                                        style={{ color: colors.success[600] }}
+                                      >
+                                        ₹{breakdown.paid.toFixed(2)}
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span
+                                        style={{ color: colors.text.secondary }}
+                                      >
+                                        Remaining:
+                                      </span>
+                                      <span
+                                        style={{
+                                          color:
+                                            breakdown.remaining > 0
+                                              ? colors.error[600]
+                                              : colors.success[600],
+                                        }}
+                                      >
+                                        ₹{breakdown.remaining.toFixed(2)}
+                                      </span>
+                                    </div>
+                                    {breakdown.paymentsCount > 0 && (
+                                      <div className="flex justify-between text-xs">
+                                        <span
+                                          style={{
+                                            color: colors.text.secondary,
+                                          }}
+                                        >
+                                          Payments Made:
+                                        </span>
+                                        <span
+                                          style={{ color: colors.text.primary }}
+                                        >
+                                          {breakdown.paymentsCount}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })()}
+
                               <div className="flex items-center gap-2">
                                 <span
                                   className="font-medium"
@@ -1024,29 +1255,34 @@ const Dispatch = () => {
                             setShowDeliveryProof(true);
                           }}
                           className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                            dispatch?.dispatch_status === "Delivered" ? 'border-green-500 bg-green-50' : ''
+                            dispatch?.dispatch_status === "Delivered"
+                              ? "border-green-500 bg-green-50"
+                              : ""
                           }`}
                           style={{
-                            backgroundColor: dispatch?.dispatch_status === "Delivered"
-                              ? colors.success[50] 
-                              : colors.background.card,
-                            borderColor: dispatch?.dispatch_status === "Delivered"
-                              ? colors.success[500] 
-                              : colors.border.medium,
-                            color: dispatch?.dispatch_status === "Delivered"
-                              ? colors.success[700] 
-                              : colors.text.secondary,
+                            backgroundColor:
+                              dispatch?.dispatch_status === "Delivered"
+                                ? colors.success[50]
+                                : colors.background.card,
+                            borderColor:
+                              dispatch?.dispatch_status === "Delivered"
+                                ? colors.success[500]
+                                : colors.border.medium,
+                            color:
+                              dispatch?.dispatch_status === "Delivered"
+                                ? colors.success[700]
+                                : colors.text.secondary,
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor =
                               dispatch?.dispatch_status === "Delivered"
-                                ? colors.success[100] 
+                                ? colors.success[100]
                                 : colors.gray[50];
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor =
                               dispatch?.dispatch_status === "Delivered"
-                                ? colors.success[50] 
+                                ? colors.success[50]
                                 : colors.background.card;
                           }}
                         >
@@ -1054,52 +1290,57 @@ const Dispatch = () => {
                           Delivery Proof
                         </button>
 
-                        {dispatch?.dispatch_status === "Delivered" && dispatch?.delivery_proof?.filename && (
-                          <button
-                            onClick={async () => {
-                              try {
-                                const response = await axios.get(
-                                  `${process.env.REACT_APP_BACKEND_URL}dispatch/download/${dispatch._id}/delivery-proof`,
-                                  {
-                                    headers: {
-                                      Authorization: `Bearer ${cookies?.access_token}`,
-                                    },
-                                    responseType: 'blob',
-                                  }
-                                );
+                        {dispatch?.dispatch_status === "Delivered" &&
+                          dispatch?.delivery_proof?.filename && (
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const response = await axios.get(
+                                    `${process.env.REACT_APP_BACKEND_URL}dispatch/download/${dispatch._id}/delivery-proof`,
+                                    {
+                                      headers: {
+                                        Authorization: `Bearer ${cookies?.access_token}`,
+                                      },
+                                      responseType: "blob",
+                                    }
+                                  );
 
-                                // Create a blob URL and trigger download
-                                const blob = new Blob([response.data]);
-                                const url = window.URL.createObjectURL(blob);
-                                const link = document.createElement('a');
-                                link.href = url;
-                                link.download = dispatch.delivery_proof.originalName || 'delivery-proof.pdf';
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                window.URL.revokeObjectURL(url);
-                              } catch (error) {
-                                console.error('Download error:', error);
-                                toast.error('Failed to download file');
-                              }
-                            }}
-                            className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
-                            style={{
-                              backgroundColor: colors.success[100],
-                              borderColor: colors.success[300],
-                              color: colors.success[700],
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = colors.success[200];
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = colors.success[100];
-                            }}
-                          >
-                            <FiEye size={14} />
-                            View
-                          </button>
-                        )}
+                                  // Create a blob URL and trigger download
+                                  const blob = new Blob([response.data]);
+                                  const url = window.URL.createObjectURL(blob);
+                                  const link = document.createElement("a");
+                                  link.href = url;
+                                  link.download =
+                                    dispatch.delivery_proof.originalName ||
+                                    "delivery-proof.pdf";
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                  window.URL.revokeObjectURL(url);
+                                } catch (error) {
+                                  console.error("Download error:", error);
+                                  toast.error("Failed to download file");
+                                }
+                              }}
+                              className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                              style={{
+                                backgroundColor: colors.success[100],
+                                borderColor: colors.success[300],
+                                color: colors.success[700],
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                  colors.success[200];
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                  colors.success[100];
+                              }}
+                            >
+                              <FiEye size={14} />
+                              View
+                            </button>
+                          )}
 
                         <button
                           onClick={() => {
@@ -1108,30 +1349,32 @@ const Dispatch = () => {
                             setShowInvoice(true);
                           }}
                           className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                            dispatch?.invoice?.filename ? 'border-green-500 bg-green-50' : ''
+                            dispatch?.invoice?.filename
+                              ? "border-green-500 bg-green-50"
+                              : ""
                           }`}
                           style={{
-                            backgroundColor: dispatch?.invoice?.filename 
-                              ? colors.success[50] 
+                            backgroundColor: dispatch?.invoice?.filename
+                              ? colors.success[50]
                               : colors.background.card,
-                            borderColor: dispatch?.invoice?.filename 
-                              ? colors.success[500] 
+                            borderColor: dispatch?.invoice?.filename
+                              ? colors.success[500]
                               : colors.border.medium,
-                            color: dispatch?.invoice?.filename 
-                              ? colors.success[700] 
+                            color: dispatch?.invoice?.filename
+                              ? colors.success[700]
                               : colors.text.secondary,
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor =
-                              dispatch?.invoice?.filename 
-                                ? colors.success[100] 
-                                : colors.gray[50];
+                            e.currentTarget.style.backgroundColor = dispatch
+                              ?.invoice?.filename
+                              ? colors.success[100]
+                              : colors.gray[50];
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor =
-                              dispatch?.invoice?.filename 
-                                ? colors.success[50] 
-                                : colors.background.card;
+                            e.currentTarget.style.backgroundColor = dispatch
+                              ?.invoice?.filename
+                              ? colors.success[50]
+                              : colors.background.card;
                           }}
                         >
                           <HiOutlinePaperClip size={16} />
@@ -1148,23 +1391,25 @@ const Dispatch = () => {
                                     headers: {
                                       Authorization: `Bearer ${cookies?.access_token}`,
                                     },
-                                    responseType: 'blob',
+                                    responseType: "blob",
                                   }
                                 );
 
                                 // Create a blob URL and trigger download
                                 const blob = new Blob([response.data]);
                                 const url = window.URL.createObjectURL(blob);
-                                const link = document.createElement('a');
+                                const link = document.createElement("a");
                                 link.href = url;
-                                link.download = dispatch.invoice.originalName || 'invoice.pdf';
+                                link.download =
+                                  dispatch.invoice.originalName ||
+                                  "invoice.pdf";
                                 document.body.appendChild(link);
                                 link.click();
                                 document.body.removeChild(link);
                                 window.URL.revokeObjectURL(url);
                               } catch (error) {
-                                console.error('Download error:', error);
-                                toast.error('Failed to download file');
+                                console.error("Download error:", error);
+                                toast.error("Failed to download file");
                               }
                             }}
                             className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
@@ -1174,10 +1419,12 @@ const Dispatch = () => {
                               color: colors.success[700],
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = colors.success[200];
+                              e.currentTarget.style.backgroundColor =
+                                colors.success[200];
                             }}
                             onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = colors.success[100];
+                              e.currentTarget.style.backgroundColor =
+                                colors.success[100];
                             }}
                           >
                             <FiEye size={14} />

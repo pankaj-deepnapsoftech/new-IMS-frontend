@@ -48,6 +48,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [buyerOptions, setBuyerOptions] = useState<BuyerOption[]>([]);
   const [isLoadingBuyers, setIsLoadingBuyers] = useState(false);
+  const [selectedSalesData, setSelectedSalesData] = useState<any>(null); // Store selected sales data
 
   // Items management
   const [items, setItems] = useState<
@@ -252,6 +253,9 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
       const party = selectedBuyer.data.party;
       const products = selectedBuyer.data.product_id || [];
 
+      // Store the selected sales data
+      setSelectedSalesData(selectedBuyer.data);
+
       // Auto set buyer + addresses
       formik.setValues({
         ...formik.values,
@@ -265,12 +269,16 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
         termsOfDelivery: selectedBuyer.data.terms_of_delivery || "",
       });
 
-      // Auto add product list to items
+      // Auto add product list to items with sales price
       if (products.length > 0) {
+        const salesPrice = selectedBuyer.data.price || 0; // Get the sales price
+        const quantity = selectedBuyer.data.product_qty || 1;
+
         const mappedItems = products.map((p: any) => ({
           item: { value: p._id, label: p.name },
-          quantity: selectedBuyer.data.product_qty || 1,
-          price: p.price,
+          quantity: quantity,
+          // Use the sales price for total price calculation
+          price: quantity * salesPrice,
           uom: p.uom || "PCS",
         }));
         setItems(mappedItems);
@@ -278,12 +286,14 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
 
       // Set Total from sales API
       if (selectedBuyer.data.total_price) {
-        setSubtotal(selectedBuyer.data.total_price / (1 + (selectedBuyer.data.GST || 0) / 100));
+        setSubtotal(
+          selectedBuyer.data.total_price /
+            (1 + (selectedBuyer.data.GST || 0) / 100)
+        );
         setTotal(selectedBuyer.data.total_price);
       }
     }
   };
-
 
   useEffect(() => {
     fetchBuyersHandler();
@@ -304,7 +314,6 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
       setTotal(subtotal);
     }
   }, [tax, subtotal]);
-
 
   return (
     <div
@@ -346,8 +355,6 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
       {/* Form */}
       <div className="p-6">
         <form onSubmit={formik.handleSubmit} className="space-y-6">
-
-
           {/* Consignee Ship To Section */}
           <div
             className="p-6 rounded-xl border"
@@ -395,7 +402,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     backgroundColor: colors.input.background,
                     borderColor:
                       formik.touched.consigneeShipTo &&
-                        formik.errors.consigneeShipTo
+                      formik.errors.consigneeShipTo
                         ? "#ef4444"
                         : colors.input.border,
                     color: colors.text.primary,
@@ -588,7 +595,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     backgroundColor: colors.input.background,
                     borderColor:
                       formik.touched.billerAddress &&
-                        formik.errors.billerAddress
+                      formik.errors.billerAddress
                         ? "#ef4444"
                         : colors.input.border,
                     color: colors.text.primary,
@@ -733,7 +740,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     backgroundColor: colors.input.background,
                     borderColor:
                       formik.touched.modeTermsOfPayment &&
-                        formik.errors.modeTermsOfPayment
+                      formik.errors.modeTermsOfPayment
                         ? "#ef4444"
                         : colors.input.border,
                     color: colors.text.primary,
@@ -818,7 +825,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                     backgroundColor: colors.input.background,
                     borderColor:
                       formik.touched.buyersOrderNo &&
-                        formik.errors.buyersOrderNo
+                      formik.errors.buyersOrderNo
                         ? "#ef4444"
                         : colors.input.border,
                     color: colors.text.primary,
@@ -1051,7 +1058,11 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
               </h3>
             </div>
 
-            <AddItems inputs={items} setInputs={setItems} />
+            <AddItems
+              inputs={items}
+              setInputs={setItems}
+              salesData={selectedSalesData}
+            />
           </div>
 
           {/* Tax and Financial Summary */}
