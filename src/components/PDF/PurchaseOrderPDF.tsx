@@ -339,8 +339,8 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
               <Text style={styles.sectionValue}>
                 {purchaseOrder?.supplierShippedGSTIN || "N/A"}
               </Text>
-              <Text style={styles.sectionLabel}>Our PAN No.:</Text>
-              <Text style={styles.sectionValue}>ABCDE1234F</Text>
+              {/* <Text style={styles.sectionLabel}>Our PAN No.:</Text>
+              <Text style={styles.sectionValue}>ABCDE1234F</Text> */}
               <Text style={styles.sectionLabel}>Email:</Text>
               <Text style={styles.sectionValue}>info@deepnapsoftech.com</Text>
             </View>
@@ -351,17 +351,17 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
                 {purchaseOrder?.supplier?.company_name ||
                   purchaseOrder?.supplier?.consignee_name?.[0] ||
                   purchaseOrder?.supplierName ||
-                  "Supplier Name"}
+                  "N/A"}
               </Text>
               <Text style={styles.sectionLabel}>Supplier Address:</Text>
               <Text style={styles.sectionValue}>
                 {purchaseOrder?.supplier?.address?.[0] ||
                   purchaseOrder?.supplierShippedTo ||
-                  "Supplier Address"}
+                  "N/A"}
               </Text>
               <Text style={styles.sectionLabel}>Supplier Code:</Text>
               <Text style={styles.sectionValue}>
-                {purchaseOrder?.supplier?.cust_id || "SUP001"}
+                {purchaseOrder?.supplier?.cust_id}
               </Text>
               <Text style={styles.sectionLabel}>Supplier GSTIN:</Text>
               <Text style={styles.sectionValue}>
@@ -369,15 +369,15 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
                   purchaseOrder?.supplierBillGSTIN ||
                   "N/A"}
               </Text>
-              <Text style={styles.sectionLabel}>Supplier PAN No.:</Text>
+              {/* <Text style={styles.sectionLabel}>Supplier PAN No.:</Text>
               <Text style={styles.sectionValue}>
                 {purchaseOrder?.supplier?.pan_number || "FGHIJ5678K"}
-              </Text>
+              </Text> */}
               <Text style={styles.sectionLabel}>Supplier Email:</Text>
               <Text style={styles.sectionValue}>
                 {purchaseOrder?.supplier?.email_id?.[0] ||
                   purchaseOrder?.supplierEmail ||
-                  "supplier@email.com"}
+                  "N/A"}
               </Text>
             </View>
             {/* <View style={styles.dateSection}>
