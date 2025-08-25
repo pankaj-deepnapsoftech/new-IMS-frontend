@@ -252,7 +252,6 @@ const toWords = new ToWords({
 
 const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
   // Handle both new items array structure and legacy single item structure
-  console.log("hello fom pdf====>>>",purchaseOrder)
   const items =
     purchaseOrder?.items && purchaseOrder.items.length > 0
       ? purchaseOrder.items
@@ -271,7 +270,6 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             productId: purchaseOrder?.product?.product_id || "ITM001",
           },
         ];
-
 
   // Calculate totals from actual items
   const baseAmount = items.reduce(
@@ -298,8 +296,6 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
     sgst = (baseAmount * sgstRate) / 100;
     grandTotal = baseAmount + cgst + sgst;
   }
-
-  console.log("Purchase Order Daaaaaaaaaaaaata:", purchaseOrder);
 
   return (
     <Document>
@@ -330,13 +326,15 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
           <View style={styles.headerRow}>
             <View style={styles.companySection}>
               <Text style={styles.sectionLabel}>Company Name:</Text>
-              <Text style={styles.sectionValue}>{purchaseOrder?.cpny_name}</Text>
-              <Text style={styles.sectionLabel}>Address:</Text>
               <Text style={styles.sectionValue}>
-                {purchaseOrder.address}
+                {purchaseOrder?.cpny_name}
               </Text>
+              <Text style={styles.sectionLabel}>Address:</Text>
+              <Text style={styles.sectionValue}>{purchaseOrder.address}</Text>
               <Text style={styles.sectionLabel}>Phone No:</Text>
-              <Text style={styles.sectionValue}>+91-{purchaseOrder?.phone}</Text>
+              <Text style={styles.sectionValue}>
+                +91-{purchaseOrder?.phone}
+              </Text>
               <Text style={styles.sectionLabel}>Our GSTIN:</Text>
               <Text style={styles.sectionValue}>
                 {purchaseOrder?.GSTIN || "N/A"}

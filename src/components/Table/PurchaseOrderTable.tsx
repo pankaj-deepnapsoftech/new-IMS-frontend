@@ -61,15 +61,18 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState<string>("");
 
-// NEW: State to store fetched user data
+  // NEW: State to store fetched user data
   const [userData, setUserData] = useState<PurchaseOrder | null>(null);
 
-   // NEW: Function to fetch purchase order data from API
+  // NEW: Function to fetch purchase order data from API
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/user`, {
-        headers: { Authorization: `Bearer ${cookies?.access_token}` },
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}auth/user`,
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
 
       if (response.data.success) {
         setUserData(response.data.user); // Assuming API returns data in `data` field
@@ -77,7 +80,7 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
         console.error("Failed to fetch user data:", response.data.message);
         toast.error("Failed to fetch user data");
       }
-      console.log("ggggggggggggggggggggggggggg",response.data)
+      console.log("ggggggggggggggggggggggggggg", response.data);
     } catch (error: any) {
       console.error("Error fetching user data:", error);
       toast.error(error.message || "Failed to fetch user data");
@@ -90,8 +93,8 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
   }, []); // Empty dependency array ensures it runs only on mount
 
   useEffect(() => {
-    console.log("The user data is ::: ",userData)
-  },[]);
+    console.log("The user data is ::: ", userData);
+  }, []);
 
   // Auto-refresh setup
   useEffect(() => {
@@ -214,7 +217,6 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
     const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
     return dateB - dateA;
   });
-
 
   // Selection state helpers
   const isAllSelected =
@@ -872,7 +874,9 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                           </button>
                           <PDFDownloadLink
                             document={
-                              <PurchaseOrderPDF purchaseOrder={userData || order} />
+                              <PurchaseOrderPDF
+                                purchaseOrder={{ ...order, ...userData }}
+                              />
                             }
                             fileName={`purchase_order_${
                               order.poOrder || order._id
@@ -937,7 +941,10 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                       className="w-12 h-12 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: colors.error[100] }}
                     >
-                      <BiSolidTrash className="w-6 h-6" style={{ color: colors.error[600] }} />
+                      <BiSolidTrash
+                        className="w-6 h-6"
+                        style={{ color: colors.error[600] }}
+                      />
                     </div>
                     <div className="text-center">
                       <p
@@ -1013,7 +1020,10 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                     onClick={() => setShowBulkDeleteModal(false)}
                     className="p-1 rounded-lg transition-colors hover:bg-gray-100"
                   >
-                    <BiX className="w-5 h-5" style={{ color: colors.text.secondary }} />
+                    <BiX
+                      className="w-5 h-5"
+                      style={{ color: colors.text.secondary }}
+                    />
                   </button>
                 )}
               </div>
@@ -1028,14 +1038,18 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                       className="w-12 h-12 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: colors.error[100] }}
                     >
-                      <BiSolidTrash className="w-6 h-6" style={{ color: colors.error[600] }} />
+                      <BiSolidTrash
+                        className="w-6 h-6"
+                        style={{ color: colors.error[600] }}
+                      />
                     </div>
                     <div className="text-center">
                       <p
                         className="font-medium mb-1"
                         style={{ color: colors.error[800] }}
                       >
-                        Delete {selectedOrders.length} Purchase Order{selectedOrders.length !== 1 ? "s" : ""}
+                        Delete {selectedOrders.length} Purchase Order
+                        {selectedOrders.length !== 1 ? "s" : ""}
                       </p>
                       <p
                         className="text-sm"
@@ -1051,8 +1065,9 @@ const PurchaseOrderTable: React.FC<PurchaseOrderTableProps> = ({
                   className="text-sm text-center"
                   style={{ color: colors.text.secondary }}
                 >
-                  Are you sure you want to delete {selectedOrders.length} selected
-                  purchase order{selectedOrders.length !== 1 ? "s" : ""}?
+                  Are you sure you want to delete {selectedOrders.length}{" "}
+                  selected purchase order
+                  {selectedOrders.length !== 1 ? "s" : ""}?
                 </p>
               </div>
 
