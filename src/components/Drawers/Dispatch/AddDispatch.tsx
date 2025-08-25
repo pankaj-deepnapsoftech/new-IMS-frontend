@@ -138,7 +138,7 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
         };
 
         if (editDispatch) {
-          await axios.put(
+          const response = await axios.put(
             `${process.env.REACT_APP_BACKEND_URL}dispatch/update/${editDispatch._id}`,
             payload,
             {
@@ -147,7 +147,15 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
               },
             }
           );
-          toast.success("Dispatch updated successfully");
+          
+          // Check if quantity was changed and show appropriate message
+          const prevQty = parseInt(editDispatch?.dispatch_qty) || 0;
+          const newQty = parseInt(payload.dispatch_qty) || 0;
+          const message = prevQty !== newQty 
+            ? response?.data?.message || "Dispatch updated successfully, status changed to Dispatch Pending"
+            : "Dispatch updated successfully";
+          
+          toast.success(message);
         } else {
           await axios.post(
             `${process.env.REACT_APP_BACKEND_URL}dispatch/create`,
