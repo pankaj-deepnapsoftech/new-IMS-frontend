@@ -2,12 +2,15 @@
 
 import { Select, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import moment from "moment";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { FaCaretDown, FaCaretUp, FaFilePdf } from "react-icons/fa";
 import { usePagination, useSortBy, useTable } from "react-table";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { colors } from "../../theme/colors";
 import PorformaInvoicePDF from "../PDF/PorformaInvoicePDF";
+import axios from "axios";
+import { useCookies } from "react-cookie";
+
 
 interface ProformaInvoiceTableProps {
   proformaInvoices: Array<{
@@ -34,6 +37,40 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
 }) => {
   const [showDeletePage, setshowDeletePage] = useState(false);
   const [deleteId, setdeleteId] = useState("");
+  const [userData, setUserData] = useState<PurchaseOrder | null>(null);
+  const [cookies] = useCookies();
+   
+
+  // NEW: Function to fetch purchase order data from API
+  const fetchUserData = async () => {
+    try {
+      console.log("INside try")
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}auth/user`,
+        {
+          headers: { Authorization: `Bearer ${cookies?.access_token}` },
+        }
+      );
+      console.log("Inside Proforma Function ::", response.data);
+
+      if (response.data.success) {
+        setUserData(response.data.user); // Assuming API returns data in `data` field
+      } else {
+        console.error("Failed to fetch user data:", response.data.message);
+        // toast.error("Failed to fetch user data");
+      }
+
+      console.log("Inside Proforma Function ::", response.data);
+    } catch (error: any) {
+      console.error("Error fetching user data:", error);
+      // toast.error(error.message || "Failed to fetch user data");
+    }
+  };
+
+  // NEW: useEffect to fetch user data on component mount
+  useEffect(() => {
+    fetchUserData();
+  }, []); // Empty dependency array ensures it runs only on mount
 
   const columns = useMemo(
     () => [
@@ -79,6 +116,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
     usePagination
   );
   // console.log(proformaInvoices)
+ 
 
   return (
     <div className="p-6">
@@ -224,9 +262,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                               <div className="flex items-center gap-1">
                                 {column.render("Header")}
                                 {column.isSorted && (
-                                  <span
-                                    style={{ color: colors.primary[500] }}
-                                  >
+                                  <span style={{ color: colors.primary[500] }}>
                                     {column.isSortedDesc ? (
                                       <FaCaretDown />
                                     ) : (
@@ -250,8 +286,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                         </Th>
                       </Tr>
                     );
-                  }
-                  )}
+                  })}
                 </Thead>
                 <Tbody {...getTableBodyProps()}>
                   {page.map((row: any, index) => {
@@ -498,6 +533,7 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                               document={
                                 <PorformaInvoicePDF
                                   proformaInvoice={row.original}
+                                  userData={userData}
                                 />
                               }
                               fileName={`ProformaInvoice_${row.original._id}.pdf`}
@@ -538,7 +574,6 @@ const ProformaInvoiceTable: React.FC<ProformaInvoiceTableProps> = ({
                     );
                   })}
                 </Tbody>
-
               </Table>
             </div>
           </div>

@@ -252,6 +252,7 @@ const toWords = new ToWords({
 
 const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
   // Handle both new items array structure and legacy single item structure
+  console.log("hello fom pdf====>>>",purchaseOrder)
   const items =
     purchaseOrder?.items && purchaseOrder.items.length > 0
       ? purchaseOrder.items
@@ -270,6 +271,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
             productId: purchaseOrder?.product?.product_id || "ITM001",
           },
         ];
+
 
   // Calculate totals from actual items
   const baseAmount = items.reduce(
@@ -328,21 +330,21 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
           <View style={styles.headerRow}>
             <View style={styles.companySection}>
               <Text style={styles.sectionLabel}>Company Name:</Text>
-              <Text style={styles.sectionValue}>Deepnap Softech</Text>
+              <Text style={styles.sectionValue}>{purchaseOrder?.cpny_name}</Text>
               <Text style={styles.sectionLabel}>Address:</Text>
               <Text style={styles.sectionValue}>
-                123 Street, Sector 28, Faridabad, Haryana - 1210002
+                {purchaseOrder.address}
               </Text>
-              <Text style={styles.sectionLabel}>Phone No.:</Text>
-              <Text style={styles.sectionValue}>+91-1234567890</Text>
+              <Text style={styles.sectionLabel}>Phone No:</Text>
+              <Text style={styles.sectionValue}>+91-{purchaseOrder?.phone}</Text>
               <Text style={styles.sectionLabel}>Our GSTIN:</Text>
               <Text style={styles.sectionValue}>
-                {purchaseOrder?.supplierShippedGSTIN || "N/A"}
+                {purchaseOrder?.GSTIN || "N/A"}
               </Text>
-              <Text style={styles.sectionLabel}>Our PAN No.:</Text>
+              <Text style={styles.sectionLabel}>Our PAN No:</Text>
               <Text style={styles.sectionValue}>ABCDE1234F</Text>
               <Text style={styles.sectionLabel}>Email:</Text>
-              <Text style={styles.sectionValue}>info@deepnapsoftech.com</Text>
+              <Text style={styles.sectionValue}>{purchaseOrder?.email}</Text>
             </View>
 
             <View style={styles.companySection}>

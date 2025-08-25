@@ -30,6 +30,7 @@ import EmptyData from "../../ui/emptyData";
 import { colors } from "../../theme/colors";
 import { useCookies } from "react-cookie";
 import BOMPDF from "../PDF/BOMPDF";
+import axios from 'axios'
 
 interface BOMTableProps {
   boms: Array<{
@@ -94,13 +95,40 @@ const BOMTable: React.FC<BOMTableProps> = ({
     }
   };
 
+  const [userData, setUserData] = useState<PurchaseOrder | null>(null);
+    
+       // NEW: Function to fetch purchase order data from API
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/user`, {
+            headers: { Authorization: `Bearer ${cookies?.access_token}` },
+          });
+    
+          if (response.data.success) {
+            setUserData(response.data.user); // Assuming API returns data in `data` field
+          } else {
+            console.error("Failed to fetch user data:", response.data.message);
+            toast.error("Failed to fetch user data");
+          }
+        } catch (error: any) {
+          console.error("Error fetching user data:", error);
+          toast.error(error.message || "Failed to fetch user data");
+        }
+      };
+    
+      // NEW: useEffect to fetch user data on component mount
+      useEffect(() => {
+        fetchUserData();
+      }, []); // Empty dependency array ensures it runs only on mount
+  
+
   // Handle PDF download with complete BOM data
   const handlePDFDownload = async (bomId: string, bomName: string) => {
     const fullBomData = await fetchBomForPDF(bomId);
     if (fullBomData) {
       // Create a temporary PDF download link
       const { pdf } = await import("@react-pdf/renderer");
-      const blob = await pdf(<BOMPDF bom={fullBomData} />).toBlob();
+      const blob = await pdf(<BOMPDF bom={fullBomData} userData ={userData} />).toBlob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;

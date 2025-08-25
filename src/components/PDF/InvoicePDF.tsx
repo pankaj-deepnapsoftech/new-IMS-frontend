@@ -326,7 +326,7 @@ interface InvoicePDFProps {
   };
 }
 
-const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
+const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice,userData }) => {
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -399,17 +399,17 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
                 {isSupplier ? "Buyer Details:" : "Seller Details:"}
               </Text>
               <Text style={styles.sectionValue}>
-                {COMPANY_INFO.name}
+                {userData?.cpny_name}
                 {"\n"}
-                {COMPANY_INFO.address}
+                {userData?.address}
                 {"\n"}
-                Phone: {COMPANY_INFO.phone}
+                Phone: {userData?.phone}
                 {"\n"}
-                GSTIN: {COMPANY_INFO.gstin}
+                GSTIN: {userData?.GSTIN}
                 {"\n"}
-                PAN: {COMPANY_INFO.pan}
-                {"\n"}
-                Email: {COMPANY_INFO.email}
+                {/* PAN: {COMPANY_INFO.pan} */}
+                {/* {"\n"} */}
+                Email: {userData?.email}
               </Text>
             </View>
             <View style={styles.invoiceNoSection}>
@@ -578,11 +578,11 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
         <View style={styles.notesSection}>
           <Text style={styles.notesLabel}>Bank Details:</Text>
           <Text style={styles.notesText}>
-            Bank Name: {COMPANY_INFO.bankName}
+            Bank Name: {userData?.Bank_Name}
             {"\n"}
-            Account No.: {COMPANY_INFO.accountNo}
+            Account No.: {userData?.Account_No}
             {"\n"}
-            IFSC Code: {COMPANY_INFO.ifscCode}
+            IFSC Code: {userData?.IFSC_Code}
           </Text>
         </View>
 

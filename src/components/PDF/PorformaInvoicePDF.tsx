@@ -232,11 +232,12 @@ const toWords = new ToWords({
   },
 });
 
-const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
+const PorformaInvoicePDF = ({ proformaInvoice, userData }: any) => {
   const subtotal = proformaInvoice?.subtotal || 0;
   const cgst = (subtotal * 9) / 100;
   const sgst = (subtotal * 9) / 100;
   const total = subtotal + cgst + sgst;
+  console.log("Proforma Invoice Userdata",userData);
 
   console.log(proformaInvoice);
   return (
@@ -248,7 +249,7 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
           <View style={styles.headerRow}>
             <View style={styles.sellerSection}>
               <Text style={styles.sectionLabel}>Seller</Text>
-              <Text style={styles.sectionValue}>Deepnap Softech</Text>
+              <Text style={styles.sectionValue}>{userData?.cpny_name}</Text>
             </View>
             <View style={styles.invoiceNoSection}>
               <Text style={styles.sectionLabel}>Invoice No.</Text>
@@ -451,9 +452,9 @@ const PorformaInvoicePDF = ({ proformaInvoice }: any) => {
           <View style={styles.bankDetailsSection}>
             <Text style={styles.sectionLabel}>Bank Details</Text>
             <Text style={styles.sectionValue}>
-              Bank Name: HDFC Bank{"\n"}
-              Account No.: 123456789123456{"\n"}
-              IFSC Code: F4H5ED08
+              Bank Name: {userData?.Bank_Name}{"\n"}
+              Account No.: {userData?.Account_No}{"\n"}
+              IFSC Code: {userData?.IFSC_Code}
             </Text>
           </View>
           <View style={styles.signatureSection}>
