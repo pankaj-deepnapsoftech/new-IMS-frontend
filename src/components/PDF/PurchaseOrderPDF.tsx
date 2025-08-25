@@ -297,7 +297,7 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
     grandTotal = baseAmount + cgst + sgst;
   }
 
-  console.log("Purchase Order Data:", purchaseOrder);
+  console.log("Purchase Order Daaaaaaaaaaaaata:", purchaseOrder);
 
   return (
     <Document>
@@ -361,7 +361,9 @@ const PurchaseOrderPDF = ({ purchaseOrder }: any) => {
               </Text>
               <Text style={styles.sectionLabel}>Supplier Code:</Text>
               <Text style={styles.sectionValue}>
-                {purchaseOrder?.supplier?.cust_id}
+                {purchaseOrder?.supplier?.supplier_code ||
+                  purchaseOrder?.supplierCode ||
+                  "N/A"}
               </Text>
               <Text style={styles.sectionLabel}>Supplier GSTIN:</Text>
               <Text style={styles.sectionValue}>

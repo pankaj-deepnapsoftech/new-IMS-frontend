@@ -93,6 +93,7 @@ interface PurchaseOrderFormValues {
   additionalImportant: string;
   items: Item[];
   isSameAddress: boolean;
+  supplierCode: string;
 }
 
 const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
@@ -203,6 +204,8 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
       paymentTerms: edittable?.paymentTerms || "",
       additionalRemarks: edittable?.additionalRemarks || "",
       additionalImportant: edittable?.additionalImportant || "",
+      supplierCode: edittable?.supplierCode || "",
+
       items:
         edittable?.items?.map((item) => ({
           ...item,
@@ -246,6 +249,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
       const payload = {
         ...values,
         supplierName: values.supplierIdentifier,
+        supplierCode: values.supplierCode,
       };
 
       try {
@@ -494,6 +498,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
 
     if (selectedSupplier) {
       // First set the basic data from the initial supplier list
+      formik.setFieldValue("supplierCode", selectedSupplier?.supplierCode);
       formik.setFieldValue(
         "supplierName",
         selectedSupplier.supplierName || selectedSupplier.companyName
@@ -541,7 +546,7 @@ const AddPurchaseOrder: React.FC<AddPurchaseOrderProps> = ({
         if (data.success && data.supplier) {
           const supplier = data.supplier;
           console.log("Supplier details from API:", supplier);
-
+  formik.setFieldValue("supplierCode", supplier.supplierCode || "");
           // Override with detailed data from API
           formik.setFieldValue(
             "supplierName",
