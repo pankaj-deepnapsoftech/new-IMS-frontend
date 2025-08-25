@@ -48,39 +48,49 @@ const Dispatch = () => {
     const invoiceTotal = parseFloat(dispatch.invoice.total) || 0;
     const invoiceBalance = parseFloat(dispatch.invoice.balance) || 0;
 
+    // Calculate total paid amount
+    // If invoiceBalance is available, total paid = total - balance
+    // Otherwise, sum up individual payments
     let totalPaid = 0;
-    if (dispatch.invoice.payments && Array.isArray(dispatch.invoice.payments)) {
+    if (typeof invoiceBalance === "number") {
+      totalPaid = invoiceTotal - invoiceBalance;
+    } else if (
+      dispatch.invoice.payments &&
+      Array.isArray(dispatch.invoice.payments)
+    ) {
       totalPaid = dispatch.invoice.payments.reduce((sum, payment) => {
         return sum + (parseFloat(payment.amount) || 0);
       }, 0);
-    } else {
-      totalPaid = invoiceTotal - invoiceBalance;
     }
 
+    // Ensure totalPaid is not negative
     totalPaid = Math.max(0, totalPaid);
 
-    const remainingBalance = invoiceTotal - totalPaid;
+    // Debug logging
+    if (dispatch.invoice.invoice_no) {
+      console.log(`Invoice ${dispatch.invoice.invoice_no}:`, {
+        total: invoiceTotal,
+        balance: invoiceBalance,
+        totalPaid: totalPaid,
+        status:
+          totalPaid === 0
+            ? "Unpaid"
+            : Math.abs(invoiceBalance) <= 0.01
+            ? "Paid"
+            : "Partial Paid",
+      });
+    }
 
-    // if (dispatch.invoice.invoice_no) {
-    //   console.log(`Invoice ${dispatch.invoice.invoice_no}:`, {
-    //     total: invoiceTotal,
-    //     balance: invoiceBalance,
-    //     totalPaid: totalPaid,
-    //     remainingBalance: remainingBalance,
-    //     paymentsArray: dispatch.invoice.payments,
-    //     status: totalPaid === 0 ? "Unpaid" : remainingBalance <= 0.01 ? "Paid" : "Partial Paid"
-    //   });
-    // }
-
+    // Determine payment status
     if (invoiceTotal === 0) {
       return "Unpaid";
     }
 
     if (totalPaid === 0) {
       return "Unpaid";
-    } else if (remainingBalance <= 0.01) {
+    } else if (Math.abs(invoiceBalance) <= 0.01) {
       return "Paid";
-    } else if (totalPaid > 0 && remainingBalance > 0.01) {
+    } else if (totalPaid > 0 && invoiceBalance > 0.01) {
       return "Partial Paid";
     } else {
       return "Unpaid";
@@ -93,17 +103,21 @@ const Dispatch = () => {
     const invoiceTotal = parseFloat(dispatch.invoice.total) || 0;
     const invoiceBalance = parseFloat(dispatch.invoice.balance) || 0;
 
+    // Calculate total paid amount
     let totalPaid = 0;
-    if (dispatch.invoice.payments && Array.isArray(dispatch.invoice.payments)) {
+    if (typeof invoiceBalance === "number") {
+      totalPaid = invoiceTotal - invoiceBalance;
+    } else if (
+      dispatch.invoice.payments &&
+      Array.isArray(dispatch.invoice.payments)
+    ) {
       totalPaid = dispatch.invoice.payments.reduce((sum, payment) => {
         return sum + (parseFloat(payment.amount) || 0);
       }, 0);
-    } else {
-      totalPaid = invoiceTotal - invoiceBalance;
     }
 
     totalPaid = Math.max(0, totalPaid);
-    const remainingBalance = Math.max(0, invoiceTotal - totalPaid);
+    const remainingBalance = Math.max(0, invoiceBalance);
 
     return {
       total: invoiceTotal,
@@ -962,7 +976,6 @@ const Dispatch = () => {
                                       {dispatch?.sales_data ? (
                                         <span className="flex items-center gap-1">
                                           ₹{dispatch?.total_amount || "N/A"}
-                                          
                                         </span>
                                       ) : (
                                         `₹${dispatch?.total_amount || "N/A"}`
@@ -998,7 +1011,6 @@ const Dispatch = () => {
                                         return dispatchAmount > 0 ? (
                                           <span className="flex items-center gap-1">
                                             ₹{Math.round(dispatchAmount)}
-                                            
                                           </span>
                                         ) : (
                                           "N/A"
@@ -1063,7 +1075,6 @@ const Dispatch = () => {
                                         return remainingAmount >= 0 ? (
                                           <span className="flex items-center gap-1">
                                             ₹{Math.round(remainingAmount)}
-                                            
                                           </span>
                                         ) : (
                                           "N/A"

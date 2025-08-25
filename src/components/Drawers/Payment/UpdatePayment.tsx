@@ -5,9 +5,7 @@ import Drawer from "../../../ui/Drawer";
 import { BiX } from "react-icons/bi";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
-import {
-  useUpdatePaymentMutation,
-} from "../../../redux/api/api";
+import { useUpdatePaymentMutation } from "../../../redux/api/api";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 
@@ -17,7 +15,11 @@ interface UpdatePayment {
   id: string | undefined;
 }
 
-const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPaymentsHandler, id }) => {
+const UpdatePayment: React.FC<UpdatePayment> = ({
+  closeDrawerHandler,
+  fetchPaymentsHandler,
+  id,
+}) => {
   const [cookies] = useCookies();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
@@ -44,7 +46,7 @@ const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPayme
     e.preventDefault();
 
     if ((invoiceBalance || 0) < (amount || 0)) {
-      toast.error('Amount must be less than the balance amount');
+      toast.error("Amount must be less than the balance amount");
       return;
     }
 
@@ -52,7 +54,7 @@ const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPayme
       _id: paymentId,
       amount: amount,
       description: description,
-      mode: mode?.value
+      mode: mode?.value,
     };
 
     try {
@@ -63,7 +65,7 @@ const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPayme
       }
       toast.success(response.message);
       closeDrawerHandler();
-      fetchPaymentsHandler()
+      fetchPaymentsHandler();
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
@@ -75,7 +77,8 @@ const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPayme
     try {
       setIsLoading(true);
       // @ts-ignore
-      const response = await fetch(process.env.REACT_APP_BACKEND_URL + `payment/${id}`,
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + `payment/${id}`,
         {
           method: "GET",
           headers: {
@@ -93,6 +96,32 @@ const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPayme
       setMode({ value: data.payment.mode, label: data.payment.mode });
       setDescription(data.payment?.description);
       setAmount(data.payment.amount);
+
+      // Double-check the balance by fetching the current invoice directly
+      // This ensures we have the most up-to-date balance for validation
+      try {
+        const invoiceResponse = await fetch(
+          process.env.REACT_APP_BACKEND_URL +
+            `invoice/${data.payment.invoice._id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${cookies?.access_token}`,
+            },
+          }
+        );
+        const invoiceData = await invoiceResponse.json();
+        if (invoiceData.success && invoiceData.invoice) {
+          console.log(
+            "UpdatePayment - Direct invoice balance:",
+            invoiceData.invoice.balance
+          );
+          setInvoiceBalance(invoiceData.invoice.balance);
+        }
+      } catch (invoiceError) {
+        console.log("Could not fetch direct invoice balance:", invoiceError);
+        // Continue with the balance from payment response
+      }
     } catch (error: any) {
       toast.error(error.messsage || "Something went wrong");
     } finally {
@@ -118,16 +147,16 @@ const UpdatePayment: React.FC<UpdatePayment> = ({ closeDrawerHandler, fetchPayme
       </h1>
 
       <div className="mt-8 px-5">
-        <h2 className="text-2xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
-          Edit Payment
-        </h2>
-
         <div>
           <h2 className="text-xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
-            Invoice Details
+            Edit Payment
           </h2>
-          <p className="mt-1"><span className="font-bold">Total</span>: ₹ {invoiceTotal}/-</p>
-          <p className="mt-1"><span className="font-bold">Balance</span>: ₹ {invoiceBalance}/-</p>
+          <p className="mt-1">
+            <span className="font-bold">Total</span>: ₹ {invoiceTotal}/-
+          </p>
+          <p className="mt-1">
+            <span className="font-bold">Balance</span>: ₹ {invoiceBalance}/-
+          </p>
         </div>
 
         <form onSubmit={updatePaymentHandler}>

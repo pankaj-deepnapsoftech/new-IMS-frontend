@@ -54,7 +54,8 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
       const invoice = payment.invoice;
       const buyer = invoice.buyer;
 
-      console.log("IIIIIIIInvoice", invoice);
+      console.log("Payment Details Invoice:", invoice);
+      console.log("Current Balance:", invoice.balance);
 
       setInvoiceNo(invoice.invoice_no);
       setMode(payment.mode);
@@ -72,13 +73,33 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
       setTotal(invoice.total);
       setBalance(invoice.balance);
 
+      // Double-check the balance by fetching the current invoice directly
+      // This ensures we have the most up-to-date balance
+      try {
+        const invoiceResponse = await fetch(
+          process.env.REACT_APP_BACKEND_URL + `invoice/${invoice._id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${cookies?.access_token}`,
+            },
+          }
+        );
+        const invoiceData = await invoiceResponse.json();
+        if (invoiceData.success && invoiceData.invoice) {
+          console.log("Direct invoice balance:", invoiceData.invoice.balance);
+          setBalance(invoiceData.invoice.balance);
+        }
+      } catch (invoiceError) {
+        console.log("Could not fetch direct invoice balance:", invoiceError);
+        // Continue with the balance from payment response
+      }
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
     } finally {
       setIsLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchPaymentDetails(id || "");
@@ -94,7 +115,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
       }}
     >
       <h1 className="px-4 flex gap-x-2 items-center text-xl py-3 border-b">
-        { /* @ts-ignore */}
+        {/* @ts-ignore */}
         <BiX onClick={closeDrawerHandler} size="26px" />
         Payment
       </h1>
@@ -113,7 +134,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
               <p>{invoiceNo}</p>
             </div>
             <div className="mt-3 mb-5">
-              <p className="font-semibold">Paid  Amount</p>
+              <p className="font-semibold">Paid Amount</p>
               <p>₹ {amount}/-</p>
             </div>
             <div className="mt-3 mb-5">
@@ -122,7 +143,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Description</p>
-              <p>{description || 'N/A'}</p>
+              <p>{description || "N/A"}</p>
             </div>
 
             {/* New Buyer Info */}
@@ -136,11 +157,11 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
             </div> */}
             <div className="mt-3 mb-5">
               <p className="font-semibold">Email</p>
-              <p>{buyerEmail || 'N/A'}</p>
+              <p>{buyerEmail || "N/A"}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Contact Number</p>
-              <p>{buyerContact || 'N/A'}</p>
+              <p>{buyerContact || "N/A"}</p>
             </div>
             {buyerCompany ? (
               <div className="mt-3 mb-5">
@@ -154,8 +175,6 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
                   <p key={index}>{name}</p>
                 ))}
               </div>
-
-
             ) : null}
             <h2 className="text-xl font-semibold py-3 mt-6 border-b">
               Invoice Summary
@@ -163,27 +182,30 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
 
             <div className="mt-3 mb-5">
               <p className="font-semibold">Subtotal</p>
-              <p>₹ {subtotal?.toFixed(2) || '0.00'}</p>
+              <p>₹ {subtotal?.toFixed(2) || "0.00"}</p>
             </div>
             {taxName && (
               <div className="mt-3 mb-5">
                 <p className="font-semibold">Tax ({taxName})</p>
-                <p>₹ {(subtotal && taxAmount) ? (subtotal * taxAmount).toFixed(2) : '0.00'}</p>
+                <p>
+                  ₹{" "}
+                  {subtotal && taxAmount
+                    ? (subtotal * taxAmount).toFixed(2)
+                    : "0.00"}
+                </p>
               </div>
             )}
             <div className="mt-3 mb-5">
               <p className="font-semibold">Total</p>
-              <p>₹ {total?.toFixed(2) || '0.00'}</p>
+              <p>₹ {total?.toFixed(2) || "0.00"}</p>
             </div>
             <div className="mt-3 mb-5">
               <p className="font-semibold">Balance (Remaining)</p>
-              <p>₹ {balance?.toFixed(2) || '0.00'}</p>
+              <p>₹ {balance?.toFixed(2) || "0.00"}</p>
             </div>
-
           </div>
         )}
       </div>
-
     </div>
   );
 };
