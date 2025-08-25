@@ -36,12 +36,16 @@ const Dispatch = () => {
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDispatchId, setSelectedDispatchId] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadType, setUploadType] = useState(""); // "delivery" or "invoice"
 
   const role = cookies?.role;
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setSelectedFile(file);
       setFileName(file.name);
 
       if (file.type.startsWith("image/")) {
@@ -53,6 +57,65 @@ const Dispatch = () => {
       } else {
         setPreview(null);
       }
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile || !selectedDispatchId) {
+      toast.error("Please select a file and dispatch");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+      if (uploadType === "delivery") {
+        formData.append("delivery_proof", selectedFile);
+      } else {
+        formData.append("invoice", selectedFile);
+      }
+
+      const endpoint =
+        uploadType === "delivery"
+          ? `upload-delivery-proof/${selectedDispatchId}`
+          : `upload-invoice/${selectedDispatchId}`;
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}dispatch/${endpoint}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+
+      toast.success(
+        `${
+          uploadType === "delivery" 
+            ? "Delivery proof uploaded successfully! Status changed to Delivered." 
+            : "Invoice uploaded successfully"
+        }`
+      );
+
+      setSelectedFile(null);
+      setFileName("");
+      setPreview(null);
+      setSelectedDispatchId(null);
+      setShowDeliveryProof(false);
+      setShowInvoice(false);
+
+      GetDispatch();
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(
+        `Failed to upload ${
+          uploadType === "delivery" ? "delivery proof" : "invoice"
+        }`
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -101,8 +164,26 @@ const Dispatch = () => {
   const GetDispatch = async () => {
     try {
       setIsLoading(true);
+      
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '10'
+      });
+
+      // Add filters if not "All"
+      if (productFilter !== "All") {
+        params.append('dispatch_status', productFilter);
+      }
+      if (paymentFilter !== "All") {
+        params.append('payment_status', paymentFilter);
+      }
+      if (searchTerm) {
+        params.append('search', searchTerm);
+      }
+
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}dispatch/getAll?page=${page}&limit=10`,
+        `${process.env.REACT_APP_BACKEND_URL}dispatch/getAll?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${cookies.access_token}`,
@@ -121,7 +202,7 @@ const Dispatch = () => {
 
   useEffect(() => {
     GetDispatch();
-  }, [page]);
+  }, [page, productFilter, paymentFilter, searchTerm]);
 
   if (isLoading) {
     return (
@@ -522,7 +603,41 @@ const Dispatch = () => {
               >
                 <option value="All">All Product Status</option>
                 <option value="Dispatch">Dispatch</option>
+                <option value="Dispatch Pending">Dispatch Pending</option>
                 <option value="Delivered">Delivered</option>
+              </select>
+            </div>
+
+            <div className="w-full lg:w-48">
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                Payment Status
+              </label>
+              <select
+                className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-3 transition-colors"
+                style={{
+                  backgroundColor: colors.input.background,
+                  borderColor: colors.input.border,
+                  color: colors.text.primary,
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor =
+                    colors.input.borderFocus;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[100]}`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = colors.input.border;
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+                value={paymentFilter}
+                onChange={(e) => setPaymentFilter(e.target.value)}
+              >
+                <option value="All">All Payment Status</option>
+                <option value="Paid">Paid</option>
+                <option value="Partial Paid">Partial Paid</option>
+                <option value="Unpaid">Unpaid</option>
               </select>
             </div>
           </div>
@@ -834,6 +949,41 @@ const Dispatch = () => {
                                     : "Unpaid"}
                                 </span>
                               </div>
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className="font-medium"
+                                  style={{ color: colors.text.primary }}
+                                >
+                                  Dispatch Status:
+                                </span>
+                                <span
+                                  className="px-2 py-1 rounded-full text-xs font-medium"
+                                  style={{
+                                    backgroundColor: (() => {
+                                      switch (dispatch?.dispatch_status) {
+                                        case "Delivered":
+                                          return colors.success[100];
+                                        case "Dispatch Pending":
+                                          return colors.warning[100];
+                                        default:
+                                          return colors.primary[100];
+                                      }
+                                    })(),
+                                    color: (() => {
+                                      switch (dispatch?.dispatch_status) {
+                                        case "Delivered":
+                                          return colors.success[800];
+                                        case "Dispatch Pending":
+                                          return colors.warning[800];
+                                        default:
+                                          return colors.primary[800];
+                                      }
+                                    })(),
+                                  }}
+                                >
+                                  {dispatch?.dispatch_status || "Dispatch"}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -868,46 +1018,172 @@ const Dispatch = () => {
                         </button>
 
                         <button
-                          onClick={() => setShowDeliveryProof(true)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                          onClick={() => {
+                            setSelectedDispatchId(dispatch._id);
+                            setUploadType("delivery");
+                            setShowDeliveryProof(true);
+                          }}
+                          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            dispatch?.dispatch_status === "Delivered" ? 'border-green-500 bg-green-50' : ''
+                          }`}
                           style={{
-                            backgroundColor: colors.background.card,
-                            borderColor: colors.border.medium,
-                            color: colors.text.secondary,
+                            backgroundColor: dispatch?.dispatch_status === "Delivered"
+                              ? colors.success[50] 
+                              : colors.background.card,
+                            borderColor: dispatch?.dispatch_status === "Delivered"
+                              ? colors.success[500] 
+                              : colors.border.medium,
+                            color: dispatch?.dispatch_status === "Delivered"
+                              ? colors.success[700] 
+                              : colors.text.secondary,
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor =
-                              colors.gray[50];
+                              dispatch?.dispatch_status === "Delivered"
+                                ? colors.success[100] 
+                                : colors.gray[50];
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor =
-                              colors.background.card;
+                              dispatch?.dispatch_status === "Delivered"
+                                ? colors.success[50] 
+                                : colors.background.card;
                           }}
                         >
                           <HiOutlinePaperClip size={16} />
                           Delivery Proof
                         </button>
 
+                        {dispatch?.dispatch_status === "Delivered" && dispatch?.delivery_proof?.filename && (
+                          <button
+                            onClick={async () => {
+                              try {
+                                const response = await axios.get(
+                                  `${process.env.REACT_APP_BACKEND_URL}dispatch/download/${dispatch._id}/delivery-proof`,
+                                  {
+                                    headers: {
+                                      Authorization: `Bearer ${cookies?.access_token}`,
+                                    },
+                                    responseType: 'blob',
+                                  }
+                                );
+
+                                // Create a blob URL and trigger download
+                                const blob = new Blob([response.data]);
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = dispatch.delivery_proof.originalName || 'delivery-proof.pdf';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(url);
+                              } catch (error) {
+                                console.error('Download error:', error);
+                                toast.error('Failed to download file');
+                              }
+                            }}
+                            className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                            style={{
+                              backgroundColor: colors.success[100],
+                              borderColor: colors.success[300],
+                              color: colors.success[700],
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = colors.success[200];
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = colors.success[100];
+                            }}
+                          >
+                            <FiEye size={14} />
+                            View
+                          </button>
+                        )}
+
                         <button
-                          onClick={() => setShowInvoice(true)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                          onClick={() => {
+                            setSelectedDispatchId(dispatch._id);
+                            setUploadType("invoice");
+                            setShowInvoice(true);
+                          }}
+                          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            dispatch?.invoice?.filename ? 'border-green-500 bg-green-50' : ''
+                          }`}
                           style={{
-                            backgroundColor: colors.background.card,
-                            borderColor: colors.border.medium,
-                            color: colors.text.secondary,
+                            backgroundColor: dispatch?.invoice?.filename 
+                              ? colors.success[50] 
+                              : colors.background.card,
+                            borderColor: dispatch?.invoice?.filename 
+                              ? colors.success[500] 
+                              : colors.border.medium,
+                            color: dispatch?.invoice?.filename 
+                              ? colors.success[700] 
+                              : colors.text.secondary,
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor =
-                              colors.gray[50];
+                              dispatch?.invoice?.filename 
+                                ? colors.success[100] 
+                                : colors.gray[50];
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor =
-                              colors.background.card;
+                              dispatch?.invoice?.filename 
+                                ? colors.success[50] 
+                                : colors.background.card;
                           }}
                         >
                           <HiOutlinePaperClip size={16} />
                           Invoice
                         </button>
+
+                        {dispatch?.invoice?.filename && (
+                          <button
+                            onClick={async () => {
+                              try {
+                                const response = await axios.get(
+                                  `${process.env.REACT_APP_BACKEND_URL}dispatch/download/${dispatch._id}/invoice`,
+                                  {
+                                    headers: {
+                                      Authorization: `Bearer ${cookies?.access_token}`,
+                                    },
+                                    responseType: 'blob',
+                                  }
+                                );
+
+                                // Create a blob URL and trigger download
+                                const blob = new Blob([response.data]);
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = dispatch.invoice.originalName || 'invoice.pdf';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(url);
+                              } catch (error) {
+                                console.error('Download error:', error);
+                                toast.error('Failed to download file');
+                              }
+                            }}
+                            className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                            style={{
+                              backgroundColor: colors.success[100],
+                              borderColor: colors.success[300],
+                              color: colors.success[700],
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = colors.success[200];
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = colors.success[100];
+                            }}
+                          >
+                            <FiEye size={14} />
+                            View
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1038,7 +1314,12 @@ const Dispatch = () => {
                   Upload Delivery Proof
                 </h3>
                 <button
-                  onClick={() => setShowDeliveryProof(false)}
+                  onClick={() => {
+                    setShowDeliveryProof(false);
+                    setSelectedFile(null);
+                    setFileName("");
+                    setPreview(null);
+                  }}
                   className="p-2 rounded-lg transition-colors"
                   style={{ color: colors.text.secondary }}
                 >
@@ -1047,8 +1328,15 @@ const Dispatch = () => {
               </div>
 
               <div className="mb-6">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Select File (Image or PDF)
+                </label>
                 <input
                   type="file"
+                  accept="image/*,.pdf"
                   onChange={handleFileChange}
                   className="w-full px-4 py-2 border rounded-lg"
                   style={{
@@ -1065,20 +1353,39 @@ const Dispatch = () => {
                     Selected: {fileName}
                   </p>
                 )}
+                {preview && (
+                  <div className="mt-3">
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="max-w-full h-32 object-cover rounded border"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3">
                 <button
-                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                  onClick={handleFileUpload}
+                  disabled={!selectedFile || isSubmitting}
+                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    backgroundColor: colors.primary[600],
+                    backgroundColor:
+                      selectedFile && !isSubmitting
+                        ? colors.primary[600]
+                        : colors.gray[400],
                     color: colors.text.inverse,
                   }}
                 >
-                  Upload
+                  {isSubmitting ? "Uploading..." : "Upload"}
                 </button>
                 <button
-                  onClick={() => setShowDeliveryProof(false)}
+                  onClick={() => {
+                    setShowDeliveryProof(false);
+                    setSelectedFile(null);
+                    setFileName("");
+                    setPreview(null);
+                  }}
                   className="flex-1 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200"
                   style={{
                     backgroundColor: colors.background.card,
@@ -1106,10 +1413,15 @@ const Dispatch = () => {
                   className="text-lg font-semibold"
                   style={{ color: colors.text.primary }}
                 >
-                  Upload Delivery Proof
+                  Upload Invoice
                 </h3>
                 <button
-                  onClick={() => setShowInvoice(false)}
+                  onClick={() => {
+                    setShowInvoice(false);
+                    setSelectedFile(null);
+                    setFileName("");
+                    setPreview(null);
+                  }}
                   className="p-2 rounded-lg transition-colors"
                   style={{ color: colors.text.secondary }}
                 >
@@ -1118,8 +1430,15 @@ const Dispatch = () => {
               </div>
 
               <div className="mb-6">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Select File (Image or PDF)
+                </label>
                 <input
                   type="file"
+                  accept="image/*,.pdf"
                   onChange={handleFileChange}
                   className="w-full px-4 py-2 border rounded-lg"
                   style={{
@@ -1136,20 +1455,39 @@ const Dispatch = () => {
                     Selected: {fileName}
                   </p>
                 )}
+                {preview && (
+                  <div className="mt-3">
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="max-w-full h-32 object-cover rounded border"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3">
                 <button
-                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                  onClick={handleFileUpload}
+                  disabled={!selectedFile || isSubmitting}
+                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    backgroundColor: colors.primary[600],
+                    backgroundColor:
+                      selectedFile && !isSubmitting
+                        ? colors.primary[600]
+                        : colors.gray[400],
                     color: colors.text.inverse,
                   }}
                 >
-                  Upload
+                  {isSubmitting ? "Uploading..." : "Upload"}
                 </button>
                 <button
-                  onClick={() => setShowInvoice(false)}
+                  onClick={() => {
+                    setShowInvoice(false);
+                    setSelectedFile(null);
+                    setFileName("");
+                    setPreview(null);
+                  }}
                   className="flex-1 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200"
                   style={{
                     backgroundColor: colors.background.card,
@@ -1170,7 +1508,7 @@ const Dispatch = () => {
         setShow={(show) => {
           setShowAddDispatch(show);
           if (!show) {
-            setEditDispatch(null); // Clear edit data when modal closes
+            setEditDispatch(null);
           }
         }}
         fetchDispatch={GetDispatch}
