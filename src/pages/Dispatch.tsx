@@ -36,12 +36,16 @@ const Dispatch = () => {
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDispatchId, setSelectedDispatchId] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadType, setUploadType] = useState(""); // "delivery" or "invoice"
 
   const role = cookies?.role;
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setSelectedFile(file);
       setFileName(file.name);
 
       if (file.type.startsWith("image/")) {
@@ -53,6 +57,63 @@ const Dispatch = () => {
       } else {
         setPreview(null);
       }
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile || !selectedDispatchId) {
+      toast.error("Please select a file and dispatch");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+      if (uploadType === "delivery") {
+        formData.append("delivery_proof", selectedFile);
+      } else {
+        formData.append("invoice", selectedFile);
+      }
+
+      const endpoint =
+        uploadType === "delivery"
+          ? `upload-delivery-proof/${selectedDispatchId}`
+          : `upload-invoice/${selectedDispatchId}`;
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}dispatch/${endpoint}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+
+      toast.success(
+        `${
+          uploadType === "delivery" ? "Delivery proof" : "Invoice"
+        } uploaded successfully`
+      );
+
+      setSelectedFile(null);
+      setFileName("");
+      setPreview(null);
+      setSelectedDispatchId(null);
+      setShowDeliveryProof(false);
+      setShowInvoice(false);
+
+      GetDispatch();
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(
+        `Failed to upload ${
+          uploadType === "delivery" ? "delivery proof" : "invoice"
+        }`
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -868,7 +929,11 @@ const Dispatch = () => {
                         </button>
 
                         <button
-                          onClick={() => setShowDeliveryProof(true)}
+                          onClick={() => {
+                            setSelectedDispatchId(dispatch._id);
+                            setUploadType("delivery");
+                            setShowDeliveryProof(true);
+                          }}
                           className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
                           style={{
                             backgroundColor: colors.background.card,
@@ -889,7 +954,11 @@ const Dispatch = () => {
                         </button>
 
                         <button
-                          onClick={() => setShowInvoice(true)}
+                          onClick={() => {
+                            setSelectedDispatchId(dispatch._id);
+                            setUploadType("invoice");
+                            setShowInvoice(true);
+                          }}
                           className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
                           style={{
                             backgroundColor: colors.background.card,
@@ -1038,7 +1107,12 @@ const Dispatch = () => {
                   Upload Delivery Proof
                 </h3>
                 <button
-                  onClick={() => setShowDeliveryProof(false)}
+                  onClick={() => {
+                    setShowDeliveryProof(false);
+                    setSelectedFile(null);
+                    setFileName("");
+                    setPreview(null);
+                  }}
                   className="p-2 rounded-lg transition-colors"
                   style={{ color: colors.text.secondary }}
                 >
@@ -1047,8 +1121,15 @@ const Dispatch = () => {
               </div>
 
               <div className="mb-6">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Select File (Image or PDF)
+                </label>
                 <input
                   type="file"
+                  accept="image/*,.pdf"
                   onChange={handleFileChange}
                   className="w-full px-4 py-2 border rounded-lg"
                   style={{
@@ -1065,20 +1146,39 @@ const Dispatch = () => {
                     Selected: {fileName}
                   </p>
                 )}
+                {preview && (
+                  <div className="mt-3">
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="max-w-full h-32 object-cover rounded border"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3">
                 <button
-                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                  onClick={handleFileUpload}
+                  disabled={!selectedFile || isSubmitting}
+                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    backgroundColor: colors.primary[600],
+                    backgroundColor:
+                      selectedFile && !isSubmitting
+                        ? colors.primary[600]
+                        : colors.gray[400],
                     color: colors.text.inverse,
                   }}
                 >
-                  Upload
+                  {isSubmitting ? "Uploading..." : "Upload"}
                 </button>
                 <button
-                  onClick={() => setShowDeliveryProof(false)}
+                  onClick={() => {
+                    setShowDeliveryProof(false);
+                    setSelectedFile(null);
+                    setFileName("");
+                    setPreview(null);
+                  }}
                   className="flex-1 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200"
                   style={{
                     backgroundColor: colors.background.card,
@@ -1106,10 +1206,15 @@ const Dispatch = () => {
                   className="text-lg font-semibold"
                   style={{ color: colors.text.primary }}
                 >
-                  Upload Delivery Proof
+                  Upload Invoice
                 </h3>
                 <button
-                  onClick={() => setShowInvoice(false)}
+                  onClick={() => {
+                    setShowInvoice(false);
+                    setSelectedFile(null);
+                    setFileName("");
+                    setPreview(null);
+                  }}
                   className="p-2 rounded-lg transition-colors"
                   style={{ color: colors.text.secondary }}
                 >
@@ -1118,8 +1223,15 @@ const Dispatch = () => {
               </div>
 
               <div className="mb-6">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  Select File (Image or PDF)
+                </label>
                 <input
                   type="file"
+                  accept="image/*,.pdf"
                   onChange={handleFileChange}
                   className="w-full px-4 py-2 border rounded-lg"
                   style={{
@@ -1136,20 +1248,39 @@ const Dispatch = () => {
                     Selected: {fileName}
                   </p>
                 )}
+                {preview && (
+                  <div className="mt-3">
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="max-w-full h-32 object-cover rounded border"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3">
                 <button
-                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                  onClick={handleFileUpload}
+                  disabled={!selectedFile || isSubmitting}
+                  className="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    backgroundColor: colors.primary[600],
+                    backgroundColor:
+                      selectedFile && !isSubmitting
+                        ? colors.primary[600]
+                        : colors.gray[400],
                     color: colors.text.inverse,
                   }}
                 >
-                  Upload
+                  {isSubmitting ? "Uploading..." : "Upload"}
                 </button>
                 <button
-                  onClick={() => setShowInvoice(false)}
+                  onClick={() => {
+                    setShowInvoice(false);
+                    setSelectedFile(null);
+                    setFileName("");
+                    setPreview(null);
+                  }}
                   className="flex-1 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200"
                   style={{
                     backgroundColor: colors.background.card,
@@ -1170,7 +1301,7 @@ const Dispatch = () => {
         setShow={(show) => {
           setShowAddDispatch(show);
           if (!show) {
-            setEditDispatch(null); // Clear edit data when modal closes
+            setEditDispatch(null);
           }
         }}
         fetchDispatch={GetDispatch}
