@@ -73,41 +73,11 @@ const Invoice: React.FC = () => {
 
   const openAddPaymentHandler = async (id: string) => {
     try {
-      // Check if payment already exists for this invoice
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}payment/all`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
-        }
-      );
-      const data = await response.json();
-
-      if (data.success) {
-        // Find existing payment for this invoice
-        const existingPayment = data.payments.find(
-          (payment: any) => payment.invoice._id === id
-        );
-
-        if (existingPayment) {
-          // If payment exists, open update drawer
-          setId(existingPayment._id);
-          dispatch(openUpdatePaymentDrawer());
-          toast.info("Found existing payment - opening for editing");
-        } else {
-          // If no payment exists, open add payment drawer
-          setId(id);
-          dispatch(openAddPaymentDrawer());
-        }
-      } else {
-        // If API fails, default to add payment
-        setId(id);
-        dispatch(openAddPaymentDrawer());
-      }
+      // Always open add payment drawer to allow multiple payments per invoice
+      setId(id);
+      dispatch(openAddPaymentDrawer());
     } catch (error) {
-      console.error("Error checking existing payments:", error);
+      console.error("Error opening payment drawer:", error);
       // If error occurs, default to add payment
       setId(id);
       dispatch(openAddPaymentDrawer());

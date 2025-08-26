@@ -688,7 +688,7 @@ const PurchaseOrder: React.FC = () => {
 
       if (fullyResolvedItems.length > 0) {
         toast.success(
-          `✅ Fully resolved and removed ${fullyResolvedItems.length} items from shortages`
+          `Fully resolved and removed ${fullyResolvedItems.length} items from shortages`
         );
       }
 

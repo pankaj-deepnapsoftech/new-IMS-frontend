@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { TbTruckDelivery } from "react-icons/tb";
 import { HiOutlinePaperClip } from "react-icons/hi";
 import { FiEye } from "react-icons/fi";
-import { RefreshCw, Filter, Search, Pencil } from "lucide-react";
+import { RefreshCw, Filter, Search, Pencil, Download } from "lucide-react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
@@ -43,86 +43,65 @@ const Dispatch = () => {
   const role = cookies?.role;
 
   const calculatePaymentStatus = (dispatch) => {
-    if (!dispatch?.invoice) return "Unpaid";
+    // Debug logging - let's see the complete dispatch object structure
+    // console.log(`=== COMPLETE DISPATCH OBJECT ===`);
+    // console.log(dispatch);
+    // console.log(`=== SALES DATA ===`);
+    // console.log(dispatch.sales_data);
+    // console.log(`=== INVOICE FIELD ===`);
+    // console.log(dispatch.invoice);
 
+    // Check if we have invoice data in the dispatch object or sales_data
+    if (
+      !dispatch?.invoice ||
+      typeof dispatch.invoice !== "object" ||
+      !dispatch.invoice.total
+    ) {
+      console.log("No valid invoice data found - returning Unpaid");
+      return "Unpaid";
+    }
+
+    // Get total and balance from invoice data
     const invoiceTotal = parseFloat(dispatch.invoice.total) || 0;
     const invoiceBalance = parseFloat(dispatch.invoice.balance) || 0;
 
-    // Calculate total paid amount
-    // If invoiceBalance is available, total paid = total - balance
-    // Otherwise, sum up individual payments
-    let totalPaid = 0;
-    if (typeof invoiceBalance === "number") {
-      totalPaid = invoiceTotal - invoiceBalance;
-    } else if (
-      dispatch.invoice.payments &&
-      Array.isArray(dispatch.invoice.payments)
-    ) {
-      totalPaid = dispatch.invoice.payments.reduce((sum, payment) => {
-        return sum + (parseFloat(payment.amount) || 0);
-      }, 0);
-    }
+    console.log(
+      `Final values - Total: ${invoiceTotal}, Balance: ${invoiceBalance}`
+    );
 
-    // Ensure totalPaid is not negative
-    totalPaid = Math.max(0, totalPaid);
-
-    // Debug logging
-    if (dispatch.invoice.invoice_no) {
-      console.log(`Invoice ${dispatch.invoice.invoice_no}:`, {
-        total: invoiceTotal,
-        balance: invoiceBalance,
-        totalPaid: totalPaid,
-        status:
-          totalPaid === 0
-            ? "Unpaid"
-            : Math.abs(invoiceBalance) <= 0.01
-            ? "Paid"
-            : "Partial Paid",
-      });
-    }
-
-    // Determine payment status
-    if (invoiceTotal === 0) {
-      return "Unpaid";
-    }
-
-    if (totalPaid === 0) {
-      return "Unpaid";
-    } else if (Math.abs(invoiceBalance) <= 0.01) {
-      return "Paid";
-    } else if (totalPaid > 0 && invoiceBalance > 0.01) {
-      return "Partial Paid";
+    let status;
+    if (invoiceBalance === 0) {
+      status = "Paid";
+      console.log(`Status: Paid (balance === 0)`);
+    } else if (invoiceTotal === invoiceBalance) {
+      status = "Unpaid";
+      console.log(`Status: Unpaid (total === balance)`);
+    } else if (invoiceTotal > invoiceBalance && invoiceBalance > 0) {
+      status = "Partial Paid";
+      console.log(`Status: Partial Paid (total > balance > 0)`);
     } else {
-      return "Unpaid";
+      status = "Unpaid";
+      console.log(`Status: Unpaid (fallback)`);
     }
-  };
 
+    console.log(`Final status:`, status);
+    console.log(`=== End Debug ===`);
+
+    return status;
+  };
   const getPaymentBreakdown = (dispatch) => {
     if (!dispatch?.invoice) return null;
 
     const invoiceTotal = parseFloat(dispatch.invoice.total) || 0;
     const invoiceBalance = parseFloat(dispatch.invoice.balance) || 0;
 
-    // Calculate total paid amount
-    let totalPaid = 0;
-    if (typeof invoiceBalance === "number") {
-      totalPaid = invoiceTotal - invoiceBalance;
-    } else if (
-      dispatch.invoice.payments &&
-      Array.isArray(dispatch.invoice.payments)
-    ) {
-      totalPaid = dispatch.invoice.payments.reduce((sum, payment) => {
-        return sum + (parseFloat(payment.amount) || 0);
-      }, 0);
-    }
-
-    totalPaid = Math.max(0, totalPaid);
-    const remainingBalance = Math.max(0, invoiceBalance);
+    // Calculate total paid amount: total - balance
+    const totalPaid = Math.max(0, invoiceTotal - invoiceBalance);
 
     return {
       total: invoiceTotal,
       paid: totalPaid,
-      remaining: remainingBalance,
+      remaining: invoiceBalance,
       paymentsCount: dispatch.invoice.payments
         ? dispatch.invoice.payments.length
         : 0,
@@ -290,7 +269,19 @@ const Dispatch = () => {
 
         const salesData = salesResponse?.data?.data || [];
 
-        // Enrich dispatch data with sales price information
+        // Fetch invoice data to get payment information
+        const invoiceResponse = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}invoice/all`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies.access_token}`,
+            },
+          }
+        );
+
+        const invoiceData = invoiceResponse?.data?.invoices || [];
+
+        // Enrich dispatch data with sales price information and invoice data
         dispatchData = dispatchData.map((dispatch) => {
           // Find matching sales order by order_id or sales_order_id
           const matchingSale = salesData.find(
@@ -300,9 +291,20 @@ const Dispatch = () => {
               sale._id === dispatch.sale_id
           );
 
+          // Find matching invoice by order_id or sales data
+          const matchingInvoice = invoiceData.find(
+            (invoice) =>
+              invoice.invoice_no === dispatch.order_id ||
+              (matchingSale &&
+                (invoice.buyer?._id === matchingSale.party?._id ||
+                  invoice.supplier?._id === matchingSale.party?._id))
+          );
+
+          let enrichedDispatch = { ...dispatch };
+
           if (matchingSale) {
-            return {
-              ...dispatch,
+            enrichedDispatch = {
+              ...enrichedDispatch,
               // Override with sales price data
               total_amount: matchingSale.total_price || dispatch.total_amount,
               sales_price: matchingSale.price || 0,
@@ -316,11 +318,23 @@ const Dispatch = () => {
             };
           }
 
-          return dispatch;
+          if (matchingInvoice) {
+            enrichedDispatch = {
+              ...enrichedDispatch,
+              invoice: {
+                ...matchingInvoice,
+                total: matchingInvoice.total,
+                balance: matchingInvoice.balance,
+                invoice_no: matchingInvoice.invoice_no,
+              },
+            };
+          }
+
+          return enrichedDispatch;
         });
       } catch (salesError) {
-        console.error("Error fetching sales data:", salesError);
-        // Continue with original dispatch data if sales fetch fails
+        console.error("Error fetching sales or invoice data:", salesError);
+        // Continue with original dispatch data if fetch fails
       }
 
       if (paymentFilter !== "All") {
@@ -1119,8 +1133,8 @@ const Dispatch = () => {
                                 </span>
                               </div>
 
-                              {/* Payment Breakdown */}
-                              {(() => {
+                              {/* TODO: Payment Breakdown */}
+                              {/* {(() => {
                                 const breakdown = getPaymentBreakdown(dispatch);
                                 if (!breakdown || breakdown.total === 0)
                                   return null;
@@ -1189,7 +1203,7 @@ const Dispatch = () => {
                                     )}
                                   </div>
                                 );
-                              })()}
+                              })()} */}
 
                               <div className="flex items-center gap-2">
                                 <span
@@ -1298,7 +1312,9 @@ const Dispatch = () => {
                           }}
                         >
                           <HiOutlinePaperClip size={16} />
-                          Delivery Proof
+                          {dispatch?.delivery_proof?.filename
+                            ? "Update Delivery Proof"
+                            : "Upload Delivery Proof"}
                         </button>
 
                         {dispatch?.dispatch_status === "Delivered" &&
@@ -1328,11 +1344,16 @@ const Dispatch = () => {
                                   link.click();
                                   document.body.removeChild(link);
                                   window.URL.revokeObjectURL(url);
+
+                                  toast.success(
+                                    "Latest delivery proof downloaded successfully"
+                                  );
                                 } catch (error) {
                                   console.error("Download error:", error);
                                   toast.error("Failed to download file");
                                 }
                               }}
+                              title="Download latest delivery proof"
                               className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
                               style={{
                                 backgroundColor: colors.success[100],
@@ -1348,20 +1369,27 @@ const Dispatch = () => {
                                   colors.success[100];
                               }}
                             >
-                              <FiEye size={14} />
-                              View
+                              <Download size={14} />
+                              Latest Delivery Proof
                             </button>
                           )}
 
                         <button
                           onClick={() => {
+                            if (dispatch?.invoice?.filename) {
+                              toast.info(
+                                "Invoice already uploaded. You can only upload once."
+                              );
+                              return;
+                            }
                             setSelectedDispatchId(dispatch._id);
                             setUploadType("invoice");
                             setShowInvoice(true);
                           }}
+                          disabled={dispatch?.invoice?.filename}
                           className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                             dispatch?.invoice?.filename
-                              ? "border-green-500 bg-green-50"
+                              ? "border-green-500 bg-green-50 cursor-not-allowed opacity-60"
                               : ""
                           }`}
                           style={{
@@ -1376,10 +1404,10 @@ const Dispatch = () => {
                               : colors.text.secondary,
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = dispatch
-                              ?.invoice?.filename
-                              ? colors.success[100]
-                              : colors.gray[50];
+                            if (!dispatch?.invoice?.filename) {
+                              e.currentTarget.style.backgroundColor =
+                                colors.gray[50];
+                            }
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = dispatch
@@ -1389,7 +1417,9 @@ const Dispatch = () => {
                           }}
                         >
                           <HiOutlinePaperClip size={16} />
-                          Invoice
+                          {dispatch?.invoice?.filename
+                            ? "Invoice Uploaded"
+                            : "Upload Invoice"}
                         </button>
 
                         {dispatch?.invoice?.filename && (
@@ -1423,6 +1453,7 @@ const Dispatch = () => {
                                 toast.error("Failed to download file");
                               }
                             }}
+                            title="Download invoice (uploaded once)"
                             className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
                             style={{
                               backgroundColor: colors.success[100],
@@ -1438,8 +1469,8 @@ const Dispatch = () => {
                                 colors.success[100];
                             }}
                           >
-                            <FiEye size={14} />
-                            View
+                            <Download size={14} />
+                            Download Invoice
                           </button>
                         )}
                       </div>
@@ -1565,12 +1596,14 @@ const Dispatch = () => {
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3
-                  className="text-lg font-semibold"
-                  style={{ color: colors.text.primary }}
-                >
-                  Upload Delivery Proof
-                </h3>
+                <div>
+                  <h3
+                    className="text-lg font-semibold"
+                    style={{ color: colors.text.primary }}
+                  >
+                    Upload Delivery Proof
+                  </h3>
+                </div>
                 <button
                   onClick={() => {
                     setShowDeliveryProof(false);
@@ -1667,12 +1700,14 @@ const Dispatch = () => {
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3
-                  className="text-lg font-semibold"
-                  style={{ color: colors.text.primary }}
-                >
-                  Upload Invoice
-                </h3>
+                <div>
+                  <h3
+                    className="text-lg font-semibold"
+                    style={{ color: colors.text.primary }}
+                  >
+                    Upload Invoice
+                  </h3>
+                </div>
                 <button
                   onClick={() => {
                     setShowInvoice(false);

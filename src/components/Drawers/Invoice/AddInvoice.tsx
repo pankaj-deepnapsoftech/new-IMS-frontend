@@ -898,7 +898,7 @@ const AddInvoice: React.FC<AddInvoiceProps> = ({
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text.primary }}
                 >
-                  Delivery Note Date
+                  Delivery Note Date *
                 </label>
                 <input
                   type="date"
