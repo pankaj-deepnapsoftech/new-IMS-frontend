@@ -72,6 +72,9 @@ const Invoice: React.FC = () => {
   const closePaymentDrawerHandler = () => {
     dispatch(closeAddPaymentDrawer());
   };
+  useEffect(()=>{
+    console.log("bhai ye hai filtered data: ",filteredData)
+  })
 
   const fetchInvoiceHandler = async () => {
     try {
@@ -160,6 +163,7 @@ const Invoice: React.FC = () => {
       </div>
     );
   }
+  
 
   return (
     <div

@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   tableCol4: {
     width: "15%",
     paddingRight: 4,
-    textAlign: "right",
+    textAlign: "center",
   },
   tableCol5: {
     width: "15%",
@@ -327,6 +327,8 @@ interface InvoicePDFProps {
 }
 
 const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice,userData }) => {
+
+  console.log("here it is invoicce :::000",invoice)
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -361,6 +363,8 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice,userData }) => {
 
   const customer = invoice.buyer || invoice.supplier;
   const isSupplier = !!invoice.supplier;
+  console.log("Ye hai customer ::: ",customer)
+  console.log("invoice ka buyer :: ",invoice.buyer);
 
   // Safe access to nested properties
   const invoiceNumber = invoice.invoice_no || invoice.invoiceNo || "N/A";
@@ -383,12 +387,14 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice,userData }) => {
   const taxAmount = invoice.tax?.tax_amount || 0;
   const taxName = invoice.tax?.tax_name || "No Tax";
   const note = invoice.note || invoice.remarks || "";
+  console.log("-----items:::",items)
+    console.log("-----items:::",items[0])
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Title */}
-        <Text style={styles.title}>{category.toUpperCase()} INVOICE</Text>
+        <Text style={styles.title}>TAX INVOICE</Text>
 
         {/* Header Section */}
         <View style={styles.headerSection}>
@@ -431,11 +437,14 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice,userData }) => {
                 {isSupplier ? "Supplier Details:" : "Buyer Details:"}
               </Text>
               <Text style={styles.sectionValue}>
-                {customer?.name || "N/A"}
+                {customer?.consignee_name[0] || "N/A"}
                 {"\n"}
-                {customer?.address || "Address not provided"}
+                {customer?.shipped_to || "Address not provided"}
                 {"\n"}
-                {customer?.gstin ? `GSTIN: ${customer.gstin}` : ""}
+                Phone: {customer?.contact_number || "N/A"}
+                {/* {customer?.email_id || 'N/A'} */}
+                {/* {"\n"} */}
+                {/* {customer?.gstin ? `GSTIN: ${customer.gstin}` : ""} */}
                 {customer?.cust_id ? `\nCustomer ID: ${customer.cust_id}` : ""}
               </Text>
             </View>
@@ -485,9 +494,9 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice,userData }) => {
             <View style={styles.tableCol2}>
               <Text style={styles.tableHeaderText}>Description</Text>
             </View>
-            <View style={styles.tableCol3}>
+            {/* <View style={styles.tableCol3}>
               <Text style={styles.tableHeaderText}>HSN Code</Text>
-            </View>
+            </View> */}
             <View style={styles.tableCol4}>
               <Text style={styles.tableHeaderText}>Quantity</Text>
             </View>
@@ -507,15 +516,15 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice,userData }) => {
               </View>
               <View style={styles.tableCol2}>
                 <Text style={styles.tableCellText}>
-                  {item.item?.name || "Unknown Item"}
+                  {items[0].item?.name || "Unknown Item"}
                   {item.item?.description && `\n${item.item.description}`}
                 </Text>
               </View>
-              <View style={styles.tableCol3}>
+              {/* <View style={styles.tableCol3}>
                 <Text style={styles.tableCellText}>
                   {item.item?.hsn_code || "N/A"}
                 </Text>
-              </View>
+              </View> */}
               <View style={styles.tableCol4}>
                 <Text style={styles.tableCellText}>{item.quantity || 0}</Text>
               </View>

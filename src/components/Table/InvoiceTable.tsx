@@ -66,6 +66,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   const [deleteModalId, setDeleteModalId] = useState<string | null>(null);
   const [userData, setUserData] = useState<PurchaseOrder | null>(null);
     const [cookies] = useCookies();
+
+    console.log("bhai ye hai invoices::::",invoices)
      
   
     // NEW: Function to fetch purchase order data from API
@@ -78,7 +80,6 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             headers: { Authorization: `Bearer ${cookies?.access_token}` },
           }
         );
-        console.log("Inside Proforma Function ::", response.data);
   
         if (response.data.success) {
           setUserData(response.data.user); // Assuming API returns data in `data` field
@@ -87,7 +88,6 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
           // toast.error("Failed to fetch user data");
         }
   
-        console.log("Inside Proforma Function ::", response.data);
       } catch (error: any) {
         console.error("Error fetching user data:", error);
         // toast.error(error.message || "Failed to fetch user data");
@@ -133,6 +133,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
     useSortBy,
     usePagination
   );
+
+  console.log("ye hai pages ::::::---",page)
 
   const handleDelete = (id: string) => {
     setDeleteModalId(id);
