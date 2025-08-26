@@ -314,8 +314,10 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           {cell.column.id === "customer" &&
                             (row.original?.buyer || row.original?.supplier) && (
                               <span className="font-medium">
-                                {row.original?.buyer?.name ||
-                                  row.original?.supplier?.name}
+                                {row.original?.buyer?.company_name ||
+                                  row.original?.buyer?.consignee_name?.[0] ||
+                                  row.original?.supplier?.name ||
+                                  "N/A"}
                               </span>
                             )}
 
