@@ -27,6 +27,8 @@ const BomDetails: React.FC<BomDetailsProps> = ({
   const [totalBomCost, setTotalBomCost] = useState<number | undefined>();
   const [otherCharges, setOtherCharges] = useState<any>();
   const [remarks, setRemarks] = useState<any[] | []>([]);
+  const [resources, setResources] = useState<any[] | []>([]);
+  const [manpower, setManpower] = useState<any[] | []>([]);
   const fetchBomDetails = async () => {
     if (!bomId) return;
     try {
@@ -42,7 +44,7 @@ const BomDetails: React.FC<BomDetailsProps> = ({
       );
       const data = await response.json();
       if (!data.success) throw new Error(data.message);
-      console.log(data)
+      console.log(data);
       setFinishedGood(data.bom.finished_good);
       setRawMaterials(data.bom.raw_materials);
       setBomName(data.bom.bom_name);
@@ -52,6 +54,8 @@ const BomDetails: React.FC<BomDetailsProps> = ({
       setScrapMaterials(data.bom?.scrap_materials);
       setOtherCharges(data.bom?.other_charges);
       setRemarks(data?.bom?.remarks);
+      setResources(data.bom?.resources || []);
+      setManpower(data.bom?.manpower || []);
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
@@ -81,7 +85,7 @@ const BomDetails: React.FC<BomDetailsProps> = ({
           className="text-xl font-semibold"
           style={{ color: colors.text.primary }}
         >
-          Employee Details
+          BOM Details
         </h1>
         <button
           onClick={closeDrawerHandler}
@@ -129,8 +133,6 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                       ? `₹${totalBomCost?.toLocaleString() || 0}`
                       : "₹*****"}
                   </p>
-
-
                 </p>
               </div>
             </div>
@@ -180,16 +182,18 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                       {material?.quantity}
                     </p>
                     <p>
-                      <span className="font-semibold text-gray-600">
-                        UOM:
-                      </span>{" "}
+                      <span className="font-semibold text-gray-600">UOM:</span>{" "}
                       {material?.item?.uom}
                     </p>
                     <p>
-                      <span className="font-semibold text-gray-600">Total Part Cost:</span>{" "}
-                      ₹ {cookies?.role === "admin"
+                      <span className="font-semibold text-gray-600">
+                        Total Part Cost:
+                      </span>{" "}
+                      ₹{" "}
+                      {cookies?.role === "admin"
                         ? material?.total_part_cost ?? 0
-                        : "****"}/-
+                        : "****"}
+                      /-
                     </p>
                   </li>
                 ))}
@@ -221,9 +225,7 @@ const BomDetails: React.FC<BomDetailsProps> = ({
               </h3>
               <ul className="pl-5 space-y-3">
                 <li>
-                  <span className="font-semibold text-gray-600">
-                    Item ID:
-                  </span>{" "}
+                  <span className="font-semibold text-gray-600">Item ID:</span>{" "}
                   {finishedGood?.item?.product_id ?? "N/A"}
                 </li>
                 <li>
@@ -250,9 +252,7 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                   </li>
                 ) : null}
                 <li>
-                  <span className="font-semibold text-gray-600">
-                    Quantity:
-                  </span>{" "}
+                  <span className="font-semibold text-gray-600">Quantity:</span>{" "}
                   {finishedGood.quantity}
                 </li>
                 <li>
@@ -260,17 +260,17 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                   {finishedGood?.item?.uom}
                 </li>
                 <li>
-                  <span className="font-semibold text-gray-600">
-                    Category:
-                  </span>{" "}
+                  <span className="font-semibold text-gray-600">Category:</span>{" "}
                   {finishedGood?.item?.category}
                 </li>
                 <li>
                   <li>
-                    <span className="font-semibold text-gray-600">Cost:</span>{" "}
-                    ₹ {cookies?.role === "admin" ? finishedGood.cost ?? 0 : "****"}/-
+                    <span className="font-semibold text-gray-600">Cost:</span> ₹{" "}
+                    {cookies?.role === "admin"
+                      ? finishedGood.cost ?? 0
+                      : "****"}
+                    /-
                   </li>
-
                 </li>
                 <li>
                   <span className="font-semibold text-gray-600">
@@ -337,14 +337,18 @@ const BomDetails: React.FC<BomDetailsProps> = ({
                       {material?.quantity}
                     </p>
                     <p>
-                      <span className="font-semibold text-gray-600">
-                        UOM:
-                      </span>{" "}
+                      <span className="font-semibold text-gray-600">UOM:</span>{" "}
                       {material?.item?.uom}
                     </p>
                     <p>
-                      <span className="font-semibold text-gray-600">Total Part Cost:</span>{" "}
-                      ₹ {cookies?.role === "admin" ? material?.total_part_cost ?? 0 : "****"}/-
+                      <span className="font-semibold text-gray-600">
+                        Total Part Cost:
+                      </span>{" "}
+                      ₹{" "}
+                      {cookies?.role === "admin"
+                        ? material?.total_part_cost ?? 0
+                        : "****"}
+                      /-
                     </p>
                   </li>
                 ))}
@@ -386,6 +390,81 @@ const BomDetails: React.FC<BomDetailsProps> = ({
               </div>
             </div>
           )}
+
+          {resources && resources.length > 0 && (
+            <div className="bg-orange-50 p-6 shadow-lg rounded-lg border border-orange-300">
+              <h3 className="text-xl font-semibold mb-4 text-orange-600">
+                Resources
+              </h3>
+              <ul className="pl-5 list-disc space-y-4">
+                {resources.map((resource, index) => (
+                  <li key={index} className="space-y-1">
+                    <p>
+                      <p>
+                        <span className="font-semibold text-gray-600">
+                          Resource Name:
+                        </span>{" "}
+                        {resource?.name || resource?.resource_id?.name || "N/A"}
+                      </p>
+                    </p>
+                    {resource?.type && (
+                      <p>
+                        <span className="font-semibold text-gray-600">
+                          Type:
+                        </span>{" "}
+                        {resource?.type}
+                      </p>
+                    )}
+                    {resource?.specification && (
+                      <p>
+                        <span className="font-semibold text-gray-600">
+                          Specification:
+                        </span>{" "}
+                        {resource?.specification}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {manpower && manpower.length > 0 && (
+            <div className="bg-indigo-50 p-6 shadow-lg rounded-lg border border-indigo-300">
+              <h3 className="text-xl font-semibold mb-4 text-indigo-600">
+                Manpower Required
+              </h3>
+              <ul className="pl-5 list-disc space-y-4">
+                {manpower.map((mp, index) => (
+                  <li key={index} className="space-y-1">
+                    <p>
+                      <span className="font-semibold text-gray-600">
+                        Number of Workers:
+                      </span>{" "}
+                      {mp?.number ?? "N/A"}
+                    </p>
+                    {mp?.role && (
+                      <p>
+                        <span className="font-semibold text-gray-600">
+                          Role:
+                        </span>{" "}
+                        {mp?.role}
+                      </p>
+                    )}
+                    {mp?.skill_level && (
+                      <p>
+                        <span className="font-semibold text-gray-600">
+                          Skill Level:
+                        </span>{" "}
+                        {mp?.skill_level}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {remarks && (
             <div className="bg-cyan-50 p-6 shadow-lg rounded-lg border border-cyan-300">
               <h3 className="text-xl font-semibold mb-4 text-cyan-600">
@@ -394,10 +473,8 @@ const BomDetails: React.FC<BomDetailsProps> = ({
               <p className="text-sm text-gray-700 whitespace-pre-line capitalize">
                 {remarks}
               </p>
-
             </div>
           )}
-
         </div>
       )}
     </div>

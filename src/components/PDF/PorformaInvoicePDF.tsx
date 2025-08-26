@@ -376,7 +376,7 @@ const PorformaInvoicePDF = ({ proformaInvoice, userData }: any) => {
           {proformaInvoice?.items?.map((item: any, index: number) => (
             <View key={index} style={styles.tableRow}>
               <Text style={styles.colSno}>{index + 1}</Text>
-              <Text style={styles.colName}>{item?.name || "N/A"}</Text>
+              <Text style={styles.colName}>{item?.item?.name || "N/A"}</Text>
               <Text style={styles.colUnitQty}>{item?.quantity || "0"}</Text>
               <Text style={styles.colUnitType}>{"Piece"}</Text>
               <Text style={styles.colPrice}>
@@ -469,7 +469,7 @@ const PorformaInvoicePDF = ({ proformaInvoice, userData }: any) => {
             Additional Information:
           </Text>
           <View style={styles.additionalInfoWritingSpace}>
-            {[...Array(8)].map((_, i) => (
+            {[...Array(6)].map((_, i) => (
               <Text key={i} style={styles.blankLine}>
                 _________________________________________________________________
               </Text>

@@ -90,6 +90,10 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
       const prevQty = parseInt(editDispatch?.dispatch_qty) || 0;
       const totalQty = editDispatch ? prevQty + addQty : addQty;
 
+      // Get order quantity for validation
+      const orderQuantity =
+        selectedOrder?.product_qty || editDispatch?.quantity || 0;
+
       // Get product ID
       const firstProductId =
         selectedOrder?.product_id?.[0]?._id ||
@@ -104,6 +108,15 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
         stockData?.quantity_changed ||
         0;
 
+      // Validate order quantity first
+      if (totalQty > orderQuantity) {
+        toast.error(
+          `Total dispatch quantity (${totalQty}) cannot exceed order quantity (${orderQuantity} units)`
+        );
+        return;
+      }
+
+      // Then validate stock
       if (addQty > currentStock) {
         toast.error(
           `Dispatch quantity (${addQty}) cannot exceed available stock (${currentStock} units)`
@@ -147,14 +160,16 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
               },
             }
           );
-          
+
           // Check if quantity was changed and show appropriate message
           const prevQty = parseInt(editDispatch?.dispatch_qty) || 0;
           const newQty = parseInt(payload.dispatch_qty) || 0;
-          const message = prevQty !== newQty 
-            ? response?.data?.message || "Dispatch updated successfully, status changed to Dispatch Pending"
-            : "Dispatch updated successfully";
-          
+          const message =
+            prevQty !== newQty
+              ? response?.data?.message ||
+                "Dispatch updated successfully, status changed to Dispatch Pending"
+              : "Dispatch updated successfully";
+
           toast.success(message);
         } else {
           await axios.post(
@@ -525,6 +540,48 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                   Dispatch Quantity *
                 </label>
 
+                {/* Order Quantity Information */}
+                {/* {(selectedOrder || editDispatch) && (
+                  <div className="mb-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                    <h4 className="text-sm font-medium text-indigo-800 mb-2">
+                      Order Quantity Information:
+                    </h4>
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-indigo-700">
+                          Total Order Quantity:
+                        </span>
+                        <span className="text-indigo-900 font-semibold">
+                          {selectedOrder?.product_qty ||
+                            editDispatch?.quantity ||
+                            0}{" "}
+                          units
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-indigo-700">
+                          Already Dispatched:
+                        </span>
+                        <span className="text-indigo-900">
+                          {parseInt(editDispatch?.dispatch_qty) || 0} units
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm font-semibold border-t border-indigo-200 pt-1">
+                        <span className="text-indigo-800">
+                          Remaining to Dispatch:
+                        </span>
+                        <span className="text-indigo-900">
+                          {(selectedOrder?.product_qty ||
+                            editDispatch?.quantity ||
+                            0) -
+                            (parseInt(editDispatch?.dispatch_qty) || 0)}{" "}
+                          units
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )} */}
+
                 {editDispatch && editDispatch.product_id && (
                   <div className="mb-3 p-3 bg-green-50 rounded-lg border border-green-200">
                     <h4 className="text-sm font-medium text-green-800 mb-2">
@@ -656,7 +713,6 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                   name="dispatch_qty"
                   value={values.dispatch_qty}
                   onChange={(e) => {
-                    // Original toast warning approach
                     const value = parseInt(e.target.value) || 0;
 
                     // Get product ID - either from selected order or edit dispatch
@@ -673,12 +729,25 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                       stockData?.quantity_changed ||
                       0;
 
-                    // Use current stock directly
-                    const availableStock = currentStock;
+                    // Get order quantity for validation
+                    const orderQuantity =
+                      selectedOrder?.product_qty || editDispatch?.quantity || 0;
+                    const currentDispatchQty =
+                      parseInt(editDispatch?.dispatch_qty) || 0;
+                    const totalDispatchQty = editDispatch
+                      ? currentDispatchQty + value
+                      : value;
 
-                    if (value > availableStock) {
+                    // Check against order quantity first
+                    if (totalDispatchQty > orderQuantity) {
                       toast.warning(
-                        `Dispatch quantity cannot exceed available stock (${availableStock} units)`
+                        `Total dispatch quantity (${totalDispatchQty}) cannot exceed order quantity (${orderQuantity} units)`
+                      );
+                    }
+                    // Then check against stock
+                    else if (value > currentStock) {
+                      toast.warning(
+                        `Dispatch quantity cannot exceed available stock (${currentStock} units)`
                       );
                     }
 
@@ -688,6 +757,15 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                   placeholder="Enter Dispatch Quantity"
                   min="1"
                   max={(() => {
+                    // Get order quantity
+                    const orderQuantity =
+                      selectedOrder?.product_qty || editDispatch?.quantity || 0;
+                    const currentDispatchQty =
+                      parseInt(editDispatch?.dispatch_qty) || 0;
+                    const remainingOrderQty =
+                      orderQuantity - currentDispatchQty;
+
+                    // Get stock quantity
                     const firstProductId =
                       selectedOrder?.product_id?.[0]?._id ||
                       selectedOrder?.product_id?.[0]?.product_id ||
@@ -701,8 +779,8 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                       stockData?.quantity_changed ||
                       0;
 
-                    // Use current stock directly
-                    return currentStock || 999999;
+                    // Return the minimum of remaining order quantity and available stock
+                    return Math.min(remainingOrderQty, currentStock) || 1;
                   })()}
                   className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   style={{
@@ -731,16 +809,48 @@ const AddDispatch: React.FC<AddDispatchProps> = ({
                         stockData?.quantity_changed ||
                         0;
 
-                      // Use current stock directly
-                      const availableStock = currentStock;
+                      const orderQuantity =
+                        selectedOrder?.product_qty ||
+                        editDispatch?.quantity ||
+                        0;
+                      const currentDispatchQty =
+                        parseInt(editDispatch?.dispatch_qty) || 0;
+                      const enteredQty = parseInt(values.dispatch_qty) || 0;
+                      const totalDispatchQty = editDispatch
+                        ? currentDispatchQty + enteredQty
+                        : enteredQty;
 
-                      const dispatchQty = parseInt(values.dispatch_qty);
+                      // Check order quantity validation first
+                      if (totalDispatchQty > orderQuantity) {
+                        return (
+                          <p className="text-sm text-red-600 flex items-center gap-1">
+                            <span>⚠️</span>
+                            Exceeds order quantity! Maximum allowed:{" "}
+                            {orderQuantity - currentDispatchQty} units
+                          </p>
+                        );
+                      }
 
-                      if (dispatchQty > 0 && dispatchQty <= availableStock) {
+                      // Then check stock validation
+                      if (enteredQty > currentStock) {
+                        return (
+                          <p className="text-sm text-red-600 flex items-center gap-1">
+                            {/* <span>⚠️</span> */}
+                            Exceeds available stock! Maximum stock:{" "}
+                            {currentStock} units
+                          </p>
+                        );
+                      }
+
+                      // Show success message if both validations pass
+                      if (enteredQty > 0) {
                         return (
                           <p className="text-sm text-green-600 flex items-center gap-1">
-                            Valid quantity - {availableStock - dispatchQty}{" "}
-                            units will remain in stock
+                            {/* <span>✅</span> */}
+                            Valid quantity - {orderQuantity -
+                              totalDispatchQty}{" "}
+                            units remaining in order,{" "}
+                            {currentStock - enteredQty} units remaining in stock
                           </p>
                         );
                       }

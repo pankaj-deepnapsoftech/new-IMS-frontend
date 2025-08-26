@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,10 +8,12 @@ import {
   closeAddPaymentDrawer,
   closeInvoiceDetailsDrawer,
   closeUpdateInvoiceDrawer,
+  closeUpdatePaymentDrawer,
   openAddInvoiceDrawer,
   openAddPaymentDrawer,
   openInvoiceDetailsDrawer,
   openUpdateInvoiceDrawer,
+  openUpdatePaymentDrawer,
 } from "../redux/reducers/drawersSlice";
 import { useCookies } from "react-cookie";
 import { MdAdd, MdOutlineRefresh } from "react-icons/md";
@@ -20,6 +24,7 @@ import AddInvoice from "../components/Drawers/Invoice/AddInvoice";
 import InvoiceDetails from "../components/Drawers/Invoice/InvoiceDetails";
 import UpdateInvoice from "../components/Drawers/Invoice/UpdateInvoice";
 import AddPayment from "../components/Drawers/Payment/AddPayment";
+import UpdatePayment from "../components/Drawers/Payment/UpdatePayment";
 import { colors } from "../theme/colors";
 import { Button } from "@chakra-ui/react";
 
@@ -36,6 +41,7 @@ const Invoice: React.FC = () => {
     isUpdateInvoiceDrawerOpened,
     isInvoiceDetailsDrawerOpened,
     isAddPaymentDrawerOpened,
+    isUpdatePaymentDrawerOpened,
   } = useSelector((state: any) => state.drawers);
   const dispatch = useDispatch();
   const [id, setId] = useState<string | undefined>();
@@ -65,16 +71,24 @@ const Invoice: React.FC = () => {
     dispatch(closeUpdateInvoiceDrawer());
   };
 
-  const openAddPaymentHandler = (id: string) => {
-    setId(id);
-    dispatch(openAddPaymentDrawer());
+  const openAddPaymentHandler = async (id: string) => {
+    try {
+      // Always open add payment drawer to allow multiple payments per invoice
+      setId(id);
+      dispatch(openAddPaymentDrawer());
+    } catch (error) {
+      console.error("Error opening payment drawer:", error);
+      // If error occurs, default to add payment
+      setId(id);
+      dispatch(openAddPaymentDrawer());
+    }
   };
   const closePaymentDrawerHandler = () => {
     dispatch(closeAddPaymentDrawer());
   };
-  useEffect(()=>{
-    console.log("bhai ye hai filtered data: ",filteredData)
-  })
+  const closeUpdatePaymentDrawerHandler = () => {
+    dispatch(closeUpdatePaymentDrawer());
+  };
 
   const fetchInvoiceHandler = async () => {
     try {
@@ -192,6 +206,13 @@ const Invoice: React.FC = () => {
       )}
       {isAddPaymentDrawerOpened && (
         <AddPayment id={id} closeDrawerHandler={closePaymentDrawerHandler} />
+      )}
+      {isUpdatePaymentDrawerOpened && (
+        <UpdatePayment
+          id={id}
+          closeDrawerHandler={closeUpdatePaymentDrawerHandler}
+          fetchPaymentsHandler={fetchInvoiceHandler}
+        />
       )}
 
       <div className="p-2 lg:p-3">

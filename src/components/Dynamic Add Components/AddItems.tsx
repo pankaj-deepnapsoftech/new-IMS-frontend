@@ -4,20 +4,26 @@ import { useCookies } from "react-cookie";
 import { BiMinus } from "react-icons/bi";
 import { IoIosAdd } from "react-icons/io";
 import { toast } from "react-toastify";
-import Select from 'react-select';
+import Select from "react-select";
 
 interface AddItemsProps {
-  inputs: {
-    item: { value: string, label: string },
-    quantity: number,
-    price: number,
-    uom?: string
-  }[] | [],
-  setInputs: (input: any) => void
+  inputs:
+    | {
+        item: { value: string; label: string };
+        quantity: number;
+        price: number;
+        uom?: string;
+      }[]
+    | [];
+  setInputs: (input: any) => void;
+  salesData?: any; // Optional sales data to get prices from
 }
 
-
-const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
+const AddItems: React.FC<AddItemsProps> = ({
+  inputs,
+  setInputs,
+  salesData,
+}) => {
   const [cookies] = useCookies();
   const [products, setProducts] = useState<any[] | []>([]);
   const [productOptions, setProductOptions] = useState<any[] | []>([]);
@@ -28,9 +34,6 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
       { item: null, quantity: 0, price: 0, uom: "" },
     ]);
   };
-
-
-
 
   const deleteInputHandler = () => {
     const inputsArr = [...inputs];
@@ -75,34 +78,48 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
   const onChangeHandler = (ind: number, name: string, value: any) => {
     const inputsArr = [...inputs];
 
-    if (name === 'quantity' && inputsArr[ind].item) {
-      const product = products.find(prod => prod._id === inputsArr[ind].item?.value);
-      inputsArr[ind]["price"] = (+value || 0) * (+product?.price || 0);
-      inputsArr[ind]["quantity"] = +value;
-    }
+    if (name === "quantity" && inputsArr[ind].item) {
+      // Use price from sales data if available, otherwise fallback to product price
+      let unitPrice = 0;
 
-    else if (name === 'price') {
+      if (salesData && salesData.product_id) {
+        const salesProduct = salesData.product_id.find(
+          (p: any) => p._id === inputsArr[ind].item?.value
+        );
+        if (salesProduct) {
+          // Use the sales price instead of product price
+          unitPrice = salesData.price || salesProduct.price || 0;
+        }
+      } else {
+        // Fallback to product price from inventory
+        const product = products.find(
+          (prod) => prod._id === inputsArr[ind].item?.value
+        );
+        unitPrice = product?.price || 0;
+      }
+
+      inputsArr[ind]["price"] = (+value || 0) * unitPrice;
+      inputsArr[ind]["quantity"] = +value;
+    } else if (name === "price") {
       inputsArr[ind]["price"] = +value;
-    }
-    else {
-      const selectedProduct = products.find(prod => prod._id === value.value);
+    } else {
+      const selectedProduct = products.find((prod) => prod._id === value.value);
       inputsArr[ind]["item"] = value;
       inputsArr[ind]["uom"] = selectedProduct?.uom || "";
     }
 
-
-
     setInputs(inputsArr);
-  }
+  };
   useEffect(() => {
-    // Sync UOM when products or inputs change
     if (products.length && inputs.length) {
       const updatedInputs = inputs.map((input) => {
         if (input.item?.value && !input.uom) {
-          const matched = products.find(prod => prod._id === input.item.value);
+          const matched = products.find(
+            (prod) => prod._id === input.item.value
+          );
           return {
             ...input,
-            uom: matched?.uom || ""
+            uom: matched?.uom || "",
           };
         }
         return input;
@@ -161,25 +178,21 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
                 options={productOptions}
                 placeholder="Select a product"
               />
-
-
             </FormControl>
 
             <FormControl>
               <FormLabel color="black">UOM</FormLabel>
-              <Input
-                className="text-gray-600"
-                value={input.uom}
-                isDisabled
-              />
+              <Input className="text-gray-600" value={input.uom} isDisabled />
             </FormControl>
 
             <FormControl>
               <FormLabel color="black">Quantity</FormLabel>
               <Input
                 className="text-gray-600"
-                value={input.quantity === 0 ? "" : input.quantity} 
-                onChange={(e) => onChangeHandler(ind, "quantity", e.target.value)}
+                value={input.quantity === 0 ? "" : input.quantity}
+                onChange={(e) =>
+                  onChangeHandler(ind, "quantity", e.target.value)
+                }
                 type="number"
                 isDisabled={!input.item?.value}
               />
@@ -189,14 +202,13 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
               <FormLabel color="black">Price</FormLabel>
               <Input
                 className="text-gray-600"
-                value={input.price === 0 ? "" : input.price} 
+                value={input.price === 0 ? "" : input.price}
                 onChange={(e) => onChangeHandler(ind, "price", e.target.value)}
                 type="number"
                 isDisabled={!input.item?.value}
               />
             </FormControl>
           </div>
-
         ))}
       </div>
       <div className="mt-3 flex justify-end">
@@ -220,7 +232,6 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
           px={6}
           py={5}
           fontWeight="medium"
-         
           _hover={{
             bg: "blue.800",
             boxShadow: "lg",
@@ -232,7 +243,6 @@ const AddItems: React.FC<AddItemsProps> = ({ inputs, setInputs }) => {
         >
           Add
         </Button>
-
       </div>
     </div>
   );

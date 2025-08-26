@@ -361,7 +361,7 @@ const SalesOrderPDF = ({ sale,userData }: any) => {
         <View style={styles.termsOfDeliverySection}>
           <Text style={styles.termsOfDeliveryLabel}>Terms of Delivery:</Text>
           <View style={styles.termsWritingSpace}>
-            {[...Array(8)].map((_, i) => (
+            {[...Array(6)].map((_, i) => (
               <Text key={i} style={styles.blankLine}>
                 _________________________________________________________________
               </Text>
