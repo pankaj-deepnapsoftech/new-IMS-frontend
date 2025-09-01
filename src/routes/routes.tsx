@@ -43,7 +43,7 @@ import Dispatch from "../pages/Dispatch";
 import Parties from "../pages/Parties";
 import { IoIosPeople } from "react-icons/io";
 import Task from "../pages/Task";
-import {
+import { 
   Box,
   Calendar,
   Component,
@@ -57,8 +57,10 @@ import {
   TicketPercent,
   Workflow,
   Wrench,
+  BarChart3,
 } from "lucide-react";
 import Dashboard from "../pages/Dashboard";
+import Analytics from "../pages/Analytics";
 import Planning from "../pages/Planning";
 import Designing from "../pages/Designing";
 import Supplier from "../pages/Supplier";
@@ -82,6 +84,13 @@ const routes = [
     icon: <MdOutlineSpeed />,
     path: "",
     element: <Dashboard />,
+    isSublink: false,
+  },
+  {
+    name: "Analytics",
+    icon: <BarChart3 />,
+    path: "analytics",
+    element: <Analytics />,
     isSublink: false,
   },
   {
