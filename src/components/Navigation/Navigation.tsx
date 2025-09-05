@@ -51,11 +51,10 @@ const Navigation: React.FC = () => {
   };
   return (
     <>
-     
+
       <div
-        className={`absolute top-2 z-40 lg:hidden transition-all duration-300 ease-in-out ${
-          checkMenu ? "left-[250px]" : "left-4"
-        }`}
+        className={`absolute top-2 z-40 lg:hidden transition-all duration-300 ease-in-out ${checkMenu ? "left-[250px]" : "left-4"
+          }`}
       >
         <button
           onClick={() => setCheckMenu(!checkMenu)}
@@ -69,7 +68,7 @@ const Navigation: React.FC = () => {
         </button>
       </div>
 
-    
+
       {checkMenu && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden transition-opacity duration-300"
@@ -98,6 +97,7 @@ const Navigation: React.FC = () => {
           <ul className="space-y-2 whitespace-nowrap">
             {routes.map((route, ind) => {
               const isAllowed =
+                route.name === "Dashboard" ||
                 isSuper ||
                 allowedroutes.includes(route.path.replaceAll("/", ""));
 
@@ -106,10 +106,9 @@ const Navigation: React.FC = () => {
                   <div key={ind}>
                     <li
                       className={`flex items-center justify-between  px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 group
-                        ${
-                          isAllowed
-                            ? "hover:bg-blue-50 hover:text-blue-700 text-gray-700"
-                            : "text-gray-400 cursor-not-allowed"
+                        ${isAllowed
+                          ? "hover:bg-blue-50 hover:text-blue-700 text-gray-700"
+                          : "text-gray-400 cursor-not-allowed"
                         }`}
                       onClick={() =>
                         isAllowed && toggleSubMenusHandler(route.path)
@@ -137,10 +136,9 @@ const Navigation: React.FC = () => {
                             key={index}
                             to={route.path + "/" + sublink.path}
                             className={({ isActive }) =>
-                              `block px-4 py-2 rounded-lg transition-all duration-200 ${
-                                isActive
-                                  ? "bg-blue-100 text-blue-700 border-l-4 border-blue-500"
-                                  : isAllowed
+                              `block px-4 py-2 rounded-lg transition-all duration-200 ${isActive
+                                ? "bg-blue-100 text-blue-700 border-l-4 border-blue-500"
+                                : isAllowed
                                   ? "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
                                   : "text-gray-400 cursor-not-allowed"
                               }`
@@ -168,10 +166,9 @@ const Navigation: React.FC = () => {
                     key={ind}
                     to={route.path || ""}
                     className={({ isActive }) =>
-                      `block px-4 py-3 rounded-lg transition-all duration-200 ${
-                        isActive
-                          ? "bg-blue-100 text-blue-700 border-l-4 border-blue-500"
-                          : isAllowed
+                      `block px-4 py-3 rounded-lg transition-all duration-200 ${isActive
+                        ? "bg-blue-100 text-blue-700 border-l-4 border-blue-500"
+                        : isAllowed
                           ? "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
                           : "text-gray-400 cursor-not-allowed"
                       }`
@@ -193,10 +190,9 @@ const Navigation: React.FC = () => {
                     key={ind}
                     to={route.path || ""}
                     className={({ isActive }) =>
-                      `block px-4 py-3 rounded-lg transition-all duration-200 ${
-                        isActive
-                          ? "bg-blue-100 text-blue-700 border-l-4 border-blue-500"
-                          : isAllowed
+                      `block px-4 py-3 rounded-lg transition-all duration-200 ${isActive
+                        ? "bg-blue-100 text-blue-700 border-l-4 border-blue-500"
+                        : isAllowed
                           ? "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
                           : "text-gray-400 cursor-not-allowed"
                       }`
