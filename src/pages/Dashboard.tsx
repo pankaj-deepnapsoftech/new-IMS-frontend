@@ -27,14 +27,14 @@ import {
   ModalCloseButton,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   LineChart,
   Line,
@@ -42,9 +42,9 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import { 
-  TrendingUp, 
-  TrendingDown, 
+import {
+  TrendingUp,
+  TrendingDown,
   Calendar,
   List,
   Check,
@@ -77,7 +77,7 @@ const Analytics: React.FC = () => {
   const [isLoadingRoles, setIsLoadingRoles] = useState(false);
   const [apiApprovalData, setApiApprovalData] = useState<any[]>([]);
   const [isLoadingApproval, setIsLoadingApproval] = useState(false);
-    const [financeData, setFinanceData] = useState<any>(null);
+  const [financeData, setFinanceData] = useState<any>(null);
   const [isLoadingFinance, setIsLoadingFinance] = useState(false);
   const [accountsYear, setAccountsYear] = useState(new Date().getFullYear());
   const [statsData, setStatsData] = useState<any>(null);
@@ -140,7 +140,7 @@ const Analytics: React.FC = () => {
     });
     onEditOpen();
   };
-          
+
   const handleDeleteRole = (role: any) => {
     setSelectedRole(role);
     onDeleteOpen();
@@ -258,15 +258,15 @@ const Analytics: React.FC = () => {
     setIsLoadingDispatch(true);
     try {
       let url = `${process.env.REACT_APP_BACKEND_URL}dashboard/dispatch?view=${dispatchPeriod.toLowerCase()}&year=${new Date().getFullYear()}`;
-      
+
       // Add month parameter for monthly view
       if (dispatchPeriod.toLowerCase() === 'monthly') {
         const currentMonth = new Date().getMonth() + 1; // 1-12
         url += `&month=${currentMonth}`;
       }
-      
+
       console.log('Dispatch API URL:', url); // Debug log
-      
+
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -317,9 +317,9 @@ const Analytics: React.FC = () => {
     fetchDispatchData();
   }, [dispatchPeriod]);
 
-     // Fetch inventory chart data from API
-   const fetchInventoryData = async () => {
-     setIsLoadingInventory(true);
+  // Fetch inventory chart data from API
+  const fetchInventoryData = async () => {
+    setIsLoadingInventory(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}dashboard?filter=${inventoryPeriod.toLowerCase()}`,
@@ -333,10 +333,10 @@ const Analytics: React.FC = () => {
       );
 
       if (response.ok) {
-         const data = await response.json();
-         if (data.success) {
-           setInventoryChartData(data.inventory_chart);
-         } else {
+        const data = await response.json();
+        if (data.success) {
+          setInventoryChartData(data.inventory_chart);
+        } else {
           toast({
             title: "Error",
             description: data.message || "Failed to fetch inventory data",
@@ -358,13 +358,13 @@ const Analytics: React.FC = () => {
         isClosable: true,
       });
     } finally {
-       setIsLoadingInventory(false);
-     }
+      setIsLoadingInventory(false);
+    }
   };
 
   // Fetch production chart data from API
-   const fetchProductionData = async () => {
-     setIsLoadingProduction(true);
+  const fetchProductionData = async () => {
+    setIsLoadingProduction(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}dashboard?filter=${productionPeriod.toLowerCase()}`,
@@ -378,10 +378,10 @@ const Analytics: React.FC = () => {
       );
 
       if (response.ok) {
-         const data = await response.json();
-         if (data.success) {
-           setProductionChartData(data.production_chart);
-         } else {
+        const data = await response.json();
+        if (data.success) {
+          setProductionChartData(data.production_chart);
+        } else {
           toast({
             title: "Error",
             description: data.message || "Failed to fetch production data",
@@ -403,13 +403,13 @@ const Analytics: React.FC = () => {
         isClosable: true,
       });
     } finally {
-       setIsLoadingProduction(false);
-     }
+      setIsLoadingProduction(false);
+    }
   };
 
-     // Fetch merchant chart data from API
-   const fetchMerchantData = async () => {
-     setIsLoadingMerchant(true);
+  // Fetch merchant chart data from API
+  const fetchMerchantData = async () => {
+    setIsLoadingMerchant(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}dashboard?filter=${merchantPeriod.toLowerCase()}`,
@@ -422,11 +422,11 @@ const Analytics: React.FC = () => {
         }
       );
 
-             if (response.ok) {
-         const data = await response.json();
-         if (data.success) {
-           setMerchantChartData(data.merchant_chart);
-         } else {
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setMerchantChartData(data.merchant_chart);
+        } else {
           toast({
             title: "Error",
             description: data.message || "Failed to fetch merchant data",
@@ -447,264 +447,264 @@ const Analytics: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
-         } finally {
-       setIsLoadingMerchant(false);
-     }
+    } finally {
+      setIsLoadingMerchant(false);
+    }
   };
 
-     // Fetch data when periods change
-   useEffect(() => {
-     fetchInventoryData();
-   }, [inventoryPeriod]);
+  // Fetch data when periods change
+  useEffect(() => {
+    fetchInventoryData();
+  }, [inventoryPeriod]);
 
-   useEffect(() => {
-     fetchProductionData();
-   }, [productionPeriod]);
+  useEffect(() => {
+    fetchProductionData();
+  }, [productionPeriod]);
 
-   useEffect(() => {
-     fetchMerchantData();
-   }, [merchantPeriod]);
+  useEffect(() => {
+    fetchMerchantData();
+  }, [merchantPeriod]);
 
-   // Fetch resources data from API
-   const fetchResourcesData = async () => {
-     setIsLoadingResources(true);
-     try {
-       const response = await fetch(
-         `${process.env.REACT_APP_BACKEND_URL}resources`,
-         {
-           method: 'GET',
-           headers: {
-             'Content-Type': 'application/json',
-             'Authorization': `Bearer ${cookies?.access_token}`
-           }
-         }
-       );
-
-       if (response.ok) {
-         const data = await response.json();
-         if (data.success) {
-           setApiResourcesData(data.resources || []);
-         } else {
-           toast({
-             title: "Error",
-             description: data.message || "Failed to fetch resources data",
-             status: "error",
-             duration: 3000,
-             isClosable: true,
-           });
-         }
-       } else {
-         throw new Error('Failed to fetch resources data');
-       }
-     } catch (error) {
-       console.error('Error fetching resources data:', error);
-       toast({
-         title: "Error",
-         description: "Failed to fetch resources data",
-         status: "error",
-         duration: 3000,
-         isClosable: true,
-       });
-     } finally {
-       setIsLoadingResources(false);
-     }
-   };
-
-   // Fetch resources data on component mount
-   useEffect(() => {
-     fetchResourcesData();
-   }, []);
-
-   // Fetch roles data from API
-   const fetchRolesData = async () => {
-     setIsLoadingRoles(true);
-     try {
-       const response = await fetch(
-         `${process.env.REACT_APP_BACKEND_URL}role/`,
-         {
-           method: 'GET',
-           headers: {
-             'Content-Type': 'application/json',
-             'Authorization': `Bearer ${cookies?.access_token}`
-           }
-         }
-       );
-
-       if (response.ok) {
-         const data = await response.json();
-         if (data.success) {
-           setApiRolesData(data.roles || []);
-         } else {
-           toast({
-             title: "Error",
-             description: data.message || "Failed to fetch roles data",
-             status: "error",
-             duration: 3000,
-             isClosable: true,
-           });
-         }
-       } else {
-         throw new Error('Failed to fetch roles data');
-       }
-     } catch (error) {
-       console.error('Error fetching roles data:', error);
-       toast({
-         title: "Error",
-         description: "Failed to fetch roles data",
-         status: "error",
-         duration: 3000,
-         isClosable: true,
-       });
-     } finally {
-       setIsLoadingRoles(false);
-     }
-   };
-
-   // Fetch roles data on component mount
-   useEffect(() => {
-     fetchRolesData();
-   }, []);
-
-       // Fetch approval data from API
-    const fetchApprovalData = async () => {
-      setIsLoadingApproval(true);
-      try {
-        // Fetch inventory data (BOM API)
-        const inventoryResponse = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}bom/all/inventory/raw-materials`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${cookies?.access_token}`
-            }
-          }
-        );
-
-        // Fetch production data
-        const productionResponse = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}production-process/all`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${cookies?.access_token}`
-            }
-          }
-        );
-
-        let inventoryData = [];
-        let productionData = [];
-
-        if (inventoryResponse.ok) {
-          const inventoryResult = await inventoryResponse.json();
-          if (inventoryResult.success) {
-            inventoryData = inventoryResult.unapproved || [];
+  // Fetch resources data from API
+  const fetchResourcesData = async () => {
+    setIsLoadingResources(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}resources`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${cookies?.access_token}`
           }
         }
+      );
 
-        if (productionResponse.ok) {
-          const productionResult = await productionResponse.json();
-          if (productionResult.success) {
-            productionData = productionResult.production_processes || [];
-          }
-        }
-
-        // Combine data: top 1 inventory + top 1 production
-        const combinedData = [];
-        
-        // Add top 1 inventory data
-        if (inventoryData.length > 0) {
-          combinedData.push({
-            ...inventoryData[0],
-            source: 'inventory'
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setApiResourcesData(data.resources || []);
+        } else {
+          toast({
+            title: "Error",
+            description: data.message || "Failed to fetch resources data",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
           });
         }
-        
-        // Add top 1 production data
-        if (productionData.length > 0) {
-          combinedData.push({
-            ...productionData[0],
-            source: 'production'
-          });
-        }
-
-        setApiApprovalData(combinedData);
-      } catch (error) {
-        console.error('Error fetching approval data:', error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch approval data",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      } finally {
-        setIsLoadingApproval(false);
+      } else {
+        throw new Error('Failed to fetch resources data');
       }
-    };
+    } catch (error) {
+      console.error('Error fetching resources data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch resources data",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoadingResources(false);
+    }
+  };
 
-   // Fetch approval data on component mount
-   useEffect(() => {
-     fetchApprovalData();
-   }, []);
+  // Fetch resources data on component mount
+  useEffect(() => {
+    fetchResourcesData();
+  }, []);
 
-   // Fetch finance data from API
-   const fetchFinanceData = async () => {
-     setIsLoadingFinance(true);
-     try {
+  // Fetch roles data from API
+  const fetchRolesData = async () => {
+    setIsLoadingRoles(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}role/`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${cookies?.access_token}`
+          }
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setApiRolesData(data.roles || []);
+        } else {
+          toast({
+            title: "Error",
+            description: data.message || "Failed to fetch roles data",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      } else {
+        throw new Error('Failed to fetch roles data');
+      }
+    } catch (error) {
+      console.error('Error fetching roles data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch roles data",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoadingRoles(false);
+    }
+  };
+
+  // Fetch roles data on component mount
+  useEffect(() => {
+    fetchRolesData();
+  }, []);
+
+  // Fetch approval data from API
+  const fetchApprovalData = async () => {
+    setIsLoadingApproval(true);
+    try {
+      // Fetch inventory data (BOM API)
+      const inventoryResponse = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}bom/all/inventory/raw-materials`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${cookies?.access_token}`
+          }
+        }
+      );
+
+      // Fetch production data
+      const productionResponse = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}production-process/all`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${cookies?.access_token}`
+          }
+        }
+      );
+
+      let inventoryData = [];
+      let productionData = [];
+
+      if (inventoryResponse.ok) {
+        const inventoryResult = await inventoryResponse.json();
+        if (inventoryResult.success) {
+          inventoryData = inventoryResult.unapproved || [];
+        }
+      }
+
+      if (productionResponse.ok) {
+        const productionResult = await productionResponse.json();
+        if (productionResult.success) {
+          productionData = productionResult.production_processes || [];
+        }
+      }
+
+      // Combine data: top 1 inventory + top 1 production
+      const combinedData = [];
+
+      // Add top 1 inventory data
+      if (inventoryData.length > 0) {
+        combinedData.push({
+          ...inventoryData[0],
+          source: 'inventory'
+        });
+      }
+
+      // Add top 1 production data
+      if (productionData.length > 0) {
+        combinedData.push({
+          ...productionData[0],
+          source: 'production'
+        });
+      }
+
+      setApiApprovalData(combinedData);
+    } catch (error) {
+      console.error('Error fetching approval data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch approval data",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoadingApproval(false);
+    }
+  };
+
+  // Fetch approval data on component mount
+  useEffect(() => {
+    fetchApprovalData();
+  }, []);
+
+  // Fetch finance data from API
+  const fetchFinanceData = async () => {
+    setIsLoadingFinance(true);
+    try {
       let url = `${process.env.REACT_APP_BACKEND_URL}dashboard/finance?view=${accountsPeriod.toLowerCase()}&year=${accountsYear}`;
-      
+
       // Add month parameter for monthly view
       if (accountsPeriod.toLowerCase() === 'monthly') {
         const currentMonth = new Date().getMonth() + 1; // 1-12
         url += `&mon=${currentMonth}`;
       }
-      
+
       console.log('Finance API URL:', url); // Debug log
-      
+
       const response = await fetch(url, {
-           method: 'GET',
-           headers: {
-             'Content-Type': 'application/json',
-             'Authorization': `Bearer ${cookies?.access_token}`
-           }
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${cookies?.access_token}`
+        }
       });
 
-       if (response.ok) {
-         const data = await response.json();
-         if (data.success) {
-           setFinanceData(data);
-         } else {
-           toast({
-             title: "Error",
-             description: data.message || "Failed to fetch finance data",
-             status: "error",
-             duration: 3000,
-             isClosable: true,
-           });
-         }
-       } else {
-         throw new Error('Failed to fetch finance data');
-       }
-     } catch (error) {
-       console.error('Error fetching finance data:', error);
-       toast({
-         title: "Error",
-         description: "Failed to fetch finance data",
-         status: "error",
-         duration: 3000,
-         isClosable: true,
-       });
-     } finally {
-       setIsLoadingFinance(false);
-     }
-   };
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setFinanceData(data);
+        } else {
+          toast({
+            title: "Error",
+            description: data.message || "Failed to fetch finance data",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      } else {
+        throw new Error('Failed to fetch finance data');
+      }
+    } catch (error) {
+      console.error('Error fetching finance data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch finance data",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoadingFinance(false);
+    }
+  };
 
-   // Fetch finance data when period or year changes
-   useEffect(() => {
-     fetchFinanceData();
-   }, [accountsPeriod, accountsYear]);
+  // Fetch finance data when period or year changes
+  useEffect(() => {
+    fetchFinanceData();
+  }, [accountsPeriod, accountsYear]);
 
    // Fetch stats data from API
    const fetchStatsData = async () => {
@@ -819,7 +819,7 @@ const Analytics: React.FC = () => {
       });
 
       const data = await response.json();
-      
+
       if (!data.success) {
         throw new Error(data.message);
       }
@@ -831,7 +831,7 @@ const Analytics: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
-      
+
       // Refresh roles data
       fetchRolesData();
       onEditClose();
@@ -860,7 +860,7 @@ const Analytics: React.FC = () => {
       });
 
       const data = await response.json();
-      
+
       if (!data.success) {
         throw new Error(data.message);
       }
@@ -872,7 +872,7 @@ const Analytics: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
-      
+
       // Refresh roles data
       fetchRolesData();
       onDeleteClose();
@@ -951,73 +951,73 @@ const Analytics: React.FC = () => {
     { month: 'Dec', value1: 28, value2: 38 },
   ];
 
-     // Inventory Data (fallback data)
-   const fallbackInventoryData = [
-     { name: 'Raw materials', value: 30, color: '#6AC6FF' },
-     { name: 'Work in progress', value: 25, color: '#78A5F7' },
-     { name: 'Finished goods', value: 20, color: '#FF86E1' },
-     { name: 'Indirect inventory', value: 25, color: '#FFC680' },
-   ];
+  // Inventory Data (fallback data)
+  const fallbackInventoryData = [
+    { name: 'Raw materials', value: 30, color: '#6AC6FF' },
+    { name: 'Work in progress', value: 25, color: '#78A5F7' },
+    { name: 'Finished goods', value: 20, color: '#FF86E1' },
+    { name: 'Indirect inventory', value: 25, color: '#FFC680' },
+  ];
 
-       // Transform API inventory data to chart format
-    const inventoryData = inventoryChartData ? [
-      { 
-        name: 'Raw materials', 
-        value: inventoryChartData.raw_materials || 0, 
-        color: '#6AC6FF' 
-      },
-      { 
-        name: 'Work in progress', 
-        value: inventoryChartData.work_in_progress || 0, 
-        color: '#78A5F7' 
-      },
-      { 
-        name: 'Finished goods', 
-        value: inventoryChartData.finished_goods || 0, 
-        color: '#FF86E1' 
-      },
-      { 
-        name: 'Indirect inventory', 
-        value: inventoryChartData.indirect_inventory || 0, 
-        color: '#FFC680' 
-      },
-    ] : fallbackInventoryData;
+  // Transform API inventory data to chart format
+  const inventoryData = inventoryChartData ? [
+    {
+      name: 'Raw materials',
+      value: inventoryChartData.raw_materials || 0,
+      color: '#6AC6FF'
+    },
+    {
+      name: 'Work in progress',
+      value: inventoryChartData.work_in_progress || 0,
+      color: '#78A5F7'
+    },
+    {
+      name: 'Finished goods',
+      value: inventoryChartData.finished_goods || 0,
+      color: '#FF86E1'
+    },
+    {
+      name: 'Indirect inventory',
+      value: inventoryChartData.indirect_inventory || 0,
+      color: '#FFC680'
+    },
+  ] : fallbackInventoryData;
 
-    // Console log for debugging
-    console.log('Inventory Chart Data:', inventoryChartData);
-    console.log('Inventory Data Array:', inventoryData);
-    console.log('Inventory Data Length:', inventoryData.length);
+  // Console log for debugging
+  console.log('Inventory Chart Data:', inventoryChartData);
+  console.log('Inventory Data Array:', inventoryData);
+  console.log('Inventory Data Length:', inventoryData.length);
 
-     // Production Data (fallback data)
-   const fallbackProductionData = [
-     { name: 'Completed', value: 124, color: '#51B6F5' },
-     { name: 'Progress', value: 85, color: '#F778D7' },
-     { name: 'Pre Production', value: 65, color: '#80ADFF' },
-   ];
+  // Production Data (fallback data)
+  const fallbackProductionData = [
+    { name: 'Completed', value: 124, color: '#51B6F5' },
+    { name: 'Progress', value: 85, color: '#F778D7' },
+    { name: 'Pre Production', value: 65, color: '#80ADFF' },
+  ];
 
-       // Transform API production data to chart format
-    const productionData = productionChartData ? [
-      { 
-        name: 'Completed', 
-        value: productionChartData.completed || 0, 
-        color: '#51B6F5' 
-      },
-      { 
-        name: 'Progress', 
-        value: productionChartData.progress || 0, 
-        color: '#F778D7' 
-      },
-      { 
-        name: 'Pre Production', 
-        value: productionChartData.pre_production || 0, 
-        color: '#80ADFF' 
-      },
-    ] : fallbackProductionData;
+  // Transform API production data to chart format
+  const productionData = productionChartData ? [
+    {
+      name: 'Completed',
+      value: productionChartData.completed || 0,
+      color: '#51B6F5'
+    },
+    {
+      name: 'Progress',
+      value: productionChartData.progress || 0,
+      color: '#F778D7'
+    },
+    {
+      name: 'Pre Production',
+      value: productionChartData.pre_production || 0,
+      color: '#80ADFF'
+    },
+  ] : fallbackProductionData;
 
-    // Console log for debugging
-    console.log('Production Chart Data:', productionChartData);
-    console.log('Production Data Array:', productionData);
-    console.log('Production Data Length:', productionData.length);
+  // Console log for debugging
+  console.log('Production Chart Data:', productionChartData);
+  console.log('Production Data Array:', productionData);
+  console.log('Production Data Length:', productionData.length);
 
   // Dispatch Data (fallback data)
   const fallbackDispatchData = [
@@ -1030,30 +1030,30 @@ const Analytics: React.FC = () => {
     { day: 'Sun', dispatch: 8, deliver: 6 },
   ];
 
-     // Resources Data (fallback data)
-   const fallbackResourcesData = [
-     { name: 'CNC', type: 'Machine', color: '#FA4F4F' },
-     { name: 'Packing assembl...', type: 'Assembly line', color: '#5D94F5' },
-     { name: 'Oil machine', type: 'Machine', color: '#FA4F4F' },
-     { name: 'Motor manufact...', type: 'Assembly line', color: '#5D94F5' },
-   ];
+  // Resources Data (fallback data)
+  const fallbackResourcesData = [
+    { name: 'CNC', type: 'Machine', color: '#FA4F4F' },
+    { name: 'Packing assembl...', type: 'Assembly line', color: '#5D94F5' },
+    { name: 'Oil machine', type: 'Machine', color: '#FA4F4F' },
+    { name: 'Motor manufact...', type: 'Assembly line', color: '#5D94F5' },
+  ];
 
   // Transform API finance data to chart format
   const accountsData = financeData ? [
-    { 
-      name: 'Proforma Invoice', 
-      value: financeData.proforma_invoices?.total_count || 0, 
-      color: '#78A5F7' 
+    {
+      name: 'Proforma Invoice',
+      value: financeData.proforma_invoices?.total_count || 0,
+      color: '#78A5F7'
     },
-    { 
-      name: 'Tax Invoice', 
-      value: financeData.invoices?.total_count || 0, 
-      color: '#FFC680' 
+    {
+      name: 'Tax Invoice',
+      value: financeData.invoices?.total_count || 0,
+      color: '#FFC680'
     },
-    { 
-      name: 'Payments', 
-      value: financeData.payments?.total_count || 0, 
-      color: '#F778D7' 
+    {
+      name: 'Payments',
+      value: financeData.payments?.total_count || 0,
+      color: '#F778D7'
     },
   ] : [
     { name: 'Proforma Invoice', value: 0, color: '#78A5F7' },
@@ -1061,38 +1061,38 @@ const Analytics: React.FC = () => {
     { name: 'Payments', value: 0, color: '#F778D7' },
   ];
 
-           // Merchant Data - Pie Chart (fallback data)
-    const fallbackMerchantData = [
-      { name: 'Individual', value: 60, color: '#6AC6FF' },
-      { name: 'Company', value: 40, color: '#FF86E1' },
-    ];
+  // Merchant Data - Pie Chart (fallback data)
+  const fallbackMerchantData = [
+    { name: 'Individual', value: 60, color: '#6AC6FF' },
+    { name: 'Company', value: 40, color: '#FF86E1' },
+  ];
 
-    // Transform API merchant data to chart format    
-    const merchantData = merchantChartData ? [
-      { 
-        name: 'Individual', 
-        value: merchantChartData.totals?.total_individual || 0, 
-        color: '#6AC6FF' 
-      },
-      { 
-        name: 'Company', 
-        value: merchantChartData.totals?.total_company || 0, 
-        color: '#FF86E1' 
-      },
-    ] : fallbackMerchantData;
+  // Transform API merchant data to chart format
+  const merchantData = merchantChartData ? [
+    {
+      name: 'Individual',
+      value: merchantChartData.totals?.total_individual || 0,
+      color: '#6AC6FF'
+    },
+    {
+      name: 'Company',
+      value: merchantChartData.totals?.total_company || 0,
+      color: '#FF86E1'
+    },
+  ] : fallbackMerchantData;
 
-     // User Roles Data (fallback data)
-   const fallbackUserRolesData = [
-     { role: 'Inventory', description: 'Manage raw materials s...', createdOn: '14/07/25', lastUpdated: '19/08/25' },
-     { role: 'Production', description: 'Overseas manufacturi...', createdOn: '14/07/25', lastUpdated: '19/08/25' },
-     { role: 'Accountant', description: 'Overseas manufacturi...', createdOn: '14/06/25', lastUpdated: '19/08/25' },
-   ];
+  // User Roles Data (fallback data)
+  const fallbackUserRolesData = [
+    { role: 'Inventory', description: 'Manage raw materials s...', createdOn: '14/07/25', lastUpdated: '19/08/25' },
+    { role: 'Production', description: 'Overseas manufacturi...', createdOn: '14/07/25', lastUpdated: '19/08/25' },
+    { role: 'Accountant', description: 'Overseas manufacturi...', createdOn: '14/06/25', lastUpdated: '19/08/25' },
+  ];
 
-       // Approval Data (fallback data)
-    const fallbackApprovalData = [
-      { bom_name: 'Sample BOM', name: 'Sample Material', status: 'raw material approval pending', createdAt: '30/08/25', source: 'inventory' },
-      { bom: { bom_name: 'Test BOM' }, item: { name: 'Test Material' }, status: 'completed', createdAt: '29/08/25', source: 'production' },
-    ];
+  // Approval Data (fallback data)
+  const fallbackApprovalData = [
+    { bom_name: 'Sample BOM', name: 'Sample Material', status: 'raw material approval pending', createdAt: '30/08/25', source: 'inventory' },
+    { bom: { bom_name: 'Test BOM' }, item: { name: 'Test Material' }, status: 'completed', createdAt: '29/08/25', source: 'production' },
+  ];
 
   const kpiCards = [
     {
@@ -1162,17 +1162,17 @@ const Analytics: React.FC = () => {
 
   // Render admin dashboard content (Analytics)
   return (
-    <Box 
-      p={{ base: 4, md: 6, lg: 8 }} 
-      bg="gray.50" 
+    <Box
+      p={{ base: 4, md: 6, lg: 8 }}
+      bg="gray.50"
       minH="100vh"
       maxW="100vw"
       overflowX="hidden"
     >
       {/* Header */}
-      <Flex 
+      <Flex
         direction={{ base: 'column', md: 'row' }}
-        justify="space-between" 
+        justify="space-between"
         align={{ base: 'start', md: 'center' }}
         mb={6}
         gap={{ base: 4, md: 0 }}
@@ -1189,18 +1189,18 @@ const Analytics: React.FC = () => {
       </Flex>
 
       {/* KPI Cards */}
-      <Flex 
+      <Flex
         direction={{ base: 'column', lg: 'row' }}
-        gap={{ base: 4, lg: 6 }} 
+        gap={{ base: 4, lg: 6 }}
         mb={6}
         flexWrap="wrap"
       >
         {kpiCards.map((kpi, index) => (
-          <Box 
-            key={index} 
-            bg="white" 
-            p={{ base: 4, md: 6 }} 
-            borderRadius="lg" 
+          <Box
+            key={index}
+            bg="white"
+            p={{ base: 4, md: 6 }}
+            borderRadius="lg"
             flex={{ base: '1', lg: '1' }}
             minW={{ base: '100%', lg: 'auto' }}
             boxShadow="sm"
@@ -1213,33 +1213,33 @@ const Analytics: React.FC = () => {
             }}
             transition="all 0.2s"
           >
-            <Flex 
+            <Flex
               direction={{ base: 'column', sm: 'row' }}
-              justify="space-between" 
+              justify="space-between"
               align={{ base: 'start', sm: 'center' }}
               gap={{ base: 3, sm: 0 }}
             >
               <Box flex="1">
                 <Text fontSize="sm" color="gray.600" mb={1}>{kpi.title}</Text>
                 <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color="gray.800" mb={2}>{kpi.value}</Text>
-                                 <Flex align="center" gap={1} flexWrap="wrap">
-                   <Text 
-                     fontSize="sm" 
-                     color={kpi.trend === 'up' ? 'green.500' : kpi.change === '0' ? 'gray.500' : 'red.500'}
-                   >
-                     {kpi.change} {kpi.trend === 'up' ? '▲' : '▼'}
-                   </Text>
-                   <Text 
-                     fontSize="sm" 
-                     color="gray.500"
-                   >
-                     v/s last month
-                   </Text>
-                 </Flex>
+                <Flex align="center" gap={1} flexWrap="wrap">
+                  <Text
+                    fontSize="sm"
+                    color={kpi.trend === 'up' ? 'green.500' : kpi.change === '0' ? 'gray.500' : 'red.500'}
+                  >
+                    {kpi.change} {kpi.trend === 'up' ? '▲' : '▼'}
+                  </Text>
+                  <Text
+                    fontSize="sm"
+                    color="gray.500"
+                  >
+                    v/s last month
+                  </Text>
+                </Flex>
               </Box>
-              <Box 
-                bg={kpi.bgColor} 
-                p={3} 
+              <Box
+                bg={kpi.bgColor}
+                p={3}
                 borderRadius={kpi.icon === List ? 'md' : 'full'}
                 display="flex"
                 alignItems="center"
@@ -1256,22 +1256,22 @@ const Analytics: React.FC = () => {
 
 
       {/* Middle Row - Sales Overview and Inventory */}
-      <Flex 
+      <Flex
         direction={{ base: 'column', xl: 'row' }}
-        gap={{ base: 4, xl: 6 }} 
+        gap={{ base: 4, xl: 6 }}
         mb={6}
       >
         {/* Sales Overview */}
-                 <Box 
-           bg="white" 
-           p={{ base: 4, md: 6 }} 
-           borderRadius="lg" 
-           flex={{ base: '1', xl: '2.5' }}
-           boxShadow="sm"
-         >
-          <Flex 
+        <Box
+          bg="white"
+          p={{ base: 4, md: 6 }}
+          borderRadius="lg"
+          flex={{ base: '1', xl: '2.5' }}
+          boxShadow="sm"
+        >
+          <Flex
             direction={{ base: 'column', sm: 'row' }}
-            justify="space-between" 
+            justify="space-between"
             align={{ base: 'start', sm: 'center' }}
             mb={4}
             gap={{ base: 3, sm: 0 }}
@@ -1327,9 +1327,9 @@ const Analytics: React.FC = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                   <XAxis dataKey="month" stroke="#6B7280" />
                   <YAxis stroke="#6B7280" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'white', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
                       border: '1px solid #E5E7EB',
                       borderRadius: '8px'
                     }}
@@ -1354,16 +1354,16 @@ const Analytics: React.FC = () => {
         </Box>
 
         {/* Inventory */}
-        <Box 
-          bg="white" 
-          p={{ base: 4, md: 6 }} 
-          borderRadius="lg" 
+        <Box
+          bg="white"
+          p={{ base: 4, md: 6 }}
+          borderRadius="lg"
           flex={{ base: '1', xl: '1' }}
           boxShadow="sm"
         >
-          <Flex 
+          <Flex
             direction={{ base: 'column', sm: 'row' }}
-            justify="space-between" 
+            justify="space-between"
             align={{ base: 'start', sm: 'center' }}
             mb={4}
             gap={{ base: 3, sm: 0 }}
@@ -1386,65 +1386,65 @@ const Analytics: React.FC = () => {
               </Select>
             </HStack>
           </Flex>
-                     <Box height={{ base: '200px', md: '200px' }}>
-             {isLoadingInventory ? (
-               <Flex justify="center" align="center" height="100%">
-                 <Text color="gray.500">Loading inventory data...</Text>
-               </Flex>
-             ) : (
-               <ResponsiveContainer width="100%" height="100%">
-                 <PieChart>
-                   <Pie
-                     data={inventoryData}
-                     cx="50%"
-                     cy="50%"
-                     innerRadius={40}
-                     outerRadius={80}
-                     dataKey="value"
-                   >
-                     {inventoryData.map((entry, index) => (
-                       <Cell key={`cell-${index}`} fill={entry.color} />
-                     ))}
-                   </Pie>
-                   <Tooltip 
-                     contentStyle={{ 
-                       backgroundColor: 'white', 
-                       border: '1px solid #E5E7EB',
-                       borderRadius: '8px'
-                     }}
-                   />
-                 </PieChart>
-               </ResponsiveContainer>
-             )}
-           </Box>
-                                           <VStack spacing={2} mt={4} align="start">
-              {inventoryData.map((item, index) => (
-                <Flex key={index} align="center" gap={2}>
-                  <Box w={3} h={3} borderRadius="full" bg={item.color} />
-                  <Text fontSize="sm" color="gray.600">{item.name}</Text>
-                </Flex>
-              ))}
-            </VStack>
+          <Box height={{ base: '200px', md: '200px' }}>
+            {isLoadingInventory ? (
+              <Flex justify="center" align="center" height="100%">
+                <Text color="gray.500">Loading inventory data...</Text>
+              </Flex>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={inventoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={80}
+                    dataKey="value"
+                  >
+                    {inventoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '8px'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </Box>
+          <VStack spacing={2} mt={4} align="start">
+            {inventoryData.map((item, index) => (
+              <Flex key={index} align="center" gap={2}>
+                <Box w={3} h={3} borderRadius="full" bg={item.color} />
+                <Text fontSize="sm" color="gray.600">{item.name}</Text>
+              </Flex>
+            ))}
+          </VStack>
         </Box>
       </Flex>
 
       {/* Bottom Row - Production, Dispatch, and Resources */}
-      <Flex 
+      <Flex
         direction={{ base: 'column', lg: 'row' }}
-        gap={{ base: 4, lg: 6 }} 
+        gap={{ base: 4, lg: 6 }}
         mb={6}
       >
         {/* Production */}
-        <Box 
-          bg="white" 
-          p={{ base: 4, md: 6 }} 
-          borderRadius="lg" 
+        <Box
+          bg="white"
+          p={{ base: 4, md: 6 }}
+          borderRadius="lg"
           flex={{ base: '1', lg: '0.8' }}
           boxShadow="sm"
         >
-          <Flex 
+          <Flex
             direction={{ base: 'column', sm: 'row' }}
-            justify="space-between" 
+            justify="space-between"
             align={{ base: 'start', sm: 'center' }}
             mb={4}
             gap={{ base: 3, sm: 0 }}
@@ -1467,63 +1467,63 @@ const Analytics: React.FC = () => {
               </Select>
             </HStack>
           </Flex>
-                     <Box height={{ base: '200px', md: '200px' }}>
-             {isLoadingProduction ? (
-               <Flex justify="center" align="center" height="100%">
-                 <Text color="gray.500">Loading production data...</Text>
-               </Flex>
-             ) : (
-               <ResponsiveContainer width="100%" height="100%">
-                 <PieChart>
-                   <Pie
-                     data={productionData}
-                     cx="50%"
-                     cy="50%"
-                     outerRadius={80}
-                     dataKey="value"
-                   >
-                     {productionData.map((entry, index) => (
-                       <Cell key={`cell-${index}`} fill={entry.color} />
-                     ))}
-                   </Pie>
-                   <Tooltip 
-                     contentStyle={{ 
-                       backgroundColor: 'white', 
-                       border: '1px solid #E5E7EB',
-                       borderRadius: '8px'
-                     }}
-                   />
-                 </PieChart>
-               </ResponsiveContainer>
-             )}
-           </Box>
-                     <Box textAlign="center" mt={2}>
-             <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold" color="gray.800">Completed</Text>
-             <Text fontSize="sm" color="gray.600">
-               {isLoadingProduction ? 'Loading...' : `${productionChartData?.completed || 0} orders`}
-             </Text>
-           </Box>
-                                           <VStack spacing={2} mt={4} align="start">
-              {productionData.map((item, index) => (
-                <Flex key={index} align="center" gap={2}>
-                  <Box w={3} h={3} borderRadius="full" bg={item.color} />
-                  <Text fontSize="sm" color="gray.600">{item.name}</Text>
-                </Flex>
-              ))}
-            </VStack>
+          <Box height={{ base: '200px', md: '200px' }}>
+            {isLoadingProduction ? (
+              <Flex justify="center" align="center" height="100%">
+                <Text color="gray.500">Loading production data...</Text>
+              </Flex>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={productionData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="value"
+                  >
+                    {productionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '8px'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </Box>
+          <Box textAlign="center" mt={2}>
+            <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold" color="gray.800">Completed</Text>
+            <Text fontSize="sm" color="gray.600">
+              {isLoadingProduction ? 'Loading...' : `${productionChartData?.completed || 0} orders`}
+            </Text>
+          </Box>
+          <VStack spacing={2} mt={4} align="start">
+            {productionData.map((item, index) => (
+              <Flex key={index} align="center" gap={2}>
+                <Box w={3} h={3} borderRadius="full" bg={item.color} />
+                <Text fontSize="sm" color="gray.600">{item.name}</Text>
+              </Flex>
+            ))}
+          </VStack>
         </Box>
 
         {/* Dispatch */}
-        <Box 
-          bg="white" 
-          p={{ base: 4, md: 6 }} 
-          borderRadius="lg" 
+        <Box
+          bg="white"
+          p={{ base: 4, md: 6 }}
+          borderRadius="lg"
           flex={{ base: '1', lg: '1' }}
           boxShadow="sm"
         >
-          <Flex 
+          <Flex
             direction={{ base: 'column', sm: 'row' }}
-            justify="space-between" 
+            justify="space-between"
             align={{ base: 'start', sm: 'center' }}
             mb={4}
             gap={{ base: 3, sm: 0 }}
@@ -1546,71 +1546,71 @@ const Analytics: React.FC = () => {
               </Select>
             </HStack>
           </Flex>
-                     <Box height={{ base: '200px', md: '200px' }}>
-             {isLoadingDispatch ? (
-               <Flex justify="center" align="center" height="100%">
-                 <Text color="gray.500">Loading dispatch data...</Text>
-               </Flex>
-             ) : (
-               <ResponsiveContainer width="100%" height="100%">
-                 <BarChart data={apiDispatchData.length > 0 ? apiDispatchData : fallbackDispatchData}>
-                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                   <XAxis dataKey="day" stroke="#6B7280" />
-                   <YAxis stroke="#6B7280" />
-                   <Tooltip 
-                     contentStyle={{ 
-                       backgroundColor: 'white', 
-                       border: '1px solid #E5E7EB',
-                       borderRadius: '8px'
-                     }}
-                   />
-                   <Bar dataKey="dispatch" fill="#F778D7" radius={[4, 4, 0, 0]} />
-                   <Bar dataKey="deliver" fill="#78A5F7" radius={[4, 4, 0, 0]} />
-                 </BarChart>
-               </ResponsiveContainer>
-             )}
-           </Box>                     <HStack spacing={4} mt={4} justify="center" flexWrap="wrap">
-             <Flex align="center" gap={2}>
-               <Box w={3} h={3} borderRadius="full" bg="#F778D7" />
-               <Text fontSize="sm" color="gray.600">Dispatch</Text>
-             </Flex>
-             <Flex align="center" gap={2}>
-               <Box w={3} h={3} borderRadius="full" bg="#78A5F7" />
-               <Text fontSize="sm" color="gray.600">Deliver</Text>
-             </Flex>
-           </HStack>
+          <Box height={{ base: '200px', md: '200px' }}>
+            {isLoadingDispatch ? (
+              <Flex justify="center" align="center" height="100%">
+                <Text color="gray.500">Loading dispatch data...</Text>
+              </Flex>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={apiDispatchData.length > 0 ? apiDispatchData : fallbackDispatchData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <XAxis dataKey="day" stroke="#6B7280" />
+                  <YAxis stroke="#6B7280" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Bar dataKey="dispatch" fill="#F778D7" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="deliver" fill="#78A5F7" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </Box>                     <HStack spacing={4} mt={4} justify="center" flexWrap="wrap">
+            <Flex align="center" gap={2}>
+              <Box w={3} h={3} borderRadius="full" bg="#F778D7" />
+              <Text fontSize="sm" color="gray.600">Dispatch</Text>
+            </Flex>
+            <Flex align="center" gap={2}>
+              <Box w={3} h={3} borderRadius="full" bg="#78A5F7" />
+              <Text fontSize="sm" color="gray.600">Deliver</Text>
+            </Flex>
+          </HStack>
         </Box>
 
         {/* Resources */}
-        <Box 
-          bg="white" 
-          p={{ base: 4, md: 6 }} 
-          borderRadius="lg" 
+        <Box
+          bg="white"
+          p={{ base: 4, md: 6 }}
+          borderRadius="lg"
           flex={{ base: '1', lg: '1.2' }}
           boxShadow="sm"
         >
-                     <Flex 
-             direction={{ base: 'column', sm: 'row' }}
-             justify="space-between" 
-             align={{ base: 'start', sm: 'center' }}
-             mb={4}
-             gap={{ base: 3, sm: 0 }}
-           >
-             <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold" color="gray.800">Resources</Text>
-             <Text 
-               fontSize="sm" 
-               color="blue.500" 
-               cursor="pointer"
-               onClick={() => navigate('/resources')}
-               _hover={{ color: 'blue.600' }}
-               transition="color 0.2s"
-             >
-               View all
-             </Text>
-           </Flex>
-                     <Text fontSize="sm" color="gray.600" mb={4}>
-             {isLoadingResources ? 'Loading...' : `${apiResourcesData.length || 0} resources found`}
-           </Text>
+          <Flex
+            direction={{ base: 'column', sm: 'row' }}
+            justify="space-between"
+            align={{ base: 'start', sm: 'center' }}
+            mb={4}
+            gap={{ base: 3, sm: 0 }}
+          >
+            <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold" color="gray.800">Resources</Text>
+            <Text
+              fontSize="sm"
+              color="blue.500"
+              cursor="pointer"
+              onClick={() => navigate('/resources')}
+              _hover={{ color: 'blue.600' }}
+              transition="color 0.2s"
+            >
+              View all
+            </Text>
+          </Flex>
+          <Text fontSize="sm" color="gray.600" mb={4}>
+            {isLoadingResources ? 'Loading...' : `${apiResourcesData.length || 0} resources found`}
+          </Text>
           <VStack spacing={3} align="stretch">
                          {(apiResourcesData.length > 0 ? apiResourcesData : fallbackResourcesData).slice(0, 4).map((resource, index) => (
                              <Flex 
@@ -1655,45 +1655,45 @@ const Analytics: React.FC = () => {
           minW="0"
           boxShadow="sm"
         >
-                     <Flex 
-             direction={{ base: 'column', sm: 'row' }}
-             justify="space-between" 
-             align={{ base: 'start', sm: 'center' }}
-             mb={4}
-             gap={{ base: 3, sm: 0 }}
-           >
-             <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold" color="gray.800">User roles</Text>
-             <Text 
-               fontSize="sm" 
-               color="blue.500" 
-               cursor="pointer"
-               onClick={() => navigate('/role')}
-               _hover={{ color: 'blue.600' }}
-               transition="color 0.2s"
-             >
-               View all
-             </Text>
-           </Flex>
-                                <Text fontSize="sm" color="gray.600" mb={4}>
-             {isLoadingRoles ? 'Loading...' : `${apiRolesData.length || 0} Roles found`}
-           </Text>
-           <Box overflowX="auto">
-             <Table size="sm">
-               <Thead>
-                 <Tr>
-                   <Th fontSize="xs">Role</Th>
-                   <Th fontSize="xs">Description</Th>
-                   <Th fontSize="xs">Created on</Th>
-                   <Th fontSize="xs">Last updated</Th>
-                   <Th fontSize="xs">Actions</Th>
-                 </Tr>
-               </Thead>
-               <Tbody>
-                 {(apiRolesData.length > 0 ? apiRolesData.slice(0, 3) : fallbackUserRolesData.slice(0, 3)).map((role, index) => {
+          <Flex
+            direction={{ base: 'column', sm: 'row' }}
+            justify="space-between"
+            align={{ base: 'start', sm: 'center' }}
+            mb={4}
+            gap={{ base: 3, sm: 0 }}
+          >
+            <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold" color="gray.800">User roles</Text>
+            <Text
+              fontSize="sm"
+              color="blue.500"
+              cursor="pointer"
+              onClick={() => navigate('/role')}
+              _hover={{ color: 'blue.600' }}
+              transition="color 0.2s"
+            >
+              View all
+            </Text>
+          </Flex>
+          <Text fontSize="sm" color="gray.600" mb={4}>
+            {isLoadingRoles ? 'Loading...' : `${apiRolesData.length || 0} Roles found`}
+          </Text>
+          <Box overflowX="auto">
+            <Table size="sm">
+              <Thead>
+                <Tr>
+                  <Th fontSize="xs">Role</Th>
+                  <Th fontSize="xs">Description</Th>
+                  <Th fontSize="xs">Created on</Th>
+                  <Th fontSize="xs">Last updated</Th>
+                  <Th fontSize="xs">Actions</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {(apiRolesData.length > 0 ? apiRolesData.slice(0, 3) : fallbackUserRolesData.slice(0, 3)).map((role, index) => {
                   // Format dates for API data
                   const createdOn = role.createdAt ? new Date(role.createdAt).toLocaleDateString('en-GB') : role.createdOn || '';
                   const lastUpdated = role.updatedAt ? new Date(role.updatedAt).toLocaleDateString('en-GB') : role.lastUpdated || '';
-                  
+
                   return (
                     <Tr key={index}>
                       <Td fontSize="xs">{role.role}</Td>
@@ -1702,27 +1702,27 @@ const Analytics: React.FC = () => {
                       <Td fontSize="xs">{lastUpdated}</Td>
                       <Td>
                         <HStack spacing={1}>
-                          <Icon 
-                            as={Eye} 
-                            size={14} 
-                            color="blue.500" 
-                            cursor="pointer" 
+                          <Icon
+                            as={Eye}
+                            size={14}
+                            color="blue.500"
+                            cursor="pointer"
                             onClick={() => handleViewRole(role)}
                             _hover={{ color: "blue.600" }}
                           />
-                          <Icon 
-                            as={Edit} 
-                            size={14} 
-                            color="green.500" 
-                            cursor="pointer" 
+                          <Icon
+                            as={Edit}
+                            size={14}
+                            color="green.500"
+                            cursor="pointer"
                             onClick={() => handleEditRole(role)}
                             _hover={{ color: "green.600" }}
                           />
-                          <Icon 
-                            as={Trash2} 
-                            size={14} 
-                            color="red.500" 
-                            cursor="pointer" 
+                          <Icon
+                            as={Trash2}
+                            size={14}
+                            color="red.500"
+                            cursor="pointer"
                             onClick={() => handleDeleteRole(role)}
                             _hover={{ color: "red.600" }}
                           />
@@ -1745,9 +1745,9 @@ const Analytics: React.FC = () => {
           minW="0"
           boxShadow="sm"
         >
-          <Flex 
+          <Flex
             direction={{ base: 'column', sm: 'row' }}
-            justify="space-between" 
+            justify="space-between"
             align={{ base: 'start', sm: 'center' }}
             mb={4}
             gap={{ base: 3, sm: 0 }}
@@ -1839,8 +1839,8 @@ const Analytics: React.FC = () => {
           <VStack spacing={2} mt={4} align="start">
             {accountsData.map((item, index) => (
               <Flex key={index} align="center" gap={2}>
-                  <Box w={3} h={3} borderRadius="full" bg={item.color} />
-                  <Text fontSize="sm" color="gray.600">{item.name}</Text>
+                <Box w={3} h={3} borderRadius="full" bg={item.color} />
+                <Text fontSize="sm" color="gray.600">{item.name}</Text>
               </Flex>
             ))}
           </VStack>
@@ -2143,16 +2143,16 @@ const Analytics: React.FC = () => {
         mb={6}
       >
         {/* Merchant */}
-        <Box 
-          bg="white" 
-          p={{ base: 4, md: 6 }} 
-          borderRadius="lg" 
+        <Box
+          bg="white"
+          p={{ base: 4, md: 6 }}
+          borderRadius="lg"
           flex={{ base: '1', lg: '1' }}
           boxShadow="sm"
         >
-          <Flex 
+          <Flex
             direction={{ base: 'column', sm: 'row' }}
-            justify="space-between" 
+            justify="space-between"
             align={{ base: 'start', sm: 'center' }}
             mb={4}
             gap={{ base: 3, sm: 0 }}
@@ -2233,32 +2233,32 @@ const Analytics: React.FC = () => {
         </Box>
 
         {/* Approval */}
-        <Box 
-          bg="white" 
-          p={{ base: 4, md: 6 }} 
-          borderRadius="lg" 
+        <Box
+          bg="white"
+          p={{ base: 4, md: 6 }}
+          borderRadius="lg"
           flex={{ base: '1', lg: '1' }}
           boxShadow="sm"
         >
-                     <Flex 
-             direction={{ base: 'column', sm: 'row' }}
-             justify="space-between" 
-             align={{ base: 'start', sm: 'center' }}
-             mb={4}
-             gap={{ base: 3, sm: 0 }}
-           >
-             <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold" color="gray.800">Approval</Text>
-             <Text 
-               fontSize="sm" 
-               color="blue.500" 
-               cursor="pointer"
-               onClick={() => navigate('/inventory/approval')}
-               _hover={{ color: 'blue.600' }}
-               transition="color 0.2s"
-             >
-               View all
-             </Text>
-           </Flex>
+          <Flex
+            direction={{ base: 'column', sm: 'row' }}
+            justify="space-between"
+            align={{ base: 'start', sm: 'center' }}
+            mb={4}
+            gap={{ base: 3, sm: 0 }}
+          >
+            <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold" color="gray.800">Approval</Text>
+            <Text
+              fontSize="sm"
+              color="blue.500"
+              cursor="pointer"
+              onClick={() => navigate('/inventory/approval')}
+              _hover={{ color: 'blue.600' }}
+              transition="color 0.2s"
+            >
+              View all
+            </Text>
+          </Flex>
           <Text fontSize="sm" color="gray.600" mb={4}>
             {isLoadingApproval ? 'Loading...' : `${apiApprovalData.length || 0} Approval found`}
           </Text>
@@ -2274,61 +2274,61 @@ const Analytics: React.FC = () => {
                   {/* <Th fontSize="xs">Actions</Th> */}
                 </Tr>
               </Thead>
-                             <Tbody>
-                 {(apiApprovalData.length > 0 ? apiApprovalData : fallbackApprovalData).map((item, index) => {
-                   // Format dates for API data
-                   const createdOn = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : item.createdOn || '';
-                   
-                   // Determine role based on source
-                   const getRole = (source: string) => {
-                     return source === 'inventory' ? 'Inventory' : 'Production';
-                   };
-                   
-                   // Get BOM name and material name based on source
-                   const getBomName = (item: any) => {
-                     if (item.source === 'inventory') {
-                       return item.bom_name || 'N/A';
-                     } else {
-                       return item.bom?.bom_name || 'N/A';
-                     }
-                   };
-                   
-                   const getMaterialName = (item: any) => {
-                     if (item.source === 'inventory') {
-                       return item.name || 'N/A';
-                     } else {
-                       return item.item?.name || 'N/A';
-                     }
-                   };
-                   
-                   // Get status based on source
-                   const getStatus = (item: any) => {
-                     if (item.source === 'inventory') {
-                       return item.bom_status || 'N/A';
-                     } else {
-                       return item.status || 'N/A';
-                     }
-                   };
-                   
-                   return (
-                     <Tr key={index}>
-                       <Td fontSize="xs">{getRole(item.source)}</Td>
-                       <Td fontSize="xs">{getBomName(item)}</Td>
-                       <Td fontSize="xs">{getMaterialName(item)}</Td>
-                       <Td fontSize="xs">
-                         <Badge 
-                           colorScheme={getStatus(item) === 'raw material approval pending' ? 'orange' : getStatus(item) === 'completed' ? 'green' : 'blue'} 
-                           variant="subtle"
-                           fontSize="xs"
-                         >
-                           {getStatus(item) === 'raw material approval pending' ? 'Pending' : 
-                            getStatus(item) === 'completed' ? 'Completed' : 
-                            getStatus(item) === 'production in progress' ? 'In Progress' : 
-                            getStatus(item) === 'Inventory Allocated' ? 'Allocated' : getStatus(item)}
-                         </Badge>
-                       </Td>
-                       <Td fontSize="xs">{createdOn}</Td>
-                         {/* <Td>
+              <Tbody>
+                {(apiApprovalData.length > 0 ? apiApprovalData : fallbackApprovalData).map((item, index) => {
+                  // Format dates for API data
+                  const createdOn = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : item.createdOn || '';
+
+                  // Determine role based on source
+                  const getRole = (source: string) => {
+                    return source === 'inventory' ? 'Inventory' : 'Production';
+                  };
+
+                  // Get BOM name and material name based on source
+                  const getBomName = (item: any) => {
+                    if (item.source === 'inventory') {
+                      return item.bom_name || 'N/A';
+                    } else {
+                      return item.bom?.bom_name || 'N/A';
+                    }
+                  };
+
+                  const getMaterialName = (item: any) => {
+                    if (item.source === 'inventory') {
+                      return item.name || 'N/A';
+                    } else {
+                      return item.item?.name || 'N/A';
+                    }
+                  };
+
+                  // Get status based on source
+                  const getStatus = (item: any) => {
+                    if (item.source === 'inventory') {
+                      return item.bom_status || 'N/A';
+                    } else {
+                      return item.status || 'N/A';
+                    }
+                  };
+
+                  return (
+                    <Tr key={index}>
+                      <Td fontSize="xs">{getRole(item.source)}</Td>
+                      <Td fontSize="xs">{getBomName(item)}</Td>
+                      <Td fontSize="xs">{getMaterialName(item)}</Td>
+                      <Td fontSize="xs">
+                        <Badge
+                          colorScheme={getStatus(item) === 'raw material approval pending' ? 'orange' : getStatus(item) === 'completed' ? 'green' : 'blue'}
+                          variant="subtle"
+                          fontSize="xs"
+                        >
+                          {getStatus(item) === 'raw material approval pending' ? 'Pending' :
+                            getStatus(item) === 'completed' ? 'Completed' :
+                              getStatus(item) === 'production in progress' ? 'In Progress' :
+                                getStatus(item) === 'Inventory Allocated' ? 'Allocated' : getStatus(item)}
+                        </Badge>
+                      </Td>
+                      <Td fontSize="xs">{createdOn}</Td>
+                      {/* <Td>
                          <HStack spacing={1}>
                            <Icon 
                              as={Eye} 
@@ -2356,10 +2356,10 @@ const Analytics: React.FC = () => {
                            />
                          </HStack>
                        </Td> */}
-                     </Tr>
-                   );
-                 })}
-               </Tbody>
+                    </Tr>
+                  );
+                })}
+              </Tbody>
             </Table>
           </Box>
         </Box>
