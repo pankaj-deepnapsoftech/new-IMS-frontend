@@ -72,6 +72,8 @@ const Analytics: React.FC = () => {
     const [financeData, setFinanceData] = useState<any>(null);
   const [isLoadingFinance, setIsLoadingFinance] = useState(false);
   const [accountsYear, setAccountsYear] = useState(new Date().getFullYear());
+  const [statsData, setStatsData] = useState<any>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
   const [cookies] = useCookies();
   const [inventoryPeriod, setInventoryPeriod] = useState('Weekly');
   const [productionPeriod, setProductionPeriod] = useState('Weekly');
@@ -638,6 +640,54 @@ const Analytics: React.FC = () => {
      fetchFinanceData();
    }, [accountsPeriod, accountsYear]);
 
+   // Fetch stats data from API
+   const fetchStatsData = async () => {
+     setIsLoadingStats(true);
+     try {
+       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}dashboard/stats`, {
+         method: 'GET',
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${cookies?.access_token}`
+         }
+       });
+
+       if (response.ok) {
+         const data = await response.json();
+         console.log('Stats API Response:', data); // Debug log
+         if (data.success) {
+           setStatsData(data);
+         } else {
+           toast({
+             title: "Error",
+             description: data.message || "Failed to fetch stats data",
+             status: "error",
+             duration: 3000,
+             isClosable: true,
+           });
+         }
+       } else {
+         console.error('Stats API Error:', response.status, response.statusText);
+       }
+     } catch (error) {
+       console.error('Error fetching stats data:', error);
+       toast({
+         title: "Error",
+         description: "Failed to fetch stats data",
+         status: "error",
+         duration: 3000,
+         isClosable: true,
+       });
+     } finally {
+       setIsLoadingStats(false);
+     }
+   };
+
+   // Fetch stats data on component mount
+   useEffect(() => {
+     fetchStatsData();
+   }, []);
+
   const handleSaveEdit = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}role`, {
@@ -903,8 +953,8 @@ const Analytics: React.FC = () => {
     },
     {
       title: 'Total BOM',
-      value: '3',
-      change: '1',
+      value: isLoadingStats ? '...' : (statsData?.bom?.total?.toString() || '0'),
+      change: isLoadingStats ? '...' : (statsData?.bom?.lastMonth?.toString() || '0'),
       trend: 'up',
       icon: List,
       bgColor: '#EAA250',
@@ -912,8 +962,8 @@ const Analytics: React.FC = () => {
     },
     {
       title: 'Verified Employes',
-      value: '09',
-      change: '0',
+      value: isLoadingStats ? '...' : (statsData?.verified_employees?.total?.toString() || '0'),
+      change: isLoadingStats ? '...' : (statsData?.verified_employees?.lastMonth?.toString() || '0'),
       trend: 'up',
       icon: Users,
       bgColor: '#00D6EE',
@@ -1404,9 +1454,9 @@ const Analytics: React.FC = () => {
         </Box>
       </Flex>
 
-      {/* Additional Sections - 2x2 Grid */}
+      {/* Additional Sections - Side by Side */}
       <Flex 
-        direction={{ base: 'column', lg: 'row' }}
+        direction="row"
         gap={{ base: 4, lg: 6 }} 
         mb={6}
         flexWrap="wrap"
@@ -1416,8 +1466,8 @@ const Analytics: React.FC = () => {
           bg="white" 
           p={{ base: 4, md: 6 }} 
           borderRadius="lg" 
-          flex={{ base: '1', lg: '1' }}
-          minW={{ base: '100%', lg: 'auto' }}
+          flex="1"
+          minW="0"
           boxShadow="sm"
         >
                      <Flex 
@@ -1506,7 +1556,8 @@ const Analytics: React.FC = () => {
           bg="white" 
           p={{ base: 4, md: 6 }} 
           borderRadius="lg" 
-          flex={{ base: '1', lg: '1' }}
+          flex="1"
+          minW="0"
           boxShadow="sm"
         >
           <Flex 
@@ -1555,24 +1606,32 @@ const Analytics: React.FC = () => {
               {isLoadingFinance ? 'Loading...' : `${financeData?.invoices?.total_count || 0} Invoice${financeData?.invoices?.total_count !== 1 ? 's' : ''}`}
             </Text>
           </Box>
-                     <Box height={{ base: '180px', md: '180px' }}>
+          <Box 
+            height={{ base: '180px', md: '180px' }}
+            width="100%"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            flexShrink={0}
+          >
              {isLoadingFinance ? (
                <Flex justify="center" align="center" height="100%">
                  <Text color="gray.500">Loading finance data...</Text>
                </Flex>
              ) : (
-               <ResponsiveContainer width="100%" height="100%">
-                 <PieChart>
-                   <Pie
-                     data={accountsData}
-                     cx="50%"
-                     cy="50%"
-                     innerRadius={45}
-                     outerRadius={65}
-                     startAngle={180}
-                     endAngle={0}
-                     dataKey="value"
-                   >
+               <Box width="300px" height="180px">
+                 <ResponsiveContainer width={300} height={180}>
+                   <PieChart width={300} height={180}>
+                     <Pie
+                       data={accountsData}
+                       cx="50%"
+                       cy="50%"
+                       innerRadius={45}
+                       outerRadius={65}
+                       startAngle={180}
+                       endAngle={0}
+                       dataKey="value"
+                     >
                    {accountsData.map((entry, index) => (
                      <Cell key={`cell-${index}`} fill={entry.color} />
                    ))}
@@ -1587,8 +1646,9 @@ const Analytics: React.FC = () => {
                      return [name, value];
                    }}
                  />
-               </PieChart>
-             </ResponsiveContainer>
+                   </PieChart>
+                 </ResponsiveContainer>
+               </Box>
              )}
           </Box>
           <VStack spacing={2} mt={4} align="start">
@@ -1599,6 +1659,88 @@ const Analytics: React.FC = () => {
               </Flex>
             ))}
           </VStack>
+        </Box>
+      </Flex>
+
+      {/* Stats Section - BOM and Employees */}
+      <Flex 
+        direction="row"
+        gap={{ base: 4, lg: 6 }} 
+        mb={6}
+        flexWrap="wrap"
+      >
+        {/* Total BOM */}
+        <Box 
+          bg="white" 
+          p={{ base: 4, md: 6 }} 
+          borderRadius="lg" 
+          flex="1"
+          minW="0"
+          boxShadow="sm"
+        >
+          <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold" color="gray.800" mb={4}>
+            BOM Statistics
+          </Text>
+          <Box textAlign="center">
+            <Text fontSize="3xl" fontWeight="bold" color="blue.500">
+              {isLoadingStats ? '...' : statsData?.bom?.total || 0}
+            </Text>
+            {/* Debug info */}
+            {process.env.NODE_ENV === 'development' && (
+              <Text fontSize="xs" color="gray.400">
+                Debug: {JSON.stringify(statsData?.bom)}
+              </Text>
+            )}
+            <Text fontSize="sm" color="gray.600" mb={2}>Total BOMs</Text>
+            <Flex justify="space-between" mt={4}>
+              <Box textAlign="center">
+                <Text fontSize="lg" fontWeight="semibold" color="green.500">
+                  {isLoadingStats ? '...' : statsData?.bom?.thisMonth || 0}
+                </Text>
+                <Text fontSize="xs" color="gray.500">This Month</Text>
+              </Box>
+              <Box textAlign="center">
+                <Text fontSize="lg" fontWeight="semibold" color="orange.500">
+                  {isLoadingStats ? '...' : statsData?.bom?.lastMonth || 0}
+                </Text>
+                <Text fontSize="xs" color="gray.500">Last Month</Text>
+              </Box>
+            </Flex>
+          </Box>
+        </Box>
+
+        {/* Verified Employees */}
+        <Box 
+          bg="white" 
+          p={{ base: 4, md: 6 }} 
+          borderRadius="lg" 
+          flex="1"
+          minW="0"
+          boxShadow="sm"
+        >
+          <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold" color="gray.800" mb={4}>
+            Employee Statistics
+          </Text>
+          <Box textAlign="center">
+            <Text fontSize="3xl" fontWeight="bold" color="purple.500">
+              {isLoadingStats ? '...' : statsData?.verified_employees?.total || 0}
+            </Text>
+            <Text fontSize="sm" color="gray.600" mb={2}>Verified Employees</Text>
+            <Flex justify="space-between" mt={4}>
+              <Box textAlign="center">
+                <Text fontSize="lg" fontWeight="semibold" color="green.500">
+                  {isLoadingStats ? '...' : statsData?.verified_employees?.thisMonth || 0}
+                </Text>
+                <Text fontSize="xs" color="gray.500">This Month</Text>
+              </Box>
+              <Box textAlign="center">
+                <Text fontSize="lg" fontWeight="semibold" color="orange.500">
+                  {isLoadingStats ? '...' : statsData?.verified_employees?.lastMonth || 0}
+                </Text>
+                <Text fontSize="xs" color="gray.500">Last Month</Text>
+              </Box>
+            </Flex>
+          </Box>
         </Box>
       </Flex>
 

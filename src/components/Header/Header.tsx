@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 // import logo from "../../assets/images/logo/logo.png";
 import { Avatar } from "@chakra-ui/react";
 import { IoIosNotifications } from "react-icons/io";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ClickMenu from "../../ui/ClickMenu";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
@@ -20,6 +20,61 @@ const Header: React.FC = () => {
     (state: any) => state.auth
   );
 
+  const [greeting, setGreeting] = useState<string>("Good Afternoon");
+  const [date, setDate] = useState<string>(new Date().toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  }));
+
+  // Fetch welcome data from API
+  useEffect(() => {
+    const fetchWelcomeData = async () => {
+      try {
+        // Get the access token from cookies
+        const accessToken = cookie.access_token;
+        
+        if (!accessToken) {
+          console.log('No access token found, using default values');
+          return;
+        }
+
+        const response = await fetch('http://localhost:8085/api/dashboard/welcome', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        
+        console.log('API Response:', data); // Debug log
+        
+        if (data.success) {
+          setGreeting(data.greeting);
+          setDate(data.date);
+          console.log('Updated greeting:', data.greeting, 'date:', data.date); // Debug log
+        } else {
+          console.log('API returned success: false:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching welcome data:', error);
+        // Fallback to default values if API fails
+        setGreeting("Good Afternoon");
+        setDate(new Date().toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        }));
+      }
+    };
+
+    fetchWelcomeData();
+  }, [cookie.access_token]);
+
   const logoutHandler = () => {
     try {
       removeCookie("access_token");
@@ -36,12 +91,12 @@ const Header: React.FC = () => {
       
         <div className=" flex-col justify-center hidden md:flex ml-20 lg:ml-0">
           <h1 className="text-2xl font-semibold text-gray-800">
-            Welcome back,
+            {greeting},
             <span className="ml-1 text-blue-600">
               {firstname ? `${firstname} ${lastname}` : "User"}
             </span>
           </h1>
-          <i className="text-sm text-gray-500">SOPASB2B Dashboard</i>
+          <i className="text-sm text-gray-500"> "{date}"</i>
         </div>
 
        

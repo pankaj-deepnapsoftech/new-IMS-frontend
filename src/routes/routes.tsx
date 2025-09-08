@@ -37,6 +37,7 @@ import Process from "../pages/Process";
 import IndirectProducts from "../pages/IndirectProducts";
 import WIPProducts from "../pages/WIPProducts";
 import InventoryApprovals from "../pages/InventoryApprovals";
+import InventoryDashboard from "../pages/InventoryDashboard";
 import Userprofile from "../pages/Userprofile";
 import Sales from "../pages/Sales";
 import Dispatch from "../pages/Dispatch";
@@ -58,9 +59,9 @@ import {
   Workflow,
   Wrench,
   BarChart3,
+  Activity,
 } from "lucide-react";
 import Dashboard from "../pages/Dashboard";
-import Analytics from "../pages/Analytics";
 import Planning from "../pages/Planning";
 import Designing from "../pages/Designing";
 import Supplier from "../pages/Supplier";
@@ -77,6 +78,7 @@ import PurchaseOrder from "../pages/PurchaseOrder";
 import Precurement from "../pages/Precurement";
 import Resources from "../pages/Resources";
 import ProductionStatus from "../pages/ProductionStatus";
+import MachineStatus from "../pages/MachineStatus";
 
 const routes = [
   {
@@ -87,10 +89,10 @@ const routes = [
     isSublink: false,
   },
   {
-    name: "Analytics",
-    icon: <BarChart3 />,
-    path: "analytics",
-    element: <Analytics />,
+    name: "Machine Status",
+    icon: <Activity />,
+    path: "machine-status",
+    element: <MachineStatus />,
     isSublink: false,
   },
   {
@@ -126,13 +128,19 @@ const routes = [
     name: "Inventory",
     icon: <MdOutlineShoppingCart />,
     path: "inventory",
-    sublink: [
-      {
-        name: "Direct",
-        icon: <SlDirection />,
-        path: "direct",
-        element: <Products />,
-      },
+     sublink: [
+       // {
+       //   name: "Dashboard",
+       //   icon: <MdOutlineSpeed />,
+       //   path: "dashboard",
+       //   element: <InventoryDashboard />,
+       // },
+       {
+         name: "Direct",
+         icon: <SlDirection />,
+         path: "direct",
+         element: <Products />,
+       },
       {
         name: "Indirect",
         icon: <FaHandsHelping />,
@@ -206,7 +214,7 @@ const routes = [
         icon: <VscServerProcess />,
         path: "pre-production",
         element: <Process />,
-      },  
+      },
       {
         name: "Production Status",
         icon: <VscServerProcess />,
@@ -275,3 +283,5 @@ const routes = [
 ];
 
 export default routes;
+
+

@@ -1023,8 +1023,8 @@ const AddBom: React.FC<AddBomProps> = ({
                                     value: selectedOption.type,
                                   },
                                   specification: {
-                                    label: selectedOption.specification,
-                                    value: selectedOption.specification,
+                                    label: selectedOption?.specification,
+                                    value: selectedOption?.specification,
                                   },
                                 };
                                 return updated;
@@ -1046,7 +1046,7 @@ const AddBom: React.FC<AddBomProps> = ({
                         {/* Specification */}
                         <div>
                           <input
-                            value={resource.specification?.value || ""}
+                            value={resource.specification?.value || "" } 
                             placeholder="Resource Specification"
                             disabled
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"

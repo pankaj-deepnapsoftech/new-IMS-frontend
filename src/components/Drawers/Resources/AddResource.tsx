@@ -321,10 +321,11 @@ const AddResource = ({
 
           {/* Specification */}
           <FormControl className="mt-3 mb-5">
-            <FormLabel fontWeight="bold" color="gray.700">
+            <FormLabel fontWeight="bold" color="gray.700" IsRequired>
               Specification
             </FormLabel>
             <Textarea
+            required={true}
               name="specification"
               value={formik.values.specification}
               onChange={formik.handleChange}
