@@ -56,6 +56,7 @@ import {
 } from 'lucide-react';
 import RoleModals from '../components/RoleModals';
 import InventoryDashboard from './InventoryDashboard'; // Import the InventoryDashboard component (adjust path as needed)
+import SalesDashboard from './SalesDashboard';
 
 const Analytics: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
@@ -202,7 +203,7 @@ const Analytics: React.FC = () => {
     setIsLoadingSales(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}dashboard/sales?view=${salesPeriod.toLowerCase()}&year=${salesYear}`,
+        `${process.env.REACT_APP_BACKEND_URL}dashboard/sales?view=${salesPeriod.toLowerCase()}& =${salesYear}`,
         {
           method: 'GET',
           headers: {
@@ -983,10 +984,10 @@ const Analytics: React.FC = () => {
     },
   ] : fallbackInventoryData;
 
-  // Console log for debugging
-  console.log('Inventory Chart Data:', inventoryChartData);
-  console.log('Inventory Data Array:', inventoryData);
-  console.log('Inventory Data Length:', inventoryData.length);
+  // // Console log for debugging
+  // console.log('Inventory Chart Data:', inventoryChartData);
+  // console.log('Inventory Data Array:', inventoryData);
+  // console.log('Inventory Data Length:', inventoryData.length);
 
   // Production Data (fallback data)
   const fallbackProductionData = [
@@ -1014,10 +1015,10 @@ const Analytics: React.FC = () => {
     },
   ] : fallbackProductionData;
 
-  // Console log for debugging
-  console.log('Production Chart Data:', productionChartData);
-  console.log('Production Data Array:', productionData);
-  console.log('Production Data Length:', productionData.length);
+  // // Console log for debugging
+  // console.log('Production Chart Data:', productionChartData);
+  // console.log('Production Data Array:', productionData);
+  // console.log('Production Data Length:', productionData.length);
 
   // Dispatch Data (fallback data)
   const fallbackDispatchData = [
@@ -1149,9 +1150,11 @@ const Analytics: React.FC = () => {
   if (userDetails?.isSuper) {
     // Render Analytics (admin) dashboard
   } else if (userDetails?.role?.role?.toLowerCase() === 'inventory') {
-    // Render InventoryDashboard for inventory role
+    // Render InventoryDashboard for inventory role 
     return <InventoryDashboard />;
-  } else {
+  } else if (userDetails?.role?.role?.toLowerCase() === 'sales'){
+    return <SalesDashboard/> ;
+  }else {
     // Default or other roles - for now, render a message; extend as needed
     return (
       <Box p={8} textAlign="center">
