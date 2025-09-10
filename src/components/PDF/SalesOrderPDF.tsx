@@ -345,9 +345,9 @@ const SalesOrderPDF = ({ sale,userData }: any) => {
           <View style={styles.bankDetailsAboveSignature}>
             <Text style={styles.bankLabel}>Company Bank Details:</Text>
             <Text style={styles.bankDetails}>
-              Bank Name: {userData.Bank_Name}{"\n"}
-              Account No.: {userData.Account_No}{"\n"}
-              IFSC Code: {userData.IFSC_Code}
+              Bank Name: {userData?.Bank_Name}{"\n"}
+              Account No.: {userData?.Account_No}{"\n"}
+              IFSC Code: {userData?.IFSC_Code}
             </Text>
           </View>
           <View style={styles.signatureBox}>
