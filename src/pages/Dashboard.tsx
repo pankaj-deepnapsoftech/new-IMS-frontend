@@ -59,6 +59,8 @@ import InventoryDashboard from './InventoryDashboard'; // Import the InventoryDa
 import ProductionDashboard from './ProductionDashboard';
 import DesignerDashboard from './DesignerDashboard';
 import AccountantDashboard from './AccountantDashboard';
+import SalesDashboard from './SalesDashboard';
+import DispatchDashboard from './DispatchDashboard';
         
 const Analytics: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
@@ -1182,14 +1184,22 @@ const Analytics: React.FC = () => {
   } else if (userDetails?.role?.role?.toLowerCase() === 'designer') {
     // Render DesignerDashboard for designer role
     return <DesignerDashboard />;
-  } else if (userDetails?.role?.role?.toLowerCase() === 'accountant') {
+  } else if (userDetails?.role?.role?.toLowerCase() === "accountant") {
     // Render AccountantDashboard for accountant role
     return <AccountantDashboard />;
+  } else if (userDetails?.role?.role?.toLowerCase() === "sales") {
+    // Render AccountantDashboard for accountant role
+    return <SalesDashboard />;
+  } else if (userDetails?.role?.role?.toLowerCase() === "Dispatcher") {
+    // Render AccountantDashboard for accountant role
+    return <DispatchDashboard />;
   } else {
     // Default or other roles - for now, render a message; extend as needed
     return (
       <Box p={8} textAlign="center">
-        <Text fontSize="lg" color="gray.600">No dashboard available for your role. Contact admin.</Text>
+        <Text fontSize="lg" color="gray.600">
+          No dashboard available for your role. Contact admin.
+        </Text>
       </Box>
     );
   }
