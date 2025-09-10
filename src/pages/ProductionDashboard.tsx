@@ -1382,6 +1382,7 @@ const ProductionDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      
       <div className="px-6 py-6">
         {/* Loading State */}
         {loading && (
@@ -1407,6 +1408,14 @@ const ProductionDashboard: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">Production Dashboard</h1>
+            <p className="text-gray-600 mt-1">Monitor your production processes and manufacturing progress</p>
+          </div>
+        </div>
 
         {/* Top metric cards */}
         {!loading && !error && (

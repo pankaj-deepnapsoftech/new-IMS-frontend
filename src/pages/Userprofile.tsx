@@ -120,7 +120,7 @@ const UserProfile: React.FC = () => {
       setLastName(user.last_name || "");
       setcompanyName(user.cpny_name || "");
       setGSTIN(user.GSTIN || "");
-      setBankName(user?.Bank_Name || "");
+      setBankName(user.Bank_Name || "");
       setAccountNo(user.Account_No || "");
       setIFSCCode(user.IFSC_Code || "");
 

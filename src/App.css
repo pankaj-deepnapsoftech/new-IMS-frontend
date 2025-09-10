@@ -38,7 +38,7 @@
 }
 
 ::-webkit-scrollbar {
-  width: 8 px;
+  width: 8    px;
 }
 
 ::-webkit-scrollbar-track {
@@ -47,119 +47,11 @@
 
 ::-webkit-scrollbar-thumb {
   /* border: 3px solid #e5e7eb;  */
-  background-color: #e5e7eb;
+  background-color: #e5e7eb; 
   border-radius: 6px;
   /* border: 3px solid #e5e7eb;  */
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: #d7d8db;
-}
-
-/* Global ugly design - remove border-radius from everything except toastify */
-*:not([class*="Toastify"]):not([id*="toast"]):not(.Toastify__toast):not(
-    .Toastify__toast-container
-  ):not(.Toastify__close-button):not(.Toastify__progress-bar) {
-  border-radius: 0 !important;
-}
-
-/* Additional brutalist styling */
-button:not([class*="Toastify"]):not([id*="toast"]),
-.chakra-button:not([class*="Toastify"]):not([id*="toast"]),
-input:not([class*="Toastify"]):not([id*="toast"]),
-select:not([class*="Toastify"]):not([id*="toast"]),
-textarea:not([class*="Toastify"]):not([id*="toast"]),
-.chakra-input:not([class*="Toastify"]):not([id*="toast"]),
-.chakra-select:not([class*="Toastify"]):not([id*="toast"]),
-.css-*:not([class*="Toastify"]):not([id*="toast"]) {
-  border-radius: 0 !important;
-}
-
-/* Remove border-radius from common UI elements */
-div:not([class*="Toastify"]):not([id*="toast"]),
-span:not([class*="Toastify"]):not([id*="toast"]),
-section:not([class*="Toastify"]):not([id*="toast"]),
-article:not([class*="Toastify"]):not([id*="toast"]),
-header:not([class*="Toastify"]):not([id*="toast"]),
-footer:not([class*="Toastify"]):not([id*="toast"]),
-nav:not([class*="Toastify"]):not([id*="toast"]),
-aside:not([class*="Toastify"]):not([id*="toast"]) {
-  border-radius: 0 !important;
-}
-
-/* Remove border-radius from Chakra UI components */
-[class*="chakra-"]:not([class*="Toastify"]):not([id*="toast"]) {
-  border-radius: 0 !important;
-}
-
-/* Remove border-radius from commonly rounded elements */
-.rounded:not([class*="Toastify"]):not([id*="toast"]),
-.rounded-sm:not([class*="Toastify"]):not([id*="toast"]),
-.rounded-md:not([class*="Toastify"]):not([id*="toast"]),
-.rounded-lg:not([class*="Toastify"]):not([id*="toast"]),
-.rounded-xl:not([class*="Toastify"]):not([id*="toast"]),
-.rounded-2xl:not([class*="Toastify"]):not([id*="toast"]),
-.rounded-3xl:not([class*="Toastify"]):not([id*="toast"]),
-.rounded-full:not([class*="Toastify"]):not([id*="toast"]) {
-  border-radius: 0 !important;
-}
-
-/* Global shadow removal - remove all shadows except toastify */
-*:not([class*="Toastify"]):not([id*="toast"]):not(.Toastify__toast):not(
-    .Toastify__toast-container
-  ):not(.Toastify__close-button):not(.Toastify__progress-bar) {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
-  text-shadow: none !important;
-  filter: none !important;
-}
-
-/* Remove shadows from common UI elements */
-button:not([class*="Toastify"]):not([id*="toast"]),
-.chakra-button:not([class*="Toastify"]):not([id*="toast"]),
-input:not([class*="Toastify"]):not([id*="toast"]),
-select:not([class*="Toastify"]):not([id*="toast"]),
-textarea:not([class*="Toastify"]):not([id*="toast"]),
-.chakra-input:not([class*="Toastify"]):not([id*="toast"]),
-.chakra-select:not([class*="Toastify"]):not([id*="toast"]),
-div:not([class*="Toastify"]):not([id*="toast"]),
-span:not([class*="Toastify"]):not([id*="toast"]),
-section:not([class*="Toastify"]):not([id*="toast"]),
-article:not([class*="Toastify"]):not([id*="toast"]),
-header:not([class*="Toastify"]):not([id*="toast"]),
-footer:not([class*="Toastify"]):not([id*="toast"]),
-nav:not([class*="Toastify"]):not([id*="toast"]),
-aside:not([class*="Toastify"]):not([id*="toast"]) {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
-  text-shadow: none !important;
-}
-
-/* Remove shadows from Chakra UI components */
-[class*="chakra-"]:not([class*="Toastify"]):not([id*="toast"]) {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
-}
-
-/* Remove shadows from Tailwind shadow classes */
-.shadow:not([class*="Toastify"]):not([id*="toast"]),
-.shadow-sm:not([class*="Toastify"]):not([id*="toast"]),
-.shadow-md:not([class*="Toastify"]):not([id*="toast"]),
-.shadow-lg:not([class*="Toastify"]):not([id*="toast"]),
-.shadow-xl:not([class*="Toastify"]):not([id*="toast"]),
-.shadow-2xl:not([class*="Toastify"]):not([id*="toast"]),
-.shadow-inner:not([class*="Toastify"]):not([id*="toast"]),
-.drop-shadow:not([class*="Toastify"]):not([id*="toast"]),
-.drop-shadow-sm:not([class*="Toastify"]):not([id*="toast"]),
-.drop-shadow-md:not([class*="Toastify"]):not([id*="toast"]),
-.drop-shadow-lg:not([class*="Toastify"]):not([id*="toast"]),
-.drop-shadow-xl:not([class*="Toastify"]):not([id*="toast"]),
-.drop-shadow-2xl:not([class*="Toastify"]):not([id*="toast"]) {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
-  filter: none !important;
 }
