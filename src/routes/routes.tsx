@@ -245,6 +245,12 @@ const routes = [
       //   path: "dashboard",
       //   element: <AccountantDashboard />,
       // },
+      // {
+      //   name: "Dashboard",
+      //   icon: <MdOutlineSpeed />,
+      //   path: "dashboard",
+      //   element: <AccountantDashboard />,
+      // },
       {
         name: "Proforma Invoices",
         icon: <IoDocumentTextOutline />,
