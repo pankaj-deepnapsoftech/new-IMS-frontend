@@ -138,7 +138,7 @@ const UserRoleTable: React.FC<UserRoleTableProps> = ({
         <>
           {/* Table Header with Stats and Controls */}
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-6">
+            <div className="flex it ems-center gap-6">
               <div>
                 <h3
                   className="text-lg font-semibold"

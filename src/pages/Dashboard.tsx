@@ -57,6 +57,7 @@ import {
 import RoleModals from '../components/RoleModals';
 import InventoryDashboard from './InventoryDashboard'; // Import the InventoryDashboard component (adjust path as needed)
 import SalesDashboard from './SalesDashboard';
+import DispatchDashboard from "./DispatchDashboard";
 
 const Analytics: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("monthly");
@@ -1282,7 +1283,9 @@ const Analytics: React.FC = () => {
     return <InventoryDashboard />;
   } else if (userDetails?.role?.role?.toLowerCase() === 'sales'){
     return <SalesDashboard/> ;
-  }else {
+  } else if (userDetails?.role?.role?.toLowerCase() === "dispatcher") {
+    return <DispatchDashboard />;
+  } else {
     // Default or other roles - for now, render a message; extend as needed
     return (
       <Box p={8} textAlign="center">
