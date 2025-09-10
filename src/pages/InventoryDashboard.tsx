@@ -385,6 +385,14 @@ const InventoryDashboard: React.FC = () => {
           </div>
         )}
 
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">Inventory Dashboard</h1>
+            <p className="text-gray-600 mt-1">Monitor your inventory levels and stock management</p>
+          </div>
+        </div>
+
         {/* Dashboard/Inventory Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {loading ? (

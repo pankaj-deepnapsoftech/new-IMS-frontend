@@ -56,7 +56,10 @@ import {
 } from 'lucide-react';
 import RoleModals from '../components/RoleModals';
 import InventoryDashboard from './InventoryDashboard'; // Import the InventoryDashboard component (adjust path as needed)
-
+import ProductionDashboard from './ProductionDashboard';
+import DesignerDashboard from './DesignerDashboard';
+import AccountantDashboard from './AccountantDashboard';
+        
 const Analytics: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
   const [salesPeriod, setSalesPeriod] = useState('Yearly');
@@ -103,7 +106,7 @@ const Analytics: React.FC = () => {
   const [machineStatusData, setMachineStatusData] = useState<any[]>([]);
   const [isLoadingMachineStatus, setIsLoadingMachineStatus] = useState(false);
   
-  // Selected role state
+      // Selected role state
   const [selectedRole, setSelectedRole] = useState<any>(null);
   const [editForm, setEditForm] = useState({
     role: '',
@@ -250,8 +253,10 @@ const Analytics: React.FC = () => {
 
   // Fetch sales data when period or year changes
   useEffect(() => {
-    fetchSalesData();
-  }, [salesPeriod, salesYear]);
+    if (userDetails?.isSuper) {
+      fetchSalesData();
+    }
+  }, [salesPeriod, salesYear, userDetails?.isSuper]);
 
   // Fetch dispatch data from API
   const fetchDispatchData = async () => {
@@ -313,9 +318,11 @@ const Analytics: React.FC = () => {
 
   // Fetch dispatch data when period changes
   useEffect(() => {
-    console.log('Dispatch period changed to:', dispatchPeriod); // Debug log
-    fetchDispatchData();
-  }, [dispatchPeriod]);
+    if (userDetails?.isSuper) {
+      console.log('Dispatch period changed to:', dispatchPeriod); // Debug log
+      fetchDispatchData();
+    }
+  }, [dispatchPeriod, userDetails?.isSuper]);
 
   // Fetch inventory chart data from API
   const fetchInventoryData = async () => {
@@ -454,16 +461,22 @@ const Analytics: React.FC = () => {
 
   // Fetch data when periods change
   useEffect(() => {
-    fetchInventoryData();
-  }, [inventoryPeriod]);
+    if (userDetails?.isSuper) {
+      fetchInventoryData();
+    }
+  }, [inventoryPeriod, userDetails?.isSuper]);
 
   useEffect(() => {
-    fetchProductionData();
-  }, [productionPeriod]);
+    if (userDetails?.isSuper) {
+      fetchProductionData();
+    }
+  }, [productionPeriod, userDetails?.isSuper]);
 
   useEffect(() => {
-    fetchMerchantData();
-  }, [merchantPeriod]);
+    if (userDetails?.isSuper) {
+      fetchMerchantData();
+    }
+  }, [merchantPeriod, userDetails?.isSuper]);
 
   // Fetch resources data from API
   const fetchResourcesData = async () => {
@@ -512,8 +525,10 @@ const Analytics: React.FC = () => {
 
   // Fetch resources data on component mount
   useEffect(() => {
-    fetchResourcesData();
-  }, []);
+    if (userDetails?.isSuper) {
+      fetchResourcesData();
+    }
+  }, [userDetails?.isSuper]);
 
   // Fetch roles data from API
   const fetchRolesData = async () => {
@@ -562,8 +577,10 @@ const Analytics: React.FC = () => {
 
   // Fetch roles data on component mount
   useEffect(() => {
-    fetchRolesData();
-  }, []);
+    if (userDetails?.isSuper) {
+      fetchRolesData();
+    }
+  }, [userDetails?.isSuper]);
 
   // Fetch approval data from API
   const fetchApprovalData = async () => {
@@ -646,8 +663,10 @@ const Analytics: React.FC = () => {
 
   // Fetch approval data on component mount
   useEffect(() => {
-    fetchApprovalData();
-  }, []);
+    if (userDetails?.isSuper) {
+      fetchApprovalData();
+    }
+  }, [userDetails?.isSuper]);
 
   // Fetch finance data from API
   const fetchFinanceData = async () => {
@@ -703,8 +722,10 @@ const Analytics: React.FC = () => {
 
   // Fetch finance data when period or year changes
   useEffect(() => {
-    fetchFinanceData();
-  }, [accountsPeriod, accountsYear]);
+    if (userDetails?.isSuper) {
+      fetchFinanceData();
+    }
+  }, [accountsPeriod, accountsYear, userDetails?.isSuper]);
 
    // Fetch stats data from API
    const fetchStatsData = async () => {
@@ -751,8 +772,10 @@ const Analytics: React.FC = () => {
 
    // Fetch stats data on component mount
    useEffect(() => {
-     fetchStatsData();
-   }, []);
+     if (userDetails?.isSuper) {
+       fetchStatsData();
+     }
+   }, [userDetails?.isSuper]);
 
    // Fetch sales-delivered data from API
    const fetchSalesDeliveredData = async () => {
@@ -799,8 +822,10 @@ const Analytics: React.FC = () => {
 
    // Fetch sales-delivered data on component mount
    useEffect(() => {
-     fetchSalesDeliveredData();
-   }, []);
+     if (userDetails?.isSuper) {
+       fetchSalesDeliveredData();
+     }
+   }, [userDetails?.isSuper]);
 
   const handleSaveEdit = async () => {
     try {
@@ -1147,10 +1172,19 @@ const Analytics: React.FC = () => {
   }
 
   if (userDetails?.isSuper) {
-    // Render Analytics (admin) dashboard
+    // Render Analytics (admin) dashboard (falls through to render below)
   } else if (userDetails?.role?.role?.toLowerCase() === 'inventory') {
     // Render InventoryDashboard for inventory role
     return <InventoryDashboard />;
+  } else if (userDetails?.role?.role?.toLowerCase() === 'production') {
+    // Render ProductionDashboard for production role
+    return <ProductionDashboard />;
+  } else if (userDetails?.role?.role?.toLowerCase() === 'designer') {
+    // Render DesignerDashboard for designer role
+    return <DesignerDashboard />;
+  } else if (userDetails?.role?.role?.toLowerCase() === 'accountant') {
+    // Render AccountantDashboard for accountant role
+    return <AccountantDashboard />;
   } else {
     // Default or other roles - for now, render a message; extend as needed
     return (

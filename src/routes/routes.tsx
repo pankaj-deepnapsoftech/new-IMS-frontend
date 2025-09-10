@@ -33,6 +33,7 @@ import Employees from "../pages/Emloyees";
 import ProformaInvoice from "../pages/ProformaInvoice";
 import Invoice from "../pages/Invoice";
 import Payment from "../pages/Payment";
+// import AccountantDashboard from "../pages/AccountantDashboard";
 import Process from "../pages/Process";
 import IndirectProducts from "../pages/IndirectProducts";
 import WIPProducts from "../pages/WIPProducts";
@@ -78,7 +79,9 @@ import PurchaseOrder from "../pages/PurchaseOrder";
 import Precurement from "../pages/Precurement";
 import Resources from "../pages/Resources";
 import ProductionStatus from "../pages/ProductionStatus";
+// import ProductionDashboard from "../pages/ProductionDashboard";
 import MachineStatus from "../pages/MachineStatus";
+// import DesignerDashboard from "../pages/DesignerDashboard";
 
 const routes = [
   {
@@ -236,6 +239,12 @@ const routes = [
     path: "accounts",
     icon: <BiPurchaseTagAlt />,
     sublink: [
+      // {
+      //   name: "Dashboard",
+      //   icon: <MdOutlineSpeed />,
+      //   path: "dashboard",
+      //   element: <AccountantDashboard />,
+      // },
       {
         name: "Proforma Invoices",
         icon: <IoDocumentTextOutline />,
@@ -266,6 +275,13 @@ const routes = [
     element: <Task />,
     isSublink: false,
   },
+  // {
+  //   name: "Designer Dashboard",
+  //   icon: <MdOutlineSpeed />,
+  //   path: "designer-dashboard",
+  //   element: <DesignerDashboard />,
+  //   isSublink: false,
+  // },
   {
     name: "Admin Approval",
     icon: <FaRegCheckCircle />,
