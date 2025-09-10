@@ -105,6 +105,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
     useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [processProgress, setProcessProgress] = useState<{ done: string; }[]>([]);
+  const [showMarkAsDone, setShowMarkAsDone] = useState(false);
 
 
   const [scrapMaterials, setScrapMaterials] = useState<any[]>([
@@ -121,6 +122,32 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
   ]);
 
   const [updateProcess] = useUpdateProcessMutation();
+
+
+    // ... all your useState hooks etc.
+
+    const computeMarkAsDone = (data: any) => {
+      // 1. Finished goods check
+      const fgEstimated = Number(data?.production_process?.finished_good?.estimated_quantity ?? 0);
+      const fgProduced = Number(data?.production_process?.finished_good?.produced_quantity ?? 0);
+      const fgOk = fgEstimated === fgProduced;
+
+      // 2. Raw materials check
+      const rawOk = (data?.production_process?.raw_materials || []).every((rm: any) => {
+        const est = Number(rm?.estimated_quantity) || 0;
+        const used = Number(rm?.used_quantity) || 0;
+        return est === used;  
+      });
+
+      // 3. All processes done
+      const allProcessesDone = (data?.production_process?.processes || []).every(
+        (p: any) => p?.done === true
+      );
+
+     
+      return fgOk && rawOk && allProcessesDone;
+    };
+
 
   const onFinishedGoodChangeHandler = (d: any) => {
     setFinishedGood(d);
@@ -193,8 +220,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
 
       return {
         ...m,
-        used_quantity: usedInItemUom, 
-        uom_used_quantity: itemUom,   
+        used_quantity: usedInItemUom,
+        uom_used_quantity: itemUom,
         remaining_quantity: est - usedInItemUom,
       };
 
@@ -276,19 +303,21 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
         throw new Error(response.message);
       }
       toast.success(response.message);
-
-
+   
+     
       setSelectedProducts(updatedProducts);
       setFinishedGoodRemainingQty(updatedFinishedGoodRemaining);
 
       closeDrawerHandler();
       fetchProcessHandler();
+      setShowMarkAsDone(computeMarkAsDone(data));
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
       setIsUpdating(false);
     }
   };
+
 
   // ===== UOM conversion helpers =====
   const UNIT_FACTORS: Record<string, Record<string, number>> = {
@@ -601,9 +630,12 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       ) {
         setRawMaterialApprovalPending(true);
       }
+      // Correct finished good comparison
+      setShowMarkAsDone(computeMarkAsDone(data));
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
     } finally {
+
       setIsLoading(false);
     }
   };
@@ -702,6 +734,8 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
       color: "#374151",
     }),
   };
+
+
 
   // console.log(processStatuses);
   return (
@@ -1398,7 +1432,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                     >
                       {isUpdating ? "Updating..." : submitBtnText}
                     </button>
-                    {submitBtnText === "Update" && (
+                    {submitBtnText === "Update" && showMarkAsDone && (
                       <button
                         disabled={isCompleted || rawMaterialApprovalPending}
                         type="button"
@@ -1408,6 +1442,7 @@ const UpdateProcess: React.FC<UpdateProcess> = ({
                         {isUpdating ? "Processing..." : "Mark as Done"}
                       </button>
                     )}
+
                   </div>
                 </div>
               </div>

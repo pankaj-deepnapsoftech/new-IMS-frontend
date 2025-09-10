@@ -57,7 +57,8 @@ const Process: React.FC = () => {
         status !== "moved to inventory" &&
         status !== "allocated finish goods" &&
         status !== "out finish goods" &&
-        status !== "received"	
+        status !== "received"	&&
+        status !== "production paused" 
     });
 
 

@@ -59,6 +59,7 @@ const ProductionStatus: React.FC = () => {
             "received",
             "dispatched",
             "out finish goods",
+            "production paused"
           ].includes(process.status.toLowerCase())
       );
 
@@ -209,7 +210,7 @@ const ProductionStatus: React.FC = () => {
                   className="text-sm mt-1"
                   style={{ color: colors.text.secondary }}
                 >
-                  Manages the production processes
+                  Manages the production processes  
                 </p>
               </div>
             </div>

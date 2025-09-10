@@ -282,6 +282,10 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
       backgroundColor: "#e1f5fe",
       color: "#144539",
     },
+     "production paused": {
+       backgroundColor: "#ff00003b",
+       color: "#ff000094",
+    },
   };
 
   const {
@@ -906,7 +910,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
                                 backgroundColor: colors.error[50],
                               }}
                             >
-                              Pause
+                              Pause  
                             </button>
 }
                             {deleteProcessHandler && (
