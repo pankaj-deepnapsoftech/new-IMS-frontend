@@ -78,7 +78,9 @@ import PurchaseOrder from "../pages/PurchaseOrder";
 import Precurement from "../pages/Precurement";
 import Resources from "../pages/Resources";
 import ProductionStatus from "../pages/ProductionStatus";
+// import ProductionDashboard from "../pages/ProductionDashboard";
 import MachineStatus from "../pages/MachineStatus";
+// import DesignerDashboard from "../pages/DesignerDashboard";
 
 const routes = [
   {
@@ -266,6 +268,13 @@ const routes = [
     element: <Task />,
     isSublink: false,
   },
+  // {
+  //   name: "Designer Dashboard",
+  //   icon: <MdOutlineSpeed />,
+  //   path: "designer-dashboard",
+  //   element: <DesignerDashboard />,
+  //   isSublink: false,
+  // },
   {
     name: "Admin Approval",
     icon: <FaRegCheckCircle />,
