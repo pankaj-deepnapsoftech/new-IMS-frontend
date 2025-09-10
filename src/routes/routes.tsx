@@ -33,6 +33,7 @@ import Employees from "../pages/Emloyees";
 import ProformaInvoice from "../pages/ProformaInvoice";
 import Invoice from "../pages/Invoice";
 import Payment from "../pages/Payment";
+import AccountantDashboard from "../pages/AccountantDashboard";
 import Process from "../pages/Process";
 import IndirectProducts from "../pages/IndirectProducts";
 import WIPProducts from "../pages/WIPProducts";
@@ -238,6 +239,12 @@ const routes = [
     path: "accounts",
     icon: <BiPurchaseTagAlt />,
     sublink: [
+      {
+        name: "Dashboard",
+        icon: <MdOutlineSpeed />,
+        path: "dashboard",
+        element: <AccountantDashboard />,
+      },
       {
         name: "Proforma Invoices",
         icon: <IoDocumentTextOutline />,

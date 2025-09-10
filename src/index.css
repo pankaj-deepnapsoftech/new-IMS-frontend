@@ -114,14 +114,15 @@ input[type="number"] {
   animation: fadeIn 0.6s ease-out forwards;
 }
 
-/* Card hover animations - brutalist version without shadows */
+/* Card hover animations */
 .card-hover-effect {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-hover-effect:hover {
   transform: translateY(-4px);
-  box-shadow: none !important;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 /* Smooth transitions for interactive elements */

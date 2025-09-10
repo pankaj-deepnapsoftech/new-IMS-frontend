@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Eye, Edit, Trash2, FileText, Clock, CheckCircle, Users } from 'lucide-react';
+import { Trash2, FileText, Clock, CheckCircle, Users } from 'lucide-react';
 
 interface DesignerDashboardData {
   message: string;
@@ -339,18 +339,8 @@ const DesignerDashboard: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Dashboard/Designer</h1>
+            <h1 className="text-3xl font-bold text-gray-800">Designer Dashboard</h1>
             <p className="text-gray-600 mt-1">Monitor your design tasks and progress</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Aug 21 - Sep 21</span>
-              <select className="px-3 py-1 border border-gray-300 rounded-md text-sm">
-                <option>Monthly</option>
-                <option>Weekly</option>
-                <option>Daily</option>
-              </select>
-            </div>
           </div>
         </div>
 

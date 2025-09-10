@@ -631,30 +631,6 @@ const paymentApi = createApi({
   }),
 });
 
-const dispatchApi = createApi({
-  reducerPath: "dispatchApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_BACKEND_URL + "dispatch",
-    mode: "cors",
-    prepareHeaders: (headers) => {
-      const cookies = parseCookies();
-      const token = cookies?.access_token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
-  tagTypes: ["Dispatch"],
-
-  endpoints: (builder) => ({
-    fetchDispatchStats: builder.query({
-      query: () => "/dispatch-stats",
-      providesTags: ["Dispatch"],
-    }),
-  }),
-});
-
 // export default api;
 export {
   api,
@@ -668,7 +644,6 @@ export {
   invoiceApi,
   processApi,
   paymentApi,
-  dispatchApi,
 };
 
 // Authentication APIs
@@ -779,6 +754,3 @@ export const {
   useCreatePaymentMutation,
   useUpdatePaymentMutation,
 } = paymentApi;
-
-// Dispatch APIs
-export const { useLazyFetchDispatchStatsQuery } = dispatchApi;
