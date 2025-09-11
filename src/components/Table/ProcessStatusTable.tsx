@@ -105,7 +105,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
           body: JSON.stringify({ _id: id }),
         }
       );
-
+  
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
 
