@@ -1190,7 +1190,7 @@ const Analytics: React.FC = () => {
   } else if (userDetails?.role?.role?.toLowerCase() === "sales") {
     // Render AccountantDashboard for accountant role
     return <SalesDashboard />;
-  } else if (userDetails?.role?.role?.toLowerCase() === "Dispatcher") {
+  } else if (userDetails?.role?.role?.toLowerCase() === "dispatcher") {
     // Render AccountantDashboard for accountant role
     return <DispatchDashboard />;
   } else {
