@@ -1,5 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit";
-import {agentApi, api, bomApi, employeeApi, invoiceApi, paymentApi, processApi, productApi, proformaInvoiceApi, storeApi, userRoleApi} from "./api/api";
+import {
+  agentApi,
+  api,
+  bomApi,
+  dispatchApi,
+  employeeApi,
+  invoiceApi,
+  paymentApi,
+  processApi,
+  productApi,
+  proformaInvoiceApi,
+  storeApi,
+  userRoleApi,
+} from "./api/api";
 import authSlice from "./reducers/authSlice";
 import drawersSlice from "./reducers/drawersSlice";
 
@@ -18,6 +31,7 @@ const store = configureStore({
     [proformaInvoiceApi.reducerPath]: proformaInvoiceApi.reducer,
     [invoiceApi.reducerPath]: invoiceApi.reducer,
     [paymentApi.reducerPath]: paymentApi.reducer,
+    [dispatchApi.reducerPath]: dispatchApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
@@ -32,6 +46,7 @@ const store = configureStore({
       invoiceApi.middleware,
       processApi.middleware,
       paymentApi.middleware,
+      dispatchApi.middleware,
     ]),
 });
 
