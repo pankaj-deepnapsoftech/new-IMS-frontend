@@ -90,7 +90,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   const [cookies] = useCookies();
-  
+
   const UpdatedStatus = async (id) => {
     try {
       const res = await fetch(
@@ -399,9 +399,6 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
       if (data.success) {
         toast.success("Moved to inventory successfully");
         setCloseModal(true); 
-        if (fetchProcessHandler) {
-          fetchProcessHandler();
-        }
       } else {
         toast.error("Failed to move to inventory");
       }
@@ -1522,7 +1519,7 @@ const ProcessStatusTable: React.FC<ProcessTableProps> = ({
             {/* Action Buttons */}
             <div className="flex justify-end gap-4">
               <button
-                onClick={() => moveToInventory(selectedProcess?._id) }
+                onClick={() => {moveToInventory(selectedProcess?._id); }}
                 className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-md transition"
               >
                 Move to Inventory

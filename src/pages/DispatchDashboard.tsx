@@ -4,6 +4,7 @@ import { Box, Icon } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import { TbTruckDelivery, TbPackage, TbClock, TbCheck } from "react-icons/tb";
+import { useLazyFetchDispatchStatsQuery } from "../redux/api/api";
 import { toast } from "react-toastify";
 import { colors } from "../theme/colors";
 import { useCookies } from "react-cookie";
@@ -25,7 +26,10 @@ const DispatchDashboard = () => {
   const [fetchDispatchStats, { isLoading }] = useLazyFetchDispatchStatsQuery();
   const [cookies] = useCookies();
 
-
+  useEffect(() => {
+    fetchStats();
+    fetchDispatchData();
+  }, []);
 
   const fetchStats = async () => {
     try {
@@ -253,11 +257,7 @@ const DispatchDashboard = () => {
       iconColor: "white",
     },
   ];
-  useEffect(() => {
-    fetchStats();
-    fetchDispatchData();
-  }, []);
-  
+
   if (isLoading) {
     return (
       <div className="p-6 space-y-6">
