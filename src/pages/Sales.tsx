@@ -40,10 +40,8 @@ const fetchPurchases = async (currentPage = page) => {
     setIsLoading(true);
     if (!token) throw new Error("Authentication token not found");
 
-    const url =
-      role === "admin"
-        ? `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=${currentPage}&&limit=10`
-        : `${process.env.REACT_APP_BACKEND_URL}sale/getOne?page=${currentPage}&&limit=10`;
+    const url = `${process.env.REACT_APP_BACKEND_URL}sale/getAll?page=${currentPage}&&limit=10`
+        
 
     const response = await axios.get(url, {
       headers: { Authorization: `Bearer ${token}` },
