@@ -1190,8 +1190,7 @@ const Analytics: React.FC = () => {
   } else if (userDetails?.role?.role?.toLowerCase() === "sales") {
     // Render AccountantDashboard for accountant role
     return <SalesDashboard />;
-  } else if (userDetails?.role?.role?.toLowerCase() === "Dispatcher") {
-    // Render AccountantDashboard for accountant role
+  } else if (userDetails?.role?.role?.toLowerCase() === "dispatcher") {
     return <DispatchDashboard />;
   } else {
     // Default or other roles - for now, render a message; extend as needed
